@@ -14,7 +14,6 @@ type VoteViewProps = {
 }
 
 const Vote = ({data, plainText}: VoteViewProps) => {
-  console.log('received plaintext value:', plainText)
   const { metadata } : { metadata: IElectionMetadata} = (data as any)
 
   return (

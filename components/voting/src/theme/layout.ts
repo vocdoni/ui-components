@@ -18,22 +18,3 @@ export const HorizontalRuler = defineStyleConfig({
     marginBottom: '1.5em',
   },
 })
-
-export const Text = defineStyleConfig({
-  variants: {
-    'question-description': {
-      marginBottom: 4,
-    },
-  },
-})
-
-export const VariantBox = defineStyleConfig({
-  variants: {
-    question: {
-      marginBottom: '2em',
-    },
-    questions: {
-      // nothing for now
-    },
-  },
-})

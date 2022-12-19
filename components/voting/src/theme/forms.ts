@@ -1,14 +1,4 @@
-import { createMultiStyleConfigHelpers, defineStyleConfig } from '@chakra-ui/react'
-
-export const FormLabel = defineStyleConfig({
-  variants: {
-    'question-title': {
-      fontWeight: 'bold',
-      fontSize: 'xl',
-      marginBottom: 1,
-    },
-  },
-})
+import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
 
 const radio = createMultiStyleConfigHelpers(['container', 'control', 'label'])
 export const Radio = radio.defineMultiStyleConfig({

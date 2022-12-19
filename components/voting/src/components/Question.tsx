@@ -1,7 +1,7 @@
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/form-control'
+import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
-import { chakra } from '@chakra-ui/system'
+import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Field, FormikErrors, FormikTouched } from 'formik'
 import Markdown from './layout/Markdown'
@@ -15,15 +15,22 @@ interface QuestionProps {
 }
 
 const BaseQuestion = ({question, error, touched, plainText}: QuestionProps) => {
+  const styles = useMultiStyleConfig('Questions')
+
   return (
-    <VariantBox variant='question'>
+    <VariantBox __css={styles.question}>
       <FormControl isInvalid={!!error && !!touched}>
-        <FormLabel variant='question-title'>
+        <chakra.label __css={styles.title}>
           {question.title.default}
-        </FormLabel>
-        <Markdown plainText={plainText}>
-          {question.description?.default}
-        </Markdown>
+        </chakra.label>
+        {
+          question.description &&
+          <chakra.div __css={styles.description}>
+            <Markdown plainText={plainText}>
+              {question.description.default}
+            </Markdown>
+          </chakra.div>
+        }
         <RadioGroup name={question.title.default}>
           <Stack direction='column'>
             {
@@ -38,7 +45,7 @@ const BaseQuestion = ({question, error, touched, plainText}: QuestionProps) => {
               ))
             }
           </Stack>
-          <FormErrorMessage>{error?.toString()}</FormErrorMessage>
+          <FormErrorMessage variant='voting'>{error?.toString()}</FormErrorMessage>
         </RadioGroup>
       </FormControl>
     </VariantBox>

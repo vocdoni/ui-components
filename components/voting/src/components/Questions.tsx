@@ -1,6 +1,6 @@
 import { Alert, AlertIcon } from '@chakra-ui/alert'
 import { Button } from '@chakra-ui/button'
-import { chakra } from '@chakra-ui/system'
+import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Formik } from 'formik'
 import { ReactNode } from 'react'
@@ -23,6 +23,8 @@ const BaseQuestions = ({questions, plainText}: QuestionsProps) => {
     )
   }
 
+  const styles = useMultiStyleConfig('Questions')
+
   const initialValues : any = questions.reduce((prev, curr) => ({
     ...prev,
     [curr.title.default]: '',
@@ -33,7 +35,7 @@ const BaseQuestions = ({questions, plainText}: QuestionsProps) => {
   }), {}))
 
   return (
-    <VariantBox variant='questions'>
+    <VariantBox variant='questions' __css={styles.wrapper}>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -53,10 +55,11 @@ const BaseQuestions = ({questions, plainText}: QuestionsProps) => {
                   error={errors[question.title.default]}
                   touched={touched[question.title.default]}
                   plainText={plainText}
+                  mb={50}
                 />
               ))
             }
-            <Button type='submit'>Vote</Button>
+            <Button type='submit' variant='voting'>Vote</Button>
           </form>
         )}
       </Formik>

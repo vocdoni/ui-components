@@ -1,5 +1,4 @@
-import { ChakraProvider, ColorModeScript, extendTheme } from '@chakra-ui/react'
-import { theme as vtheme } from '@vocdoni/components-voting'
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import { StrictMode } from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
@@ -7,12 +6,11 @@ import { RouterProvider } from 'react-router-dom'
 import reportWebVitals from './reportWebVitals'
 import router from './router'
 import * as serviceWorker from './serviceWorker'
+import theme from './theme'
 
 const container = document.getElementById('root')
 if (!container) throw new Error('Failed to find the root element');
 const root = ReactDOM.createRoot(container)
-
-const theme = extendTheme(vtheme)
 
 root.render(
   <StrictMode>
