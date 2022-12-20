@@ -1,5 +1,5 @@
-// import { HR } from "@vocdoni/components-voting";
-import { HR } from "@vocdoni/components-voting/src/theme/layout";
+// import { HR } from "@vocdoni/components-voting"
+import { HR } from '@vocdoni/components-voting'
 
 //👇 This default export determines where your story goes in the story list
 export default {
@@ -9,13 +9,13 @@ export default {
     */
     title: 'HR',
     component: HR,
-};
+}
 
 //👇 We create a “template” of how args map to rendering
-const Template = (args) => <HR {...args} />;
+const Template = (args) => <HR {...args} />
 
 export const FirstStory = {
     args: {
         // variant: "question"
     },
-};
+}
