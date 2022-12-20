@@ -4,6 +4,5 @@ const radio = createMultiStyleConfigHelpers(['container', 'control', 'label'])
 export const Radio = radio.defineMultiStyleConfig({
   defaultProps: {
     colorScheme: 'teal',
-    size: 'md',
   }
 })

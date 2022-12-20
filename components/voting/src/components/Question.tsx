@@ -5,7 +5,6 @@ import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Field, FormikErrors, FormikTouched } from 'formik'
 import Markdown from './layout/Markdown'
-import VariantBox from './layout/VariantBox'
 
 interface QuestionProps {
   question: IQuestion,
@@ -18,7 +17,7 @@ const BaseQuestion = ({question, error, touched, plainText}: QuestionProps) => {
   const styles = useMultiStyleConfig('Questions')
 
   return (
-    <VariantBox __css={styles.question}>
+    <chakra.div __css={styles.question}>
       <FormControl isInvalid={!!error && !!touched}>
         <chakra.label __css={styles.title}>
           {question.title.default}
@@ -31,13 +30,14 @@ const BaseQuestion = ({question, error, touched, plainText}: QuestionProps) => {
             </Markdown>
           </chakra.div>
         }
-        <RadioGroup name={question.title.default}>
+        <RadioGroup variant='voting' name={question.title.default}>
           <Stack direction='column'>
             {
               question.choices.map((choice, ck) => (
                 <Field
                   key={ck}
                   as={Radio}
+                  variant='voting'
                   value={choice.value.toString()}
                 >
                   {choice.title.default}
@@ -48,7 +48,7 @@ const BaseQuestion = ({question, error, touched, plainText}: QuestionProps) => {
           <FormErrorMessage variant='voting'>{error?.toString()}</FormErrorMessage>
         </RadioGroup>
       </FormControl>
-    </VariantBox>
+    </chakra.div>
   )
 }
 

@@ -1,6 +1,13 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/system'
 
-const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(['wrapper', 'question', 'title', 'description'])
+export const questionsAnatomy = [
+  'wrapper',
+  'question',
+  'title',
+  'description',
+]
+
+const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsAnatomy)
 
 const baseStyle = definePartsStyle({
   question: {
@@ -16,8 +23,6 @@ const baseStyle = definePartsStyle({
   },
 })
 
-const Questions = defineMultiStyleConfig({
+export const QuestionsTheme = defineMultiStyleConfig({
   baseStyle,
 })
-
-export default Questions

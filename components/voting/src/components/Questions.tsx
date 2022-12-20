@@ -5,7 +5,6 @@ import { IQuestion } from '@vocdoni/sdk'
 import { Formik } from 'formik'
 import { ReactNode } from 'react'
 import * as Yup from 'yup'
-import VariantBox from './layout/VariantBox'
 import Question from './Question'
 
 type QuestionsProps = {
@@ -35,7 +34,7 @@ const BaseQuestions = ({questions, plainText}: QuestionsProps) => {
   }), {}))
 
   return (
-    <VariantBox variant='questions' __css={styles.wrapper}>
+    <chakra.div __css={styles.wrapper}>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -55,7 +54,6 @@ const BaseQuestions = ({questions, plainText}: QuestionsProps) => {
                   error={errors[question.title.default]}
                   touched={touched[question.title.default]}
                   plainText={plainText}
-                  mb={50}
                 />
               ))
             }
@@ -63,7 +61,7 @@ const BaseQuestions = ({questions, plainText}: QuestionsProps) => {
           </form>
         )}
       </Formik>
-    </VariantBox>
+    </chakra.div>
   )
 }
 
