@@ -1,9 +1,7 @@
 import Vote from './views/Vote'
 
 // Layout components
-export { default as HR } from './layout/HR'
-export { default as Markdown } from './layout/Markdown'
-export { default as VariantBox } from './layout/VariantBox'
+export * from './layout'
 // Voting components
 export { default as Question } from './Question'
 export { default as Questions } from './Questions'

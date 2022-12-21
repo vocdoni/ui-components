@@ -1,4 +1,5 @@
 import { Box, Code, Heading, Link, ListItem, OrderedList, Text, UnorderedList } from '@chakra-ui/layout'
+import { chakra } from '@chakra-ui/system'
 import { Table, Tr } from '@chakra-ui/table'
 import ReactMarkdown, { Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -8,7 +9,7 @@ type MarkdownProps = Options & {
   plainText?: boolean
 }
 
-const Markdown = ({children, plainText, ...rest}: MarkdownProps) => {
+const MD = ({children, plainText, ...rest}: MarkdownProps) => {
   if (!children) {
     return null
   }
@@ -63,6 +64,7 @@ const Markdown = ({children, plainText, ...rest}: MarkdownProps) => {
   )
 }
 
+const Markdown = chakra(MD)
 Markdown.displayName = 'Markdown'
 
 export default Markdown
