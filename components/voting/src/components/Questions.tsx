@@ -9,11 +9,10 @@ import Question from './Question'
 
 type QuestionsProps = {
   questions?: IQuestion[]
-  plainText?: boolean
   buttonAs?: ReactNode
 }
 
-const BaseQuestions = ({questions, plainText}: QuestionsProps) => {
+const BaseQuestions = ({questions}: QuestionsProps) => {
   if (!questions || (questions && !questions?.length)) {
     return (
       <Alert variant='solid' status='info'>
@@ -53,7 +52,6 @@ const BaseQuestions = ({questions, plainText}: QuestionsProps) => {
                   question={question}
                   error={errors[question.title.default]}
                   touched={touched[question.title.default]}
-                  plainText={plainText}
                 />
               ))
             }

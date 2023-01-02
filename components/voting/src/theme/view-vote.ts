@@ -1,18 +1,18 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/system'
 import { theme } from '@chakra-ui/theme'
 
-export const questionsViewAnatomy = [
+export const viewVoteAnatomy = [
   'wrapper',
+  'image',
   'title',
   'date',
   'description',
   'hr',
 ]
 
-const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsViewAnatomy)
+const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(viewVoteAnatomy)
 
 const baseStyle = definePartsStyle({
-  wrapper: {},
   title: {
     ...theme.components.Heading.baseStyle,
     ...theme.components.Heading.sizes?.xl,

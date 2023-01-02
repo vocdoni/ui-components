@@ -10,10 +10,9 @@ interface QuestionProps {
   question: IQuestion,
   error?: string | string[] | FormikErrors<any> | FormikErrors<any>[],
   touched?: boolean | FormikTouched<any> | FormikTouched<any>[],
-  plainText?: boolean
 }
 
-const BaseQuestion = ({question, error, touched, plainText}: QuestionProps) => {
+const BaseQuestion = ({question, error, touched}: QuestionProps) => {
   const styles = useMultiStyleConfig('Questions')
 
   return (
@@ -25,7 +24,7 @@ const BaseQuestion = ({question, error, touched, plainText}: QuestionProps) => {
         {
           question.description &&
           <chakra.div __css={styles.description}>
-            <Markdown plainText={plainText}>
+            <Markdown>
               {question.description.default}
             </Markdown>
           </chakra.div>

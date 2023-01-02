@@ -7,7 +7,7 @@ const Radio = defineMultiStyleConfig({
   variants: {
     voting: definePartsStyle({
       label: {
-
+        color: 'lightgray',
       },
     }),
   },

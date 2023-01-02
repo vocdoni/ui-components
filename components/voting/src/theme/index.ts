@@ -20,4 +20,5 @@ const theme = {
 }
 
 export * from './questions'
+export * from './view-vote'
 export default theme

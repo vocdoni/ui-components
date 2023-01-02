@@ -1,4 +1,4 @@
-@vocdoni/components-voting
+@vocdoni/react-voting
 ==========================
 
 React components and hooks for easily integrating Vocdoni services.
@@ -16,7 +16,7 @@ In order to start styling the voting components, you should use the
 ~~~tsx
 // this can be imported from '@chakra-ui/react' too, but that's more generic
 import { extendTheme } from '@chakra-ui/system'
-import { theme } from '@vocdoni/components-voting'
+import { theme } from '@vocdoni/react-voting'
 
 export const App = () => (
   <ChakraProvider theme={extendTheme(theme)}>
@@ -26,7 +26,7 @@ export const App = () => (
 ~~~
 
 As you can see, we're importing a custom defined theme from
-`@vocdoni/components-voting`, but at the same time, we're using `extendTheme`.
+`@vocdoni/react-voting`, but at the same time, we're using `extendTheme`.
 This is because we're not merging our styles with the base chakra theme, both to
 avoid a bigger bundle size and to ensure we don't unexpectedly overwrite styles.
 
@@ -51,7 +51,7 @@ argument to `extendTheme`:
 
 ~~~tsx
 import { extendTheme } from '@chakra-ui/react'
-import { theme as vtheme } from '@vocdoni/components-voting'
+import { theme as vtheme } from '@vocdoni/react-voting'
 
 const theme = extendTheme(vtheme, {
   // any theme changes would go here
@@ -83,7 +83,7 @@ The easiest way to integrate a voting would be to just import the `Views.Voting`
 component:
 
 ~~~tsx
-import { Views } from '@vocdoni/components-voting'
+import { Views } from '@vocdoni/react-voting'
 import { IElection } from '@vocdoni/sdk/dist/api/election'
 
 const CustomVoteComponent = ({data: IElection}) => {
@@ -109,7 +109,7 @@ you'll need to [style the variants][advanced theming]:
 ~~~ts
 import { radioAnatomy } from '@chakra-ui/anatomy'
 import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
-import { theme as vtheme } from '@vocdoni/components-voting'
+import { theme as vtheme } from '@vocdoni/react-voting'
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(radioAnatomy.keys)
 

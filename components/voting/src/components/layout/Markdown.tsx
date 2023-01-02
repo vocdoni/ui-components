@@ -6,16 +6,11 @@ import remarkGfm from 'remark-gfm'
 
 type MarkdownProps = Options & {
   children?: string
-  plainText?: boolean
 }
 
-const MD = ({children, plainText, ...rest}: MarkdownProps) => {
+const MD = ({children, ...rest}: MarkdownProps) => {
   if (!children) {
     return null
-  }
-
-  if (plainText) {
-    return <>{children}</>
   }
 
   return (
