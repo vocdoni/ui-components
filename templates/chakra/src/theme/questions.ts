@@ -5,10 +5,7 @@ const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpe
 
 const Questions = defineMultiStyleConfig({
   baseStyle: definePartsStyle({
-    wrapper: {},
-    question: {},
-    title: {},
-    description: {}
+    // check questionsAnatomy to know what keys can be used here
   }),
 })
 

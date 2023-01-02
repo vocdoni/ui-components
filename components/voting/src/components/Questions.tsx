@@ -1,27 +1,27 @@
 import { Alert, AlertIcon } from '@chakra-ui/alert'
 import { Button } from '@chakra-ui/button'
-import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Formik } from 'formik'
 import { ReactNode } from 'react'
 import * as Yup from 'yup'
 import Question from './Question'
 
-type QuestionsProps = {
+type QuestionsProps = ChakraProps & {
   questions?: IQuestion[]
   buttonAs?: ReactNode
 }
 
-const BaseQuestions = ({questions}: QuestionsProps) => {
+const BaseQuestions = ({questions, ...rest}: QuestionsProps) => {
+  const styles = useMultiStyleConfig('Questions')
+
   if (!questions || (questions && !questions?.length)) {
     return (
-      <Alert variant='solid' status='info'>
+      <Alert variant='solid' status='warning' sx={styles.alert}>
         <AlertIcon />Apparently this process has no questions 🤔
       </Alert>
     )
   }
-
-  const styles = useMultiStyleConfig('Questions')
 
   const initialValues : any = questions.reduce((prev, curr) => ({
     ...prev,
@@ -33,7 +33,7 @@ const BaseQuestions = ({questions}: QuestionsProps) => {
   }), {}))
 
   return (
-    <chakra.div __css={styles.wrapper}>
+    <chakra.div __css={styles.wrapper} {...rest}>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -55,7 +55,7 @@ const BaseQuestions = ({questions}: QuestionsProps) => {
                 />
               ))
             }
-            <Button type='submit' variant='voting'>Vote</Button>
+            <Button type='submit' sx={styles.button}>Vote</Button>
           </form>
         )}
       </Formik>

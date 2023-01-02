@@ -29,22 +29,22 @@ const BaseQuestion = ({question, error, touched}: QuestionProps) => {
             </Markdown>
           </chakra.div>
         }
-        <RadioGroup variant='voting' name={question.title.default}>
-          <Stack direction='column'>
+        <RadioGroup name={question.title.default} sx={styles.radioGroup}>
+          <Stack direction='column' sx={styles.stack}>
             {
               question.choices.map((choice, ck) => (
                 <Field
                   key={ck}
                   as={Radio}
-                  variant='voting'
                   value={choice.value.toString()}
+                  sx={styles.radio}
                 >
                   {choice.title.default}
                 </Field>
               ))
             }
           </Stack>
-          <FormErrorMessage variant='voting'>{error?.toString()}</FormErrorMessage>
+          <FormErrorMessage sx={styles.error}>{error?.toString()}</FormErrorMessage>
         </RadioGroup>
       </FormControl>
     </chakra.div>

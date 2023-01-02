@@ -6,9 +6,10 @@ React components and hooks for easily integrating Vocdoni services.
 Theming
 -------
 
-Since we're using chakra's theming system, the way to style these voting components
-is [the same as described in their documentation][chakra theming], but using the
-custom components we defined (see [components anatomy] for more details).
+Since we're using chakra's theming system, the way to style these voting
+components is [the same as described in their documentation][chakra theming],
+but using the custom components we defined (see [components anatomy] for more
+details).
 
 In order to start styling the voting components, you should use the
 `ChakraProvider`, and customize the passed theme:
@@ -30,13 +31,13 @@ As you can see, we're importing a custom defined theme from
 This is because we're not merging our styles with the base chakra theme, both to
 avoid a bigger bundle size and to ensure we don't unexpectedly overwrite styles.
 
-The above example is the easiest way to get all the default styles up and running,
-but you can always define your entire theme and ignore our base styles. See the
-details about multipart components below.
+The above example is the easiest way to get all the default styles up and
+running, but you can always define your entire theme and ignore our base styles.
+See how our components are grainly styled below, in [components anatomy].
 
-In case you want to add the voting components to a page and ensure chakra-ui will
-not affect your theme, you may need to pass `resetCSS={false}` as a component
-prop:
+In case you want to add the voting components to a page and ensure chakra-ui
+will not affect your theme, you may need to pass `resetCSS={false}` as a
+component prop:
 
 ~~~tsx
 export const App = () => (
@@ -67,80 +68,85 @@ export const App = () => (
 )
 ~~~
 
-Or you can simply ignore our theme and redefine it from the ground. All multipart
-comonents export their helper theming methods, in case you want to ignore our
-base theme.
+Or you can simply ignore our theme and redefine it from the ground. All
+multipart comonents export their helper theming methods, in case you want to
+ignore our base theme.
 
 ### Components structure
 
 - `components`: small components with part of the logic related to Vocdoni API
   (i.e. process questions).
 - `components/views`: huge components containing all the required components for
-  full featured flows (i.e. full featured voting page).
-- `components/layout`: small components used for layout purposes.
+  full featured flows (i.e. full featured voting page). Can be styled using the
+  theme provider; read below in [components anatomy] how these multipart
+  components are styled.
+- `components/layout`: small components used for layout purposes. Can be styled
+  either using the theme provider, or individually when they're part of
+  multipart components (like views).
 
-The easiest way to integrate a voting would be to just import the `Views.Voting`
+The easiest way to integrate a voting would be to just import the `ViewVote`
 component:
 
 ~~~tsx
-import { Views } from '@vocdoni/react-voting'
+import { ViewVote } from '@vocdoni/react-voting'
 import { IElection } from '@vocdoni/sdk/dist/api/election'
 
 const CustomVoteComponent = ({data: IElection}) => {
-  return <Views.Vote data={data} />
+  return <ViewVote data={data} />
 }
 ~~~
 
-### Components anatomy
 
-#### Questions
+### Theming components
 
-- `A`: Main Wrapper
-- `B`: Question Wrapper
-- `C`: Question title
-- `D`: Question description
+All components follow a multipart component structure. Please refer to the
+[official chakra documentation][multipart components] for more info on how to
+style these type of components.
 
-![questions anatomy](./docs/questions.png)
+Other small components, like `Image` or `HR` can be styled using the theme
+provider but, since they're defined as parts of the multipart components, you
+can define a main style for them, and also override styles for each component
+part.
 
-Radio and Buttons are not defined as this component anatomy. Instead, we're using
-the chakra components with a defined `voting` variant. In order to style those
-you'll need to [style the variants][advanced theming]:
+Here's a small example styling the ViewVote component :
 
 ~~~ts
-import { radioAnatomy } from '@chakra-ui/anatomy'
-import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
-import { theme as vtheme } from '@vocdoni/react-voting'
+import { extendTheme, createMultiStyleConfigHelpers } from '@chakra-ui/react'
+import { theme as vtheme, viewVoteAnatomy } from '@vocdoni/react-voting'
 
-const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(radioAnatomy.keys)
+const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(viewVoteAnatomy)
 
-const Radio = defineMultiStyleConfig({
-  variants: {
-    voting: definePartsStyle({
-      label: {
-        color: 'green',
-      },
-    }),
-  },
+const ViewVote = defineMultiStyleConfig({
+  baseStyle: definePartsStyle({
+    title: {
+      paddingTop: '.5em',
+      position: 'relative',
+      marginTop: '-2.5em',
+      background: 'linear-gradient(180deg, rgba(0,0,0,0.50) 0%, rgba(255,255,255,0) 100%)'
+    },
+  }),
 })
 
 const theme = extendTheme(vtheme, {
   components: {
-    Radio,
-  }
+    ViewVote,
+  },
 })
+
+// this theme would then be used directly in the ChakraProvider
+export default theme
 ~~~
 
-TODOS
------
-
-- Use context API for form state, rather than passing it as props (formik already
-  has something, maybe there's no need to code a new hook).
-- Add/create more voting related components, like the Heading Image one (with ipfs support ofc).
-- Properly document everything, creating screenshots with properly defined
-  sections for the components anatomy.
-
+You can check out each component's anatomy by checking
+[their theme files][theme path]. You can also take a look to the
+[chakra template] we have in this project, where we're overwriting some of these
+styles.
 
 [components structure]: #components-structure
 [components anatomy]: #components-anatomy
 [chakra theming]: https://chakra-ui.com/docs/styled-system/customize-theme#customizing-theme-tokens
 [advanced theming]: https://chakra-ui.com/docs/styled-system/advanced-theming
+[multipart components]: https://chakra-ui.com/docs/styled-system/component-style#styling-multipart-components
+[questions]: #questions
+[theme path]: ./src/theme
+[chakra template]: ../../templates/chakra/src/theme

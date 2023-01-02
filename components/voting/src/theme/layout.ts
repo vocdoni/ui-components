@@ -1,14 +1,5 @@
 import { defineStyleConfig } from '@chakra-ui/react'
 
-export const Heading = defineStyleConfig({
-  variants: {
-    subtitle: {
-      fontStyle: 'italic',
-      color: 'gray.400',
-    },
-  },
-})
-
 export const HorizontalRuler = defineStyleConfig({
   baseStyle: {
     width: '100%',

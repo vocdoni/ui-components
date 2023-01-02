@@ -4,12 +4,8 @@ import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(radioAnatomy.keys)
 
 const Radio = defineMultiStyleConfig({
-  variants: {
-    voting: definePartsStyle({
-      label: {
-        color: 'lightgray',
-      },
-    }),
+  defaultProps: {
+    colorScheme: 'teal',
   },
 })
 
