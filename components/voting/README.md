@@ -76,13 +76,9 @@ ignore our base theme.
 
 - `components`: small components with part of the logic related to Vocdoni API
   (i.e. process questions).
-- `components/views`: huge components containing all the required components for
-  full featured flows (i.e. full featured voting page). Can be styled using the
-  theme provider; read below in [components anatomy] how these multipart
-  components are styled.
-- `components/layout`: small components used for layout purposes. Can be styled
-  either using the theme provider, or individually when they're part of
-  multipart components (like views).
+- `components/views`: bigger components containing all the required components
+  for full featured flows (i.e. full featured voting page).
+- `components/layout`: small components used for layout purposes.
 
 The easiest way to integrate a voting would be to just import the `ViewVote`
 component:
@@ -99,14 +95,14 @@ const CustomVoteComponent = ({data: IElection}) => {
 
 ### Theming components
 
-All components follow a multipart component structure. Please refer to the
+Most components follow a multipart component structure. Please refer to the
 [official chakra documentation][multipart components] for more info on how to
 style these type of components.
 
-Other small components, like `Image` or `HR` can be styled using the theme
-provider but, since they're defined as parts of the multipart components, you
-can define a main style for them, and also override styles for each component
-part.
+Other small components, like `Image` or `HR`, can be styled using the theme
+provider or via [css props] but, since they're defined as parts of the multipart
+components, you can define a main style for them, and also override styles for
+each component part.
 
 Here's a small example styling the ViewVote component :
 
@@ -142,6 +138,29 @@ You can check out each component's anatomy by checking
 [chakra template] we have in this project, where we're overwriting some of these
 styles.
 
+#### Styling via props
+
+All components have all the features you would expect from a chakra component,
+meaning you can style all components via component props too:
+
+~~~tsx
+import { Image } from '@vocdoni/react-voting'
+
+const App = () => (
+  <Image
+    borderRadius="full"
+    boxSize="100px"
+
+    src="https://picsum.photos/200"
+    alt="random image"
+  />
+)
+~~~
+
+Note this is mostly usefull for small components, since big components css props
+would only affect their wrappers. For styling their children components you'll
+have to use the theme provider.
+
 [components structure]: #components-structure
 [components anatomy]: #components-anatomy
 [chakra theming]: https://chakra-ui.com/docs/styled-system/customize-theme#customizing-theme-tokens
@@ -150,3 +169,4 @@ styles.
 [questions]: #questions
 [theme path]: ./src/theme
 [chakra template]: ../../templates/chakra/src/theme
+[css props]: #styling-via-props
