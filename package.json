@@ -10,5 +10,13 @@
       "components/*",
       "templates/*"
     ]
+  },
+  "devDependencies": {
+    "turbo": "^1.6.3"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "dev": "turbo dev"
   }
 }

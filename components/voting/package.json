@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "yarn build --watch",
-    "build": "tsc && vite build",
+    "lint": "tsc",
+    "build": "vite build",
     "preview": "vite preview",
     "prepack": "json -f package.json -I -e \"delete this.devDependencies; delete this.dependencies\""
   },

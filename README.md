@@ -5,8 +5,8 @@ This project aims to ease the creation of voting user interfaces, allowing
 developers to easily style everything as desired, and to chose from a variety of
 different voting flow components.
 
-This project is a WIP and is subject to continuous changes during its development,
-and the SDK one (meaning we'll update this project every time the
+This project is a WIP and is subject to continuous changes during its
+development, and the SDK one (meaning we'll update this project every time the
 SDK receives new updates too).
 
 Project distribution
@@ -15,9 +15,10 @@ Project distribution
 For now, two different package folders have been created:
 
 - [`components`]: holds the proper libraries. Every package in this folder will
-  be uploaded to npm registry and be available to install with your package manager.
-- [`templates`]: not published packages, used by developers to either test here the
-  components, or to easily bootstrap a voting project of they liking.
+  be uploaded to npm registry and be available to install with your package
+  manager.
+- [`templates`]: not published packages, used by developers to either test here
+  the components, or to easily bootstrap a voting project of they liking.
 
 Development
 -----------
@@ -25,34 +26,18 @@ Development
 There's a `dev` script on every project, allowing you to watch for your changes,
 and automatically refreshing the contents thanks to the hot module reload.
 
-If you want to work in any of the components library and, at the same time,
-watching the changes in one of the `templates` repos, you only need to run a
-`yarn dev` in both folders:
+But the main repo has turborepo configured, so you can start everything by just
+running `yarn dev` in the root folder.
 
-~~~bash
-cd components/voting
-yarn dev
-
-# in another terminal, without closing the previous one
-cd templates/chakra
-yarn dev
-~~~
-
-Please note though, that using this approach sometimes may reload your page before
-the entire compilation is done. In these cases you'll see your browser stuck at
-loading, and you'll need to stop it (just by using <kbd>ESC</kbd> key), and
-refresh it manually.
-
-If you're not planing on making changes to any of the components libraries and,
-instead, you only want to work on a template, you can replace the first `yarn dev`
-with a `yarn build` and forget about it unless you make any changes to the
-components library.
+Using this method you'll sometimes see errors in the console about not being
+able to resolve `@vocdoni/react-voting`. Just ignore it, since that's because
+it's building the scripts in that moment.
 
 LICENSE
 -------
 
-The components libraries are licensed under the [GNU Affero General Public License
-v3.0][license].
+The components libraries are licensed under the [GNU Affero General Public
+License v3.0][license].
 
 However, the templates folders are not licensed, so you can do whatever you want
 with them.
