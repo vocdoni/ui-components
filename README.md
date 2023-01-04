@@ -43,7 +43,7 @@ However, the templates folders are not licensed, so you can do whatever you want
 with them.
 
     Vocdoni UI Components
-    Copyright (C) 2022 Vocdoni Roots MCU
+    Copyright (C) 2023 Vocdoni Roots MCU
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
