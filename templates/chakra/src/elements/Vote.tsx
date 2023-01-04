@@ -1,9 +1,9 @@
 import { ViewVote } from '@vocdoni/react-voting'
-import { IElection } from '@vocdoni/sdk/dist/api/election'
+import { PublishedElection } from '@vocdoni/sdk'
 import { useLoaderData } from 'react-router-dom'
 
 const Vote = () => {
-  const data = (useLoaderData() as IElection)
+  const data = (useLoaderData() as PublishedElection)
   return <ViewVote data={data} />
 }
 

@@ -85,9 +85,9 @@ component:
 
 ~~~tsx
 import { ViewVote } from '@vocdoni/react-voting'
-import { IElection } from '@vocdoni/sdk/dist/api/election'
+import { PublishedElection } from '@vocdoni/sdk'
 
-const CustomVoteComponent = ({data: IElection}) => {
+const CustomVoteComponent = ({data: PublishedElection}) => {
   return <ViewVote data={data} />
 }
 ~~~

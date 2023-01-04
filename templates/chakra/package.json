@@ -15,7 +15,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@vocdoni/react-voting": "*",
-    "@vocdoni/sdk": "^0.0.1-alpha",
+    "@vocdoni/sdk": "^0.0.2-alpha",
     "date-fns": "^2.29.3",
     "formik": "^2.2.9",
     "framer-motion": "^7.6.19",

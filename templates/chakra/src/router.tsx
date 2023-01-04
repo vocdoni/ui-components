@@ -3,7 +3,7 @@ import Home from '@elements/Home'
 import RouteError from '@elements/RouteError'
 import Vote from '@elements/Vote'
 import Layout from '@src/Layout'
-import { EnvironmentInitialitzationOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { createHashRouter, createRoutesFromElements, Route } from 'react-router-dom'
 
 const router = createHashRouter(
@@ -16,7 +16,7 @@ const router = createHashRouter(
         path='/process/:pid'
         loader={async ({params}) =>
           await new VocdoniSDKClient({
-            env: EnvironmentInitialitzationOptions.DEV,
+            env: EnvOptions.DEV,
             electionId: params.pid,
           }).fetchElection()
         }
