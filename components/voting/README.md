@@ -161,6 +161,30 @@ Note this is mostly usefull for small components, since big components css props
 would only affect their wrappers. For styling their children components you'll
 have to use the theme provider.
 
+
+LICENSE
+-------
+
+This components library is licensed under the [GNU Affero General Public License
+v3.0][license].
+
+    Vocdoni UI React Components
+    Copyright (C) 2023 Vocdoni Roots MCU
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+[license]: ./LICENSE
 [components structure]: #components-structure
 [components anatomy]: #components-anatomy
 [chakra theming]: https://chakra-ui.com/docs/styled-system/customize-theme#customizing-theme-tokens
