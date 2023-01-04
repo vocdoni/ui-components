@@ -1,0 +1,22 @@
+{
+  "name": "@vocdoni/ui",
+  "version": "0.0.1",
+  "description": "Vocdoni UI components and related packages",
+  "main": "index.js",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "components/*",
+      "templates/*"
+    ]
+  },
+  "devDependencies": {
+    "turbo": "^1.6.3"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "dev": "turbo dev"
+  }
+}
