@@ -1,22 +1,46 @@
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
+import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { StrictMode } from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
-
+import { configureChains, createClient, mainnet, WagmiConfig } from 'wagmi'
+import { publicProvider } from 'wagmi/providers/public'
 import reportWebVitals from './reportWebVitals'
 import router from './router'
 import * as serviceWorker from './serviceWorker'
 import theme from './theme'
 
 const container = document.getElementById('root')
-if (!container) throw new Error('Failed to find the root element');
+if (!container) throw new Error('Failed to find the root element')
 const root = ReactDOM.createRoot(container)
+
+// wagmi + rainbowkit wallets config
+const { chains, provider, webSocketProvider } = configureChains(
+  [mainnet],
+  [publicProvider()],
+)
+
+const { connectors } = getDefaultWallets({
+  appName: 'Vocdoni Voting Protocol',
+  chains,
+})
+
+const client = createClient({
+  provider,
+  connectors,
+  webSocketProvider,
+})
+// end wallets config
 
 root.render(
   <StrictMode>
     <ChakraProvider theme={theme}>
-      <RouterProvider router={router} />
-      <ColorModeScript />
+      <WagmiConfig client={client}>
+        <RainbowKitProvider chains={chains}>
+          <RouterProvider router={router} />
+          <ColorModeScript />
+        </RainbowKitProvider>
+      </WagmiConfig>
     </ChakraProvider>
   </StrictMode>,
 )

@@ -22,10 +22,12 @@
     "@chakra-ui/theme": "^2.2.2",
     "@vocdoni/sdk": "^0.0.2-alpha",
     "date-fns": "^2.29.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "react-markdown": "^8.0.4",
     "remark-gfm": "^3.0.1"
+  },
+  "peerDependencies": {
+    "react": ">= 16.8.0",
+    "react-dom": ">= 16.8.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",

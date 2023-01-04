@@ -1,4 +1,4 @@
-import { Alert, AlertIcon } from "@chakra-ui/react"
+import { Alert, AlertIcon } from '@chakra-ui/react'
 
 const Error404 = () => (
   <Alert status='warning'>

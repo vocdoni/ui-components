@@ -1,22 +1,22 @@
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
-import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Field, FormikErrors, FormikTouched } from 'formik'
-import { Markdown } from './layout'
+import { Markdown } from '../layout'
 
-interface QuestionProps {
+type QuestionProps = ChakraProps & {
   question: IQuestion,
   error?: string | string[] | FormikErrors<any> | FormikErrors<any>[],
   touched?: boolean | FormikTouched<any> | FormikTouched<any>[],
 }
 
-const BaseQuestion = ({question, error, touched}: QuestionProps) => {
+export const Question = ({question, error, touched, ...rest}: QuestionProps) => {
   const styles = useMultiStyleConfig('Questions')
 
   return (
-    <chakra.div __css={styles.question}>
+    <chakra.div __css={styles.question} {...rest}>
       <FormControl isInvalid={!!error && !!touched}>
         <chakra.label __css={styles.title}>
           {question.title.default}
@@ -51,5 +51,4 @@ const BaseQuestion = ({question, error, touched}: QuestionProps) => {
   )
 }
 
-export const Question = chakra(BaseQuestion)
 Question.displayName = 'Question'
