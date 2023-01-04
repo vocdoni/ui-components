@@ -5,7 +5,7 @@ import { IQuestion } from '@vocdoni/sdk'
 import { Formik } from 'formik'
 import { ReactNode } from 'react'
 import * as Yup from 'yup'
-import Question from './Question'
+import { Question } from './Question'
 
 type QuestionsProps = ChakraProps & {
   questions?: IQuestion[]
@@ -63,7 +63,5 @@ const BaseQuestions = ({questions, ...rest}: QuestionsProps) => {
   )
 }
 
-const Questions = chakra(BaseQuestions)
+export const Questions = chakra(BaseQuestions)
 Questions.displayName = 'Questions'
-
-export default Questions

@@ -59,7 +59,5 @@ const MD = ({children, ...rest}: MarkdownProps) => {
   )
 }
 
-const Markdown = chakra(MD)
+export const Markdown = chakra(MD)
 Markdown.displayName = 'Markdown'
-
-export default Markdown

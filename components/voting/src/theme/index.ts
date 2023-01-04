@@ -2,7 +2,7 @@ import { HorizontalRuler } from './layout'
 import { QuestionsTheme as Questions } from './questions'
 import { ViewVoteTheme as ViewVote } from './view-vote'
 
-const theme = {
+export const theme = {
   components: {
     HorizontalRuler,
     Questions,
@@ -12,4 +12,3 @@ const theme = {
 
 export * from './questions'
 export * from './view-vote'
-export default theme

@@ -4,7 +4,7 @@ type HRProps = ChakraProps & {
   variant?: string
 }
 
-const HR = (props: HRProps) => {
+export const HR = (props: HRProps) => {
   const { variant, ...rest } = props
   const styles = useStyleConfig('HorizontalRuler', { variant })
 
@@ -12,5 +12,3 @@ const HR = (props: HRProps) => {
 }
 
 HR.displayName = 'HorizontalRuler'
-
-export default HR

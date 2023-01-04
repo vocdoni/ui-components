@@ -4,7 +4,7 @@ import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Field, FormikErrors, FormikTouched } from 'formik'
-import Markdown from './layout/Markdown'
+import { Markdown } from './layout'
 
 interface QuestionProps {
   question: IQuestion,
@@ -51,7 +51,5 @@ const BaseQuestion = ({question, error, touched}: QuestionProps) => {
   )
 }
 
-const Question = chakra(BaseQuestion)
+export const Question = chakra(BaseQuestion)
 Question.displayName = 'Question'
-
-export default Question

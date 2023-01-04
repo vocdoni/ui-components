@@ -25,7 +25,7 @@ export const linkify = (link: string | undefined, gateway: string) => {
   return gateway + pin
 }
 
-const Image = ({src, ...props} : IPFSImageProps) => {
+export const Image = ({src, ...props} : IPFSImageProps) => {
   if (!src) {
     return null
   }
@@ -34,6 +34,3 @@ const Image = ({src, ...props} : IPFSImageProps) => {
 
   return <CImage src={link} {...props} />
 }
-
-
-export default Image

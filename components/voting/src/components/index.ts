@@ -1,7 +1,7 @@
 // Layout components
 export * from './layout'
 // Voting components
-export { default as Question } from './Question'
-export { default as Questions } from './Questions'
+export * from './Question'
+export * from './Questions'
 // Views
-export { default as ViewVote } from './views/Vote'
+export * from './views/ViewVote'
