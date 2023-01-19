@@ -10,6 +10,9 @@
     "preview": "vite preview",
     "prepack": "json -f package.json -I -e \"delete this.devDependencies; delete this.dependencies\""
   },
+  "main": "dist/voting-components.js",
+  "module": "dist/voting-components.es.js",
+  "types": "dist/index.d.ts",
   "dependencies": {
     "@chakra-ui/alert": "^2.0.13",
     "@chakra-ui/button": "^2.0.13",
