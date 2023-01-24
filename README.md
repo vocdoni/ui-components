@@ -30,7 +30,7 @@ But the main repo has turborepo configured, so you can start everything by just
 running `yarn dev` in the root folder.
 
 Using this method you'll sometimes see errors in the console about not being
-able to resolve `@vocdoni/react-voting`. Just ignore it, since that's because
+able to resolve `@vocdoni/react-components`. Just ignore it, since that's because
 it's building the scripts in that moment.
 
 LICENSE

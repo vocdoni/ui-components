@@ -1,5 +1,5 @@
-@vocdoni/react-voting
-==========================
+@vocdoni/react-components
+=========================
 
 React components and hooks for easily integrating Vocdoni services.
 
@@ -17,7 +17,7 @@ In order to start styling the voting components, you should use the
 ~~~tsx
 // this can be imported from '@chakra-ui/react' too, but that's more generic
 import { extendTheme } from '@chakra-ui/system'
-import { theme } from '@vocdoni/react-voting'
+import { theme } from '@vocdoni/react-components'
 
 export const App = () => (
   <ChakraProvider theme={extendTheme(theme)}>
@@ -27,7 +27,7 @@ export const App = () => (
 ~~~
 
 As you can see, we're importing a custom defined theme from
-`@vocdoni/react-voting`, but at the same time, we're using `extendTheme`.
+`@vocdoni/react-components`, but at the same time, we're using `extendTheme`.
 This is because we're not merging our styles with the base chakra theme, both to
 avoid a bigger bundle size and to ensure we don't unexpectedly overwrite styles.
 
@@ -52,7 +52,7 @@ argument to `extendTheme`:
 
 ~~~tsx
 import { extendTheme } from '@chakra-ui/react'
-import { theme as vtheme } from '@vocdoni/react-voting'
+import { theme as vtheme } from '@vocdoni/react-components'
 
 const theme = extendTheme(vtheme, {
   // any theme changes would go here
@@ -84,7 +84,7 @@ The easiest way to integrate a voting would be to just import the `ViewVote`
 component:
 
 ~~~tsx
-import { ViewVote } from '@vocdoni/react-voting'
+import { ViewVote } from '@vocdoni/react-components'
 import { PublishedElection } from '@vocdoni/sdk'
 
 const CustomVoteComponent = ({data: PublishedElection}) => {
@@ -108,7 +108,7 @@ Here's a small example styling the ViewVote component :
 
 ~~~ts
 import { extendTheme, createMultiStyleConfigHelpers } from '@chakra-ui/react'
-import { theme as vtheme, viewVoteAnatomy } from '@vocdoni/react-voting'
+import { theme as vtheme, viewVoteAnatomy } from '@vocdoni/react-components'
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(viewVoteAnatomy)
 
@@ -144,7 +144,7 @@ All components have all the features you would expect from a chakra component,
 meaning you can style all components via component props too:
 
 ~~~tsx
-import { Image } from '@vocdoni/react-voting'
+import { Image } from '@vocdoni/react-components'
 
 const App = () => (
   <Image

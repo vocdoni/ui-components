@@ -14,15 +14,15 @@ export default defineConfig({
         sourcemap: true,
         lib: {
             entry: path.resolve(__dirname, 'src/index.ts'),
-            name: 'VotingComponents',
-            formats: ['es', 'umd'],
-            fileName: (format) => `voting-components.${format}.js`,
+            name: 'VocdoniReactComponents',
+            formats: ['es', 'cjs', 'umd'],
+            fileName: (format) => `index.${format}.js`,
         },
         rollupOptions: {
-            external: ['react', 'react-dom', '@chakra-ui/system', 'react-markdown', 'remark-gfm'],
+            external: ['react', 'react-dom', '@chakra-ui/system', 'react-markdown', 'remark-gfm', '@vocdoni/sdk'],
             output: {
                 globals: {
-                    react: 'React',
+                    'react': 'React',
                     'react-dom': 'ReactDOM',
                     '@chakra-ui/system': 'chakra',
                     '@vocdoni/sdk': 'VocdoniSDKClient',

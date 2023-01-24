@@ -15,7 +15,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@rainbow-me/rainbowkit": "^0.8.1",
-    "@vocdoni/react-voting": "*",
+    "@vocdoni/react-components": "*",
     "@vocdoni/sdk": "^0.0.2-alpha",
     "date-fns": "^2.29.3",
     "ethers": "^5.7.2",

@@ -1,5 +1,5 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
-import { viewVoteAnatomy } from '@vocdoni/react-voting'
+import { viewVoteAnatomy } from '@vocdoni/react-components'
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(viewVoteAnatomy)
 

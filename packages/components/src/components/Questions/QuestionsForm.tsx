@@ -15,7 +15,7 @@ type QuestionsFormProps = ChakraProps & {
 }
 
 export const QuestionsForm = () => {
-  const {election, signer, vote, ConnectButton} = useQuestionsContext()
+  const {election, signer, vote, ConnectButton, setError} = useQuestionsContext()
   const styles = useMultiStyleConfig('Questions')
   const questions = election?.questions
 
@@ -50,11 +50,18 @@ export const QuestionsForm = () => {
 
         try {
           await vote(values)
-        } catch (e) {
-          console.error('Could not vote:', e)
+        } catch (e: any) {
+          if (typeof e.message !== 'undefined') {
+            return setError(e.message)
+          }
+          if (typeof e.reason !== 'undefined') {
+            return setError(e.reason)
+          }
+          setError('Could not vote')
+          console.error('Could not vote', e)
+        } finally {
+          setLoading(false)
         }
-
-        setLoading(false)
       }}
     >
       {({handleSubmit, errors, touched}) => (

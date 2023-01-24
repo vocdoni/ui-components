@@ -1,5 +1,5 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { ViewVote } from '@vocdoni/react-voting'
+import { ViewVote } from '@vocdoni/react-components'
 import { PublishedElection } from '@vocdoni/sdk'
 import { useLoaderData } from 'react-router-dom'
 import { useSigner } from 'wagmi'

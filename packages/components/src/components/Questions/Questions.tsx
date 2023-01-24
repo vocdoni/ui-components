@@ -13,6 +13,7 @@ export type QuestionsProviderProps = {
 export const useQuestionsProvider = ({election, signer, ...rest}: QuestionsProviderProps) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [voted, setVoted] = useState<string>('')
+  const [error, setError] = useState<string>('')
 
   const vote = async (values: {[key:string]:string}) => {
     if (!signer) {
@@ -42,7 +43,9 @@ export const useQuestionsProvider = ({election, signer, ...rest}: QuestionsProvi
   return {
     ...rest,
     election,
+    error,
     loading,
+    setError,
     signer,
     vote,
     voted,
