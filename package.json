@@ -5,12 +5,10 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*",
+  "workspaces": [
+      "packages/components/*",
       "templates/*"
-    ]
-  },
+    ],
   "devDependencies": {
     "turbo": "^1.6.3"
   },
