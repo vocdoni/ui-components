@@ -14,8 +14,8 @@ Project distribution
 
 For now, two different package folders have been created:
 
-- [`components`]: holds the proper libraries. Every package in this folder will
-  be uploaded to npm registry and be available to install with your package
+- [`packages`]: holds published packages. Every package in this folder will be
+  uploaded to npm registry and will be available to install with your package
   manager.
 - [`templates`]: not published packages, used by developers to either test here
   the components, or to easily bootstrap a voting project of they liking.
@@ -59,5 +59,5 @@ with them.
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [license]: ./LICENSE
-[`components`]: ./components
+[`packages`]: ./packages
 [`templates`]: ./templates
