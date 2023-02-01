@@ -1,0 +1,11 @@
+{
+  "name": "tsconfig",
+  "private": true,
+  "license": "GPLv3.0",
+  "version": "0.0.0",
+  "description": "Generic tsconfig for packages",
+  "files": [
+    "react-library.json",
+    "tsconfig.node.json"
+  ]
+}

@@ -1,6 +1,7 @@
 {
   "name": "@vocdoni/templates-voting",
   "private": true,
+  "license": "unlicense",
   "version": "0.0.1",
   "type": "module",
   "scripts": {

@@ -14,7 +14,7 @@ Project distribution
 
 For now, two different package folders have been created:
 
-- [`packages`]: holds published packages. Every package in this folder will be
+- [`packages`]: holds published packages. Most packages in this folder will be
   uploaded to npm registry and will be available to install with your package
   manager.
 - [`templates`]: not published packages, used by developers to either test here
