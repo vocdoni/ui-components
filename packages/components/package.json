@@ -25,10 +25,10 @@
     "@chakra-ui/image": "^2.0.13",
     "@chakra-ui/layout": "^2.1.11",
     "@chakra-ui/radio": "^2.0.14",
-    "@chakra-ui/system": "^2.3.4",
+    "@chakra-ui/system": "2.3.8",
     "@chakra-ui/table": "^2.0.12",
     "@chakra-ui/theme": "^2.2.2",
-    "@vocdoni/sdk": "^0.0.2-alpha",
+    "@vocdoni/sdk": "^0.0.3-alpha",
     "date-fns": "^2.29.3",
     "react-markdown": "^8.0.4",
     "remark-gfm": "^3.0.1"
@@ -47,9 +47,9 @@
     "react-dom": "18.2.0",
     "size-limit": "^8.1.2",
     "tsconfig": "*",
-    "typescript": "^4.9.3",
-    "vite": "^4.0.0",
-    "vite-plugin-dts": "^1.7.1"
+    "typescript": "^4.9.5",
+    "vite": "^4.1.1",
+    "vite-plugin-dts": "^1.7.2"
   },
   "size-limit": [
     {

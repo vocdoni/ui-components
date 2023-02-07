@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 export interface ClientSettings extends ClientOptions {}
 
-export const useClientProvider = ({env, ...rest} : {env: EnvOptions}) => {
+export const useClientProvider = ({env} : {env: EnvOptions}) => {
   const [client, setClient] = useState<VocdoniSDKClient>()
 
   useEffect(() => {
@@ -30,4 +30,12 @@ export const useClientContext = () => {
   }
 
   return ctxt
+}
+
+export const ClientProvider = ({env, ...rest} : {env: EnvOptions}) => {
+  const {client} = useClientProvider({env})
+
+  return (
+    <ClientContext.Provider value={{client}} {...rest} />
+  )
 }
