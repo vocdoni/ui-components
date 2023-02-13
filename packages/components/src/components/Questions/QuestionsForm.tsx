@@ -40,7 +40,6 @@ export const QuestionsForm = () => {
     [curr.title.default]: Yup.string().required('This field is required')
   }), {}))
 
-
   return (
     <Formik
       initialValues={initialValues}
