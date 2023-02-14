@@ -19,11 +19,11 @@ export default defineConfig({
             fileName: (format) => `index.${format}.js`,
         },
         rollupOptions: {
-            external: ['react', 'react-dom', '@chakra-ui/system', 'react-markdown', 'remark-gfm', '@vocdoni/sdk'],
+            external: ['react', 'react-dom/client', '@chakra-ui/system', 'react-markdown', 'remark-gfm', '@vocdoni/sdk'],
             output: {
                 globals: {
                     'react': 'React',
-                    'react-dom': 'ReactDOM',
+                    'react-dom/client': 'ReactDOM',
                     '@chakra-ui/system': 'chakra',
                     '@vocdoni/sdk': 'VocdoniSDKClient',
                     'react-markdown': 'ReactMarkdown',

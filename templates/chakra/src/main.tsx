@@ -1,5 +1,7 @@
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { ClientProvider } from '@vocdoni/react-components'
+import { EnvOptions } from '@vocdoni/sdk'
 import { StrictMode } from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
@@ -37,8 +39,10 @@ root.render(
     <ChakraProvider theme={theme}>
       <WagmiConfig client={client}>
         <RainbowKitProvider chains={chains}>
-          <RouterProvider router={router} />
-          <ColorModeScript />
+          <ClientProvider env={EnvOptions.DEV}>
+            <RouterProvider router={router} />
+            <ColorModeScript />
+          </ClientProvider>
         </RainbowKitProvider>
       </WagmiConfig>
     </ChakraProvider>

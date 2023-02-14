@@ -1,7 +1,7 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/system'
 import { theme } from '@chakra-ui/theme'
 
-export const viewVoteAnatomy = [
+export const electionAnatomy = [
   'wrapper',
   'image',
   'title',
@@ -10,7 +10,7 @@ export const viewVoteAnatomy = [
   'hr',
 ]
 
-const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(viewVoteAnatomy)
+const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(electionAnatomy)
 
 const baseStyle = definePartsStyle({
   title: {
@@ -29,6 +29,6 @@ const baseStyle = definePartsStyle({
   },
 })
 
-export const ViewVoteTheme = defineMultiStyleConfig({
+export const ElectionTheme = defineMultiStyleConfig({
   baseStyle,
 })

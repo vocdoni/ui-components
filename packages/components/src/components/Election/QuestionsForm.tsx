@@ -6,8 +6,8 @@ import { PublishedElection } from '@vocdoni/sdk'
 import { Formik } from 'formik'
 import { useState } from 'react'
 import * as Yup from 'yup'
-import { Question } from './Question'
-import { useQuestionsContext } from './Questions'
+import { useElectionContext } from './Election'
+import { QuestionField } from './QuestionField'
 
 type QuestionsFormProps = ChakraProps & {
   election?: PublishedElection
@@ -15,7 +15,7 @@ type QuestionsFormProps = ChakraProps & {
 }
 
 export const QuestionsForm = () => {
-  const {election, signer, vote, ConnectButton, setError} = useQuestionsContext()
+  const {election, signer, vote, ConnectButton, setError} = useElectionContext()
   const styles = useMultiStyleConfig('Questions')
   const questions = election?.questions
 
@@ -67,7 +67,7 @@ export const QuestionsForm = () => {
         <form onSubmit={handleSubmit}>
           {
             questions.map((question, qk) => (
-              <Question
+              <QuestionField
                 key={qk}
                 question={question}
                 error={errors[question.title.default]}

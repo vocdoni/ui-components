@@ -1,6 +1,5 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { ViewVote } from '@vocdoni/react-components'
-import { PublishedElection } from '@vocdoni/sdk'
+import { Election } from '@vocdoni/react-components'
 import { useLoaderData } from 'react-router-dom'
 import { useSigner } from 'wagmi'
 
@@ -9,15 +8,15 @@ import '@rainbow-me/rainbowkit/styles.css'
 const Vote = () => {
   const { data: signer } = useSigner()
   const election = (useLoaderData() as PublishedElection)
+  // const { pid } = useParams()
 
   return (
-    <>
-      <ViewVote
-        election={election}
-        signer={signer}
-        ConnectButton={ConnectButton}
-      />
-    </>
+    <Election
+      // id={pid}
+      election={election}
+      signer={signer}
+      ConnectButton={ConnectButton}
+    />
   )
 }
 

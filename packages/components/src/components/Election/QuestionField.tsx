@@ -6,13 +6,13 @@ import { IQuestion } from '@vocdoni/sdk'
 import { Field, FormikErrors, FormikTouched } from 'formik'
 import { Markdown } from '../layout'
 
-type QuestionProps = ChakraProps & {
+type QuestionFieldProps = ChakraProps & {
   question: IQuestion,
   error?: string | string[] | FormikErrors<any> | FormikErrors<any>[],
   touched?: boolean | FormikTouched<any> | FormikTouched<any>[],
 }
 
-export const Question = ({question, error, touched, ...rest}: QuestionProps) => {
+export const QuestionField = ({question, error, touched, ...rest}: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('Questions')
 
   return (
@@ -51,4 +51,4 @@ export const Question = ({question, error, touched, ...rest}: QuestionProps) => 
   )
 }
 
-Question.displayName = 'Question'
+QuestionField.displayName = 'Question'

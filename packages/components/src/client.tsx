@@ -1,5 +1,5 @@
-import { ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 export interface ClientSettings extends ClientOptions {}
 
@@ -25,6 +25,7 @@ export const ClientContext = createContext<ClientState | undefined>(undefined)
 
 export const useClientContext = () => {
   const ctxt = useContext(ClientContext)
+
   if (!ctxt) {
     throw new Error('useClientContext returned `undefined`, maybe you forgot to wrap the component within <ClientProvider />?')
   }
@@ -33,9 +34,20 @@ export const useClientContext = () => {
 }
 
 export const ClientProvider = ({env, ...rest} : {env: EnvOptions}) => {
-  const {client} = useClientProvider({env})
+  const [client, setClient] = useState<VocdoniSDKClient>()
 
+  useEffect(() => {
+    if (!env || (env && !env.length) || client) return
+
+    setClient(new VocdoniSDKClient({
+      env,
+    }))
+  }, [env])
+
+  const value = {
+    client,
+  }
   return (
-    <ClientContext.Provider value={{client}} {...rest} />
+    <ClientContext.Provider value={value} {...rest} />
   )
 }

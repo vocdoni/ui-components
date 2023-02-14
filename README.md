@@ -26,12 +26,16 @@ Development
 There's a `dev` script on every project, allowing you to watch for your changes,
 and automatically refreshing the contents thanks to the hot module reload.
 
-But the main repo has turborepo configured, so you can start everything by just
-running `yarn dev` in the root folder.
+The main repo has turborepo configured, meaning you could just run `yarn dev` on
+the root folder, but to be honest it does not work very well and can be a bit
+frustrating, specially when you start having weird errors related to react
+internals.
 
-Using this method you'll sometimes see errors in the console about not being
-able to resolve `@vocdoni/react-components`. Just ignore it, since that's because
-it's building the scripts in that moment.
+For that reason it's a bit better to just run `yarn dev` on two different
+terminals when you need to work on the components (and see a preview).
+
+Turbo is still very usefull if you only want to build (`yarn build` from the
+root), that's why it has been maintained (at least for now).
 
 LICENSE
 -------

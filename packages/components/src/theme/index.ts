@@ -1,14 +1,14 @@
+import { ElectionTheme as Election } from './election'
 import { HorizontalRuler } from './layout'
 import { QuestionsTheme as Questions } from './questions'
-import { ViewVoteTheme as ViewVote } from './view-vote'
 
 export const theme = {
   components: {
+    Election,
     HorizontalRuler,
     Questions,
-    ViewVote,
   } as any,
 }
 
+export * from './election'
 export * from './questions'
-export * from './view-vote'

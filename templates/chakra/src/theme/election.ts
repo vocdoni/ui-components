@@ -1,9 +1,9 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
-import { viewVoteAnatomy } from '@vocdoni/react-components'
+import { electionAnatomy } from '@vocdoni/react-components'
 
-const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(viewVoteAnatomy)
+const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(electionAnatomy)
 
-const ViewVote = defineMultiStyleConfig({
+const Election = defineMultiStyleConfig({
   baseStyle: ({colorMode}) => definePartsStyle({
     image: {
       minHeight: '3em',
@@ -19,4 +19,4 @@ const ViewVote = defineMultiStyleConfig({
   })
 })
 
-export default ViewVote
+export default Election
