@@ -27,6 +27,7 @@
     "@chakra-ui/radio": "^2.0.14",
     "@chakra-ui/system": "2.3.1",
     "@chakra-ui/table": "^2.0.12",
+    "@chakra-ui/tag": "^2.0.17",
     "@chakra-ui/theme": "^2.2.2",
     "@vocdoni/sdk": "^0.0.3-alpha",
     "date-fns": "^2.29.3",

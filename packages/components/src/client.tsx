@@ -34,19 +34,8 @@ export const useClientContext = () => {
 }
 
 export const ClientProvider = ({env, ...rest} : {env: EnvOptions}) => {
-  const [client, setClient] = useState<VocdoniSDKClient>()
+  const value = useClientProvider({env})
 
-  useEffect(() => {
-    if (!env || (env && !env.length) || client) return
-
-    setClient(new VocdoniSDKClient({
-      env,
-    }))
-  }, [env])
-
-  const value = {
-    client,
-  }
   return (
     <ClientContext.Provider value={value} {...rest} />
   )

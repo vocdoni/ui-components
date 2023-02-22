@@ -1,4 +1,6 @@
 import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { Tag } from '@chakra-ui/tag'
+import { ElectionStatus } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 
 import { HR, Image, Markdown } from '../layout'
@@ -58,4 +60,16 @@ export const ElectionDate = () => {
 export const ElectionSeparator = () => {
   const styles = useMultiStyleConfig('Election')
   return <HR sx={styles.hr} />
+}
+
+export const ElectionStatusBadge = () => {
+  const { election } = useElectionContext()
+
+  if (!election) return null
+
+  return (
+    <Tag sx={{textTransform: 'capitalize'}}>
+      {(ElectionStatus[election.status] as string).toLowerCase()}
+    </Tag>
+  )
 }
