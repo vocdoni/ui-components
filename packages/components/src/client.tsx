@@ -1,21 +1,28 @@
 import { ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
-import {createContext, useContext, useEffect, useState} from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+
+import { ReactNode } from 'react'
 
 export interface ClientSettings extends ClientOptions {}
 
-export const useClientProvider = ({env, client: c} : {env: EnvOptions, client?: VocdoniSDKClient}) => {
-  const [client, setClient] = useState<VocdoniSDKClient>()
+type ClientProviderProps = {
+  env?: Lowercase <keyof typeof EnvOptions>
+  client?: VocdoniSDKClient
+}
+
+export const useClientProvider = ({env, client: c} : ClientProviderProps) => {
+  const [client, setClient] = useState<VocdoniSDKClient>(c as VocdoniSDKClient)
 
   useEffect(() => {
-    if (!env || (env && !env.length) || client) return
+    if (client) return
 
-    if (c) {
-      setClient(c)
-    } else {
-      setClient(new VocdoniSDKClient({
-        env,
-      }))
+    if ((!env || (env && !env.length)) && !client) {
+      throw new Error('You must provide a valid env or client to the ClientProvider')
     }
+
+    setClient(new VocdoniSDKClient({
+      env: env as EnvOptions,
+    }))
 
   }, [env, c])
 
@@ -35,10 +42,18 @@ export const useClientContext = <T extends VocdoniSDKClient>() => {
     throw new Error('useClientContext returned `undefined`, maybe you forgot to wrap the component within <ClientProvider />?')
   }
 
-  return {...ctxt, client: ctxt.client as T} // You can specify the type of the VocdoniSDKClient if you extend it
+  return {
+    ...ctxt,
+    // Allow client extensions
+    client: ctxt.client as T,
+  }
 }
 
-export const ClientProvider = ({env, client, ...rest} : {env: EnvOptions, client?: VocdoniSDKClient}) => {
+type ClientProviderComponentProps = ClientProviderProps & {
+  children?: ReactNode
+}
+
+export const ClientProvider = ({env, client, ...rest} : ClientProviderProps) => {
   const value = useClientProvider({env, client})
 
   return (

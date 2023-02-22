@@ -11,6 +11,8 @@ const Vote = () => {
   const election = (useLoaderData() as PublishedElection)
   // const { pid } = useParams()
 
+  console.log('election status:', ElectionStatus[election.status])
+
   return (
     <Election
       // id={pid}
