@@ -3,7 +3,7 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useClientContext } from '../../client'
-import { ElectionDate, ElectionDescription, ElectionHeader, ElectionSeparator, ElectionStatusBadge, ElectionTitle } from './parts'
+import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionSeparator, ElectionStatusBadge, ElectionTitle } from './parts'
 import { QuestionsForm } from './QuestionsForm'
 
 export type ElectionProviderProps = {
@@ -108,7 +108,7 @@ export const Election = (props : ElectionProviderComponentProps) => {
     <ElectionProvider {...props}>
       <ElectionHeader />
       <ElectionTitle />
-      <ElectionDate />
+      <ElectionSchedule />
       <ElectionStatusBadge />
       <ElectionDescription />
       <ElectionSeparator />

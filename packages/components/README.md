@@ -80,17 +80,84 @@ ignore our base theme.
   for full featured flows (i.e. full featured voting page).
 - `components/layout`: small components used for layout purposes.
 
-The easiest way to integrate a voting would be to just import the `ViewVote`
-component:
+The easiest way to integrate a voting would be to just import the `Election`
+component and specify it an id for your election:
 
 ~~~tsx
-import { ViewVote } from '@vocdoni/react-components'
-import { PublishedElection } from '@vocdoni/sdk'
+import { Election } from '@vocdoni/react-components'
 
-const CustomVoteComponent = ({data: PublishedElection}) => {
-  return <ViewVote data={data} />
+const CustomVoteComponent = () => {
+  return <Election id='your-awesome-election-process-uid' />
 }
 ~~~
+
+This will automatically instance the Election Provider with all the available
+voting components. You can then style them following the instructions below, or
+you can also create your own vote view, based on the components used by the
+`Election` component:
+
+~~~tsx
+import {
+  ElectionProvider,
+  ElectionTitle,
+  ElectionSchedule,
+  ElectionStatusBadge,
+  ElectionDescription,
+  ElectionSeparator,
+  QuestionsForm,
+} from '@vocdoni/react-components'
+
+const CustomVoteComponent = () => {
+  return (
+    <ElectionProvider id='your-awesome-election-process-uid'>
+      <ElectionHeader />
+      <ElectionTitle />
+      <ElectionSchedule />
+      <ElectionStatusBadge />
+      <ElectionDescription />
+      <ElectionSeparator />
+      <QuestionsForm />
+    </ElectionProvider>
+  )
+}
+~~~
+
+All these small components used in the view accept CSS props, like any other
+chakra component:
+
+~~~tsx
+import {
+  ElectionProvider,
+  ElectionTitle,
+  ElectionSchedule,
+  ElectionStatusBadge,
+  ElectionDescription,
+  ElectionSeparator,
+  QuestionsForm,
+} from '@vocdoni/react-components'
+
+const CustomVoteComponent = () => {
+  return (
+    <ElectionProvider id='your-awesome-election-process-uid'>
+      <ElectionHeader />
+      <ElectionTitle
+        p={5}
+        mt={6}
+        mb={8}
+        textColor='red'
+      />
+      <ElectionSchedule textTransform='uppercase' />
+      <ElectionStatusBadge variant='solid' colorScheme='teal' />
+      <ElectionDescription fontFamily='monospace' />
+      <ElectionSeparator />
+      <QuestionsForm />
+    </ElectionProvider>
+  )
+}
+~~~
+
+Take a look at section below on more examples of how to style the voting view
+and its components.
 
 
 ### Theming components
