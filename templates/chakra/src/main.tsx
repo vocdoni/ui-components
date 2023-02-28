@@ -1,13 +1,11 @@
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
-import { ClientProvider } from '@vocdoni/react-components'
 import { StrictMode } from 'react'
 import * as ReactDOM from 'react-dom/client'
-import { RouterProvider } from 'react-router-dom'
 import { configureChains, createClient, mainnet, WagmiConfig } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
+import { App } from './App'
 import reportWebVitals from './reportWebVitals'
-import router from './router'
 import * as serviceWorker from './serviceWorker'
 import theme from './theme'
 
@@ -31,6 +29,7 @@ const client = createClient({
   connectors,
   webSocketProvider,
 })
+
 // end wallets config
 
 root.render(
@@ -38,10 +37,7 @@ root.render(
     <ChakraProvider theme={theme}>
       <WagmiConfig client={client}>
         <RainbowKitProvider chains={chains}>
-          <ClientProvider env='dev'>
-            <RouterProvider router={router} />
-            <ColorModeScript />
-          </ClientProvider>
+          <App />
         </RainbowKitProvider>
       </WagmiConfig>
     </ChakraProvider>

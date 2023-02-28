@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "yarn build --watch",
+    "dev": "NODE_ENV=development yarn build --watch",
     "lint": "tsc",
     "build": "vite build",
     "size": "size-limit",
@@ -39,6 +39,8 @@
     "react-dom": ">= 16.8.0"
   },
   "devDependencies": {
+    "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/wallet": "^5.7.0",
     "@size-limit/file": "^8.1.2",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",

@@ -1,5 +1,6 @@
 import { ChakraProps } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
+import { Wallet } from '@ethersproject/wallet'
 import { PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useClientContext } from '../../client'
@@ -9,17 +10,25 @@ import { QuestionsForm } from './QuestionsForm'
 export type ElectionProviderProps = {
   id?: string
   election?: PublishedElection
-  signer?: Signer
+  signer?: Wallet | Signer
   ConnectButton?: ComponentType
 }
 
-export const useElectionProvider = ({id, election: data, signer, ...rest}: ElectionProviderProps) => {
+export const useElectionProvider = ({id, election: data, signer: s, ...rest}: ElectionProviderProps) => {
   const [ loading, setLoading ] = useState<boolean>(false)
   const [ loaded, setLoaded ] = useState<boolean>(false)
   const [ voted, setVoted ] = useState<string>('')
   const [ error, setError ] = useState<string>('')
   const [ election, setElection ] = useState<PublishedElection|undefined>(data)
-  const { client } = useClientContext()
+  const { client, signer, setSigner } = useClientContext()
+
+  // set signer in case it has been specified in the election
+  // provider (rather than the client provider)
+  useEffect(() => {
+    if (!client || signer || !s) return
+
+    setSigner(s)
+  }, [signer, client, s])
 
   useEffect(() => {
     if (election || data || !id || loaded || !client) return

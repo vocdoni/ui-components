@@ -3,6 +3,12 @@ import path from 'node:path'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
+// under development avoid bundling stuff that we're not gonna use to reduce time
+const formats = ['es']
+if (process.env.NODE_ENV !== 'development') {
+  formats.push('cjs', 'umd')
+}
+
 export default defineConfig({
     plugins: [
         react(),
@@ -15,7 +21,7 @@ export default defineConfig({
         lib: {
             entry: path.resolve(__dirname, 'src/index.ts'),
             name: 'VocdoniReactComponents',
-            formats: ['es', 'cjs', 'umd'],
+            formats,
             fileName: (format) => `index.${format}.js`,
         },
         rollupOptions: {

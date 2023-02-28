@@ -3,6 +3,15 @@
 
 React components and hooks for easily integrating Vocdoni services.
 
+Installing
+----------
+
+It's as easy as installing the required components:
+
+~~~bash
+yarn add @vocdoni/react-components react-markdown remark-gfm
+~~~
+
 Theming
 -------
 
