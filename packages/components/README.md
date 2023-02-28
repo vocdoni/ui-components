@@ -9,7 +9,7 @@ Installing
 It's as easy as installing the required components:
 
 ~~~bash
-yarn add @vocdoni/react-components react-markdown remark-gfm
+yarn add @vocdoni/sdk @vocdoni/react-components react-markdown remark-gfm
 ~~~
 
 Theming
@@ -17,7 +17,7 @@ Theming
 
 Since we're using chakra's theming system, the way to style these voting
 components is [the same as described in their documentation][chakra theming],
-but using the custom components we defined (see [components anatomy] for more
+but using the custom components we defined (see [components structure] for more
 details).
 
 In order to start styling the voting components, you should use the
@@ -42,7 +42,7 @@ avoid a bigger bundle size and to ensure we don't unexpectedly overwrite styles.
 
 The above example is the easiest way to get all the default styles up and
 running, but you can always define your entire theme and ignore our base styles.
-See how our components are grainly styled below, in [components anatomy].
+See how our components are grainly styled below, in [components structure].
 
 In case you want to add the voting components to a page and ensure chakra-ui
 will not affect your theme, you may need to pass `resetCSS={false}` as a
@@ -262,7 +262,6 @@ v3.0][license].
 
 [license]: ./LICENSE
 [components structure]: #components-structure
-[components anatomy]: #components-anatomy
 [chakra theming]: https://chakra-ui.com/docs/styled-system/customize-theme#customizing-theme-tokens
 [advanced theming]: https://chakra-ui.com/docs/styled-system/advanced-theming
 [multipart components]: https://chakra-ui.com/docs/styled-system/component-style#styling-multipart-components
