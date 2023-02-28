@@ -36,7 +36,10 @@
   },
   "peerDependencies": {
     "react": ">= 16.8.0",
-    "react-dom": ">= 16.8.0"
+    "react-dom": ">= 16.8.0",
+    "@vocdoni/sdk": ">= 0.0.3-alpha",
+    "react-markdown": ">= 8.0.0",
+    "remark-gfm": ">= 2.0.0"
   },
   "devDependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",
