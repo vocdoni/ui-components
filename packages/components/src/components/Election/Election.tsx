@@ -58,7 +58,12 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
     if (!election) {
       throw new Error('no election initialized')
     }
+
+    client.setElectionId(election.id)
+
     setLoading(true)
+    setError('')
+
     const mapped = election.questions.map((q) => parseInt(values[q.title.default], 10))
 
     try {
@@ -67,8 +72,14 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
       setVoted(vid)
 
       return vid
-    } catch (e) {
-      throw e
+    } catch (e: any) {
+      if ('reason' in e) {
+        setError(e.reason as string)
+      }
+      if ('message' in e) {
+        setError(e.message as string)
+      }
+      console.error('could not vote:', e)
     } finally {
       setLoading(false)
     }

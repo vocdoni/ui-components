@@ -29,7 +29,7 @@
     "@chakra-ui/table": "^2.0.12",
     "@chakra-ui/tag": "^2.0.17",
     "@chakra-ui/theme": "^2.2.2",
-    "@vocdoni/sdk": "^0.0.3-alpha",
+    "@vocdoni/sdk": "^0.0.4-alpha",
     "date-fns": "^2.29.3",
     "react-markdown": "^8.0.4",
     "remark-gfm": "^3.0.1"
@@ -37,7 +37,7 @@
   "peerDependencies": {
     "react": ">= 16.8.0",
     "react-dom": ">= 16.8.0",
-    "@vocdoni/sdk": ">= 0.0.3-alpha",
+    "@vocdoni/sdk": ">= 0.0.4-alpha",
     "react-markdown": ">= 8.0.0",
     "remark-gfm": ">= 2.0.0"
   },

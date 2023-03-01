@@ -15,11 +15,10 @@ type QuestionsFormProps = ChakraProps & {
 }
 
 export const QuestionsForm = () => {
-  const {election, signer, vote, ConnectButton, setError} = useElectionContext()
+  const {election, signer, vote, ConnectButton, error, loading} = useElectionContext()
   const styles = useMultiStyleConfig('Questions')
   const questions = election?.questions
 
-  const [loading, setLoading] = useState<boolean>(false)
   const [disabled, setDisabled] = useState<boolean>(false)
   const isDisabled = !signer || disabled || loading
 
@@ -45,22 +44,7 @@ export const QuestionsForm = () => {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={async (values) => {
-        setLoading(true)
-
-        try {
-          await vote(values)
-        } catch (e: any) {
-          if (typeof e.message !== 'undefined') {
-            return setError(e.message)
-          }
-          if (typeof e.reason !== 'undefined') {
-            return setError(e.reason)
-          }
-          setError('Could not vote')
-          console.error('Could not vote', e)
-        } finally {
-          setLoading(false)
-        }
+        await vote(values)
       }}
     >
       {({handleSubmit, errors, touched}) => (
@@ -74,6 +58,13 @@ export const QuestionsForm = () => {
                 touched={touched[question.title.default]}
               />
             ))
+          }
+          {
+            error && (
+              <Alert status='error' variant='solid' mb={3}>
+                <AlertIcon />{error}
+              </Alert>
+            )
           }
           {
             !signer && ConnectButton ? <ConnectButton /> : (
