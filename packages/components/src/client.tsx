@@ -148,7 +148,7 @@ type ClientProviderComponentProps = ClientProviderProps & {
   children?: ReactNode
 }
 
-export const ClientProvider = ({env, client, signer,...rest} : ClientProviderProps) => {
+export const ClientProvider = ({env, client, signer,...rest} : ClientProviderComponentProps) => {
   const value = useClientProvider({env, client, signer})
 
   return (
