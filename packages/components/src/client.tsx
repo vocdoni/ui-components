@@ -115,6 +115,7 @@ export const useClientProvider = ({env: e, client: c, signer: s} : ClientProvide
   }
 
   return {
+    account,
     balance,
     client,
     env,
