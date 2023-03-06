@@ -3,21 +3,20 @@ import { Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
-import { Field, FormikErrors, FormikTouched } from 'formik'
+import { Controller, useFormContext } from 'react-hook-form'
 import { Markdown } from '../layout'
 
 type QuestionFieldProps = ChakraProps & {
   question: IQuestion,
-  error?: string | string[] | FormikErrors<any> | FormikErrors<any>[],
-  touched?: boolean | FormikTouched<any> | FormikTouched<any>[],
 }
 
-export const QuestionField = ({question, error, touched, ...rest}: QuestionFieldProps) => {
+export const QuestionField = ({question, ...rest}: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('Questions')
+  const { formState: {errors} } = useFormContext()
 
   return (
     <chakra.div __css={styles.question} {...rest}>
-      <FormControl isInvalid={!!error && !!touched}>
+      <FormControl isInvalid={!!errors[question.title.default]}>
         <chakra.label __css={styles.title}>
           {question.title.default}
         </chakra.label>
@@ -29,23 +28,31 @@ export const QuestionField = ({question, error, touched, ...rest}: QuestionField
             </Markdown>
           </chakra.div>
         }
-        <RadioGroup name={question.title.default} sx={styles.radioGroup}>
-          <Stack direction='column' sx={styles.stack}>
-            {
-              question.choices.map((choice, ck) => (
-                <Field
-                  key={ck}
-                  as={Radio}
-                  value={choice.value.toString()}
-                  sx={styles.radio}
-                >
-                  {choice.title.default}
-                </Field>
-              ))
-            }
-          </Stack>
-          <FormErrorMessage sx={styles.error}>{error?.toString()}</FormErrorMessage>
-        </RadioGroup>
+        <Controller
+          rules={{required: 'This field is required'}}
+          name={question.title.default}
+          render={({field}) => (
+            <RadioGroup
+              sx={styles.radioGroup}
+              {...field}
+            >
+              <Stack direction='column' sx={styles.stack}>
+                {
+                  question.choices.map((choice, ck) => (
+                    <Radio
+                      key={ck}
+                      sx={styles.radio}
+                      value={choice.title.default}
+                    >
+                      {choice.title.default}
+                    </Radio>
+                  ))
+                }
+              </Stack>
+              <FormErrorMessage sx={styles.error}>{errors[question.title.default]?.message as string}</FormErrorMessage>
+            </RadioGroup>
+          )}
+        />
       </FormControl>
     </chakra.div>
   )

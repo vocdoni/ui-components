@@ -31,13 +31,14 @@
     "@chakra-ui/theme": "^2.2.2",
     "@vocdoni/sdk": "^0.0.4-alpha",
     "date-fns": "^2.29.3",
+    "react-hook-form": "^7.43.5",
     "react-markdown": "^8.0.4",
     "remark-gfm": "^3.0.1"
   },
   "peerDependencies": {
+    "@vocdoni/sdk": ">= 0.0.4-alpha",
     "react": ">= 16.8.0",
     "react-dom": ">= 16.8.0",
-    "@vocdoni/sdk": ">= 0.0.4-alpha",
     "react-markdown": ">= 8.0.0",
     "remark-gfm": ">= 2.0.0"
   },

@@ -3,9 +3,7 @@ import { Button } from '@chakra-ui/button'
 import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { PublishedElection } from '@vocdoni/sdk'
-import { Formik } from 'formik'
-import { useState } from 'react'
-import * as Yup from 'yup'
+import { FieldValues, FormProvider, useForm } from 'react-hook-form'
 import { useElectionContext } from './Election'
 import { QuestionField } from './QuestionField'
 
@@ -15,12 +13,21 @@ type QuestionsFormProps = ChakraProps & {
 }
 
 export const QuestionsForm = () => {
-  const {election, signer, vote, ConnectButton, error, loading} = useElectionContext()
+  const { election, signer, vote, voted, ConnectButton, error, loading } = useElectionContext()
+  const fmethods = useForm()
   const styles = useMultiStyleConfig('Questions')
+  const { formState: { isSubmitting } } = fmethods
   const questions = election?.questions
 
-  const [disabled, setDisabled] = useState<boolean>(false)
-  const isDisabled = !signer || disabled || loading
+  if (voted.length) {
+    return (
+      <Alert variant='solid' status='info'>
+        You already voted. Your vote id is {voted}
+      </Alert>
+    )
+  }
+
+  const isDisabled = !signer || loading || isSubmitting
 
   if (!questions || (questions && !questions?.length)) {
     return (
@@ -34,47 +41,40 @@ export const QuestionsForm = () => {
     ...prev,
     [curr.title.default]: '',
   }), {})
-  const validationSchema : any = Yup.object(questions.reduce((prev, curr) => ({
-    ...prev,
-    [curr.title.default]: Yup.string().required('This field is required')
-  }), {}))
+
+  const onSubmit = async (values: FieldValues) => await vote(values)
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={async (values) => {
-        await vote(values)
-      }}
-    >
-      {({handleSubmit, errors, touched}) => (
-        <form onSubmit={handleSubmit}>
-          {
-            questions.map((question, qk) => (
-              <QuestionField
-                key={qk}
-                question={question}
-                error={errors[question.title.default]}
-                touched={touched[question.title.default]}
-              />
-            ))
-          }
-          {
-            error && (
-              <Alert status='error' variant='solid' mb={3}>
-                <AlertIcon />{error}
-              </Alert>
-            )
-          }
-          {
-            !signer && ConnectButton ? <ConnectButton /> : (
-              <Button type='submit' sx={styles.button} disabled={isDisabled}>
-                Vote
-              </Button>
-            )
-          }
-        </form>
-      )}
-    </Formik>
+    <FormProvider {...fmethods}>
+      <form onSubmit={fmethods.handleSubmit(onSubmit)}>
+        {
+          questions.map((question, qk) => (
+            <QuestionField
+              key={qk}
+              question={question}
+            />
+          ))
+        }
+        {
+          error && (
+            <Alert status='error' variant='solid' mb={3}>
+              <AlertIcon />{error}
+            </Alert>
+          )
+        }
+        {
+          !signer && ConnectButton ? <ConnectButton /> : (
+            <Button
+              type='submit'
+              sx={styles.button}
+              disabled={isDisabled}
+              isLoading={isSubmitting}
+            >
+              Vote
+            </Button>
+          )
+        }
+      </form>
+    </FormProvider>
   )
 }

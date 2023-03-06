@@ -3,8 +3,15 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { FieldValues } from 'react-hook-form'
 import { useClientContext } from '../../client'
-import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionSeparator, ElectionStatusBadge, ElectionTitle } from './parts'
+import { HR } from '../layout'
+import {
+  ElectionDescription,
+  ElectionHeader,
+  ElectionSchedule, ElectionStatusBadge,
+  ElectionTitle
+} from './parts'
 import { QuestionsForm } from './QuestionsForm'
 
 export type ElectionProviderProps = {
@@ -48,7 +55,7 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
 
   }, [election, id, loaded, client])
 
-  const vote = async (values: {[key:string]:string}) => {
+  const vote = async (values: FieldValues) => {
     if (!client) {
       throw new Error('no client initialized')
     }
@@ -123,17 +130,15 @@ export const ElectionProvider = ({children, ...rest}: PropsWithChildren<Election
 }
 ElectionProvider.displayName = 'ElectionProvider'
 
-export const Election = (props : ElectionProviderComponentProps) => {
-  return (
-    <ElectionProvider {...props}>
-      <ElectionHeader />
-      <ElectionTitle />
-      <ElectionSchedule />
-      <ElectionStatusBadge />
-      <ElectionDescription />
-      <ElectionSeparator />
-      <QuestionsForm />
-    </ElectionProvider>
-  )
-}
+export const Election = (props : ElectionProviderComponentProps) => (
+  <ElectionProvider {...props}>
+    <ElectionHeader />
+    <ElectionTitle />
+    <ElectionSchedule />
+    <ElectionStatusBadge />
+    <ElectionDescription />
+    <HR />
+    <QuestionsForm />
+  </ElectionProvider>
+)
 Election.displayName = 'Election'
