@@ -12,12 +12,68 @@ It's as easy as installing the required components:
 yarn add @vocdoni/sdk @vocdoni/react-components react-markdown remark-gfm
 ~~~
 
+Usage
+-----
+
+The easiest way to integrate a voting would be to just import the `Election`
+component and specify it an id for your election:
+
+~~~tsx
+import { Election } from '@vocdoni/react-components'
+
+const CustomVoteComponent = () => {
+  return <Election id='your-awesome-election-process-uid' />
+}
+~~~
+
+This will automatically instance the Election Provider with all the available
+voting components. You can style it following the [instructions below][theming],
+or you can also create your own vote view, based on the components used by the
+`Election` component, and style it directly with props:
+
+~~~tsx
+import {
+  ElectionProvider,
+  ElectionTitle,
+  ElectionSchedule,
+  ElectionStatusBadge,
+  ElectionDescription,
+  HR,
+  QuestionsForm,
+} from '@vocdoni/react-components'
+
+const CustomVoteComponent = () => {
+  return (
+    <ElectionProvider id='your-awesome-election-process-uid'>
+      <ElectionHeader />
+      <ElectionTitle
+        p={5}
+        mt={6}
+        mb={8}
+        textColor='red'
+      />
+      <ElectionSchedule textTransform='uppercase' />
+      <ElectionStatusBadge variant='solid' colorScheme='teal' />
+      <ElectionDescription fontFamily='monospace' />
+      <HR />
+      <QuestionsForm />
+    </ElectionProvider>
+  )
+}
+~~~
+
+Take a look at section below on more examples of how to style the voting
+components.
+
+> Note you won't see some required styles if you have not added the
+> ChakraProvider to your project, see below for more details on this.
+
 Theming
 -------
 
 Since we're using chakra's theming system, the way to style these voting
 components is [the same as described in their documentation][chakra theming],
-but using the custom components we defined (see [components structure] for more
+but using the custom components we defined (see [theming components] for more
 details).
 
 In order to start styling the voting components, you should use the
@@ -49,6 +105,9 @@ will not affect your theme, you may need to pass `resetCSS={false}` as a
 component prop:
 
 ~~~tsx
+import { extendTheme } from '@chakra-ui/system'
+import { theme } from '@vocdoni/react-components'
+
 export const App = () => (
   <ChakraProvider resetCSS={false} theme={extendTheme(theme)}>
     {/* YOUR APP CONTENTS */}
@@ -77,142 +136,46 @@ export const App = () => (
 )
 ~~~
 
-Or you can simply ignore our theme and redefine it from the ground. All
-multipart comonents export their helper theming methods, in case you want to
-ignore our base theme.
-
-### Components structure
-
-- `components`: small components with part of the logic related to Vocdoni API
-  (i.e. process questions).
-- `components/views`: bigger components containing all the required components
-  for full featured flows (i.e. full featured voting page).
-- `components/layout`: small components used for layout purposes.
-
-The easiest way to integrate a voting would be to just import the `Election`
-component and specify it an id for your election:
-
-~~~tsx
-import { Election } from '@vocdoni/react-components'
-
-const CustomVoteComponent = () => {
-  return <Election id='your-awesome-election-process-uid' />
-}
-~~~
-
-This will automatically instance the Election Provider with all the available
-voting components. You can then style them following the instructions below, or
-you can also create your own vote view, based on the components used by the
-`Election` component:
-
-~~~tsx
-import {
-  ElectionProvider,
-  ElectionTitle,
-  ElectionSchedule,
-  ElectionStatusBadge,
-  ElectionDescription,
-  ElectionSeparator,
-  QuestionsForm,
-} from '@vocdoni/react-components'
-
-const CustomVoteComponent = () => {
-  return (
-    <ElectionProvider id='your-awesome-election-process-uid'>
-      <ElectionHeader />
-      <ElectionTitle />
-      <ElectionSchedule />
-      <ElectionStatusBadge />
-      <ElectionDescription />
-      <ElectionSeparator />
-      <QuestionsForm />
-    </ElectionProvider>
-  )
-}
-~~~
-
-All these small components used in the view accept CSS props, like any other
-chakra component:
-
-~~~tsx
-import {
-  ElectionProvider,
-  ElectionTitle,
-  ElectionSchedule,
-  ElectionStatusBadge,
-  ElectionDescription,
-  ElectionSeparator,
-  QuestionsForm,
-} from '@vocdoni/react-components'
-
-const CustomVoteComponent = () => {
-  return (
-    <ElectionProvider id='your-awesome-election-process-uid'>
-      <ElectionHeader />
-      <ElectionTitle
-        p={5}
-        mt={6}
-        mb={8}
-        textColor='red'
-      />
-      <ElectionSchedule textTransform='uppercase' />
-      <ElectionStatusBadge variant='solid' colorScheme='teal' />
-      <ElectionDescription fontFamily='monospace' />
-      <ElectionSeparator />
-      <QuestionsForm />
-    </ElectionProvider>
-  )
-}
-~~~
-
-Take a look at section below on more examples of how to style the voting view
-and its components.
-
+We have applied a few amount of styles, so you can perfectly ignore our styles
+and write them from the ground up.
 
 ### Theming components
 
-Most components follow a multipart component structure. Please refer to the
-[official chakra documentation][multipart components] for more info on how to
-style these type of components.
+Since you have components for every part of an election process, you can follow
+the official Chakra documentation on how to customize component styles, and just
+use our components where required.
 
-Other small components, like `Image` or `HR`, can be styled using the theme
-provider or via [css props] but, since they're defined as parts of the multipart
-components, you can define a main style for them, and also override styles for
-each component part.
-
-Here's a small example styling the ViewVote component :
+Here's a small example styling the title and image of elections:
 
 ~~~ts
-import { extendTheme, createMultiStyleConfigHelpers } from '@chakra-ui/react'
-import { theme as vtheme, viewVoteAnatomy } from '@vocdoni/react-components'
+import { extendTheme, ComponentSingleStyleConfig } from '@chakra-ui/react'
+import { theme as vtheme } from '@vocdoni/react-components'
 
-const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(viewVoteAnatomy)
+const ElectionTitle : ComponentsStyleConfig = {
+  baseStyle: {
+    paddingTop: '.5em',
+    position: 'relative',
+    marginTop: '-2.5em',
+    background: 'linear-gradient(180deg, rgba(0,0,0,0.50) 0%, rgba(255,255,255,0) 100%)',
+  }
+}
 
-const ViewVote = defineMultiStyleConfig({
-  baseStyle: definePartsStyle({
-    title: {
-      paddingTop: '.5em',
-      position: 'relative',
-      marginTop: '-2.5em',
-      background: 'linear-gradient(180deg, rgba(0,0,0,0.50) 0%, rgba(255,255,255,0) 100%)'
-    },
-  }),
-})
+const ElectionHeader : ComponentsStyleConfig = {
+  baseStyle: {
+    minHeight: '3em'
+  }
+}
 
 const theme = extendTheme(vtheme, {
   components: {
-    ViewVote,
+    ElectionTitle,
+    ElectionHeader,
   },
 })
 
-// this theme would then be used directly in the ChakraProvider
+// this theme would then be used directly in your ChakraProvider instance
 export default theme
 ~~~
-
-You can check out each component's anatomy by checking
-[their theme files][theme path]. You can also take a look to the
-[chakra template] we have in this project, where we're overwriting some of these
-styles.
 
 #### Styling via props
 
@@ -220,22 +183,63 @@ All components have all the features you would expect from a chakra component,
 meaning you can style all components via component props too:
 
 ~~~tsx
-import { Image } from '@vocdoni/react-components'
+import { ElectionTitle, ElectionHeader } from '@vocdoni/react-components'
 
 const App = () => (
-  <Image
-    borderRadius="full"
-    boxSize="100px"
+  <ElectionProvider id='an-election-id'>
+    <ElectionHeader
+      borderRadius="full"
+      boxSize="100px"
 
-    src="https://picsum.photos/200"
-    alt="random image"
-  />
+      src="https://picsum.photos/200"
+      alt="random image"
+    />
+    <ElectionTitle
+      as='h2'
+      fontSize='50px'
+    />
+  </ElectionProvider>
 )
 ~~~
 
-Note this is mostly usefull for small components, since big components css props
-would only affect their wrappers. For styling their children components you'll
-have to use the theme provider.
+### Theming complex multipart components
+
+Some components, like `<QuestionsForm />` follow a multipart component
+structure. Please refer to the
+[official chakra documentation][multipart components] for more info on how to
+style these type of components.
+
+Here's a small example styling the `QuestionsForm` component:
+
+~~~ts
+import { extendTheme, createMultiStyleConfigHelpers } from '@chakra-ui/react'
+import { theme as vtheme, questionsAnatomy } from '@vocdoni/react-components'
+
+const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsAnatomy)
+
+const QuestionsForm = defineMultiStyleConfig({
+  baseStyle: definePartsStyle({
+    title: {
+      color: 'lightblue',
+    },
+    description: {
+      color: 'lightgreen',
+    }
+  }),
+})
+
+const theme = extendTheme(vtheme, {
+  components: {
+    QuestionsForm,
+  },
+})
+
+// this theme would then be used directly in your ChakraProvider instance
+export default theme
+~~~
+
+You can check out each component's anatomy by checking
+[their theme files][theme path].
 
 
 LICENSE
@@ -261,8 +265,8 @@ v3.0][license].
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [license]: ./LICENSE
-[components structure]: #components-structure
-[chakra theming]: https://chakra-ui.com/docs/styled-system/customize-theme#customizing-theme-tokens
+[theming components]: #theming-components
+[chakra theming]: https://chakra-ui.com/docs/styled-system/customize-theme#customizing-component-styles
 [advanced theming]: https://chakra-ui.com/docs/styled-system/advanced-theming
 [multipart components]: https://chakra-ui.com/docs/styled-system/component-style#styling-multipart-components
 [questions]: #questions

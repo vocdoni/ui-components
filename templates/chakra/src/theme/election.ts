@@ -1,22 +1,18 @@
-import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
-import { electionAnatomy } from '@vocdoni/react-components'
+import { ComponentStyleConfig } from '@chakra-ui/react'
 
-const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(electionAnatomy)
+export const ElectionHeader : ComponentStyleConfig = {
+  baseStyle: {
+    minHeight: '3em',
+  },
+}
 
-const Election = defineMultiStyleConfig({
-  baseStyle: ({colorMode}) => definePartsStyle({
-    image: {
-      minHeight: '3em',
-    },
-    title: {
-      paddingY: '.5em',
-      position: 'relative',
-      marginTop: '-2.5em',
-      background: colorMode === 'dark' ?
-        'linear-gradient(180deg, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0) 100%)' :
-        'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,1) 30%)',
-    },
-  })
-})
-
-export default Election
+export const ElectionTitle : ComponentStyleConfig = {
+  baseStyle: ({colorMode}) => ({
+    paddingY: '.5em',
+    position: 'relative',
+    marginTop: '-2.5em',
+    background: colorMode === 'dark' ?
+      'linear-gradient(180deg, rgba(0,0,0,0.50) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0) 100%)' :
+      'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,1) 30%)',
+  }),
+}

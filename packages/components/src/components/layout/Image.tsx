@@ -1,6 +1,6 @@
 import { Image as CImage, ImageProps } from '@chakra-ui/image'
 
-type IPFSImageProps = ImageProps & {
+export type IPFSImageProps = ImageProps & {
   gateway?: string
 }
 
