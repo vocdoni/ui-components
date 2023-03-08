@@ -2,7 +2,7 @@ import { Alert, AlertIcon } from '@chakra-ui/alert'
 import { Button } from '@chakra-ui/button'
 import { useMultiStyleConfig } from '@chakra-ui/system'
 import { FieldValues, FormProvider, useForm } from 'react-hook-form'
-import { useElectionContext } from './Election'
+import { useElection } from './Election'
 import { QuestionField } from './QuestionField'
 
 type QuestionsFormProps = {
@@ -10,7 +10,7 @@ type QuestionsFormProps = {
 }
 
 export const QuestionsForm = ({showVoteButton} : QuestionsFormProps) => {
-  const { election, signer, vote, voted, ConnectButton, error, loading } = useElectionContext()
+  const { election, signer, vote, voted, ConnectButton, error, loading } = useElection()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('Questions')
   const { formState: { isSubmitting } } = fmethods

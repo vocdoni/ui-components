@@ -1,14 +1,15 @@
 import { HeadingProps } from '@chakra-ui/layout'
-import { chakra, ChakraComponent, forwardRef, omitThemingProps, useMultiStyleConfig, useStyleConfig } from '@chakra-ui/system'
+import { chakra, forwardRef, omitThemingProps, useMultiStyleConfig, useStyleConfig } from '@chakra-ui/system'
 import { Tag, TagProps } from '@chakra-ui/tag'
 import { ElectionStatus } from '@vocdoni/sdk'
 import { format } from 'date-fns'
+import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
 
 import { Image, IPFSImageProps, Markdown } from '../layout'
-import { useElectionContext } from "./Election"
+import { useElection } from "./Election"
 
 export const ElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
-  const { election } = useElectionContext()
+  const { election } = useElection()
   const styles = useStyleConfig('ElectionTitle', props)
   const rest = omitThemingProps(props)
 
@@ -26,9 +27,9 @@ export const ElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
 })
 ElectionTitle.displayName = 'ElectionTitle'
 
-const Header = (props: IPFSImageProps) => {
+export const ElectionHeader = (props: IPFSImageProps) => {
   const styles = useStyleConfig('ElectionHeader', props)
-  const { election } = useElectionContext()
+  const { election } = useElection()
 
   if (!election || (election && !election.header)) return null
 
@@ -36,12 +37,10 @@ const Header = (props: IPFSImageProps) => {
     <Image src={election.header} sx={styles} {...props} />
   )
 }
-export const ElectionHeader = chakra(Header)
-ElectionHeader.displayName = 'ElectionHeader'
 
-const Description = (props: ChakraComponent<typeof Markdown, {}>) => {
+export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children'|'node'>) => {
   const styles = useStyleConfig('ElectionDescription', props)
-  const { election }  = useElectionContext()
+  const { election }  = useElection()
 
   if (!election || (election && !election.description)) return null
 
@@ -51,12 +50,10 @@ const Description = (props: ChakraComponent<typeof Markdown, {}>) => {
     </Markdown>
   )
 }
-export const ElectionDescription = chakra(Description)
-ElectionDescription.displayName = 'ElectionDescription'
 
 export const ElectionSchedule = forwardRef<HeadingProps, 'h2'>((props, ref) => {
   const styles = useMultiStyleConfig('ElectionSchedule', props)
-  const { election } = useElectionContext()
+  const { election } = useElection()
 
   if (!election) return null
 
@@ -69,8 +66,8 @@ export const ElectionSchedule = forwardRef<HeadingProps, 'h2'>((props, ref) => {
 })
 ElectionSchedule.displayName = 'ElectionSchedule'
 
-const StatusBadge = (props: TagProps) => {
-  const { election } = useElectionContext()
+export const ElectionStatusBadge = (props: TagProps) => {
+  const { election } = useElection()
 
   if (!election) return null
 
@@ -80,5 +77,3 @@ const StatusBadge = (props: TagProps) => {
     </Tag>
   )
 }
-export const ElectionStatusBadge = chakra(StatusBadge)
-ElectionStatusBadge.displayName = 'ElectionStatusBadge'
