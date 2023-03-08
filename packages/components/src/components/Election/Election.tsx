@@ -138,7 +138,7 @@ export const Election = (props : ElectionProviderComponentProps) => (
     <ElectionStatusBadge />
     <ElectionDescription />
     <HR />
-    <QuestionsForm />
+    <QuestionsForm showVoteButton />
   </ElectionProvider>
 )
 Election.displayName = 'Election'

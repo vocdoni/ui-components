@@ -1,18 +1,15 @@
 import { Alert, AlertIcon } from '@chakra-ui/alert'
 import { Button } from '@chakra-ui/button'
-import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
-import { Signer } from '@ethersproject/abstract-signer'
-import { PublishedElection } from '@vocdoni/sdk'
+import { useMultiStyleConfig } from '@chakra-ui/system'
 import { FieldValues, FormProvider, useForm } from 'react-hook-form'
 import { useElectionContext } from './Election'
 import { QuestionField } from './QuestionField'
 
-type QuestionsFormProps = ChakraProps & {
-  election?: PublishedElection
-  signer?: Signer
+type QuestionsFormProps = {
+  showVoteButton?: boolean
 }
 
-export const QuestionsForm = () => {
+export const QuestionsForm = ({showVoteButton} : QuestionsFormProps) => {
   const { election, signer, vote, voted, ConnectButton, error, loading } = useElectionContext()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('Questions')
@@ -46,7 +43,7 @@ export const QuestionsForm = () => {
 
   return (
     <FormProvider {...fmethods}>
-      <form onSubmit={fmethods.handleSubmit(onSubmit)}>
+      <form onSubmit={fmethods.handleSubmit(onSubmit)} id='election-create-form'>
         {
           questions.map((question, qk) => (
             <QuestionField
@@ -63,7 +60,7 @@ export const QuestionsForm = () => {
           )
         }
         {
-          !signer && ConnectButton ? <ConnectButton /> : (
+          (showVoteButton && !signer && ConnectButton) ? <ConnectButton /> : (
             <Button
               type='submit'
               sx={styles.button}
