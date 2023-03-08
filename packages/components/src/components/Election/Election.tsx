@@ -111,7 +111,7 @@ export const ElectionContext = createContext<ElectionState | undefined>(undefine
 export const useElection = () => {
   const ctxt = useContext(ElectionContext)
   if (!ctxt) {
-    throw new Error('useElectionContext returned `undefined`, maybe you forgot to wrap the component within <ElectionProvider />?')
+    throw new Error('useElection returned `undefined`, maybe you forgot to wrap the component within <ElectionProvider />?')
   }
 
   return ctxt

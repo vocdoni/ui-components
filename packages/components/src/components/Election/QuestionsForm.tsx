@@ -60,7 +60,7 @@ export const QuestionsForm = ({showVoteButton} : QuestionsFormProps) => {
           )
         }
         {
-          (showVoteButton && !signer && ConnectButton) ? <ConnectButton /> : (
+          showVoteButton && ((!signer && ConnectButton) ? <ConnectButton /> : (
             <Button
               type='submit'
               sx={styles.button}
@@ -69,7 +69,7 @@ export const QuestionsForm = ({showVoteButton} : QuestionsFormProps) => {
             >
               Vote
             </Button>
-          )
+          ))
         }
       </form>
     </FormProvider>
