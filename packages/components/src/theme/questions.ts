@@ -1,8 +1,6 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/system'
 
 export const questionsAnatomy = [
-  // main questions wrapper
-  'wrapper',
   // alert message (when no questions are available)
   'alert',
   // question wrapper
