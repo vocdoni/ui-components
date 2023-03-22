@@ -7,9 +7,7 @@ import { RouterProvider } from 'react-router-dom'
 
 const AllProviders = ({ children }: { children?: React.ReactNode }) => (
   <ChakraProvider theme={theme}>
-    <RouterProvider router={router}>
-      {children}
-    </RouterProvider>
+    <RouterProvider router={router}>{children}</RouterProvider>
   </ChakraProvider>
 )
 

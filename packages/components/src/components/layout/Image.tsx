@@ -25,7 +25,7 @@ export const linkify = (link: string | undefined, gateway: string) => {
   return gateway + pin
 }
 
-export const Image = ({src, ...props} : IPFSImageProps) => {
+export const Image = ({ src, ...props }: IPFSImageProps) => {
   if (!src) {
     return null
   }

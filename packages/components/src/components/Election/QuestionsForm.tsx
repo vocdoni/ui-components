@@ -21,36 +21,34 @@ export const QuestionsForm = () => {
   if (!questions || (questions && !questions?.length)) {
     return (
       <Alert variant='solid' status='warning' sx={styles.alert}>
-        <AlertIcon />Apparently this process has no questions 🤔
+        <AlertIcon />
+        Apparently this process has no questions 🤔
       </Alert>
     )
   }
 
-  const initialValues : any = questions.reduce((prev, curr) => ({
-    ...prev,
-    [curr.title.default]: '',
-  }), {})
+  const initialValues: any = questions.reduce(
+    (prev, curr) => ({
+      ...prev,
+      [curr.title.default]: '',
+    }),
+    {}
+  )
 
   const onSubmit = async (values: FieldValues) => await vote(values)
 
   return (
     <FormProvider {...fmethods}>
       <form onSubmit={fmethods.handleSubmit(onSubmit)} id='election-questions-form'>
-        {
-          questions.map((question, qk) => (
-            <QuestionField
-              key={qk}
-              question={question}
-            />
-          ))
-        }
-        {
-          error && (
-            <Alert status='error' variant='solid' mb={3}>
-              <AlertIcon />{error}
-            </Alert>
-          )
-        }
+        {questions.map((question, qk) => (
+          <QuestionField key={qk} question={question} />
+        ))}
+        {error && (
+          <Alert status='error' variant='solid' mb={3}>
+            <AlertIcon />
+            {error}
+          </Alert>
+        )}
       </form>
     </FormProvider>
   )

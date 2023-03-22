@@ -17,8 +17,11 @@ const _Balance = (props: ChakraComponent<'span', TagProps>) => {
     color = 'red'
   }
 
-
-  return <Tag size='sm' colorScheme={color} {...props}>{balance} votokens</Tag>
+  return (
+    <Tag size='sm' colorScheme={color} {...props}>
+      {balance} votokens
+    </Tag>
+  )
 }
 
 export const Balance = chakra(_Balance)

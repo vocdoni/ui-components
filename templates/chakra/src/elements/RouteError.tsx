@@ -2,7 +2,7 @@ import { Alert, AlertIcon, Code, Stack } from '@chakra-ui/react'
 import { useRouteError } from 'react-router-dom'
 
 const RouteError = () => {
-  const error = (useRouteError() as Error)
+  const error = useRouteError() as Error
 
   return (
     <Stack spacing={4}>

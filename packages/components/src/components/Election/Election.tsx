@@ -6,13 +6,7 @@ import { ComponentType, createContext, PropsWithChildren, useContext, useEffect,
 import { FieldValues } from 'react-hook-form'
 import { useClientContext } from '../../client'
 import { HR } from '../layout'
-import {
-  ElectionDescription,
-  ElectionHeader,
-  ElectionSchedule,
-  ElectionStatusBadge,
-  ElectionTitle
-} from './parts'
+import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionStatusBadge, ElectionTitle } from './parts'
 import { QuestionsForm } from './QuestionsForm'
 import { VoteButton } from './VoteButton'
 
@@ -23,15 +17,15 @@ export type ElectionProviderProps = {
   ConnectButton?: ComponentType
 }
 
-export const useElectionProvider = ({id, election: data, signer: s, ...rest}: ElectionProviderProps) => {
-  const [ loading, setLoading ] = useState<boolean>(false)
-  const [ voting, setVoting ] = useState<boolean>(false)
-  const [ loaded, setLoaded ] = useState<boolean>(false)
-  const [ voted, setVoted ] = useState<string>('')
-  const [ error, setError ] = useState<string>('')
-  const [ election, setElection ] = useState<PublishedElection|undefined>(data)
+export const useElectionProvider = ({ id, election: data, signer: s, ...rest }: ElectionProviderProps) => {
   const { client, signer, setSigner } = useClientContext()
-  const [ isAbleToVote, setIsAbleToVote ] = useState<boolean|undefined>(undefined)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [voting, setVoting] = useState<boolean>(false)
+  const [loaded, setLoaded] = useState<boolean>(false)
+  const [voted, setVoted] = useState<string>('')
+  const [error, setError] = useState<string>('')
+  const [election, setElection] = useState<PublishedElection | undefined>(data)
+  const [isAbleToVote, setIsAbleToVote] = useState<boolean | undefined>(undefined)
 
   // set signer in case it has been specified in the election
   // provider (rather than the client provider)
@@ -44,7 +38,6 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
   // fetch election
   useEffect(() => {
     if (election || !id || loaded || !client) return
-
     ;(async () => {
       setLoading(true)
       try {
@@ -57,7 +50,6 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
         setLoading(false)
       }
     })()
-
   }, [election, id, loaded, client])
 
   // set loaded in case election comes from props
@@ -70,11 +62,9 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
   // check if logged in user is able to vote
   useEffect(() => {
     if (!signer || !election || !loaded || !client || isAbleToVote !== undefined) return
-
     ;(async () => {
       setIsAbleToVote(await client.isAbleToVote(election.id))
     })()
-
   }, [election, loaded, client, isAbleToVote, signer])
 
   // context vote function (the one to be used with the given components)
@@ -136,7 +126,9 @@ export const ElectionContext = createContext<ElectionState | undefined>(undefine
 export const useElection = () => {
   const ctxt = useContext(ElectionContext)
   if (!ctxt) {
-    throw new Error('useElection returned `undefined`, maybe you forgot to wrap the component within <ElectionProvider />?')
+    throw new Error(
+      'useElection returned `undefined`, maybe you forgot to wrap the component within <ElectionProvider />?'
+    )
   }
 
   return ctxt
@@ -144,18 +136,14 @@ export const useElection = () => {
 
 export type ElectionProviderComponentProps = ElectionProviderProps & ChakraProps
 
-export const ElectionProvider = ({children, ...rest}: PropsWithChildren<ElectionProviderComponentProps>) => {
+export const ElectionProvider = ({ children, ...rest }: PropsWithChildren<ElectionProviderComponentProps>) => {
   const value = useElectionProvider(rest)
 
-  return (
-    <ElectionContext.Provider value={value}>
-      {children}
-    </ElectionContext.Provider>
-  )
+  return <ElectionContext.Provider value={value}>{children}</ElectionContext.Provider>
 }
 ElectionProvider.displayName = 'ElectionProvider'
 
-export const Election = (props : ElectionProviderComponentProps) => (
+export const Election = (props: ElectionProviderComponentProps) => (
   <ElectionProvider {...props}>
     <ElectionHeader />
     <ElectionTitle />

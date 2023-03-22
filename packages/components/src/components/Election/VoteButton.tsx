@@ -6,7 +6,7 @@ export type VoteButtonProps = ChakraProps & {
   label?: string
 }
 
-export const VoteButton = ({label, ...rest} : VoteButtonProps) => {
+export const VoteButton = ({ label, ...rest }: VoteButtonProps) => {
   const { signer, loading, voting, ConnectButton } = useElection()
   const isDisabled = !signer || loading || voting
 
@@ -15,12 +15,8 @@ export const VoteButton = ({label, ...rest} : VoteButtonProps) => {
   }
 
   return (
-    <Button
-      type='submit'
-      {...rest}
-      form='election-questions-form'
-      disabled={isDisabled}
-      isLoading={voting}
-    >{label || 'Vote'}</Button>
+    <Button type='submit' {...rest} form='election-questions-form' disabled={isDisabled} isLoading={voting}>
+      {label || 'Vote'}
+    </Button>
   )
 }

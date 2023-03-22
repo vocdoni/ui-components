@@ -6,7 +6,7 @@ import '@rainbow-me/rainbowkit/styles.css'
 
 const Vote = () => {
   // we take the election from the route information for a better rendering experience
-  const election = (useLoaderData() as PublishedElection)
+  const election = useLoaderData() as PublishedElection
   /*
     you could comment the above line and uncomment the ones below to use the
     ElectionProvider to fetch the election instead, but the usage of useLoaderData

@@ -1,12 +1,19 @@
 import { HeadingProps } from '@chakra-ui/layout'
-import { chakra, ChakraProps, forwardRef, omitThemingProps, useMultiStyleConfig, useStyleConfig } from '@chakra-ui/system'
+import {
+  chakra,
+  ChakraProps,
+  forwardRef,
+  omitThemingProps,
+  useMultiStyleConfig,
+  useStyleConfig,
+} from '@chakra-ui/system'
 import { Tag, TagProps } from '@chakra-ui/tag'
 import { ElectionStatus } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
 
 import { Image, IPFSImageProps, Markdown } from '../layout'
-import { useElection } from "./Election"
+import { useElection } from './Election'
 
 export const ElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
   const { election } = useElection()
@@ -16,11 +23,7 @@ export const ElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
   if (!election) return null
 
   return (
-    <chakra.h1
-      ref={ref}
-      {...rest}
-      __css={styles}
-    >
+    <chakra.h1 ref={ref} {...rest} __css={styles}>
       {election.title.default}
     </chakra.h1>
   )
@@ -33,14 +36,12 @@ export const ElectionHeader = (props: IPFSImageProps) => {
 
   if (!election || (election && !election.header)) return null
 
-  return (
-    <Image src={election.header} sx={styles} {...props} />
-  )
+  return <Image src={election.header} sx={styles} {...props} />
 }
 
-export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children'|'node'> & ChakraProps) => {
+export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children' | 'node'> & ChakraProps) => {
   const styles = useStyleConfig('ElectionDescription', props)
-  const { election }  = useElection()
+  const { election } = useElection()
 
   if (!election || (election && !election.description)) return null
 
@@ -72,7 +73,7 @@ export const ElectionStatusBadge = (props: TagProps) => {
   if (!election) return null
 
   return (
-    <Tag sx={{textTransform: 'capitalize'}} {...props}>
+    <Tag sx={{ textTransform: 'capitalize' }} {...props}>
       {(ElectionStatus[election.status] as string).toLowerCase()}
     </Tag>
   )

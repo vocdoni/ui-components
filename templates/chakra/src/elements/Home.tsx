@@ -1,4 +1,13 @@
-import { Button, FormControl, FormErrorMessage, Input, InputGroup, InputRightElement, Text, VStack } from '@chakra-ui/react'
+import {
+  Button,
+  FormControl,
+  FormErrorMessage,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Text,
+  VStack,
+} from '@chakra-ui/react'
 import { Field, Formik } from 'formik'
 import { useNavigate } from 'react-router-dom'
 
@@ -13,21 +22,16 @@ const Home = () => {
     return nav(`/process/${id}`)
   }
 
-  const vals : HomeForm = {
+  const vals: HomeForm = {
     processId: '',
   }
 
   return (
     <VStack spacing={8}>
       <Text>Specify a process ID to easily navigate to it:</Text>
-      <Formik
-        initialValues={vals}
-        onSubmit={(values) =>
-          goto(values.processId)
-        }
-      >
-        {({handleSubmit, errors, touched}) => (
-          <form onSubmit={handleSubmit} style={{width: '100%'}}>
+      <Formik initialValues={vals} onSubmit={(values) => goto(values.processId)}>
+        {({ handleSubmit, errors, touched }) => (
+          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
             <FormControl isInvalid={!!errors.processId && touched.processId}>
               <InputGroup>
                 <Field

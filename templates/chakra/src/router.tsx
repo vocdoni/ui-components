@@ -14,7 +14,7 @@ const router = createHashRouter(
         element={<Vote />}
         errorElement={<RouteError />}
         path='/process/:pid'
-        loader={async ({params}) =>
+        loader={async ({ params }) =>
           // sadly, we cannot use hooks here, that's why we use a new
           // VocdoniSDKClient instance
           await new VocdoniSDKClient({

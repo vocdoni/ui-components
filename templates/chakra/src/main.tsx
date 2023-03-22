@@ -14,10 +14,7 @@ if (!container) throw new Error('Failed to find the root element')
 const root = ReactDOM.createRoot(container)
 
 // wagmi + rainbowkit wallets config
-const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet],
-  [publicProvider()],
-)
+const { chains, provider, webSocketProvider } = configureChains([mainnet], [publicProvider()])
 
 const { connectors } = getDefaultWallets({
   appName: 'Vocdoni Voting Protocol',
@@ -41,7 +38,7 @@ root.render(
         </RainbowKitProvider>
       </WagmiConfig>
     </ChakraProvider>
-  </StrictMode>,
+  </StrictMode>
 )
 
 // If you want your app to work offline and load faster, you can change

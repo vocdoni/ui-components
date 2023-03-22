@@ -1,6 +1,6 @@
 import { ComponentSingleStyleConfig, theme } from '@chakra-ui/theme'
 
-export const ElectionTitleTheme : ComponentSingleStyleConfig = {
+export const ElectionTitleTheme: ComponentSingleStyleConfig = {
   baseStyle: {
     ...theme.components.Heading.baseStyle,
     ...theme.components.Heading.sizes?.xl,
@@ -10,12 +10,12 @@ export const ElectionTitleTheme : ComponentSingleStyleConfig = {
   },
 }
 
-export const ElectionScheduleTheme : ComponentSingleStyleConfig = {
+export const ElectionScheduleTheme: ComponentSingleStyleConfig = {
   baseStyle: {
     ...theme.components.Heading.baseStyle,
     ...theme.components.Heading.sizes?.sm,
     textAlign: 'center',
     fontStyle: 'italic',
     color: 'gray.400',
-  }
+  },
 }

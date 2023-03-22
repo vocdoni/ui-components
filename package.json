@@ -6,15 +6,17 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "workspaces": [
-      "packages/*",
-      "templates/*"
-    ],
+    "packages/*",
+    "templates/*"
+  ],
   "devDependencies": {
+    "prettier": "^2.8.6",
     "turbo": "^1.6.3"
   },
   "scripts": {
     "build": "turbo build",
-    "lint": "turbo lint",
+    "lint": "prettier -c .",
+    "lint:fix": "prettier -c . --write",
     "dev": "turbo dev"
   }
 }
