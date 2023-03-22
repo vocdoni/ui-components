@@ -2,7 +2,7 @@
   "name": "@vocdoni/react-components",
   "private": false,
   "license": "GPL-3.0-or-later",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "files": [
     "dist"
