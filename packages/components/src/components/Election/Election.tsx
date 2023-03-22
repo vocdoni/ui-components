@@ -9,10 +9,12 @@ import { HR } from '../layout'
 import {
   ElectionDescription,
   ElectionHeader,
-  ElectionSchedule, ElectionStatusBadge,
+  ElectionSchedule,
+  ElectionStatusBadge,
   ElectionTitle
 } from './parts'
 import { QuestionsForm } from './QuestionsForm'
+import { VoteButton } from './VoteButton'
 
 export type ElectionProviderProps = {
   id?: string
@@ -23,6 +25,7 @@ export type ElectionProviderProps = {
 
 export const useElectionProvider = ({id, election: data, signer: s, ...rest}: ElectionProviderProps) => {
   const [ loading, setLoading ] = useState<boolean>(false)
+  const [ voting, setVoting ] = useState<boolean>(false)
   const [ loaded, setLoaded ] = useState<boolean>(false)
   const [ voted, setVoted ] = useState<string>('')
   const [ error, setError ] = useState<string>('')
@@ -66,11 +69,11 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
       throw new Error('no election initialized')
     }
 
-    client.setElectionId(election.id)
-
-    setLoading(true)
+    setVoting(true)
     setError('')
 
+    client.setElectionId(election.id)
+    // map questions back to expected Vote[] values
     const mapped = election.questions.map((q) => parseInt(values[q.title.default], 10))
 
     try {
@@ -88,7 +91,7 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
       }
       console.error('could not vote:', e)
     } finally {
-      setLoading(false)
+      setVoting(false)
     }
   }
 
@@ -101,6 +104,7 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
     signer,
     vote,
     voted,
+    voting,
   }
 }
 
@@ -138,7 +142,8 @@ export const Election = (props : ElectionProviderComponentProps) => (
     <ElectionStatusBadge />
     <ElectionDescription />
     <HR />
-    <QuestionsForm showVoteButton />
+    <QuestionsForm />
+    <VoteButton />
   </ElectionProvider>
 )
 Election.displayName = 'Election'

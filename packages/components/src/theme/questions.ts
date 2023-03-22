@@ -17,8 +17,6 @@ export const questionsAnatomy = [
   'radio',
   // form error message
   'error',
-  // vote button
-  'button',
 ]
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsAnatomy)
