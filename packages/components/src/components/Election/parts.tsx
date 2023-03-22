@@ -1,5 +1,5 @@
 import { HeadingProps } from '@chakra-ui/layout'
-import { chakra, forwardRef, omitThemingProps, useMultiStyleConfig, useStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, forwardRef, omitThemingProps, useMultiStyleConfig, useStyleConfig } from '@chakra-ui/system'
 import { Tag, TagProps } from '@chakra-ui/tag'
 import { ElectionStatus } from '@vocdoni/sdk'
 import { format } from 'date-fns'
@@ -38,7 +38,7 @@ export const ElectionHeader = (props: IPFSImageProps) => {
   )
 }
 
-export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children'|'node'>) => {
+export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children'|'node'> & ChakraProps) => {
   const styles = useStyleConfig('ElectionDescription', props)
   const { election }  = useElection()
 
