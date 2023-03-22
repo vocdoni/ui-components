@@ -31,6 +31,7 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
   const [ error, setError ] = useState<string>('')
   const [ election, setElection ] = useState<PublishedElection|undefined>(data)
   const { client, signer, setSigner } = useClientContext()
+  const [ isAbleToVote, setIsAbleToVote ] = useState<boolean|undefined>(undefined)
 
   // set signer in case it has been specified in the election
   // provider (rather than the client provider)
@@ -40,8 +41,9 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
     setSigner(s)
   }, [signer, client, s])
 
+  // fetch election
   useEffect(() => {
-    if (election || data || !id || loaded || !client) return
+    if (election || !id || loaded || !client) return
 
     ;(async () => {
       setLoading(true)
@@ -58,6 +60,24 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
 
   }, [election, id, loaded, client])
 
+  // set loaded in case election comes from props
+  useEffect(() => {
+    if (loaded || !data) return
+
+    setLoaded(true)
+  }, [data, loaded])
+
+  // check if logged in user is able to vote
+  useEffect(() => {
+    if (!signer || !election || !loaded || !client || isAbleToVote !== undefined) return
+
+    ;(async () => {
+      setIsAbleToVote(await client.isAbleToVote(election.id))
+    })()
+
+  }, [election, loaded, client, isAbleToVote, signer])
+
+  // context vote function (the one to be used with the given components)
   const vote = async (values: FieldValues) => {
     if (!client) {
       throw new Error('no client initialized')
@@ -99,6 +119,7 @@ export const useElectionProvider = ({id, election: data, signer: s, ...rest}: El
     ...rest,
     election,
     error,
+    isAbleToVote,
     loading,
     setError,
     signer,
