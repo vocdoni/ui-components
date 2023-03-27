@@ -20,6 +20,15 @@ For now, two different package folders have been created:
 - [`templates`]: not published packages, used by developers to either test here
   the components, or to easily bootstrap a voting project of they liking.
 
+Included packages
+-----------------
+
+For now, there's only a single package published, but we may split it in the
+future, or create new ones for other frameworks:
+
+- [`@vocdoni/react-components`] React components and hooks for easily
+  integrating Vocdoni services.
+
 Development
 -----------
 
@@ -65,3 +74,4 @@ with them.
 [license]: ./LICENSE
 [`packages`]: ./packages
 [`templates`]: ./templates
+[`@vocdoni/react-components`]: ./packages/components/README.md
