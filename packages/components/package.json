@@ -33,7 +33,7 @@
     "@chakra-ui/table": "^2.0.12",
     "@chakra-ui/tag": "^2.0.17",
     "@chakra-ui/theme": "^2.2.2",
-    "@vocdoni/sdk": "^0.0.5",
+    "@vocdoni/sdk": "^0.0.6",
     "date-fns": "^2.29.3",
     "react-hook-form": "^7.43.5",
     "react-markdown": "^8.0.4",
