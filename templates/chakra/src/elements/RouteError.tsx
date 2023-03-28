@@ -8,7 +8,7 @@ const RouteError = () => {
     <Stack spacing={4}>
       <Alert status='warning'>
         <AlertIcon />
-        Looks like the content you were accessing coult not be found.
+        Looks like the content you were accessing threw an error.
       </Alert>
       <Code>{error.message}</Code>
     </Stack>

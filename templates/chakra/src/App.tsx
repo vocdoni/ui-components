@@ -1,15 +1,16 @@
 import { ColorModeScript } from '@chakra-ui/react'
+import { VocdoniEnvironment } from '@constants'
 import { ClientProvider } from '@vocdoni/react-components'
-import { RouterProvider } from 'react-router-dom'
+import { EnvOptions } from '@vocdoni/sdk'
 import { useSigner } from 'wagmi'
-import router from './router'
+import { RoutesProvider } from './router'
 
 export const App = () => {
   const { data: signer } = useSigner()
 
   return (
-    <ClientProvider env='dev' signer={signer}>
-      <RouterProvider router={router} />
+    <ClientProvider env={VocdoniEnvironment as EnvOptions} signer={signer}>
+      <RoutesProvider />
       <ColorModeScript />
     </ClientProvider>
   )
