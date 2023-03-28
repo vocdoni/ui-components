@@ -72,8 +72,20 @@ export const ElectionStatusBadge = (props: TagProps) => {
 
   if (!election) return null
 
+  let { colorScheme } = props
+  if (!colorScheme) {
+    colorScheme = 'green'
+
+    if ([ElectionStatus.PAUSED, ElectionStatus.ENDED].includes(election.status)) {
+      colorScheme = 'yellow'
+    }
+    if ([ElectionStatus.CANCELED, ElectionStatus.PROCESS_UNKNOWN].includes(election.status)) {
+      colorScheme = 'red'
+    }
+  }
+
   return (
-    <Tag sx={{ textTransform: 'capitalize' }} {...props}>
+    <Tag sx={{ textTransform: 'capitalize' }} colorScheme={colorScheme} {...props}>
       {(ElectionStatus[election.status] as string).toLowerCase()}
     </Tag>
   )
