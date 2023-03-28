@@ -5,6 +5,7 @@ import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'
 import { Markdown } from '../layout'
+import { useElection } from './Election'
 
 type QuestionFieldProps = ChakraProps & {
   question: IQuestion
@@ -12,6 +13,7 @@ type QuestionFieldProps = ChakraProps & {
 
 export const QuestionField = ({ question, ...rest }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('Questions')
+  const { isAbleToVote } = useElection()
   const {
     formState: { errors },
   } = useFormContext()
@@ -29,7 +31,7 @@ export const QuestionField = ({ question, ...rest }: QuestionFieldProps) => {
           rules={{ required: 'This field is required' }}
           name={question.title.default}
           render={({ field }) => (
-            <RadioGroup sx={styles.radioGroup} {...field}>
+            <RadioGroup sx={styles.radioGroup} {...field} isDisabled={!isAbleToVote}>
               <Stack direction='column' sx={styles.stack}>
                 {question.choices.map((choice, ck) => (
                   <Radio key={ck} sx={styles.radio} value={choice.title.default}>
