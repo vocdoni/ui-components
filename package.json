@@ -10,8 +10,8 @@
     "templates/*"
   ],
   "devDependencies": {
-    "prettier": "^2.8.6",
-    "turbo": "^1.6.3"
+    "prettier": "^2.8.7",
+    "turbo": "^1.8.6"
   },
   "scripts": {
     "build": "turbo build",
