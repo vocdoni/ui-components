@@ -33,14 +33,14 @@
     "@chakra-ui/table": "^2.0.17",
     "@chakra-ui/tag": "^3.0.0",
     "@chakra-ui/theme": "^3.0.0",
-    "@vocdoni/sdk": "^0.0.6",
+    "@vocdoni/sdk": "^0.0.7",
     "date-fns": "^2.29.3",
     "react-hook-form": "^7.43.8",
     "react-markdown": "^8.0.6",
     "remark-gfm": "^3.0.1"
   },
   "peerDependencies": {
-    "@vocdoni/sdk": ">= 0.0.6",
+    "@vocdoni/sdk": ">= 0.0.7",
     "react": ">= 16.8.0",
     "react-dom": ">= 16.8.0",
     "react-markdown": ">= 8.0.0",
