@@ -124,6 +124,7 @@ export const useElectionProvider = ({ id, election: data, signer: s, fetchCensus
     ...rest,
     election,
     error,
+    hasAlreadyVoted,
     isAbleToVote,
     isInCensus,
     loading,
