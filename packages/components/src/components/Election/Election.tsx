@@ -15,9 +15,10 @@ export type ElectionProviderProps = {
   election?: PublishedElection
   signer?: Wallet | Signer
   ConnectButton?: ComponentType
+  fetchCensus?: boolean
 }
 
-export const useElectionProvider = ({ id, election: data, signer: s, ...rest }: ElectionProviderProps) => {
+export const useElectionProvider = ({ id, election: data, signer: s, fetchCensus, ...rest }: ElectionProviderProps) => {
   const { client, signer, setSigner } = useClientContext()
   const [loading, setLoading] = useState<boolean>(false)
   const [voting, setVoting] = useState<boolean>(false)
@@ -26,6 +27,9 @@ export const useElectionProvider = ({ id, election: data, signer: s, ...rest }: 
   const [error, setError] = useState<string>('')
   const [election, setElection] = useState<PublishedElection | undefined>(data)
   const [isAbleToVote, setIsAbleToVote] = useState<boolean | undefined>(undefined)
+  const [hasAlreadyVoted, setHasAlreadyVoted] = useState<boolean | undefined>(undefined)
+  const [votesLeft, setVotesLeft] = useState<number>(0)
+  const [isInCensus, setIsInCensus] = useState<boolean>(false)
 
   // set signer in case it has been specified in the election
   // provider (rather than the client provider)
@@ -61,11 +65,22 @@ export const useElectionProvider = ({ id, election: data, signer: s, ...rest }: 
 
   // check if logged in user is able to vote
   useEffect(() => {
-    if (!signer || !election || !loaded || !client || isAbleToVote !== undefined) return
+    if (!fetchCensus || !signer || !election || !loaded || !client || isAbleToVote !== undefined) return
     ;(async () => {
-      setIsAbleToVote(await client.isAbleToVote(election.id))
+      const isIn = await client.isInCensus(election.id)
+      let left = 0
+      let hasVoted = false
+      if (isIn) {
+        // no need to check votes left if member ain't in census
+        left = await client.votesLeftCount(election.id)
+        hasVoted = await client.hasAlreadyVoted(election.id)
+      }
+      setVotesLeft(left)
+      setIsInCensus(isIn)
+      setHasAlreadyVoted(hasVoted)
+      setIsAbleToVote(left > 0 && isIn)
     })()
-  }, [election, loaded, client, isAbleToVote, signer])
+  }, [fetchCensus, election, loaded, client, isAbleToVote, signer])
 
   // context vote function (the one to be used with the given components)
   const vote = async (values: FieldValues) => {
@@ -110,11 +125,12 @@ export const useElectionProvider = ({ id, election: data, signer: s, ...rest }: 
     election,
     error,
     isAbleToVote,
+    isInCensus,
     loading,
-    setError,
     signer,
     vote,
     voted,
+    votesLeft,
     voting,
   }
 }
@@ -144,7 +160,7 @@ export const ElectionProvider = ({ children, ...rest }: PropsWithChildren<Electi
 ElectionProvider.displayName = 'ElectionProvider'
 
 export const Election = (props: ElectionProviderComponentProps) => (
-  <ElectionProvider {...props}>
+  <ElectionProvider {...props} fetchCensus>
     <ElectionHeader />
     <ElectionTitle />
     <ElectionSchedule />
