@@ -2,13 +2,13 @@ import { ChakraProps } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { PublishedElection, Vote } from '@vocdoni/sdk'
-import { ComponentType, createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { ComponentType, PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClientContext } from '../../client'
 import { HR } from '../layout'
-import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionStatusBadge, ElectionTitle } from './parts'
 import { QuestionsForm } from './QuestionsForm'
 import { VoteButton } from './VoteButton'
+import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionStatusBadge, ElectionTitle } from './parts'
 
 export type ElectionProviderProps = {
   id?: string
@@ -109,10 +109,10 @@ export const useElectionProvider = ({ id, election: data, signer: s, fetchCensus
       return vid
     } catch (e: any) {
       if ('reason' in e) {
-        setError(e.reason as string)
+        return setError(e.reason as string)
       }
       if ('message' in e) {
-        setError(e.message as string)
+        return setError(e.message as string)
       }
       console.error('could not vote:', e)
     } finally {

@@ -8,8 +8,10 @@ export type VoteButtonProps = ChakraProps & {
 }
 
 export const VoteButton = ({ label, ...rest }: VoteButtonProps) => {
-  const { signer, loading, voting, ConnectButton, isAbleToVote, election } = useElection()
+  const { signer, loading, voting, ConnectButton, isAbleToVote, election, voted } = useElection()
   const isDisabled = !signer || !isAbleToVote || election?.status !== ElectionStatus.ONGOING
+
+  if (voted) return null
 
   if (!signer && ConnectButton) {
     return <ConnectButton />
