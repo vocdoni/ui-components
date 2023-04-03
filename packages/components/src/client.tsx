@@ -67,6 +67,22 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     })()
   }, [client, account, signer])
 
+  // switch account behavior handler
+  useEffect(() => {
+    if (!('ethereum' in window)) return
+
+    const accChanged = async (accs: string[]) => {
+      // set to null so other effects do their job
+      setAccount(undefined)
+    }
+
+    ;(window as any).ethereum.on('accountsChanged', accChanged)
+
+    return () => {
+      ;(window as any).ethereum.removeListener('accountsChanged', accChanged)
+    }
+  }, [])
+
   const fetchAccount = async () => {
     let acc: AccountData
 
