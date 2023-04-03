@@ -1,14 +1,9 @@
-import { Button } from '@chakra-ui/button'
-import { ChakraProps } from '@chakra-ui/system'
+import { Button, ButtonProps } from '@chakra-ui/button'
 import { ElectionStatus } from '@vocdoni/sdk'
 import { useElection } from './Election'
 
-export type VoteButtonProps = ChakraProps & {
-  label?: string
-}
-
-export const VoteButton = ({ label, ...rest }: VoteButtonProps) => {
-  const { signer, loading, voting, ConnectButton, isAbleToVote, election, voted } = useElection()
+export const VoteButton = (props: ButtonProps) => {
+  const { signer, loading, voting, ConnectButton, isAbleToVote, election, voted, trans } = useElection()
   const isDisabled = !signer || !isAbleToVote || election?.status !== ElectionStatus.ONGOING
 
   if (voted) return null
@@ -20,12 +15,12 @@ export const VoteButton = ({ label, ...rest }: VoteButtonProps) => {
   return (
     <Button
       type='submit'
-      {...rest}
+      {...props}
       form='election-questions-form'
       isDisabled={isDisabled}
       isLoading={loading || voting}
     >
-      {label || 'Vote'}
+      {trans('vote', 'Vote')}
     </Button>
   )
 }

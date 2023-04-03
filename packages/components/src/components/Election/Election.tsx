@@ -1,7 +1,7 @@
 import { ChakraProps } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
-import { PublishedElection, Vote } from '@vocdoni/sdk'
+import { ElectionStatus, PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClientContext } from '../../client'
@@ -16,9 +16,24 @@ export type ElectionProviderProps = {
   signer?: Wallet | Signer
   ConnectButton?: ComponentType
   fetchCensus?: boolean
+  texts?: ElectionTextsType
 }
 
-export const useElectionProvider = ({ id, election: data, signer: s, fetchCensus, ...rest }: ElectionProviderProps) => {
+export type ElectionTextsType = Record<ElectionStatus, string> & {
+  required?: string
+  empty?: string
+  vote?: string
+  voted?: string
+}
+
+export const useElectionProvider = ({
+  id,
+  election: data,
+  signer: s,
+  fetchCensus,
+  texts,
+  ...rest
+}: ElectionProviderProps) => {
   const { client, signer, setSigner } = useClientContext()
   const [loading, setLoading] = useState<boolean>(false)
   const [voting, setVoting] = useState<boolean>(false)
@@ -30,6 +45,13 @@ export const useElectionProvider = ({ id, election: data, signer: s, fetchCensus
   const [hasAlreadyVoted, setHasAlreadyVoted] = useState<boolean | undefined>(undefined)
   const [votesLeft, setVotesLeft] = useState<number>(0)
   const [isInCensus, setIsInCensus] = useState<boolean>(false)
+
+  const trans = (key: keyof ElectionTextsType, def: string) => {
+    if (texts && texts[key]) {
+      return texts[key]
+    }
+    return def
+  }
 
   // set signer in case it has been specified in the election
   // provider (rather than the client provider)
@@ -129,6 +151,7 @@ export const useElectionProvider = ({ id, election: data, signer: s, fetchCensus
     isInCensus,
     loading,
     signer,
+    trans,
     vote,
     voted,
     votesLeft,

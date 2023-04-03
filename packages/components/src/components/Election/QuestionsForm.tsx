@@ -5,7 +5,7 @@ import { useElection } from './Election'
 import { QuestionField } from './QuestionField'
 
 export const QuestionsForm = () => {
-  const { election, signer, vote, voted, ConnectButton, error, loading } = useElection()
+  const { election, signer, vote, voted, ConnectButton, error, loading, trans } = useElection()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('Questions')
   const questions = election?.questions
@@ -13,7 +13,7 @@ export const QuestionsForm = () => {
   if (voted.length) {
     return (
       <Alert variant='solid' status='info'>
-        You already voted. Your vote id is {voted}
+        {trans('voted', 'You already voted. Your vote id is %id')?.replace('%id', voted)}
       </Alert>
     )
   }
@@ -22,7 +22,7 @@ export const QuestionsForm = () => {
     return (
       <Alert variant='solid' status='warning' sx={styles.alert}>
         <AlertIcon />
-        Apparently this process has no questions 🤔
+        {trans('empty', 'Apparently this process has no questions 🤔')}
       </Alert>
     )
   }

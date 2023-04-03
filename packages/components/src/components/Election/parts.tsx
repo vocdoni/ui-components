@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/system'
 import { Tag, TagProps } from '@chakra-ui/tag'
 import { ElectionStatus } from '@vocdoni/sdk'
-import { format } from 'date-fns'
+import { format as dformat } from 'date-fns'
 import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
 
 import { Image, IPFSImageProps, Markdown } from '../layout'
@@ -52,25 +52,44 @@ export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children' |
   )
 }
 
-export const ElectionSchedule = forwardRef<HeadingProps, 'h2'>((props, ref) => {
-  const styles = useMultiStyleConfig('ElectionSchedule', props)
+export type ElectionScheduleProps = HeadingProps & {
+  format?: string
+}
+
+export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(({ format, ...rest }, ref) => {
+  const styles = useMultiStyleConfig('ElectionSchedule', rest)
   const { election } = useElection()
+
+  let f = format
+  if (!f) {
+    f = 'd-L-y HH:mm'
+  }
 
   if (!election) return null
 
   return (
-    <chakra.h2 __css={styles} {...props}>
-      Voting period {format(new Date(election.startDate), 'd-L-y HH:mm')} ~&nbsp;
-      {format(new Date(election.endDate), 'd-L-y HH:mm')}
+    <chakra.h2 __css={styles} {...rest}>
+      Voting period {dformat(new Date(election.startDate), f)} ~&nbsp;
+      {dformat(new Date(election.endDate), f)}
     </chakra.h2>
   )
 })
 ElectionSchedule.displayName = 'ElectionSchedule'
 
 export const ElectionStatusBadge = (props: TagProps) => {
-  const { election } = useElection()
+  const { election, trans } = useElection()
 
   if (!election) return null
+
+  const defaults: Record<keyof typeof ElectionStatus, string> = {
+    PROCESS_UNKNOWN: 'Unknown',
+    UPCOMING: 'Upcoming',
+    ONGOING: 'Ongoing',
+    ENDED: 'Ended',
+    CANCELED: 'Canceled',
+    PAUSED: 'Paused',
+    RESULTS: 'Results',
+  }
 
   let { colorScheme } = props
   if (!colorScheme) {
@@ -86,7 +105,7 @@ export const ElectionStatusBadge = (props: TagProps) => {
 
   return (
     <Tag sx={{ textTransform: 'capitalize' }} colorScheme={colorScheme} {...props}>
-      {(ElectionStatus[election.status] as string).toLowerCase()}
+      {trans(election.status, defaults[election.status])}
     </Tag>
   )
 }

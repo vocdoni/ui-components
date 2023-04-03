@@ -1,7 +1,7 @@
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
-import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
+import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'
 import { Markdown } from '../layout'
@@ -13,7 +13,7 @@ type QuestionFieldProps = ChakraProps & {
 
 export const QuestionField = ({ question, ...rest }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('Questions')
-  const { isAbleToVote } = useElection()
+  const { isAbleToVote, trans } = useElection()
   const {
     formState: { errors },
   } = useFormContext()
@@ -28,7 +28,7 @@ export const QuestionField = ({ question, ...rest }: QuestionFieldProps) => {
           </chakra.div>
         )}
         <Controller
-          rules={{ required: 'This field is required' }}
+          rules={{ required: trans('required', 'This field is required') }}
           name={question.title.default}
           render={({ field }) => (
             <RadioGroup sx={styles.radioGroup} {...field} isDisabled={!isAbleToVote}>
