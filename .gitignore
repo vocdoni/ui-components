@@ -3,3 +3,4 @@ node_modules
 .turbo
 vite.config.ts.timestamp-*.mjs
 .npmrc
+.vscode

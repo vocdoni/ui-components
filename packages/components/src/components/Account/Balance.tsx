@@ -1,8 +1,7 @@
-import { chakra, ChakraComponent } from '@chakra-ui/system'
 import { Tag, TagProps } from '@chakra-ui/tag'
 import { useClientContext } from '../../client'
 
-const _Balance = (props: ChakraComponent<'span', TagProps>) => {
+export const Balance = (props: TagProps) => {
   const { balance } = useClientContext()
 
   if (balance < 0) {
@@ -23,6 +22,3 @@ const _Balance = (props: ChakraComponent<'span', TagProps>) => {
     </Tag>
   )
 }
-
-export const Balance = chakra(_Balance)
-Balance.displayName = 'Balance'
