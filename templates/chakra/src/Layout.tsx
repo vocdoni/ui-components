@@ -4,6 +4,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Balance } from '@vocdoni/react-components'
 import { Outlet } from 'react-router-dom'
 
+import '@rainbow-me/rainbowkit/styles.css'
+
 const Layout = () => (
   <Box>
     <Grid p={3}>
