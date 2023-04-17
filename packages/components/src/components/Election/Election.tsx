@@ -2,13 +2,13 @@ import { ChakraProps } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { ElectionStatus, PublishedElection, Vote } from '@vocdoni/sdk'
-import { ComponentType, PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+import { ComponentType, createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClientContext } from '../../client'
 import { HR } from '../layout'
+import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionStatusBadge, ElectionTitle } from './parts'
 import { QuestionsForm } from './QuestionsForm'
 import { VoteButton } from './VoteButton'
-import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionStatusBadge, ElectionTitle } from './parts'
 
 export type ElectionProviderProps = {
   id?: string
@@ -38,11 +38,10 @@ export const useElectionProvider = ({
   const [loading, setLoading] = useState<boolean>(false)
   const [voting, setVoting] = useState<boolean>(false)
   const [loaded, setLoaded] = useState<boolean>(false)
-  const [voted, setVoted] = useState<string>('')
+  const [voted, setVoted] = useState<string | null>(null)
   const [error, setError] = useState<string>('')
   const [election, setElection] = useState<PublishedElection | undefined>(data)
   const [isAbleToVote, setIsAbleToVote] = useState<boolean | undefined>(undefined)
-  const [hasAlreadyVoted, setHasAlreadyVoted] = useState<boolean | undefined>(undefined)
   const [votesLeft, setVotesLeft] = useState<number>(0)
   const [isInCensus, setIsInCensus] = useState<boolean>(false)
 
@@ -91,15 +90,15 @@ export const useElectionProvider = ({
     ;(async () => {
       const isIn = await client.isInCensus(election.id)
       let left = 0
-      let hasVoted = false
       if (isIn) {
         // no need to check votes left if member ain't in census
         left = await client.votesLeftCount(election.id)
-        hasVoted = await client.hasAlreadyVoted(election.id)
+        setVotesLeft(left)
+
+        const voted = await client.hasAlreadyVoted(election.id)
+        setVoted(voted)
       }
-      setVotesLeft(left)
       setIsInCensus(isIn)
-      setHasAlreadyVoted(hasVoted)
       setIsAbleToVote(left > 0 && isIn)
     })()
   }, [fetchCensus, election, loaded, client, isAbleToVote, signer])
@@ -146,7 +145,6 @@ export const useElectionProvider = ({
     ...rest,
     election,
     error,
-    hasAlreadyVoted,
     isAbleToVote,
     isInCensus,
     loading,

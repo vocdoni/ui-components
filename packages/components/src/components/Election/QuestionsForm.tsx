@@ -10,7 +10,7 @@ export const QuestionsForm = () => {
   const styles = useMultiStyleConfig('Questions')
   const questions = election?.questions
 
-  if (voted.length) {
+  if (voted) {
     return (
       <Alert variant='solid' status='info'>
         {trans('voted', 'You already voted. Your vote id is %id')?.replace('%id', voted)}
