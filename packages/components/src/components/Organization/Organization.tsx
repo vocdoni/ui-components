@@ -18,7 +18,9 @@ export const useOrganizationProvider = ({ id, organization: data, ...rest }: Org
 
   const update = (account: Account, faucetPackage?: string) => {
     setLoading(true)
-    return client.setAccountInfo({ account: new Account(account), faucetPackage }).finally(() => setLoading(false))
+    return client
+      .setAccountInfo({ account: account instanceof Account ? account : new Account(account), faucetPackage })
+      .finally(() => setLoading(false))
   }
 
   // fetch organization

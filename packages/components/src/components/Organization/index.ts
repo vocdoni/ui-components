@@ -1,2 +1,6 @@
+export * from './Avatar'
+export * from './Description'
+export * from './Header'
+export * from './Logo'
 export * from './Name'
 export * from './Organization'
