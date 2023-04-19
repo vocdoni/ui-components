@@ -1,5 +1,4 @@
 import { useStyleConfig } from '@chakra-ui/system'
-import { Account } from '@vocdoni/sdk'
 import { Image, IPFSImageProps } from '../layout'
 import { useOrganization } from './Organization'
 
@@ -9,7 +8,11 @@ export const OrganizationAvatar = (props: IPFSImageProps) => {
   const { organization } = useOrganization()
   if (!organization) return null
 
-  const { avatar } = (organization as any).metadata as Account
+  let avatar = ((organization as any).metadata as any).media.avatar
+  if (!avatar) {
+    // fallback to deprecated logo field
+    avatar = ((organization as any).metadata as any).media.logo
+  }
   if (!avatar) return null
 
   return <Image src={avatar} sx={styles} {...props} />

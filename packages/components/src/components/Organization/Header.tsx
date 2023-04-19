@@ -1,15 +1,15 @@
 import { useStyleConfig } from '@chakra-ui/system'
-import { Account } from '@vocdoni/sdk'
 import { Image, IPFSImageProps } from '../layout'
 import { useOrganization } from './Organization'
 
-export const Organizationheader = (props: IPFSImageProps) => {
-  const styles = useStyleConfig('Organizationheader', props)
+export const OrganizationHeader = (props: IPFSImageProps) => {
+  const styles = useStyleConfig('OrganizationHeader', props)
 
   const { organization } = useOrganization()
+
   if (!organization) return null
 
-  const { header } = (organization as any).metadata as Account
+  const { header } = ((organization as any).metadata as any).media
   if (!header) return null
 
   return <Image src={header} sx={styles} {...props} />
