@@ -1,8 +1,8 @@
 import { Tag, TagProps } from '@chakra-ui/tag'
-import { useClientContext } from '../../client'
+import { useClient } from '../../client'
 
 export const Balance = (props: TagProps) => {
-  const { balance } = useClientContext()
+  const { balance } = useClient()
 
   if (balance < 0) {
     // maybe return the connectbutton here?

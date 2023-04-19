@@ -15,8 +15,27 @@ yarn add @vocdoni/sdk @vocdoni/react-components react-markdown remark-gfm
 Usage
 -----
 
-The easiest way to integrate a voting would be to just import the `Election`
-component and specify it an id for your election:
+The very first step is to add the `<ClientProvider />` as a wrapper of your
+application or, at least, of your election:
+
+~~~tsx
+import { ClientProvider } from '@vocdoni/react-components'
+
+const App = () => {
+  const signer = /* any ethers based signer */
+  return (
+    <ClientProvider env='stg' signer={signer}>
+      {/* your actual app code */}
+    </ClientProvider>
+  )
+}
+~~~
+
+Note `env` can be any of the [SDK available environments][sdk environments],
+either in string format, or using the SDK `EnvOptions` enum.
+
+After that, the easiest way to integrate a voting would be to just import the
+`Election` component and specify it an id for your election:
 
 ~~~tsx
 import { Election } from '@vocdoni/react-components'
@@ -39,7 +58,7 @@ import {
   ElectionStatusBadge,
   ElectionDescription,
   HR,
-  QuestionsForm,
+  ElectionQuestions,
 } from '@vocdoni/react-components'
 
 const CustomVoteComponent = () => {
@@ -56,7 +75,7 @@ const CustomVoteComponent = () => {
       <ElectionStatusBadge variant='solid' colorScheme='teal' />
       <ElectionDescription fontFamily='monospace' />
       <HR />
-      <QuestionsForm />
+      <ElectionQuestions />
     </ElectionProvider>
   )
 }
@@ -71,10 +90,10 @@ components.
 Theming
 -------
 
-Since we're using chakra's theming system, the way to style these voting
-components is [the same as described in their documentation][chakra theming],
-but using the custom components we defined (see [theming components] for more
-details).
+Since these components use chakra's theming system, the way to style these
+voting components is
+[the same as described in their documentation][chakra theming], but using the
+custom components we defined (see [theming components] for more details).
 
 In order to start styling the voting components, you should use the
 `ChakraProvider`, and customize the passed theme:
@@ -202,14 +221,14 @@ const App = () => (
 )
 ~~~
 
-### Theming complex multipart components
+#### Theming complex multipart components
 
-Some components, like `<QuestionsForm />` follow a multipart component
+Some components, like `<ElectionQuestions />` follow a multipart component
 structure. Please refer to the
 [official chakra documentation][multipart components] for more info on how to
 style these type of components.
 
-Here's a small example styling the `QuestionsForm` component:
+Here's a small example styling the `ElectionQuestions` component:
 
 ~~~ts
 import { extendTheme, createMultiStyleConfigHelpers } from '@chakra-ui/react'
@@ -217,7 +236,7 @@ import { theme as vtheme, questionsAnatomy } from '@vocdoni/react-components'
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsAnatomy)
 
-const QuestionsForm = defineMultiStyleConfig({
+const ElectionQuestions = defineMultiStyleConfig({
   baseStyle: definePartsStyle({
     title: {
       color: 'lightblue',
@@ -230,7 +249,7 @@ const QuestionsForm = defineMultiStyleConfig({
 
 const theme = extendTheme(vtheme, {
   components: {
-    QuestionsForm,
+    ElectionQuestions,
   },
 })
 
@@ -241,6 +260,24 @@ export default theme
 You can check out each component's anatomy by checking
 [their theme files][theme path].
 
+### i18n
+
+In order to change any of the texts contained in `@vocdoni/react-components`,
+you must specify the translations for each language in the ClientProvider:
+
+~~~tsx
+const translationsObject = {
+  en: {
+    // all english translations
+  },
+  ca: {
+    // catalan translations
+  }
+}
+<ClientProvider translations={translationsObject} />
+~~~
+
+Check out the [translations file] in order to see all the available keys.
 
 LICENSE
 -------
@@ -265,6 +302,7 @@ v3.0][license].
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [license]: ./LICENSE
+[theming]: #theming
 [theming components]: #theming-components
 [chakra theming]: https://chakra-ui.com/docs/styled-system/customize-theme#customizing-component-styles
 [advanced theming]: https://chakra-ui.com/docs/styled-system/advanced-theming
@@ -273,3 +311,5 @@ v3.0][license].
 [theme path]: ./src/theme
 [chakra template]: ../../templates/chakra/src/theme
 [css props]: #styling-via-props
+[sdk environments]: https://github.com/vocdoni/vocdoni-sdk#environment
+[translations file]: ./src/i18n/translations.ts

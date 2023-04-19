@@ -1,13 +1,13 @@
 import { ElectionScheduleTheme as ElectionSchedule, ElectionTitleTheme as ElectionTitle } from './election'
 import { HorizontalRuler } from './layout'
-import { QuestionsTheme as Questions } from './questions'
+import { QuestionsTheme as ElectionQuestions } from './questions'
 
 export const theme = {
   components: {
     ElectionTitle,
     ElectionSchedule,
     HorizontalRuler,
-    Questions,
+    ElectionQuestions,
   } as any,
 }
 

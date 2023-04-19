@@ -15,8 +15,10 @@
   },
   "scripts": {
     "build": "turbo build",
-    "lint": "prettier -c .",
+    "dev": "turbo dev",
     "lint:fix": "prettier -c . --write",
-    "dev": "turbo dev"
-  }
+    "lint": "prettier -c .",
+    "prepare": "yarn workspace dotobject build"
+  },
+  "packageManager": "yarn@1.22.19"
 }

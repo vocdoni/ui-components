@@ -1,7 +1,7 @@
 import { ChakraProps } from '@chakra-ui/system'
 import { Account, AccountData } from '@vocdoni/sdk'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { useClientContext } from '../../client'
+import { useClient } from '../../client'
 import { OrganizationName } from './Name'
 
 export type OrganizationProviderProps = {
@@ -10,16 +10,16 @@ export type OrganizationProviderProps = {
 }
 
 export const useOrganizationProvider = ({ id, organization: data, ...rest }: OrganizationProviderProps) => {
-  const { client, signer, setSigner } = useClientContext()
+  const { client, signer, setSigner } = useClient()
   const [loading, setLoading] = useState<boolean>(false)
   const [loaded, setLoaded] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
   const [organization, setOrganization] = useState<AccountData | undefined>(data)
 
-  const update = (account: Account, faucetPackage?: string) => {
+  const update = (account: Account) => {
     setLoading(true)
     return client
-      .setAccountInfo({ account: account instanceof Account ? account : new Account(account), faucetPackage })
+      .updateAccountInfo(account instanceof Account ? account : new Account(account))
       .finally(() => setLoading(false))
   }
 

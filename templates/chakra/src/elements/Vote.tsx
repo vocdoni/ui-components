@@ -1,5 +1,6 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Election } from '@vocdoni/react-components'
+import { PublishedElection } from '@vocdoni/sdk'
 import { useLoaderData } from 'react-router-dom'
 
 const Vote = () => {
