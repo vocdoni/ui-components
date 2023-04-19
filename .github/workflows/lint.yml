@@ -1,0 +1,25 @@
+name: lint and type checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use node 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: yarn
+      - name: Run prettier in whole project
+        run: yarn lint
+      - name: Run type checks in packages
+        run: yarn lint
+        working-directory: packages/components

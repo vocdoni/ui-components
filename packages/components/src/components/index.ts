@@ -4,3 +4,5 @@ export * from './Account'
 export * from './Election'
 // Layout components
 export * from './layout'
+// Organization components
+export * from './Organization'
