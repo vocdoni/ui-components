@@ -8,6 +8,7 @@ import { useClientContext } from '../../client'
 import { HR } from '../layout'
 import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionStatusBadge, ElectionTitle } from './parts'
 import { QuestionsForm } from './QuestionsForm'
+import { Results } from './Results'
 import { VoteButton } from './VoteButton'
 
 export type ElectionProviderProps = {
@@ -191,6 +192,7 @@ export const Election = (props: ElectionProviderComponentProps) => (
     <HR />
     <QuestionsForm />
     <VoteButton />
+    <Results/>
   </ElectionProvider>
 )
 Election.displayName = 'Election'
