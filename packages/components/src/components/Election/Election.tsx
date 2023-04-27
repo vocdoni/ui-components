@@ -9,6 +9,7 @@ import { HR } from '../layout'
 import { ElectionDescription, ElectionHeader, ElectionSchedule, ElectionStatusBadge, ElectionTitle } from './parts'
 import { QuestionsForm } from './QuestionsForm'
 import { Results } from './Results'
+import { ResultsApproval } from './ResultsApproval'
 import { VoteButton } from './VoteButton'
 
 export type ElectionProviderProps = {
@@ -122,6 +123,7 @@ export const useElectionProvider = ({
     client.setElectionId(election.id)
     // map questions back to expected Vote[] values
     const mapped = election.questions.map((q) => parseInt(values[q.title.default], 10))
+    console.log(mapped)
 
     try {
       const vote = new Vote(mapped)
@@ -192,7 +194,8 @@ export const Election = (props: ElectionProviderComponentProps) => (
     <HR />
     <QuestionsForm />
     <VoteButton />
-    <Results/>
+    {/* <Results/> */}
+    <ResultsApproval/>
   </ElectionProvider>
 )
 Election.displayName = 'Election'
