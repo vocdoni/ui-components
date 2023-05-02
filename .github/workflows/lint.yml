@@ -22,4 +22,4 @@ jobs:
         run: yarn lint
       - name: Run type checks in packages
         run: yarn lint
-        working-directory: packages/components
+        working-directory: packages/chakra-components

@@ -74,4 +74,4 @@ with them.
 [license]: ./LICENSE
 [`packages`]: ./packages
 [`templates`]: ./templates
-[`@vocdoni/chakra-components`]: ./packages/components/README.md
+[`@vocdoni/chakra-components`]: ./packages/chakra-components/README.md
