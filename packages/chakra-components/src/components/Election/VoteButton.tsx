@@ -6,8 +6,6 @@ export const VoteButton = (props: ButtonProps) => {
   const { signer, loading, voting, ConnectButton, isAbleToVote, election, voted, trans } = useElection()
   const isDisabled = !signer || !isAbleToVote || election?.status !== ElectionStatus.ONGOING
 
-  if (voted) return null
-
   if (!signer && ConnectButton) {
     return <ConnectButton />
   }
@@ -20,7 +18,7 @@ export const VoteButton = (props: ButtonProps) => {
       isDisabled={isDisabled}
       isLoading={loading || voting}
     >
-      {trans('vote', 'Vote')}
+      {voted ? trans('vote.button_update') : trans('vote.button')}
     </Button>
   )
 }

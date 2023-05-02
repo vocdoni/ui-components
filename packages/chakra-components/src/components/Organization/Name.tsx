@@ -1,6 +1,5 @@
 import { HeadingProps } from '@chakra-ui/layout'
 import { chakra, forwardRef, omitThemingProps, useStyleConfig } from '@chakra-ui/system'
-import { Account } from '@vocdoni/sdk'
 import { useOrganization } from './Organization'
 
 export const OrganizationName = forwardRef<HeadingProps, 'h1'>((props, ref) => {
@@ -12,7 +11,7 @@ export const OrganizationName = forwardRef<HeadingProps, 'h1'>((props, ref) => {
 
   return (
     <chakra.h1 ref={ref} {...rest} __css={styles}>
-      {((organization as any).metadata as Account).name.default}
+      {organization.account.name.default}
     </chakra.h1>
   )
 })

@@ -26,8 +26,8 @@ Included packages
 For now, there's only a single package published, but we may split it in the
 future, or create new ones for other frameworks:
 
-- [`@vocdoni/react-components`] React components and hooks for easily
-  integrating Vocdoni services.
+- [`@vocdoni/chakra-components`] React components and hooks built with chakra
+  for easily integrating Vocdoni services.
 
 Development
 -----------
@@ -74,4 +74,4 @@ with them.
 [license]: ./LICENSE
 [`packages`]: ./packages
 [`templates`]: ./templates
-[`@vocdoni/react-components`]: ./packages/components/README.md
+[`@vocdoni/chakra-components`]: ./packages/chakra-components/README.md

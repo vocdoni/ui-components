@@ -1,19 +1,20 @@
+import { ToastProvider } from '@chakra-ui/toast'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { AccountData, ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import merge from 'ts-deepmerge'
+import { TranslationProvider, Translations, useTranslate } from './i18n/translate'
+import ltranslations from './i18n/translations'
 
-import { ReactNode } from 'react'
-
-export interface ClientSettings extends ClientOptions {}
-
-type ClientProviderProps = {
+export type ClientProviderProps = {
   env?: Lowercase<keyof typeof EnvOptions>
   client?: VocdoniSDKClient
   signer?: Wallet | Signer
 }
 
 export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProviderProps) => {
+  const trans = useTranslate()
   const [client, setClient] = useState<VocdoniSDKClient>(c as VocdoniSDKClient)
   const [signer, setSigner] = useState<Wallet | Signer>(s as Wallet | Signer)
   const [env, setEnv] = useState<string>(e as string)
@@ -83,6 +84,11 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     }
   }, [])
 
+  /**
+   * Fetches currently connected account information.
+   *
+   * @returns {Promise<AccountData>}
+   */
   const fetchAccount = async () => {
     let acc: AccountData
 
@@ -96,6 +102,11 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     }
   }
 
+  /**
+   * Fetches and sets to state current account balance.
+   *
+   * @returns {Promise<number>}
+   */
   const fetchBalance = async () => {
     try {
       if (!account) {
@@ -107,15 +118,20 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
         const acc = await client.fetchAccountInfo()
         setBalance(acc.balance)
 
-        return
+        return acc.balance
       }
 
       setBalance(account.balance)
+      return account.balance
     } catch (e) {
       console.error('could not fetch balance:', e)
     }
   }
 
+  /**
+   * Changes the current signer in state and in the initialized SDK client.
+   * @param {Wallet|Signer} signer
+   */
   const changeSigner = (signer: Wallet | Signer) => {
     if (!client) {
       throw new Error('No client initialized')
@@ -135,6 +151,7 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     fetchBalance,
     setClient,
     setSigner: changeSigner,
+    trans,
   }
 }
 
@@ -142,13 +159,11 @@ export type ClientState = ReturnType<typeof useClientProvider>
 
 export const ClientContext = createContext<ClientState | undefined>(undefined)
 
-export const useClientContext = <T extends VocdoniSDKClient>() => {
+export const useClient = <T extends VocdoniSDKClient>() => {
   const ctxt = useContext(ClientContext)
 
   if (!ctxt) {
-    throw new Error(
-      'useClientContext returned `undefined`, maybe you forgot to wrap the component within <ClientProvider />?'
-    )
+    throw new Error('useClient returned `undefined`, maybe you forgot to wrap the component within <ClientProvider />?')
   }
 
   return {
@@ -158,12 +173,36 @@ export const useClientContext = <T extends VocdoniSDKClient>() => {
   }
 }
 
-type ClientProviderComponentProps = ClientProviderProps & {
-  children?: ReactNode
+export type InternalClientProviderComponentProps = PropsWithChildren<ClientProviderProps>
+
+export type ClientProviderComponentProps = InternalClientProviderComponentProps & {
+  defaultLanguage?: string
+  language?: string
+  translations?: Translations
 }
 
-export const ClientProvider = ({ env, client, signer, ...rest }: ClientProviderComponentProps) => {
+/**
+ * Required internal client provider so we can use useTranslate in it.
+ */
+const InternalClientProvider = ({ env, client, signer, ...rest }: ClientProviderComponentProps) => {
   const value = useClientProvider({ env, client, signer })
 
   return <ClientContext.Provider value={value} {...rest} />
+}
+
+export const ClientProvider = ({ defaultLanguage, language, translations, ...rest }: ClientProviderComponentProps) => {
+  const trans = {
+    defaultLanguage: defaultLanguage || 'en',
+    language,
+    translations: merge(ltranslations, translations || {}),
+  }
+
+  return (
+    <TranslationProvider {...trans}>
+      <>
+        <ToastProvider />
+        <InternalClientProvider {...rest} />
+      </>
+    </TranslationProvider>
+  )
 }

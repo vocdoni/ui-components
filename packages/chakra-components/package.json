@@ -1,8 +1,7 @@
 {
-  "name": "@vocdoni/react-components",
-  "private": false,
+  "name": "@vocdoni/chakra-components",
   "license": "GPL-3.0-or-later",
-  "version": "0.0.13",
+  "version": "0.1.0",
   "type": "module",
   "files": [
     "dist"
@@ -33,13 +32,17 @@
     "@chakra-ui/table": "^2.0.17",
     "@chakra-ui/tag": "^3.0.0",
     "@chakra-ui/theme": "^3.0.0",
-    "@vocdoni/sdk": "^0.0.8",
+    "@chakra-ui/toast": "^6.1.1",
+    "@vocdoni/sdk": "^0.0.11",
     "date-fns": "^2.29.3",
     "react-hook-form": "^7.43.8",
+    "react-icons": "^4.8.0",
     "react-markdown": "^8.0.6",
-    "remark-gfm": "^3.0.1"
+    "remark-gfm": "^3.0.1",
+    "ts-deepmerge": "^6.0.3"
   },
   "peerDependencies": {
+    "@chakra-ui/react": "~2.6.0",
     "@vocdoni/sdk": ">= 0.0.7",
     "react": ">= 16.8.0",
     "react-dom": ">= 16.8.0",
@@ -65,11 +68,11 @@
   "size-limit": [
     {
       "path": "dist/index.es.js",
-      "limit": "250 KB"
+      "limit": "50 KB"
     },
     {
       "path": "dist/index.cjs.js",
-      "limit": "250 KB"
+      "limit": "50 KB"
     }
   ]
 }
