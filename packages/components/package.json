@@ -1,5 +1,5 @@
 {
-  "name": "@vocdoni/react-components",
+  "name": "@vocdoni/chakra-components",
   "license": "GPL-3.0-or-later",
   "version": "0.1.0",
   "type": "module",
@@ -42,6 +42,7 @@
     "ts-deepmerge": "^6.0.3"
   },
   "peerDependencies": {
+    "@chakra-ui/react": "~2.6.0",
     "@vocdoni/sdk": ">= 0.0.7",
     "react": ">= 16.8.0",
     "react-dom": ">= 16.8.0",
@@ -67,11 +68,11 @@
   "size-limit": [
     {
       "path": "dist/index.es.js",
-      "limit": "250 KB"
+      "limit": "50 KB"
     },
     {
       "path": "dist/index.cjs.js",
-      "limit": "250 KB"
+      "limit": "50 KB"
     }
   ]
 }

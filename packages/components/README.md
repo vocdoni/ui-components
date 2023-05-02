@@ -1,15 +1,18 @@
-@vocdoni/react-components
-=========================
+@vocdoni/chakra-components
+==========================
 
-React components and hooks for easily integrating Vocdoni services.
+Chakra ui components for easily integrating Vocdoni services.
 
 Installing
 ----------
 
-It's as easy as installing the required components:
+You'll first need to have a project with chakra installed and configured. Follow
+their [official documentation][chakra getting started] in order to do so.
+
+After that, you can add the required vocdoni components dependencies:
 
 ~~~bash
-yarn add @vocdoni/sdk @vocdoni/react-components react-markdown remark-gfm
+yarn add @vocdoni/sdk @vocdoni/chakra-components react-markdown remark-gfm
 ~~~
 
 Usage
@@ -19,7 +22,7 @@ The very first step is to add the `<ClientProvider />` as a wrapper of your
 application or, at least, of your election:
 
 ~~~tsx
-import { ClientProvider } from '@vocdoni/react-components'
+import { ClientProvider } from '@vocdoni/chakra-components'
 
 const App = () => {
   const signer = /* any ethers based signer */
@@ -38,7 +41,7 @@ After that, the easiest way to integrate a voting would be to just import the
 `Election` component and specify it an id for your election:
 
 ~~~tsx
-import { Election } from '@vocdoni/react-components'
+import { Election } from '@vocdoni/chakra-components'
 
 const CustomVoteComponent = () => {
   return <Election id='your-awesome-election-process-uid' />
@@ -59,7 +62,7 @@ import {
   ElectionDescription,
   HR,
   ElectionQuestions,
-} from '@vocdoni/react-components'
+} from '@vocdoni/chakra-components'
 
 const CustomVoteComponent = () => {
   return (
@@ -101,7 +104,7 @@ In order to start styling the voting components, you should use the
 ~~~tsx
 // this can be imported from '@chakra-ui/react' too, but that's more generic
 import { extendTheme } from '@chakra-ui/system'
-import { theme } from '@vocdoni/react-components'
+import { theme } from '@vocdoni/chakra-components'
 
 export const App = () => (
   <ChakraProvider theme={extendTheme(theme)}>
@@ -111,7 +114,7 @@ export const App = () => (
 ~~~
 
 As you can see, we're importing a custom defined theme from
-`@vocdoni/react-components`, but at the same time, we're using `extendTheme`.
+`@vocdoni/chakra-components`, but at the same time, we're using `extendTheme`.
 This is because we're not merging our styles with the base chakra theme, both to
 avoid a bigger bundle size and to ensure we don't unexpectedly overwrite styles.
 
@@ -125,7 +128,7 @@ component prop:
 
 ~~~tsx
 import { extendTheme } from '@chakra-ui/system'
-import { theme } from '@vocdoni/react-components'
+import { theme } from '@vocdoni/chakra-components'
 
 export const App = () => (
   <ChakraProvider resetCSS={false} theme={extendTheme(theme)}>
@@ -139,7 +142,7 @@ argument to `extendTheme`:
 
 ~~~tsx
 import { extendTheme } from '@chakra-ui/react'
-import { theme as vtheme } from '@vocdoni/react-components'
+import { theme as vtheme } from '@vocdoni/chakra-components'
 
 const theme = extendTheme(vtheme, {
   // any theme changes would go here
@@ -168,7 +171,7 @@ Here's a small example styling the title and image of elections:
 
 ~~~ts
 import { extendTheme, ComponentSingleStyleConfig } from '@chakra-ui/react'
-import { theme as vtheme } from '@vocdoni/react-components'
+import { theme as vtheme } from '@vocdoni/chakra-components'
 
 const ElectionTitle : ComponentsStyleConfig = {
   baseStyle: {
@@ -202,7 +205,7 @@ All components have all the features you would expect from a chakra component,
 meaning you can style all components via component props too:
 
 ~~~tsx
-import { ElectionTitle, ElectionHeader } from '@vocdoni/react-components'
+import { ElectionTitle, ElectionHeader } from '@vocdoni/chakra-components'
 
 const App = () => (
   <ElectionProvider id='an-election-id'>
@@ -232,7 +235,7 @@ Here's a small example styling the `ElectionQuestions` component:
 
 ~~~ts
 import { extendTheme, createMultiStyleConfigHelpers } from '@chakra-ui/react'
-import { theme as vtheme, questionsAnatomy } from '@vocdoni/react-components'
+import { theme as vtheme, questionsAnatomy } from '@vocdoni/chakra-components'
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsAnatomy)
 
@@ -262,7 +265,7 @@ You can check out each component's anatomy by checking
 
 ### i18n
 
-In order to change any of the texts contained in `@vocdoni/react-components`,
+In order to change any of the texts contained in `@vocdoni/chakra-components`,
 you must specify the translations for each language in the ClientProvider:
 
 ~~~tsx
@@ -301,6 +304,7 @@ v3.0][license].
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+[chakra getting started]: https://chakra-ui.com/getting-started
 [license]: ./LICENSE
 [theming]: #theming
 [theming components]: #theming-components
