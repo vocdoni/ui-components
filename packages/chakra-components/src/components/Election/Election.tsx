@@ -13,6 +13,7 @@ import { ElectionSchedule } from './Schedule'
 import { ElectionStatusBadge } from './StatusBadge'
 import { ElectionTitle } from './Title'
 import { VoteButton } from './VoteButton'
+import { ElectionResults } from './Results'
 
 export type ElectionProviderProps = {
   id?: string
@@ -185,6 +186,7 @@ export const Election = (props: ElectionProviderComponentProps) => (
     <HR />
     <ElectionQuestions />
     <VoteButton />
+    <ElectionResults />
   </ElectionProvider>
 )
 Election.displayName = 'Election'
