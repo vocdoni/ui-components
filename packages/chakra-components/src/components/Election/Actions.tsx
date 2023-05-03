@@ -5,6 +5,7 @@ import { useRef } from 'react'
 import { FaPause, FaPlay } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { useClient } from '../../client'
+import { areEqualHexStrings } from '../../utils'
 import { useElection } from './Election'
 
 export const ElectionActions = () => {
@@ -13,7 +14,7 @@ export const ElectionActions = () => {
   const { election } = useElection()
   const tRef = useRef<ToastId>()
 
-  if (!election || (election && election.organizationId !== account?.address)) return null
+  if (!election || (election && !areEqualHexStrings(election.organizationId, account?.address))) return null
 
   const closeToast = () => {
     if (tRef.current) {
