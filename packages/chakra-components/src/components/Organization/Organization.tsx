@@ -1,7 +1,8 @@
 import { ChakraProps } from '@chakra-ui/system'
 import { Account, AccountData } from '@vocdoni/sdk'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { useClient } from '../../client'
+import { areEqualHexStrings } from '../../utils'
 import { OrganizationName } from './Name'
 
 export type OrganizationProviderProps = {
@@ -25,7 +26,8 @@ export const useOrganizationProvider = ({ id, organization: data, ...rest }: Org
 
   // fetch organization
   useEffect(() => {
-    if (organization || !id || loaded || !client) return
+    if (!id || !client) return
+    if (loaded && areEqualHexStrings(organization?.address, id)) return
     ;(async () => {
       setLoading(true)
       try {
