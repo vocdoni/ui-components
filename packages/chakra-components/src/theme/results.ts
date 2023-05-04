@@ -7,12 +7,12 @@ export const resultsAnatomy = [
   'resultsFlex',
   // results title
   'title',
-  // choice flex box
-  'choice',
-  // choice result wrapper
-  'choiceResultWrapper',
-  // percentages box
-  'percentages',
+  // choice result card
+  'choiceResultCard',
+  // choice result box
+  'resultsProgress',
+  // secret election no results text
+  'textSecretElection',
   // form error message
   'error',
 ]
@@ -25,16 +25,11 @@ const baseStyle = definePartsStyle({
     direction: 'column',
     gap: 1,
   },
-  choices: {
-    alignItems: 'center',
-    gap: 4,
+  resultsProgress: {
+    colorScheme: 'pink',
+    size: 'xs',
   },
-  choiceResultWrapper: {
-    backgroundColor: 'gray.100',
-    width: 48,
-    height: 2.5,
-  },
-  percentages: {
+  choiceResultCard: {
     bgColor: 'blue.400',
     height: '100%',
   },
@@ -42,8 +37,10 @@ const baseStyle = definePartsStyle({
     fontWeight: 'bold',
     marginBottom: 1,
   },
-  description: {
-    marginBottom: 4,
+  textSecretElection: {
+    color: '#892BE2',
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 })
 
