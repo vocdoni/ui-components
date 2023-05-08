@@ -54,7 +54,7 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
 
   // fetch account
   useEffect(() => {
-    if (!client || account || !signer) return
+    if (!client?.wallet || account || !signer) return
     ;(async () => {
       await fetchAccount()
     })()
@@ -62,7 +62,7 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
 
   // fetch balance
   useEffect(() => {
-    if (!client || !account || !signer) return
+    if (!client?.wallet || !account || !signer) return
     ;(async () => {
       await fetchBalance()
     })()
@@ -73,14 +73,14 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     if (!('ethereum' in window)) return
 
     const accChanged = async (accs: string[]) => {
-      // set to null so other effects do their job
-      setAccount(undefined)
       setClient(
         new VocdoniSDKClient({
           env: env as EnvOptions,
           wallet: signer,
         })
       )
+      // set to null so other effects do their job
+      setAccount(undefined)
     }
 
     ;(window as any).ethereum.on('accountsChanged', accChanged)
