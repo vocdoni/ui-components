@@ -18,6 +18,12 @@ export default {
     empty: 'Apparently this process has no questions 🤔',
     required: 'This field is required',
     voted: 'You already voted. Your vote id is {{id}}',
+    // results component
+    results: {
+      secret_until_the_end: 'Secret until the end',
+      title: 'Results for "{{title}}"',
+      votes: 'Votes: {{votes}} ({{percent}})',
+    },
     // status badge
     statuses: {
       CANCELED: 'Canceled',

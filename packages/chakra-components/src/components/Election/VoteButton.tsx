@@ -18,7 +18,7 @@ export const VoteButton = (props: ButtonProps) => {
       isDisabled={isDisabled}
       isLoading={loading || voting}
     >
-      {voted ? trans('vote.button_update') : trans('vote.button')}
+      {voted && isAbleToVote ? trans('vote.button_update') : trans('vote.button')}
     </Button>
   )
 }

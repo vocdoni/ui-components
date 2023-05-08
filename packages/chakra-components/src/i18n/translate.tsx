@@ -94,7 +94,7 @@ const TranslationProvider = ({
     }
 
     return translation?.replace(
-      /{{[^{}]+}}/,
+      /{{[^{}]+}}/g,
       (substitution: string) => substitutions[substitution.slice(2, -2)]
     ) as string
   }
