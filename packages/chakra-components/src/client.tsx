@@ -2,7 +2,7 @@ import { ToastProvider } from '@chakra-ui/toast'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { AccountData, ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import merge from 'ts-deepmerge'
 import { TranslationProvider, Translations, useTranslate } from './i18n/translate'
 import ltranslations from './i18n/translations'
@@ -75,6 +75,12 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     const accChanged = async (accs: string[]) => {
       // set to null so other effects do their job
       setAccount(undefined)
+      setClient(
+        new VocdoniSDKClient({
+          env: env as EnvOptions,
+          wallet: signer,
+        })
+      )
     }
 
     ;(window as any).ethereum.on('accountsChanged', accChanged)
