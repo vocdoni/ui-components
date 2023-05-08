@@ -3,6 +3,7 @@ import { theme as vtheme } from '@vocdoni/chakra-components'
 import { ElectionHeader, ElectionTitle } from './election'
 import Questions from './questions'
 import Radio from './radio'
+import Results from './results'
 
 const theme = extendTheme(vtheme, {
   components: {
@@ -10,6 +11,7 @@ const theme = extendTheme(vtheme, {
     ElectionHeader,
     Questions,
     Radio,
+    Results,
   },
 })
 

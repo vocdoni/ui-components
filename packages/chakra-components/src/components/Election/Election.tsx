@@ -2,13 +2,14 @@ import { ChakraProps } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { PublishedElection, Vote } from '@vocdoni/sdk'
-import { ComponentType, createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { ComponentType, PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClient } from '../../client'
 import { HR } from '../layout'
 import { ElectionDescription } from './Description'
 import { ElectionHeader } from './Header'
 import { ElectionQuestions } from './Questions'
+import { ElectionResults } from './Results'
 import { ElectionSchedule } from './Schedule'
 import { ElectionStatusBadge } from './StatusBadge'
 import { ElectionTitle } from './Title'
@@ -110,7 +111,7 @@ export const useElectionProvider = ({
 
     client.setElectionId(election.id)
     // map questions back to expected Vote[] values
-    const mapped = election.questions.map((q) => parseInt(values[q.title.default], 10))
+    const mapped = election.questions.map((q, k) => parseInt(values[k.toString()], 10))
 
     try {
       const vote = new Vote(mapped)
@@ -120,6 +121,8 @@ export const useElectionProvider = ({
 
       const vid = await client.submitVote(vote)
       setVoted(vid)
+      setVotesLeft(votesLeft - 1)
+      setIsAbleToVote(isInCensus && votesLeft - 1 > 0)
 
       return vid
     } catch (e: any) {
@@ -185,6 +188,7 @@ export const Election = (props: ElectionProviderComponentProps) => (
     <HR />
     <ElectionQuestions />
     <VoteButton />
+    <ElectionResults />
   </ElectionProvider>
 )
 Election.displayName = 'Election'

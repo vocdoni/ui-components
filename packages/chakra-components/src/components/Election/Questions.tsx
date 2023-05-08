@@ -2,7 +2,7 @@ import { Alert, AlertIcon } from '@chakra-ui/alert'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
-import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
+import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { Markdown } from '../layout'
@@ -40,7 +40,7 @@ export const ElectionQuestions = () => {
       <Voted />
       <form onSubmit={fmethods.handleSubmit(vote)} id='election-questions-form'>
         {questions.map((question, qk) => (
-          <QuestionField key={qk} question={question} />
+          <QuestionField key={qk} index={qk.toString()} question={question} />
         ))}
         {error && (
           <Alert status='error' variant='solid' mb={3}>
@@ -69,10 +69,11 @@ const Voted = () => {
 }
 
 type QuestionFieldProps = ChakraProps & {
+  index: string
   question: IQuestion
 }
 
-const QuestionField = ({ question, ...rest }: QuestionFieldProps) => {
+const QuestionField = ({ question, index, ...rest }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('Questions')
   const { isAbleToVote, trans } = useElection()
   const {
@@ -81,7 +82,7 @@ const QuestionField = ({ question, ...rest }: QuestionFieldProps) => {
 
   return (
     <chakra.div __css={styles.question} {...rest}>
-      <FormControl isInvalid={!!errors[question.title.default]}>
+      <FormControl isInvalid={!!errors[index]}>
         <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
         {question.description && (
           <chakra.div __css={styles.description}>
@@ -90,17 +91,17 @@ const QuestionField = ({ question, ...rest }: QuestionFieldProps) => {
         )}
         <Controller
           rules={{ required: trans('required') }}
-          name={question.title.default}
+          name={index}
           render={({ field }) => (
             <RadioGroup sx={styles.radioGroup} {...field} isDisabled={!isAbleToVote}>
               <Stack direction='column' sx={styles.stack}>
                 {question.choices.map((choice, ck) => (
-                  <Radio key={ck} sx={styles.radio} value={choice.title.default}>
+                  <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
                     {choice.title.default}
                   </Radio>
                 ))}
               </Stack>
-              <FormErrorMessage sx={styles.error}>{errors[question.title.default]?.message as string}</FormErrorMessage>
+              <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
             </RadioGroup>
           )}
         />
