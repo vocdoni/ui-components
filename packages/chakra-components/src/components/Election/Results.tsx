@@ -9,7 +9,7 @@ import { useElection } from './Election'
 const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(0) + '%'
 
 export const ElectionResults = (props: ChakraProps) => {
-  const styles = useMultiStyleConfig('Results')
+  const styles = useMultiStyleConfig('ElectionResults')
   const { election } = useElection()
   const { trans } = useClient()
   const totals = election?.questions.map((el) => el.choices.reduce((acc, curr) => acc + Number(curr.results), 0))
