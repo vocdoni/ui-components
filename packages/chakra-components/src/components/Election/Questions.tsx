@@ -5,6 +5,8 @@ import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { useClient } from '../../client'
+import { environment } from '../../environment'
 import { Markdown } from '../layout'
 import { useElection } from './Election'
 
@@ -54,6 +56,7 @@ export const ElectionQuestions = () => {
 }
 
 const Voted = () => {
+  const { env } = useClient()
   const { trans, voted } = useElection()
 
   if (!voted) {
@@ -63,7 +66,11 @@ const Voted = () => {
   return (
     <Alert variant='solid' status='info'>
       <AlertIcon />
-      {trans('voted', { id: voted })}
+      <span
+        dangerouslySetInnerHTML={{
+          __html: trans('voted', { id: voted, link: `${environment.verifyVote(env)}/#/${voted}` }),
+        }}
+      />
     </Alert>
   )
 }
