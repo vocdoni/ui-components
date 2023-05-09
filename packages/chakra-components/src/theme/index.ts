@@ -13,6 +13,7 @@ export const theme = {
   } as any,
 }
 
+export * from './actions'
 export * from './election'
 export * from './questions'
 export * from './results'

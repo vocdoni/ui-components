@@ -6,6 +6,7 @@ import { ComponentType, PropsWithChildren, createContext, useContext, useEffect,
 import { FieldValues } from 'react-hook-form'
 import { useClient } from '../../client'
 import { HR } from '../layout'
+import { ElectionActions } from './Actions'
 import { ElectionDescription } from './Description'
 import { ElectionHeader } from './Header'
 import { ElectionQuestions } from './Questions'
@@ -184,6 +185,7 @@ export const Election = (props: ElectionProviderComponentProps) => (
     <ElectionTitle />
     <ElectionSchedule />
     <ElectionStatusBadge />
+    <ElectionActions />
     <ElectionDescription />
     <HR />
     <ElectionQuestions />

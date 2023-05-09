@@ -1,4 +1,5 @@
 import { ButtonGroup, IconButton } from '@chakra-ui/button'
+import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { ToastId, useToast } from '@chakra-ui/toast'
 import { ElectionStatus } from '@vocdoni/sdk'
 import { useRef } from 'react'
@@ -8,11 +9,16 @@ import { useClient } from '../../client'
 import { areEqualHexStrings } from '../../utils'
 import { useElection } from './Election'
 
-export const ElectionActions = () => {
+const PlayIcon = chakra(FaPlay)
+const PauseIcon = chakra(FaPause)
+const CancelIcon = chakra(ImCross)
+
+export const ElectionActions = (props: ChakraProps) => {
   const toast = useToast()
   const { client, trans, account } = useClient()
   const { election } = useElection()
   const tRef = useRef<ToastId>()
+  const styles = useMultiStyleConfig('ElectionActions')
 
   if (!election || (election && !areEqualHexStrings(election.organizationId, account?.address))) return null
 
@@ -41,11 +47,11 @@ export const ElectionActions = () => {
   }
 
   return (
-    <ButtonGroup size='sm' isAttached variant='outline' position='relative'>
+    <ButtonGroup size='sm' isAttached variant='outline' position='relative' sx={styles.group} {...props}>
       <IconButton
         aria-label={trans('actions.continue')}
         title={trans('actions.continue')}
-        icon={<FaPlay />}
+        icon={<PlayIcon sx={styles.icons} />}
         onClick={async () => {
           infoToast(
             trans('actions.continue_description', {
@@ -64,12 +70,13 @@ export const ElectionActions = () => {
             closeToast()
           }
         }}
-        isDisabled={election.status === ElectionStatus.ONGOING}
+        isDisabled={[ElectionStatus.ONGOING, ElectionStatus.CANCELED].includes(election.status)}
+        sx={styles.buttons}
       />
       <IconButton
         aria-label={trans('actions.pause')}
         title={trans('actions.pause')}
-        icon={<FaPause />}
+        icon={<PauseIcon sx={styles.icons} />}
         onClick={async () => {
           infoToast(
             trans('actions.pause_description', {
@@ -88,12 +95,13 @@ export const ElectionActions = () => {
             closeToast()
           }
         }}
-        isDisabled={election.status === ElectionStatus.PAUSED}
+        isDisabled={[ElectionStatus.PAUSED, ElectionStatus.CANCELED].includes(election.status)}
+        sx={styles.buttons}
       />
       <IconButton
         aria-label={trans('actions.cancel')}
         title={trans('actions.cancel')}
-        icon={<ImCross />}
+        icon={<CancelIcon sx={styles.icons} />}
         onClick={async () => {
           infoToast(
             trans('actions.cancel_description', {
@@ -112,6 +120,8 @@ export const ElectionActions = () => {
             closeToast()
           }
         }}
+        isDisabled={election.status === ElectionStatus.CANCELED}
+        sx={styles.buttons}
       />
     </ButtonGroup>
   )
