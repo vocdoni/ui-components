@@ -31,7 +31,9 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
 
     const opts: ClientOptions = {
       env: env as EnvOptions,
-    }
+      // TODO: REMOVE THE FOLLOWING csp_url when https://github.com/vocdoni/vocdoni-sdk/issues/163 is ready
+      csp_url: "http://localhost:5000/v1"
+    }    
 
     if (signer) {
       opts.wallet = signer
@@ -147,12 +149,29 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     client.wallet = signer
   }
 
+  const generateSigner = (seed?: string | string[]) => {
+    if (!client) {
+      throw new Error('No client initialized')
+    }
+
+    let signer: Wallet
+    if (!seed) {
+      client.generateRandomWallet()
+      signer = client.wallet as Wallet
+    } else {
+      signer = VocdoniSDKClient.generateWalletFromData(seed)
+    }
+
+    return signer
+  }
+
   return {
     account,
     balance,
     client,
     env,
     signer,
+    generateSigner,
     fetchAccount,
     fetchBalance,
     setClient,

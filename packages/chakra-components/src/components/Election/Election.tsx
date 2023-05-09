@@ -1,7 +1,7 @@
 import { ChakraProps } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
-import { PublishedElection, Vote } from '@vocdoni/sdk'
+import { CensusType, CspVote, ElectionStatus, PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClient } from '../../client'
@@ -43,6 +43,10 @@ export const useElectionProvider = ({
   const [isAbleToVote, setIsAbleToVote] = useState<boolean | undefined>(undefined)
   const [votesLeft, setVotesLeft] = useState<number>(0)
   const [isInCensus, setIsInCensus] = useState<boolean>(false)
+  const [censusType, setCensusType] = useState<CensusType | undefined>(undefined)
+  const [voteInstance, setVoteInstance] = useState<Vote | undefined>(undefined)
+  const [authToken, setAuthToken] = useState<any>(null)
+  const [handler, setHandler] = useState<string>("facebook") // Hardcoded until we let to choose
 
   // set signer in case it has been specified in the election
   // provider (rather than the client provider). Not sure if this is useful tho...
@@ -80,9 +84,10 @@ export const useElectionProvider = ({
   useEffect(() => {
     if (!fetchCensus || !signer || !election || !loaded || !client || isAbleToVote !== undefined) return
     ;(async () => {
+      const censusType: CensusType = election.census.type
       const isIn = await client.isInCensus(election.id)
       let left = 0
-      if (isIn) {
+      if (isIn || censusType == CensusType.WEIGHTED) {
         // no need to check votes left if member ain't in census
         left = await client.votesLeftCount(election.id)
         setVotesLeft(left)
@@ -90,11 +95,45 @@ export const useElectionProvider = ({
         const voted = await client.hasAlreadyVoted(election.id)
         setVoted(voted)
       }
+      setCensusType(censusType)
       setIsInCensus(isIn)
-      setIsAbleToVote(left > 0 && isIn)
+      setIsAbleToVote((left > 0 && isIn) || censusType == CensusType.CSP)
     })()
   }, [fetchCensus, election, loaded, client, isAbleToVote, signer])
 
+  // Listening for the popup window meessage (oauth flows)
+  useEffect(() => {
+    ;(async () => {
+      if(window.opener) return
+      if(!client) return
+      if(censusType != CensusType.CSP) return
+
+      window.addEventListener('message', (event) => {
+        if(event.data.code && event.data.handler){
+          getOAuthToken(client, event.data.code, event.data.handler)
+        }
+      })
+    })()
+  },[client, censusType])
+  
+  // Posting the message to the main window
+  useEffect(() => {
+    (async () => {
+      if (typeof window == 'undefined') return
+      if (window.location.href.split('?').length < 2) return
+
+      const code = window.location.href.split('?')[1].split('&').find((param: string) => param.startsWith('code='))?.split('=')[1]
+      const handler = window.location.href.split('?')[1].split('&').find((param: string) => param.startsWith('handler='))?.split('=')[1]
+      if(!code || !handler) return
+
+      if(window.opener) {
+        // If it is, send the code to the parent window and close the popup
+        window.opener.postMessage({ code, handler }, '*')
+        window.close()
+      }
+    })()
+  },[])
+  
   // context vote function (the one to be used with the given components)
   const vote = async (values: FieldValues) => {
     if (!client) {
@@ -114,18 +153,22 @@ export const useElectionProvider = ({
     // map questions back to expected Vote[] values
     const mapped = election.questions.map((q, k) => parseInt(values[k.toString()], 10))
 
+    let vote = new Vote(mapped)
+    setVoteInstance(vote)
+    if (typeof beforeSubmit === 'function' && !beforeSubmit(vote)) {
+      return
+    }
+
     try {
-      const vote = new Vote(mapped)
-      if (typeof beforeSubmit === 'function' && !beforeSubmit(vote)) {
-        return
+      let vid;
+      if (censusType == CensusType.CSP) {
+        await cspAuthAndVote(vote)
+      }else if (censusType == CensusType.WEIGHTED) {
+        vid = await weightedVote(vote)
+        setVoted(vid)
+        setVotesLeft(votesLeft - 1)
+        setIsAbleToVote(isInCensus && votesLeft - 1 > 0)
       }
-
-      const vid = await client.submitVote(vote)
-      setVoted(vid)
-      setVotesLeft(votesLeft - 1)
-      setIsAbleToVote(isInCensus && votesLeft - 1 > 0)
-
-      return vid
     } catch (e: any) {
       if ('reason' in e) {
         return setError(e.reason as string)
@@ -136,6 +179,122 @@ export const useElectionProvider = ({
       console.error('could not vote:', e)
     } finally {
       setVoting(false)
+    }
+  }
+
+  const weightedVote = async (vote: Vote): Promise<string> => {
+    if (!vote) {
+      throw new Error('no vote instance')
+    }
+    if( censusType != CensusType.WEIGHTED ){
+      throw new Error('not a Weighted election')
+    }
+
+    return await client.submitVote(vote)
+  }
+
+  const cspAuthAndVote = async (vote: Vote) => {
+    if ( !client ) {
+      throw new Error('no client initialized')
+    }
+    if (!election) {
+      throw new Error('no election initialized')
+    }
+    if( censusType != CensusType.CSP ){
+      throw new Error('not a CSP election')
+    }
+
+    let redirectURL = `${window.location.href}`
+    // Add electionId and handler to the redirectURL if it is not there
+    if(!redirectURL.includes(`electionId=${election.id}`)){
+      redirectURL.includes('?') ? redirectURL += `&electionId=${election.id}` : redirectURL += `?electionId=${election.id}`
+    }
+    if(!redirectURL.includes(`handler=${handler}`)){
+      redirectURL.includes('?') ? redirectURL += `&handler=${handler}` : redirectURL += `?handler=${handler}`
+    }
+    
+    let step0: any;
+    try {
+      step0 = await client.cspStep(0, [handler, redirectURL])
+    } catch (e: any) {
+      if ('reason' in e) {
+        return setError(e.reason as string)
+      }
+    }
+
+    setAuthToken(step0.authToken)
+    openLoginPopup(handler, step0['response'][0])
+  }
+
+    // Opens a popup window to the service login page
+  const openLoginPopup = (handler: string, url: string) => {
+    const width = 600
+    const height = 600
+    const left = (window.outerWidth / 2) - (width / 2)
+    const top = (window.outerHeight / 2) - (height / 2)
+    const params = [
+      `width=${width}`,
+      `height=${height}`,
+      `top=${top}`,
+      `left=${left}`,
+      `status=no`,
+      `resizable=yes`,
+      `scrollbars=yes`,
+    ].join(',')
+
+    window.open(url, handler, params)
+  }
+
+  const getOAuthToken = async (vocdoniClient: any, code: string, handler: string) => {
+    if (!code) {
+      throw new Error('no code provided')
+    }
+    if (!handler) {
+      throw new Error('no handler provided')
+    }
+
+    // Extract the electionId query param from the redirectURL
+    const electionId = window.location.href.split('?')[1].split('&').find((param: string) => param.startsWith('electionId='))?.split('=')[1]
+    let redirectURL = `${window.location.href.split('?')[0]}?electionId=${electionId}&handler=${handler}`
+
+    let step1;
+    try {
+      step1 = await vocdoniClient.cspStep(1, [handler, code, redirectURL], authToken)
+      cspVote(step1.token);
+    } catch(e) {
+      setError("Not authorized to vote")
+      return false;
+    }
+  }
+
+  const cspVote = async (token: string) => {
+    if (!client) {
+      throw new Error('no client initialized')
+    }
+
+    if(!voteInstance){
+      throw new Error('no vote instance')
+    }
+
+    if(!token){
+      throw new Error('no token provided')
+    }
+
+    if( censusType != CensusType.CSP ){
+      throw new Error('not a CSP election')
+    }
+
+    try {
+      const walletAddress: string = await client.wallet?.getAddress() as string
+      const signature: string = await client.cspSign(walletAddress, token)
+      const cspVote: CspVote = client.cspVote(voteInstance as Vote, signature)
+      const vid: string = await client.submitVote(cspVote)
+      setVoted(vid)
+      setVotesLeft(votesLeft - 1)
+      return vid
+    } catch(e) {
+      setError("Error submitting vote")
+      return false;
     }
   }
 
