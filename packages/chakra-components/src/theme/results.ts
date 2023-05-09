@@ -21,8 +21,11 @@ const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpe
 
 const baseStyle = definePartsStyle({
   wrapper: {
-    direction: 'column',
-    gap: 1,
+    flexDirection: 'column',
+    gap: 2,
+  },
+  cardHeader: {
+    pb: 0,
   },
   title: {
     fontWeight: 'bold',

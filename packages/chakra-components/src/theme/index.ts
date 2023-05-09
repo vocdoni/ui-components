@@ -6,10 +6,10 @@ import { ResultsTheme as ElectionResults } from './results'
 export const theme = {
   components: {
     ElectionQuestions,
+    ElectionResults,
     ElectionSchedule,
     ElectionTitle,
     HorizontalRuler,
-    ElectionResults,
   } as any,
 }
 

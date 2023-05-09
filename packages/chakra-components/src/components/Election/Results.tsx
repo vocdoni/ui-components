@@ -23,7 +23,7 @@ export const ElectionResults = (props: ChakraProps) => {
   }
 
   return (
-    <Flex sx={styles.wrapper}>
+    <Flex sx={styles.wrapper} {...props}>
       {election?.questions.map((q: any, idx: number) => (
         <Card key={idx} sx={styles.card}>
           <CardHeader sx={styles.cardHeader}>
