@@ -1,7 +1,17 @@
 {
   "name": "@vocdoni/chakra-components",
-  "license": "GPL-3.0-or-later",
   "version": "0.1.5",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/chakra-components#readme",
+  "bugs": "https://github.com/vocdoni/ui-components/issues",
+  "repository": "github.com:vocdoni/ui-components",
+  "description": "Vocdoni's Chakra UI Components",
+  "keywords": [
+    "react",
+    "chakra",
+    "blockchain",
+    "voting"
+  ],
   "type": "module",
   "files": [
     "dist"

@@ -93,10 +93,7 @@ const TranslationProvider = ({
       return key
     }
 
-    return translation?.replace(
-      /{{[^{}]+}}/g,
-      (substitution: string) => substitutions[substitution.slice(2, -2)]
-    ) as string
+    return translation?.replace(/{{\s*([^{}\s]+)\s*}}/g, (ign, varname) => dotobject(substitutions, varname)) as string
   }
 
   return (

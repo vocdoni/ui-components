@@ -11,7 +11,7 @@ import { useElection } from './Election'
 export const ElectionQuestions = () => {
   const { election, signer, vote, voted, ConnectButton, error, loading, trans, isAbleToVote } = useElection()
   const fmethods = useForm()
-  const styles = useMultiStyleConfig('Questions')
+  const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
 
   if (voted && !isAbleToVote) {
