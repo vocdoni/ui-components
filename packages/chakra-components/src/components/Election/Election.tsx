@@ -45,7 +45,9 @@ export const useElectionProvider = ({
   const [isInCensus, setIsInCensus] = useState<boolean>(false)
   const [censusType, setCensusType] = useState<CensusType | undefined>(undefined)
   const [voteInstance, setVoteInstance] = useState<Vote | undefined>(undefined)
+  const [cspVotingToken, setCspVotingToken] = useState<string | undefined>(undefined)
   const [authToken, setAuthToken] = useState<any>(null)
+  const [receivedMessage, setReceivedMessage] = useState<boolean>(false)
   const [handler, setHandler] = useState<string>("facebook") // Hardcoded until we let to choose
 
   // set signer in case it has been specified in the election
@@ -55,6 +57,12 @@ export const useElectionProvider = ({
 
     setSigner(s)
   }, [signer, client, s])
+
+  useEffect(() => {
+    if(cspVotingToken && voteInstance) {
+      cspVote(cspVotingToken, voteInstance)
+    }
+  },[cspVotingToken, voteInstance])
 
   // fetch election
   useEffect(() => {
@@ -104,15 +112,21 @@ export const useElectionProvider = ({
   // Listening for the popup window meessage (oauth flows)
   useEffect(() => {
     ;(async () => {
-      if(window.opener) return
-      if(!client) return
-      if(censusType != CensusType.CSP) return
-
-      window.addEventListener('message', (event) => {
-        if(event.data.code && event.data.handler){
-          getOAuthToken(client, event.data.code, event.data.handler)
+      const handleMessage = (event: any) => {
+        if (event.data.code && event.data.handler) {
+          getOAuthToken(client, event.data.code, event.data.handler);
         }
-      })
+      };
+    
+      if (window.opener || !client || censusType !== CensusType.CSP) {
+        return;
+      }
+
+      window.addEventListener('message', handleMessage);
+
+      return () => {
+        window.removeEventListener('message', handleMessage);
+      };
     })()
   },[client, censusType])
   
@@ -162,7 +176,7 @@ export const useElectionProvider = ({
     try {
       let vid;
       if (censusType == CensusType.CSP) {
-        await cspAuthAndVote(vote)
+        await cspAuthAndVote()
       }else if (censusType == CensusType.WEIGHTED) {
         vid = await weightedVote(vote)
         setVoted(vid)
@@ -193,7 +207,7 @@ export const useElectionProvider = ({
     return await client.submitVote(vote)
   }
 
-  const cspAuthAndVote = async (vote: Vote) => {
+  const cspAuthAndVote = async () => {
     if ( !client ) {
       throw new Error('no client initialized')
     }
@@ -246,6 +260,10 @@ export const useElectionProvider = ({
   }
 
   const getOAuthToken = async (vocdoniClient: any, code: string, handler: string) => {
+    if(cspVotingToken) {
+      return
+    }
+
     if (!code) {
       throw new Error('no code provided')
     }
@@ -256,41 +274,34 @@ export const useElectionProvider = ({
     // Extract the electionId query param from the redirectURL
     const electionId = window.location.href.split('?')[1].split('&').find((param: string) => param.startsWith('electionId='))?.split('=')[1]
     let redirectURL = `${window.location.href.split('?')[0]}?electionId=${electionId}&handler=${handler}`
-
     let step1;
     try {
       step1 = await vocdoniClient.cspStep(1, [handler, code, redirectURL], authToken)
-      cspVote(step1.token);
+      setCspVotingToken(step1.token)
     } catch(e) {
       setError("Not authorized to vote")
       return false;
     }
   }
 
-  const cspVote = async (token: string) => {
+  const cspVote = async (token: string, vote: Vote) => {
     if (!client) {
       throw new Error('no client initialized')
     }
-
-    if(!voteInstance){
-      throw new Error('no vote instance')
-    }
-
-    if(!token){
-      throw new Error('no token provided')
-    }
-
-    if( censusType != CensusType.CSP ){
+    
+    if(censusType != CensusType.CSP){
       throw new Error('not a CSP election')
     }
-
+    
     try {
       const walletAddress: string = await client.wallet?.getAddress() as string
       const signature: string = await client.cspSign(walletAddress, token)
-      const cspVote: CspVote = client.cspVote(voteInstance as Vote, signature)
+      const cspVote: CspVote = client.cspVote(vote as Vote, signature)
       const vid: string = await client.submitVote(cspVote)
       setVoted(vid)
       setVotesLeft(votesLeft - 1)
+      setCspVotingToken(undefined)
+      setVoteInstance(undefined)
       return vid
     } catch(e) {
       setError("Error submitting vote")
