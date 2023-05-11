@@ -47,7 +47,6 @@ export const useElectionProvider = ({
   const [voteInstance, setVoteInstance] = useState<Vote | undefined>(undefined)
   const [cspVotingToken, setCspVotingToken] = useState<string | undefined>(undefined)
   const [authToken, setAuthToken] = useState<any>(null)
-  const [receivedMessage, setReceivedMessage] = useState<boolean>(false)
   const [handler, setHandler] = useState<string>("facebook") // Hardcoded until we let to choose
 
   // set signer in case it has been specified in the election
@@ -109,6 +108,7 @@ export const useElectionProvider = ({
     })()
   }, [fetchCensus, election, loaded, client, isAbleToVote, signer])
 
+  // CSP OAuth flow
   // Listening for the popup window meessage (oauth flows)
   useEffect(() => {
     ;(async () => {
@@ -130,6 +130,7 @@ export const useElectionProvider = ({
     })()
   },[client, censusType])
   
+  // CSP OAuth flow
   // Posting the message to the main window
   useEffect(() => {
     (async () => {
@@ -207,6 +208,7 @@ export const useElectionProvider = ({
     return await client.submitVote(vote)
   }
 
+  // CSP OAuth flow
   const cspAuthAndVote = async () => {
     if ( !client ) {
       throw new Error('no client initialized')
@@ -240,7 +242,8 @@ export const useElectionProvider = ({
     openLoginPopup(handler, step0['response'][0])
   }
 
-    // Opens a popup window to the service login page
+  // CSP OAuth flow
+  // Opens a popup window to the service login page
   const openLoginPopup = (handler: string, url: string) => {
     const width = 600
     const height = 600
@@ -259,6 +262,7 @@ export const useElectionProvider = ({
     window.open(url, handler, params)
   }
 
+  // CSP OAuth flow
   const getOAuthToken = async (vocdoniClient: any, code: string, handler: string) => {
     if(cspVotingToken) {
       return
