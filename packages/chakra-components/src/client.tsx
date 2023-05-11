@@ -32,8 +32,8 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     const opts: ClientOptions = {
       env: env as EnvOptions,
       // TODO: REMOVE THE FOLLOWING csp_url when https://github.com/vocdoni/vocdoni-sdk/issues/163 is ready
-      csp_url: "http://localhost:5000/v1"
-    }    
+      csp_url: 'http://localhost:5000/v1',
+    }
 
     if (signer) {
       opts.wallet = signer
