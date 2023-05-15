@@ -3,6 +3,7 @@ import { Box, Flex, Text } from '@chakra-ui/layout'
 import { Progress } from '@chakra-ui/progress'
 import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { ElectionStatus } from '@vocdoni/sdk'
+import { format } from 'date-fns'
 import { useClient } from '../../client'
 import { useElection } from './Election'
 
@@ -17,7 +18,7 @@ export const ElectionResults = (props: ChakraProps) => {
   if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS) {
     return (
       <Text sx={styles.secret} {...props}>
-        {trans('results.secret_until_the_end')}
+        {trans('results.secret_until_the_end', { endDate: format(election.endDate, trans('results.date_format')) })}
       </Text>
     )
   }

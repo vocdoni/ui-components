@@ -13,15 +13,17 @@ export default {
     },
     vote: {
       button: 'Vote',
-      button_update: 'Update vote',
+      button_update: 'Re-submit vote',
     },
     empty: 'Apparently this process has no questions 🤔',
     required: 'This field is required',
     voted:
-      'You already voted. Your vote id is <a href="{{ link }}" target="_blank" rel="noreferrer noopener">{{ id }}</a>',
+      'Your vote was successfully cast! Your vote id is <a href="{{ link }}" target="_blank" rel="noreferrer noopener">{{ id }}</a>',
     // results component
     results: {
-      secret_until_the_end: 'Secret until the end',
+      secret_until_the_end:
+        'Secret until the end. The results will be available when the process ends at {{ endDate }}',
+      date_format: 'd-L-y HH:mm',
       title: 'Results for "{{title}}"',
       votes: 'Votes: {{votes}} ({{percent}})',
     },
