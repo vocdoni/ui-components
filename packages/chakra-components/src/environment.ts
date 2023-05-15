@@ -6,5 +6,5 @@ export const environment = {
     }
     return explorer
   },
-  verifyVote: (env: string) => `${environment.explorer(env)}/verify`,
+  verifyVote: (env: string, proof: string) => `${environment.explorer(env)}/verify/#/${proof}`,
 }

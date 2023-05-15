@@ -11,14 +11,15 @@ export default {
       pause_description: 'pausing the "{{ election.title.default }}" election process',
       waiting_title: 'Waiting for transaction confirmation...',
     },
+    // questions and vote button
     vote: {
       button: 'Vote',
       button_update: 'Re-submit vote',
+      voted_title: 'Your vote was successfully cast!',
+      voted_description: 'Your vote id is {{ id }}. You can use it to verify your vote.',
     },
     empty: 'Apparently this process has no questions 🤔',
     required: 'This field is required',
-    voted:
-      'Your vote was successfully cast! Your vote id is <a href="{{ link }}" target="_blank" rel="noreferrer noopener">{{ id }}</a>',
     // results component
     results: {
       secret_until_the_end:

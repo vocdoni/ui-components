@@ -1,10 +1,11 @@
-import { Alert, AlertIcon } from '@chakra-ui/alert'
+import { Alert, AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/alert'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
-import { Stack } from '@chakra-ui/layout'
+import { Link, Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { IQuestion } from '@vocdoni/sdk'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
+import reactStringReplace from 'react-string-replace'
 import { useClient } from '../../client'
 import { environment } from '../../environment'
 import { Markdown } from '../layout'
@@ -22,7 +23,7 @@ export const ElectionQuestions = () => {
 
   if (!questions || (questions && !questions?.length)) {
     return (
-      <Alert variant='solid' status='warning' sx={styles.alert}>
+      <Alert variant='subtle' status='warning' sx={styles.alert}>
         <AlertIcon />
         {trans('empty')}
       </Alert>
@@ -58,19 +59,32 @@ export const ElectionQuestions = () => {
 const Voted = () => {
   const { env } = useClient()
   const { trans, voted } = useElection()
+  const styles = useMultiStyleConfig('ElectionQuestions')
 
   if (!voted) {
     return null
   }
 
   return (
-    <Alert variant='solid' status='info'>
+    <Alert
+      variant='subtle'
+      alignItems='center'
+      justifyContent='center'
+      textAlign='center'
+      status='info'
+      flexDir='column'
+      isTruncated
+      sx={styles.alert}
+    >
       <AlertIcon />
-      <span
-        dangerouslySetInnerHTML={{
-          __html: trans('voted', { id: voted, link: `${environment.verifyVote(env)}/#/${voted}` }),
-        }}
-      />
+      <AlertTitle sx={styles.alertTitle}>{trans('vote.voted_title')}</AlertTitle>
+      <AlertDescription isTruncated maxW='100%' whiteSpace='initial' sx={styles.alertDescription}>
+        {reactStringReplace(trans('vote.voted_description', { id: voted }), voted, (match, k) => (
+          <Link key={k} href={environment.verifyVote(env, voted)} target='_blank' isTruncated sx={styles.alertLink}>
+            {match}
+          </Link>
+        ))}
+      </AlertDescription>
     </Alert>
   )
 }
@@ -81,7 +95,7 @@ type QuestionFieldProps = ChakraProps & {
 }
 
 const QuestionField = ({ question, index, ...rest }: QuestionFieldProps) => {
-  const styles = useMultiStyleConfig('Questions')
+  const styles = useMultiStyleConfig('ElectionQuestions')
   const { isAbleToVote, trans } = useElection()
   const {
     formState: { errors },
