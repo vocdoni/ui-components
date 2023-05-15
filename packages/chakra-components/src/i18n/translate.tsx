@@ -49,11 +49,7 @@ const TranslationProvider = ({
     translations?: Translations
   }) => {
     if (!language && translations) {
-      language = navigator.language
-      if (!translations[language]) language = language.substring(0, 2)
-      if (!translations[language]) language = navigator.languages.find((language) => translations[language]) as string
-      if (!translations[language])
-        language = translations[defaultLanguage as string] ? defaultLanguage : Object.keys(translations)[0]
+      language = translations[defaultLanguage as string] ? defaultLanguage : Object.keys(translations)[0]
     }
     return { language, defaultLanguage, translations } as {
       translations: Translations
