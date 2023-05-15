@@ -3,7 +3,7 @@ import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Link, Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
-import { IQuestion } from '@vocdoni/sdk'
+import { ElectionStatus, IQuestion } from '@vocdoni/sdk'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
 import { useClient } from '../../client'
@@ -96,7 +96,7 @@ type QuestionFieldProps = ChakraProps & {
 
 const QuestionField = ({ question, index, ...rest }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const { isAbleToVote, trans } = useElection()
+  const { election, isAbleToVote, trans } = useElection()
   const {
     formState: { errors },
   } = useFormContext()
@@ -114,7 +114,11 @@ const QuestionField = ({ question, index, ...rest }: QuestionFieldProps) => {
           rules={{ required: trans('required') }}
           name={index}
           render={({ field }) => (
-            <RadioGroup sx={styles.radioGroup} {...field} isDisabled={!isAbleToVote}>
+            <RadioGroup
+              sx={styles.radioGroup}
+              {...field}
+              isDisabled={!isAbleToVote || election?.status !== ElectionStatus.ONGOING}
+            >
               <Stack direction='column' sx={styles.stack}>
                 {question.choices.map((choice, ck) => (
                   <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
