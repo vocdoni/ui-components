@@ -3,7 +3,7 @@ import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { ToastId, useToast } from '@chakra-ui/toast'
 import { ElectionStatus } from '@vocdoni/sdk'
 import { useRef } from 'react'
-import { FaPause, FaPlay } from 'react-icons/fa'
+import { FaPause, FaPlay, FaStop } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { useClient } from '../../client'
 import { areEqualHexStrings } from '../../utils'
@@ -12,6 +12,7 @@ import { useElection } from './Election'
 const PlayIcon = chakra(FaPlay)
 const PauseIcon = chakra(FaPause)
 const CancelIcon = chakra(ImCross)
+const StopIcon = chakra(FaStop)
 
 export const ElectionActions = (props: ChakraProps) => {
   const toast = useToast()
@@ -96,6 +97,31 @@ export const ElectionActions = (props: ChakraProps) => {
           }
         }}
         isDisabled={[ElectionStatus.PAUSED, ElectionStatus.CANCELED].includes(election.status)}
+        sx={styles.buttons}
+      />
+      <IconButton
+        aria-label={trans('actions.end')}
+        title={trans('actions.end')}
+        icon={<StopIcon sx={styles.icons} />}
+        onClick={async () => {
+          infoToast(
+            trans('actions.end_description', {
+              election,
+            })
+          )
+
+          try {
+            await client.endElection(election.id)
+          } catch (e: any) {
+            if (typeof e === 'string') {
+              return errorToast(e)
+            }
+            console.warn('catched error in "pause" action', e)
+          } finally {
+            closeToast()
+          }
+        }}
+        isDisabled={election.status !== ElectionStatus.ONGOING}
         sx={styles.buttons}
       />
       <IconButton
