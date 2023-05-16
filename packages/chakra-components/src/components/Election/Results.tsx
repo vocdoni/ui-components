@@ -1,7 +1,6 @@
-import { Card, CardBody, CardHeader } from '@chakra-ui/card'
 import { Box, Flex, Text } from '@chakra-ui/layout'
 import { Progress } from '@chakra-ui/progress'
-import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
+import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { ElectionStatus } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 import { useClient } from '../../client'
@@ -26,11 +25,11 @@ export const ElectionResults = (props: ChakraProps) => {
   return (
     <Flex sx={styles.wrapper} {...props}>
       {election?.questions.map((q: any, idx: number) => (
-        <Card key={idx} sx={styles.card}>
-          <CardHeader sx={styles.cardHeader}>
+        <chakra.div key={idx} sx={styles.question}>
+          <chakra.div sx={styles.header}>
             <Text sx={styles.title}>{trans('results.title', { title: q.title.default })}</Text>
-          </CardHeader>
-          <CardBody sx={styles.cardBody}>
+          </chakra.div>
+          <chakra.div sx={styles.body}>
             {election?.questions[idx].choices.map((c: any, i: number) => (
               <Box key={i}>
                 {totals && (
@@ -44,8 +43,8 @@ export const ElectionResults = (props: ChakraProps) => {
                 )}
               </Box>
             ))}
-          </CardBody>
-        </Card>
+          </chakra.div>
+        </chakra.div>
       ))}
     </Flex>
   )

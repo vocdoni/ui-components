@@ -11,7 +11,7 @@ import { environment } from '../../environment'
 import { Markdown } from '../layout'
 import { useElection } from './Election'
 
-export const ElectionQuestions = () => {
+export const ElectionQuestions = (props: ChakraProps) => {
   const { election, signer, vote, voted, ConnectButton, error, loading, setFormError, trans, isAbleToVote } =
     useElection()
   const fmethods = useForm()
@@ -40,23 +40,25 @@ export const ElectionQuestions = () => {
   )
 
   return (
-    <FormProvider {...fmethods}>
-      <Voted />
-      <form
-        onSubmit={fmethods.handleSubmit(vote, (errs) => setFormError(Object.values(errs).length > 0))}
-        id='election-questions-form'
-      >
-        {questions.map((question, qk) => (
-          <QuestionField key={qk} index={qk.toString()} question={question} />
-        ))}
-        {error && (
-          <Alert status='error' variant='solid' mb={3}>
-            <AlertIcon />
-            {error}
-          </Alert>
-        )}
-      </form>
-    </FormProvider>
+    <chakra.div __css={styles.wrapper} {...props}>
+      <FormProvider {...fmethods}>
+        <Voted />
+        <form
+          onSubmit={fmethods.handleSubmit(vote, (errs) => setFormError(Object.values(errs).length > 0))}
+          id='election-questions-form'
+        >
+          {questions.map((question, qk) => (
+            <QuestionField key={qk} index={qk.toString()} question={question} />
+          ))}
+          {error && (
+            <Alert status='error' variant='solid' mb={3}>
+              <AlertIcon />
+              {error}
+            </Alert>
+          )}
+        </form>
+      </FormProvider>
+    </chakra.div>
   )
 }
 
@@ -98,7 +100,7 @@ type QuestionFieldProps = ChakraProps & {
   question: IQuestion
 }
 
-const QuestionField = ({ question, index, ...rest }: QuestionFieldProps) => {
+const QuestionField = ({ question, index }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
   const { election, isAbleToVote, trans } = useElection()
   const {
@@ -106,34 +108,38 @@ const QuestionField = ({ question, index, ...rest }: QuestionFieldProps) => {
   } = useFormContext()
 
   return (
-    <chakra.div __css={styles.question} {...rest}>
+    <chakra.div __css={styles.question}>
       <FormControl isInvalid={!!errors[index]}>
-        <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
-        {question.description && (
-          <chakra.div __css={styles.description}>
-            <Markdown>{question.description.default}</Markdown>
-          </chakra.div>
-        )}
-        <Controller
-          rules={{ required: trans('required') }}
-          name={index}
-          render={({ field }) => (
-            <RadioGroup
-              sx={styles.radioGroup}
-              {...field}
-              isDisabled={!isAbleToVote || election?.status !== ElectionStatus.ONGOING}
-            >
-              <Stack direction='column' sx={styles.stack}>
-                {question.choices.map((choice, ck) => (
-                  <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
-                    {choice.title.default}
-                  </Radio>
-                ))}
-              </Stack>
-              <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
-            </RadioGroup>
+        <chakra.div __css={styles.header}>
+          <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
+        </chakra.div>
+        <chakra.div __css={styles.body}>
+          {question.description && (
+            <chakra.div __css={styles.description}>
+              <Markdown>{question.description.default}</Markdown>
+            </chakra.div>
           )}
-        />
+          <Controller
+            rules={{ required: trans('required') }}
+            name={index}
+            render={({ field }) => (
+              <RadioGroup
+                sx={styles.radioGroup}
+                {...field}
+                isDisabled={!isAbleToVote || election?.status !== ElectionStatus.ONGOING}
+              >
+                <Stack direction='column' sx={styles.stack}>
+                  {question.choices.map((choice, ck) => (
+                    <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
+                      {choice.title.default}
+                    </Radio>
+                  ))}
+                </Stack>
+                <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
+              </RadioGroup>
+            )}
+          />
+        </chakra.div>
       </FormControl>
     </chakra.div>
   )

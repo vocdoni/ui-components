@@ -1,20 +1,24 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/system'
 
 export const resultsAnatomy = [
-  // wrapper
+  // all questions wrapper
   'wrapper',
-  // results card
-  'card',
-  // results card header
-  'cardHeader',
-  // results title
+  // individual question results
+  'question',
+  // result header
+  'header',
+  // result title
   'title',
-  // results card body
-  'cardBody',
+  // result body
+  'body',
   // choice result box
   'progress',
   // secret election (no results until the end text)
   'secret',
+  // choice title/label
+  'choiceTitle',
+  // choice number of votes
+  'choiceVotes',
 ]
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(resultsAnatomy)
@@ -24,7 +28,7 @@ const baseStyle = definePartsStyle({
     flexDirection: 'column',
     gap: 2,
   },
-  cardHeader: {
+  header: {
     pb: 0,
   },
   title: {

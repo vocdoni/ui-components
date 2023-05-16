@@ -1,6 +1,8 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/system'
 
 export const questionsAnatomy = [
+  // main content wrapper
+  'wrapper',
   // alert messages (voted or no questions available)
   'alert',
   'alertTitle',
@@ -8,6 +10,10 @@ export const questionsAnatomy = [
   'alertLink',
   // question wrapper
   'question',
+  // question header
+  'header',
+  // question body
+  'body',
   // question title
   'title',
   // question description
