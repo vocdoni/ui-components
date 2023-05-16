@@ -54,21 +54,24 @@ export const useElectionProvider = ({
     setSigner(s)
   }, [signer, client, s])
 
+  const fetchElection = async (id: string) => {
+    setLoading(true)
+    try {
+      const e = await client.fetchElection(id)
+      setLoaded(true)
+      setElection(e)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // fetch election
   useEffect(() => {
-    if (election || !id || loaded || !client) return
-    ;(async () => {
-      setLoading(true)
-      try {
-        const e = await client.fetchElection(id)
-        setLoaded(true)
-        setElection(e)
-      } catch (e) {
-        setError((e as Error).message)
-      } finally {
-        setLoading(false)
-      }
-    })()
+    if (election || !id || loaded || loading || !client) return
+
+    fetchElection(id)
   }, [election, id, loaded, client])
 
   // set loaded in case election comes from props
@@ -80,9 +83,12 @@ export const useElectionProvider = ({
 
   // check if logged in user is able to vote
   useEffect(() => {
-    if (!fetchCensus || !signer || !election || !loaded || !client || isAbleToVote !== undefined) return
+    if (!fetchCensus || !signer || !election || !loaded || loading || !client || isAbleToVote !== undefined) return
     ;(async () => {
+      setLoading(true)
       const isIn = await client.isInCensus(election.id)
+      setIsInCensus(isIn)
+
       let left = 0
       if (isIn) {
         // no need to check votes left if member ain't in census
@@ -92,8 +98,8 @@ export const useElectionProvider = ({
         const voted = await client.hasAlreadyVoted(election.id)
         setVoted(voted)
       }
-      setIsInCensus(isIn)
       setIsAbleToVote(left > 0 && isIn)
+      setLoading(false)
     })()
   }, [fetchCensus, election, loaded, client, isAbleToVote, signer])
 
@@ -138,6 +144,8 @@ export const useElectionProvider = ({
       console.error('could not vote:', e)
     } finally {
       setVoting(false)
+      // fetch election metadata to retrieve results and other useful updated information
+      fetchElection(election.id)
     }
   }
 
