@@ -1,10 +1,9 @@
 import { ChakraProps, useStyleConfig } from '@chakra-ui/system'
-import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
 
-import { Markdown } from '../layout'
+import { Markdown, MarkdownProps } from '../layout'
 import { useElection } from './Election'
 
-export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children' | 'node'> & ChakraProps) => {
+export const ElectionDescription = (props: Omit<MarkdownProps, 'children' | 'node'> & ChakraProps) => {
   const styles = useStyleConfig('ElectionDescription', props)
   const { election } = useElection()
 
