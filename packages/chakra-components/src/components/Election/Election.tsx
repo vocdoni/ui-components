@@ -8,6 +8,7 @@ import { useClient } from '../../client'
 import { HR } from '../layout'
 import { ElectionActions } from './Actions'
 import { ElectionDescription } from './Description'
+import { ElectionFormError } from './FormError'
 import { ElectionHeader } from './Header'
 import { ElectionQuestions } from './Questions'
 import { ElectionResults } from './Results'
@@ -43,6 +44,7 @@ export const useElectionProvider = ({
   const [isAbleToVote, setIsAbleToVote] = useState<boolean | undefined>(undefined)
   const [votesLeft, setVotesLeft] = useState<number>(0)
   const [isInCensus, setIsInCensus] = useState<boolean>(false)
+  const [formError, setFormError] = useState<boolean>(false)
 
   // set signer in case it has been specified in the election
   // provider (rather than the client provider). Not sure if this is useful tho...
@@ -143,9 +145,11 @@ export const useElectionProvider = ({
     ...rest,
     election,
     error,
+    formError,
     isAbleToVote,
     isInCensus,
     loading,
+    setFormError,
     signer,
     trans,
     vote,
@@ -189,6 +193,7 @@ export const Election = (props: ElectionProviderComponentProps) => (
     <ElectionDescription />
     <HR />
     <ElectionQuestions />
+    <ElectionFormError />
     <VoteButton />
     <ElectionResults />
   </ElectionProvider>

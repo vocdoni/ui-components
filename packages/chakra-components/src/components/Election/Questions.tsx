@@ -12,7 +12,8 @@ import { Markdown } from '../layout'
 import { useElection } from './Election'
 
 export const ElectionQuestions = () => {
-  const { election, signer, vote, voted, ConnectButton, error, loading, trans, isAbleToVote } = useElection()
+  const { election, signer, vote, voted, ConnectButton, error, loading, setFormError, trans, isAbleToVote } =
+    useElection()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
@@ -41,7 +42,10 @@ export const ElectionQuestions = () => {
   return (
     <FormProvider {...fmethods}>
       <Voted />
-      <form onSubmit={fmethods.handleSubmit(vote)} id='election-questions-form'>
+      <form
+        onSubmit={fmethods.handleSubmit(vote, (errs) => setFormError(Object.values(errs).length > 0))}
+        id='election-questions-form'
+      >
         {questions.map((question, qk) => (
           <QuestionField key={qk} index={qk.toString()} question={question} />
         ))}
