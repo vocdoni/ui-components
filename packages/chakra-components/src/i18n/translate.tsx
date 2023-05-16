@@ -1,86 +1,23 @@
 import dotobject from 'dotobject'
-import { createContext, ReactElement, useContext, useState } from 'react'
+import { createContext, ReactElement, useContext } from 'react'
+import type { Translations } from './translations'
 
-export type Translation = {
-  [key: string]: string | Translation
-}
-
-export type Translations = {
-  [language: string]: Translation
-}
 type TranslateFunction = (key: string, substitutions?: any) => string
-type ConfigureFunction = ({
-  language,
-  defaultLanguage,
-  translations,
-}: {
-  language?: string
-  defaultLanguage?: string
-  translations?: Translations
-}) => void
 
 const TranslationContext = createContext(
   {} as {
-    configure: ConfigureFunction
-    setLanguage: (lang: string) => void
     translate: TranslateFunction
-    configuration: { language: string; defaultLanguage?: string }
   }
 )
 
-const TranslationProvider = ({
-  language,
-  defaultLanguage,
-  translations,
-  children,
-}: {
-  language?: string
-  defaultLanguage?: string
-  translations: Translations
-  children: ReactElement
-}) => {
-  const validateConfiguration = ({
-    language,
-    defaultLanguage,
-    translations,
-  }: {
-    language?: string
-    defaultLanguage?: string
-    translations?: Translations
-  }) => {
-    if (!language && translations) {
-      language = translations[defaultLanguage as string] ? defaultLanguage : Object.keys(translations)[0]
-    }
-    return { language, defaultLanguage, translations } as {
+const TranslationProvider = ({ translations, children }: { translations: Translations; children: ReactElement }) => {
+  const validateConfiguration = ({ translations }: { translations?: Translations }) => {
+    return { translations } as {
       translations: Translations
-      language: string
-      defaultLanguage?: string
     }
   }
 
-  const [configuration, setConfiguration] = useState(
-    validateConfiguration({
-      translations,
-      ...(language ? { language } : {}),
-      ...(defaultLanguage ? { defaultLanguage } : {}),
-    })
-  )
-
-  const activeTranslation = configuration.translations[configuration.language]
-
-  const configure = (translatorConfiguration: {
-    language?: string
-    defaultLanguage?: string
-    translations?: Translations
-  }) =>
-    setConfiguration(
-      validateConfiguration({
-        ...configuration,
-        ...translatorConfiguration,
-      })
-    )
-
-  const setLanguage = (language: string) => configure({ language })
+  const activeTranslation = translations
 
   const translate = (key: string, substitutions?: any) => {
     let translation = dotobject(activeTranslation, key)
@@ -92,11 +29,7 @@ const TranslationProvider = ({
     return translation?.replace(/{{\s*([^{}\s]+)\s*}}/g, (ign, varname) => dotobject(substitutions, varname)) as string
   }
 
-  return (
-    <TranslationContext.Provider value={{ configure, setLanguage, translate, configuration }}>
-      {children}
-    </TranslationContext.Provider>
-  )
+  return <TranslationContext.Provider value={{ translate }}>{children}</TranslationContext.Provider>
 }
 
 const useTranslate = () => {
@@ -105,16 +38,4 @@ const useTranslate = () => {
   return translate as TranslateFunction
 }
 
-const useTranslatorConfigurer = () => {
-  const { configure } = useContext(TranslationContext) || {}
-  if (!configure) throw new Error('useTranslatorConfigurer must be used within TranslationProvider.')
-  return configure as ConfigureFunction
-}
-
-const useTranslatorConfiguration = () => {
-  const { configuration } = useContext(TranslationContext) || {}
-  if (!configuration) throw new Error('useTranslatorConfigurer must be used within TranslationProvider.')
-  return configuration as { language: string; defaultLanguage?: string }
-}
-
-export { useTranslate, useTranslatorConfigurer, useTranslatorConfiguration, TranslationProvider }
+export { useTranslate, TranslationProvider }

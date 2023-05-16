@@ -4,8 +4,9 @@ import { Wallet } from '@ethersproject/wallet'
 import { AccountData, ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import merge from 'ts-deepmerge'
-import { TranslationProvider, Translations, useTranslate } from './i18n/translate'
-import ltranslations from './i18n/translations'
+import { TranslationProvider, useTranslate } from './i18n/translate'
+import type { Translations } from './i18n/translations'
+import { translations as ltranslations } from './i18n/translations'
 
 export type ClientProviderProps = {
   env?: Lowercase<keyof typeof EnvOptions>
