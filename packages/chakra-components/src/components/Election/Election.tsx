@@ -24,6 +24,8 @@ export type ElectionProviderProps = {
   ConnectButton?: ComponentType
   fetchCensus?: boolean
   beforeSubmit?: (vote: Vote) => boolean
+  autoUpdateInterval?: number
+  autoUpdate?: boolean
 }
 
 export const useElectionProvider = ({
@@ -32,6 +34,8 @@ export const useElectionProvider = ({
   signer: s,
   fetchCensus,
   beforeSubmit,
+  autoUpdateInterval,
+  autoUpdate,
   ...rest
 }: ElectionProviderProps) => {
   const { client, signer, setSigner, trans } = useClient()
@@ -102,6 +106,15 @@ export const useElectionProvider = ({
       setLoading(false)
     })()
   }, [fetchCensus, election, loaded, client, isAbleToVote, signer])
+
+  // auto update metadata (if enabled)
+  useEffect(() => {
+    if (!autoUpdate || !(election && election.id)) return
+
+    const interval = setInterval(() => fetchElection(election.id), autoUpdateInterval || 30000)
+
+    return () => clearInterval(interval)
+  }, [autoUpdate, autoUpdateInterval])
 
   // context vote function (the one to be used with the given components)
   const vote = async (values: FieldValues) => {
