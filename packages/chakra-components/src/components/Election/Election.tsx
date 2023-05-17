@@ -137,16 +137,9 @@ export const useElectionProvider = ({
       if (typeof window == 'undefined') return
       if (window.location.href.split('?').length < 2) return
 
-      const code = window.location.href
-        .split('?')[1]
-        .split('&')
-        .find((param: string) => param.startsWith('code='))
-        ?.split('=')[1]
-      const handler = window.location.href
-        .split('?')[1]
-        .split('&')
-        .find((param: string) => param.startsWith('handler='))
-        ?.split('=')[1]
+      const params: URLSearchParams = new URLSearchParams(window.location.search);
+      const code: string | null = params.get('code');
+      const handler: string | null = params.get('handler');
       if (!code || !handler) return
 
       if (window.opener) {
@@ -183,11 +176,10 @@ export const useElectionProvider = ({
     }
 
     try {
-      let vid
       if (censusType == CensusType.CSP) {
         await cspAuthAndVote()
       } else if (censusType == CensusType.WEIGHTED) {
-        vid = await weightedVote(vote)
+        const vid = await weightedVote(vote)
         setVoted(vid)
         setVotesLeft(votesLeft - 1)
         setIsAbleToVote(isInCensus && votesLeft - 1 > 0)
@@ -228,16 +220,17 @@ export const useElectionProvider = ({
       throw new Error('not a CSP election')
     }
 
-    let redirectURL = `${window.location.href}`
-    // Add electionId and handler to the redirectURL if it is not there
-    if (!redirectURL.includes(`electionId=${election.id}`)) {
-      redirectURL.includes('?')
-        ? (redirectURL += `&electionId=${election.id}`)
-        : (redirectURL += `?electionId=${election.id}`)
+    const params: URLSearchParams = new URLSearchParams(window.location.search);
+
+    if (!params.has('electionId')) {
+      params.append('electionId', election.id);
     }
-    if (!redirectURL.includes(`handler=${handler}`)) {
-      redirectURL.includes('?') ? (redirectURL += `&handler=${handler}`) : (redirectURL += `?handler=${handler}`)
+
+    if (!params.has('handler')) {
+      params.append('handler', handler);
     }
+
+    const redirectURL: string = `${window.location.origin}${window.location.pathname}?${params.toString()}${window.location.hash}`;
 
     let step0: any
     try {
@@ -286,12 +279,14 @@ export const useElectionProvider = ({
     }
 
     // Extract the electionId query param from the redirectURL
-    const electionId = window.location.href
-      .split('?')[1]
-      .split('&')
-      .find((param: string) => param.startsWith('electionId='))
-      ?.split('=')[1]
-    let redirectURL = `${window.location.href.split('?')[0]}?electionId=${electionId}&handler=${handler}`
+    const existingParams = new URLSearchParams(window.location.search);
+    const electionId = existingParams.get('electionId');
+    const params: URLSearchParams = new URLSearchParams();
+    params.append('electionId', electionId as string);
+    params.append('handler', handler);
+
+    const redirectURL = `${window.location.origin}${window.location.pathname}?${params.toString()}${window.location.hash}`;
+
     let step1
     try {
       step1 = await vocdoniClient.cspStep(1, [handler, code, redirectURL], authToken)
