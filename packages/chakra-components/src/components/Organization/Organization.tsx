@@ -1,59 +1,62 @@
 import { ChakraProps } from '@chakra-ui/system'
 import { Account, AccountData } from '@vocdoni/sdk'
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+import { PropsWithChildren, createContext, useContext, useEffect } from 'react'
 import { useClient } from '../../client'
 import { areEqualHexStrings } from '../../utils'
 import { OrganizationName } from './Name'
+import { useOrganizationReducer } from './use-organization-reducer'
 
 export type OrganizationProviderProps = {
   id?: string
   organization?: AccountData
 }
 
-export const useOrganizationProvider = ({ id, organization: data, ...rest }: OrganizationProviderProps) => {
-  const { client, signer, setSigner } = useClient()
-  const [loading, setLoading] = useState<boolean>(false)
-  const [loaded, setLoaded] = useState<boolean>(false)
-  const [error, setError] = useState<string>('')
-  const [organization, setOrganization] = useState<AccountData | undefined>(data)
+export const useOrganizationProvider = ({ id, organization }: OrganizationProviderProps) => {
+  const { client, signer, setSigner, account: vAccount } = useClient()
+  const { state, loading, setAccount, loadError, updateError } = useOrganizationReducer(organization)
 
-  const update = (account: Account) => {
-    setLoading(true)
+  // fetches organization info, and sets it to the state
+  const fetch = async (id: string) => {
+    loading()
+    try {
+      const account = await client.fetchAccountInfo(id)
+      setAccount(account)
+
+      return account
+    } catch (e) {
+      if (typeof e === 'string') {
+        loadError(e)
+      }
+      if (e instanceof Error) {
+        loadError(e.message)
+      }
+    }
+  }
+
+  // updates organization info, and sets the new result to state
+  const update = async (account: Account | Partial<Account>) => {
+    if (!areEqualHexStrings(await signer.getAddress(), vAccount?.address)) {
+      throw new Error("You're not the owner of this account")
+    }
+
+    loading()
     return client
       .updateAccountInfo(account instanceof Account ? account : new Account(account))
-      .finally(() => setLoading(false))
+      .then(setAccount)
+      .catch(updateError)
   }
 
   // fetch organization
   useEffect(() => {
-    if (!id || !client) return
-    if (loaded && areEqualHexStrings(organization?.address, id)) return
-    ;(async () => {
-      setLoading(true)
-      try {
-        setOrganization(await client.fetchAccountInfo(id))
-        setLoaded(true)
-      } catch (e) {
-        setError((e as Error).message)
-      } finally {
-        setLoading(false)
-      }
-    })()
-  }, [organization, id, loaded, client])
+    if (!id || !client || state.loading) return
+    if (state.loaded && areEqualHexStrings(state.organization?.address, id)) return
 
-  // set loaded in case organization comes from props
-  useEffect(() => {
-    if (loaded || !data) return
-
-    setLoaded(true)
-  }, [data, loaded])
+    fetch(id)
+  }, [state.organization, id, client])
 
   return {
-    ...rest,
-    organization,
-    error,
-    loading,
-    loaded,
+    ...state,
+    fetch,
     update,
   }
 }

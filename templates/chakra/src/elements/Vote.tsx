@@ -1,24 +1,23 @@
+import { Card, CardBody, CardHeader } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { Election } from '@vocdoni/chakra-components'
+import { Election, OrganizationName, OrganizationProvider } from '@vocdoni/chakra-components'
 import { PublishedElection } from '@vocdoni/sdk'
 import { useLoaderData } from 'react-router-dom'
 
 const Vote = () => {
-  // we take the election from the route information for a better rendering experience
   const election = useLoaderData() as PublishedElection
-  /*
-    you could comment the above line and uncomment the ones below to use the
-    ElectionProvider to fetch the election instead, but the usage of useLoaderData
-    is recommended
-  */
-  // const { pid } = useParams()
 
   return (
-    <Election
-      // id={pid}
-      election={election}
-      ConnectButton={ConnectButton}
-    />
+    <OrganizationProvider id={election.organizationId}>
+      <Card>
+        <CardHeader>
+          <OrganizationName />
+        </CardHeader>
+        <CardBody>
+          <Election election={election} ConnectButton={ConnectButton} />
+        </CardBody>
+      </Card>
+    </OrganizationProvider>
   )
 }
 
