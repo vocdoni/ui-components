@@ -3,7 +3,8 @@
     "baseUrl": "src",
     "paths": {
       "@components/*": ["components/*"],
-      "@constants": ["constants.ts"],
+      "@constants": ["constants/index.ts"],
+      "@constants/*": ["constants/*"],
       "@elements/*": ["elements/*"],
       "@hooks/*": ["hooks/*"],
       "@src/*": ["./*"]
