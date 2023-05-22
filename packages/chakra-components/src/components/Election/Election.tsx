@@ -5,6 +5,7 @@ import { PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClient } from '../../client'
+import { areEqualHexStrings } from '../../utils'
 import { HR } from '../layout'
 import { ElectionActions } from './Actions'
 import { ElectionDescription } from './Description'
@@ -73,15 +74,18 @@ export const useElectionProvider = ({
 
   // fetch election
   useEffect(() => {
-    if (election || !id || loaded || loading || !client) return
+    if (!id || !client || loading) return
+    if (loaded && areEqualHexStrings(election?.id, id)) return
 
     fetchElection(id)
-  }, [election, id, loaded, client])
+  }, [election, id, client])
 
-  // set loaded in case election comes from props
+  // properly set election data in case it comes from props (and/or updates)
   useEffect(() => {
-    if (loaded || !data) return
+    if (!data) return
+    if (loaded && areEqualHexStrings(election?.id, id)) return
 
+    setElection(data)
     setLoaded(true)
   }, [data, loaded])
 
