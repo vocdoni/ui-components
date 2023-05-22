@@ -53,14 +53,6 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     changeSigner(s)
   }, [s])
 
-  // fetch account
-  useEffect(() => {
-    if (!client?.wallet || account || !signer) return
-    ;(async () => {
-      await fetchAccount()
-    })()
-  }, [client, account, signer])
-
   // fetch balance
   useEffect(() => {
     if (!client?.wallet || !account || !signer) return
