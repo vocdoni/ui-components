@@ -1,7 +1,7 @@
 import { ToastProvider } from '@chakra-ui/toast'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
-import { AccountData, ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { Account, AccountData, ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import merge from 'ts-deepmerge'
 import { TranslationProvider, useTranslate } from './i18n/translate'
@@ -106,11 +106,11 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
    *
    * @returns {Promise<AccountData>}
    */
-  const createAccount = async () => {
+  const createAccount = async (account?: Account, faucetPackage?: string) => {
     let acc: AccountData
 
     try {
-      acc = await client.createAccount()
+      acc = await client.createAccount({ account, faucetPackage })
       setAccount(acc)
 
       return acc
