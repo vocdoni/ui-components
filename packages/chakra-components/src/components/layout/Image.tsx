@@ -2,6 +2,7 @@ import { Image as CImage, ImageProps } from '@chakra-ui/image'
 
 export type IPFSImageProps = ImageProps & {
   gateway?: string
+  fallback?: string
 }
 
 export const linkify = (link: string | undefined, gateway: string) => {
@@ -25,12 +26,12 @@ export const linkify = (link: string | undefined, gateway: string) => {
   return gateway + pin
 }
 
-export const Image = ({ src, ...props }: IPFSImageProps) => {
-  if (!src) {
+export const Image = ({ src, fallback, ...props }: IPFSImageProps) => {
+  if (!src && !fallback) {
     return null
   }
 
-  const link = linkify(src, props.gateway || 'https://infura-ipfs.io/ipfs/')
+  const link = linkify(src || fallback, props.gateway || 'https://infura-ipfs.io/ipfs/')
 
   return <CImage src={link} {...props} />
 }
