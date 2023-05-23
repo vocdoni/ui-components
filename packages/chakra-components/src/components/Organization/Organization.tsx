@@ -24,7 +24,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
   // updates organization info, and sets the new result to state
   const update = async (account: Account | Partial<Account>) => {
     if (!vAccount) {
-      throw new Error("There's no vocdoni account initialized. Maybe you forgot to fetch organization details?")
+      await fetch()
     }
     if (!areEqualHexStrings(await signer.getAddress(), vAccount?.address)) {
       throw new Error("You're not the owner of this account")
