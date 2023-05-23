@@ -92,12 +92,30 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     let acc: AccountData
 
     try {
-      acc = await client.createAccount()
+      acc = await client.fetchAccountInfo()
       setAccount(acc)
 
       return acc
     } catch (e) {
       console.error('could not fetch account:', e)
+    }
+  }
+
+  /**
+   * Creates an account.
+   *
+   * @returns {Promise<AccountData>}
+   */
+  const createAccount = async () => {
+    let acc: AccountData
+
+    try {
+      acc = await client.createAccount()
+      setAccount(acc)
+
+      return acc
+    } catch (e) {
+      console.error('could not create account:', e)
     }
   }
 
@@ -144,12 +162,13 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
     account,
     balance,
     client,
+    createAccount,
     env,
-    signer,
     fetchAccount,
     fetchBalance,
     setClient,
     setSigner: changeSigner,
+    signer,
     trans,
   }
 }

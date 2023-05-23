@@ -9,8 +9,8 @@ export const OrganizationUpdateError = 'organization:update:error'
 
 export type OrganizationSetPayload = AccountData
 export type OrganizationUpdatePayload = Partial<AccountData>
-export type OrganizationLoadErrorPayload = string
-export type OrganizationUpdateErrorPayload = string
+export type OrganizationLoadErrorPayload = string | Error
+export type OrganizationUpdateErrorPayload = string | Error
 
 export type OrganizationActionPayload =
   | OrganizationSetPayload
@@ -97,7 +97,7 @@ const organizationReducer: Reducer<OrganizationReducerState, OrganizationAction>
         loaded: false,
         errors: {
           ...state.errors,
-          load: error,
+          load: errorToString(error),
         },
       }
     }
@@ -110,13 +110,30 @@ const organizationReducer: Reducer<OrganizationReducerState, OrganizationAction>
         loaded: false,
         errors: {
           ...state.errors,
-          update: error,
+          update: errorToString(error),
         },
       }
     }
   }
 
   return state
+}
+
+/**
+ * Theoretically, all errors from the SDK should be returned as strings, but this is not true
+ * for any error coming from the signer (which is, in part, coming from the SDK). That's why
+ * we need to properly cast them to strings. Note we're not using error instanceof Error because
+ * it just not works for many signer errors.
+ *
+ * @param {Error|string} error The error to be casted
+ * @returns {string}
+ */
+const errorToString = (error: Error | string): string => {
+  if (typeof error !== 'string' && 'message' in error) {
+    return error.message
+  }
+
+  return error
 }
 
 export const useOrganizationReducer = (organization?: AccountData) => {
@@ -130,8 +147,9 @@ export const useOrganizationReducer = (organization?: AccountData) => {
     state,
     dispatch,
     loading: () => dispatch({ type: OrganizationLoading }),
-    updateAccount: (account: Partial<AccountData>) => dispatch({ type: OrganizationUpdate, payload: account }),
-    setAccount: (account: AccountData) => dispatch({ type: OrganizationSet, payload: account }),
+    updateOrganization: (organization: Partial<AccountData>) =>
+      dispatch({ type: OrganizationUpdate, payload: organization }),
+    setOrganization: (organization: AccountData) => dispatch({ type: OrganizationSet, payload: organization }),
     loadError: (error: string) => dispatch({ type: OrganizationLoadError, payload: error }),
     updateError: (error: string) => dispatch({ type: OrganizationUpdateError, payload: error }),
   }

@@ -13,28 +13,19 @@ export type OrganizationProviderProps = {
 
 export const useOrganizationProvider = ({ id, organization }: OrganizationProviderProps) => {
   const { client, signer, setSigner, account: vAccount } = useClient()
-  const { state, loading, setAccount, loadError, updateError } = useOrganizationReducer(organization)
+  const { state, loading, setOrganization, loadError, updateError } = useOrganizationReducer(organization)
 
   // fetches organization info, and sets it to the state
-  const fetch = async (id: string) => {
+  const fetch = () => {
     loading()
-    try {
-      const account = await client.fetchAccountInfo(id)
-      setAccount(account)
-
-      return account
-    } catch (e) {
-      if (typeof e === 'string') {
-        loadError(e)
-      }
-      if (e instanceof Error) {
-        loadError(e.message)
-      }
-    }
+    return client.fetchAccountInfo(id).then(setOrganization).catch(loadError)
   }
 
   // updates organization info, and sets the new result to state
   const update = async (account: Account | Partial<Account>) => {
+    if (!vAccount) {
+      throw new Error("There's no vocdoni account initialized. Maybe you forgot to fetch organization details?")
+    }
     if (!areEqualHexStrings(await signer.getAddress(), vAccount?.address)) {
       throw new Error("You're not the owner of this account")
     }
@@ -42,7 +33,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
     loading()
     return client
       .updateAccountInfo(account instanceof Account ? account : new Account(account))
-      .then(setAccount)
+      .then(setOrganization)
       .catch(updateError)
   }
 
@@ -51,7 +42,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
     if (!id || !client || state.loading) return
     if (state.loaded && areEqualHexStrings(state.organization?.address, id)) return
 
-    fetch(id)
+    fetch()
   }, [state.organization, id, client])
 
   return {

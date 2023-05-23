@@ -2,7 +2,7 @@ import { ButtonGroup, IconButton } from '@chakra-ui/button'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { ToastId, useToast } from '@chakra-ui/toast'
 import { ElectionStatus } from '@vocdoni/sdk'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { FaPause, FaPlay, FaStop } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { useClient } from '../../client'
@@ -16,10 +16,17 @@ const StopIcon = chakra(FaStop)
 
 export const ElectionActions = (props: ChakraProps) => {
   const toast = useToast()
-  const { client, trans, account } = useClient()
+  const { client, trans, account, fetchAccount } = useClient()
   const { election } = useElection()
   const tRef = useRef<ToastId>()
   const styles = useMultiStyleConfig('ElectionActions')
+
+  // ensure we have account data
+  useEffect(() => {
+    if (typeof account !== 'undefined') return
+
+    fetchAccount()
+  }, [account])
 
   if (!election || (election && !areEqualHexStrings(election.organizationId, account?.address))) return null
 
