@@ -88,36 +88,15 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
    *
    * @returns {Promise<AccountData>}
    */
-  const fetchAccount = async () => {
-    let acc: AccountData
-
-    try {
-      acc = await client.fetchAccountInfo()
-      setAccount(acc)
-
-      return acc
-    } catch (e) {
-      console.error('could not fetch account:', e)
-    }
-  }
+  const fetchAccount = () => client.fetchAccountInfo().then(setAccount)
 
   /**
    * Creates an account.
    *
    * @returns {Promise<AccountData>}
    */
-  const createAccount = async (account?: Account, faucetPackage?: string) => {
-    let acc: AccountData
-
-    try {
-      acc = await client.createAccount({ account, faucetPackage })
-      setAccount(acc)
-
-      return acc
-    } catch (e) {
-      console.error('could not create account:', e)
-    }
-  }
+  const createAccount = (account?: Account, faucetPackage?: string) =>
+    client.createAccount({ account, faucetPackage }).then(setAccount)
 
   /**
    * Fetches and sets to state current account balance.
