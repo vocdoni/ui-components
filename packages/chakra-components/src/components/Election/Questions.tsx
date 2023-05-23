@@ -77,7 +77,7 @@ const Voted = () => {
       alignItems='center'
       justifyContent='center'
       textAlign='center'
-      status='info'
+      status='success'
       flexDir='column'
       isTruncated
       sx={styles.alert}
