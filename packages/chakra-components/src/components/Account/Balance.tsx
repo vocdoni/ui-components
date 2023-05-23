@@ -1,11 +1,17 @@
 import { Tag, TagProps } from '@chakra-ui/tag'
+import { useEffect } from 'react'
 import { useClient } from '../../client'
 
 export const Balance = (props: TagProps) => {
-  const { balance } = useClient()
+  const { balance, account, fetchAccount } = useClient()
+
+  useEffect(() => {
+    if (typeof account !== 'undefined') return
+
+    fetchAccount().then(console.log)
+  }, [account])
 
   if (balance < 0) {
-    // maybe return the connectbutton here?
     return null
   }
 
