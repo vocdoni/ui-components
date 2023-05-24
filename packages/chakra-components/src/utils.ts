@@ -17,9 +17,8 @@ export const enforceHexPrefix = (address?: string) =>
  */
 export const areEqualHexStrings = (hex1?: string, hex2?: string) => {
   if (!hex1 || !hex2) return false
-  if (hex1 === hex2) return true
 
-  return enforceHexPrefix(hex1.toLocaleLowerCase()) === enforceHexPrefix(hex2.toLowerCase())
+  return enforceHexPrefix(hex1.toLowerCase()) === enforceHexPrefix(hex2.toLowerCase())
 }
 
 /**
