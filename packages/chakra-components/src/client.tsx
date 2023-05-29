@@ -1,79 +1,67 @@
 import { ToastProvider } from '@chakra-ui/toast'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
-import { Account, AccountData, ClientOptions, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
+import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { PropsWithChildren, createContext, useContext, useEffect } from 'react'
 import merge from 'ts-deepmerge'
 import { TranslationProvider, useTranslate } from './i18n/translate'
 import type { Translations } from './i18n/translations'
 import { translations as ltranslations } from './i18n/translations'
+import { useClientReducer } from './use-client-reducer'
 
 export type ClientProviderProps = {
-  env?: Lowercase<keyof typeof EnvOptions>
   client?: VocdoniSDKClient
+  env?: Lowercase<keyof typeof EnvOptions>
   signer?: Wallet | Signer
 }
 
-export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProviderProps) => {
+export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProviderProps) => {
   const trans = useTranslate()
-  const [client, setClient] = useState<VocdoniSDKClient>(c as VocdoniSDKClient)
-  const [signer, setSigner] = useState<Wallet | Signer>(s as Wallet | Signer)
-  const [env, setEnv] = useState<string>(e as string)
-  const [account, setAccount] = useState<AccountData>()
-  const [balance, setBalance] = useState<number>(-1)
+  const { actions, state } = useClientReducer({
+    client: c,
+    env: e,
+    signer: s,
+  })
 
-  // initialize client
-  useEffect(() => {
-    if (client) return
-
-    if ((!env || (env && !env.length)) && !client) {
-      throw new Error('You must provide a valid env or client to the ClientProvider')
-    }
-
-    const opts: ClientOptions = {
-      env: env as EnvOptions,
-    }
-
-    if (signer) {
-      opts.wallet = signer
-    }
-
-    setClient(new VocdoniSDKClient(opts))
-  }, [env, c])
-
-  // update env
+  // update env on updates
   useEffect(() => {
     if (!e) return
-    setEnv(e)
+    actions.setEnv(e)
   }, [e])
 
-  // update signer
+  // fetch account (only with signer connected)
+  useEffect(() => {
+    if (!state.connected || (state.connected && state.account)) return
+
+    fetchAccount()
+  }, [state.account, state.connected])
+
+  // fetch balance (only with signer connected)
+  useEffect(() => {
+    if (!state.connected || !state.account) return
+
+    fetchBalance()
+  }, [state.account, state.connected])
+
+  // update signer on updates
   useEffect(() => {
     if (!s) return
-    changeSigner(s)
+    actions.setSigner(s)
   }, [s])
-
-  // fetch balance
-  useEffect(() => {
-    if (!client?.wallet || !account || !signer) return
-    ;(async () => {
-      await fetchBalance()
-    })()
-  }, [client, account, signer])
 
   // switch account behavior handler
   useEffect(() => {
     if (!('ethereum' in window)) return
 
     const accChanged = async (accs: string[]) => {
-      setClient(
+      actions.setClient(
         new VocdoniSDKClient({
-          env: env as EnvOptions,
-          wallet: signer,
+          env: state.env as EnvOptions,
+          wallet: state.signer,
         })
       )
-      // set to null so other effects do their job
-      setAccount(undefined)
+      // undefine so other effects do their job
+      actions.setAccount(undefined)
     }
 
     ;(window as any).ethereum.on('accountsChanged', accChanged)
@@ -88,15 +76,12 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
    *
    * @returns {Promise<AccountData>}
    */
-  const fetchAccount = () => client.fetchAccountInfo().then(setAccount)
+  const fetchAccount = () => {
+    if (state.loading.account) return
 
-  /**
-   * Creates an account.
-   *
-   * @returns {Promise<AccountData>}
-   */
-  const createAccount = (account?: Account, faucetPackage?: string) =>
-    client.createAccount({ account, faucetPackage }).then(setAccount)
+    actions.fetchAccount()
+    return state.client.fetchAccountInfo().then(actions.setAccount).catch(actions.errorAccount)
+  }
 
   /**
    * Fetches and sets to state current account balance.
@@ -104,50 +89,48 @@ export const useClientProvider = ({ env: e, client: c, signer: s }: ClientProvid
    * @returns {Promise<number>}
    */
   const fetchBalance = async () => {
+    if (state.loading.balance) return
+
     try {
-      if (!account) {
+      if (!state.account) {
         throw new Error('Account not available')
       }
+      // tell state machine we're fetching balance
+      actions.fetchBalance()
 
-      if (account.balance <= 10 && env !== 'prod') {
-        await client.collectFaucetTokens()
-        const acc = await client.fetchAccountInfo()
-        setBalance(acc.balance)
+      if (state.account.balance <= 10 && state.env !== 'prod') {
+        await state.client.collectFaucetTokens()
+        const acc = await state.client.fetchAccountInfo()
+        actions.setBalance(acc.balance)
 
         return acc.balance
       }
 
-      setBalance(account.balance)
-      return account.balance
-    } catch (e) {
-      console.error('could not fetch balance:', e)
+      actions.setBalance(state.account.balance)
+      return state.account.balance
+    } catch (e: any) {
+      actions.errorBalance(e)
     }
   }
 
   /**
-   * Changes the current signer in state and in the initialized SDK client.
-   * @param {Wallet|Signer} signer
+   * Creates an account.
+   *
+   * @returns {Promise<AccountData>}
    */
-  const changeSigner = (signer: Wallet | Signer) => {
-    if (!client) {
-      throw new Error('No client initialized')
-    }
+  const createAccount = (account?: Account, faucetPackage?: string) => {
+    if (state.loading.account) return
 
-    setSigner(signer)
-    client.wallet = signer
+    actions.fetchAccount()
+    return state.client.createAccount({ account, faucetPackage }).then(actions.setAccount).catch(actions.errorAccount)
   }
 
   return {
-    account,
-    balance,
-    client,
+    ...state,
     createAccount,
-    env,
     fetchAccount,
     fetchBalance,
-    setClient,
-    setSigner: changeSigner,
-    signer,
+    setClient: actions.setClient,
     trans,
   }
 }
