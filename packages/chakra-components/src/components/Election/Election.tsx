@@ -1,6 +1,4 @@
 import { ChakraProps } from '@chakra-ui/system'
-import { Signer } from '@ethersproject/abstract-signer'
-import { Wallet } from '@ethersproject/wallet'
 import { PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
@@ -21,7 +19,6 @@ import { VoteButton } from './VoteButton'
 export type ElectionProviderProps = {
   id?: string
   election?: PublishedElection
-  signer?: Wallet | Signer
   ConnectButton?: ComponentType
   fetchCensus?: boolean
   beforeSubmit?: (vote: Vote) => boolean
@@ -32,14 +29,13 @@ export type ElectionProviderProps = {
 export const useElectionProvider = ({
   id,
   election: data,
-  signer: s,
   fetchCensus,
   beforeSubmit,
   autoUpdateInterval,
   autoUpdate,
   ...rest
 }: ElectionProviderProps) => {
-  const { client, signer, setSigner, trans } = useClient()
+  const { client, signer, trans } = useClient()
   const [loading, setLoading] = useState<boolean>(false)
   const [voting, setVoting] = useState<boolean>(false)
   const [loaded, setLoaded] = useState<boolean>(false)
@@ -50,14 +46,6 @@ export const useElectionProvider = ({
   const [votesLeft, setVotesLeft] = useState<number>(0)
   const [isInCensus, setIsInCensus] = useState<boolean>(false)
   const [formError, setFormError] = useState<boolean>(false)
-
-  // set signer in case it has been specified in the election
-  // provider (rather than the client provider). Not sure if this is useful tho...
-  useEffect(() => {
-    if (!client || signer || !s) return
-
-    setSigner(s)
-  }, [signer, client, s])
 
   const fetchElection = async (id: string) => {
     setLoading(true)

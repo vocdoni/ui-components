@@ -12,7 +12,7 @@ export type OrganizationProviderProps = {
 }
 
 export const useOrganizationProvider = ({ id, organization }: OrganizationProviderProps) => {
-  const { client, signer, setSigner, account: vAccount } = useClient()
+  const { client, signer, account: vAccount } = useClient()
   const { state, loading, setOrganization, loadError, updateError } = useOrganizationReducer(organization)
 
   // fetches organization info, and sets it to the state
