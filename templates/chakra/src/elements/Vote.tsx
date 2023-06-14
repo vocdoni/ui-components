@@ -1,6 +1,12 @@
-import { Card, CardBody, CardHeader } from '@chakra-ui/react'
+import { Box, Card, CardBody, CardHeader, Flex } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { Election, OrganizationName, OrganizationProvider } from '@vocdoni/chakra-components'
+import {
+  Election,
+  OrganizationAvatar,
+  OrganizationDescription,
+  OrganizationName,
+  OrganizationProvider,
+} from '@vocdoni/chakra-components'
 import { PublishedElection } from '@vocdoni/sdk'
 import { useLoaderData } from 'react-router-dom'
 
@@ -11,9 +17,18 @@ const Vote = () => {
     <OrganizationProvider id={election.organizationId}>
       <Card>
         <CardHeader>
-          <OrganizationName />
+          <Flex gap='4'>
+            <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
+              <OrganizationAvatar maxW='200px' />
+
+              <Box flex='1'>
+                <OrganizationName as='h1' fontSize='2rem' fontWeight='bold' />
+                <OrganizationDescription />
+              </Box>
+            </Flex>
+          </Flex>
         </CardHeader>
-        <CardBody>
+        <CardBody borderTop='3px solid' borderColor='blue.700'>
           <Election election={election} ConnectButton={ConnectButton} />
         </CardBody>
       </Card>
