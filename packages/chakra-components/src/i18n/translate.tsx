@@ -11,16 +11,10 @@ const TranslationContext = createContext(
 )
 
 const TranslationProvider = ({ translations, children }: { translations: Translations; children: ReactElement }) => {
-  const validateConfiguration = ({ translations }: { translations?: Translations }) => {
-    return { translations } as {
-      translations: Translations
-    }
-  }
-
   const activeTranslation = translations
 
   const translate = (key: string, substitutions?: any) => {
-    let translation = dotobject(activeTranslation, key)
+    const translation = dotobject(activeTranslation, key)
     if (typeof translation !== 'string') {
       console.warn(`The translation key "${key}" was not found!`)
       return key
@@ -38,4 +32,4 @@ const useTranslate = () => {
   return translate as TranslateFunction
 }
 
-export { useTranslate, TranslationProvider }
+export { TranslationProvider, useTranslate }

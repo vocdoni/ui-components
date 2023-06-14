@@ -12,8 +12,7 @@ import { Markdown } from '../layout'
 import { useElection } from './Election'
 
 export const ElectionQuestions = (props: ChakraProps) => {
-  const { election, signer, vote, voted, ConnectButton, error, loading, setFormError, trans, isAbleToVote } =
-    useElection()
+  const { election, vote, voted, error, setFormError, trans, isAbleToVote } = useElection()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
@@ -30,14 +29,6 @@ export const ElectionQuestions = (props: ChakraProps) => {
       </Alert>
     )
   }
-
-  const initialValues: any = questions.reduce(
-    (prev, curr) => ({
-      ...prev,
-      [curr.title.default]: '',
-    }),
-    {}
-  )
 
   return (
     <chakra.div __css={styles.wrapper} {...props}>

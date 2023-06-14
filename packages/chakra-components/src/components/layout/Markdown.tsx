@@ -15,7 +15,6 @@ const MD = ({ children, ...rest }: MarkdownProps) => {
 
   return (
     <ReactMarkdown
-      children={children}
       remarkPlugins={[remarkGfm]}
       components={{
         a: ({ node, children, ...props }) => (
@@ -55,7 +54,9 @@ const MD = ({ children, ...rest }: MarkdownProps) => {
         code: ({ node, children, ...props }) => <Code {...props}>{children}</Code>,
       }}
       {...rest}
-    />
+    >
+      {children}
+    </ReactMarkdown>
   )
 }
 

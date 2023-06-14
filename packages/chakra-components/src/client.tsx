@@ -1,7 +1,7 @@
 import { ToastProvider } from '@chakra-ui/toast'
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
-import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { PropsWithChildren, createContext, useContext, useEffect } from 'react'
 import merge from 'ts-deepmerge'
 import { TranslationProvider, useTranslate } from './i18n/translate'
@@ -27,6 +27,7 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
   useEffect(() => {
     if (!e) return
     actions.setEnv(e)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [e])
 
   // fetch account (only with signer connected)
@@ -34,6 +35,7 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
     if (!state.connected || (state.connected && state.account)) return
 
     fetchAccount()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.account, state.connected])
 
   // fetch balance (only with signer connected)
@@ -41,19 +43,21 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
     if (!state.connected || !state.account) return
 
     fetchBalance()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.account, state.connected])
 
   // update signer on updates
   useEffect(() => {
     if (!s) return
     actions.setSigner(s)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [s])
 
   // switch account behavior handler
   useEffect(() => {
     if (!('ethereum' in window)) return
 
-    const accChanged = async (accs: string[]) => {
+    const accChanged = async () => {
       actions.setClient(
         new VocdoniSDKClient({
           env: state.env as EnvOptions,
@@ -69,6 +73,7 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
     return () => {
       ;(window as any).ethereum.removeListener('accountsChanged', accChanged)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /**

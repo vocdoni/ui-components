@@ -66,7 +66,8 @@ export const useElectionProvider = ({
     if (loaded && areEqualHexStrings(election?.id, id)) return
 
     fetchElection(id)
-  }, [election, id, client])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [election, id, client, loading, loaded])
 
   // properly set election data in case it comes from props (and/or updates)
   useEffect(() => {
@@ -75,7 +76,7 @@ export const useElectionProvider = ({
 
     setElection(data)
     setLoaded(true)
-  }, [data, loaded])
+  }, [data, election?.id, id, loaded])
 
   // check if logged in user is able to vote
   useEffect(() => {
@@ -97,7 +98,7 @@ export const useElectionProvider = ({
       setIsAbleToVote(left > 0 && isIn)
       setLoading(false)
     })()
-  }, [fetchCensus, election, loaded, client, isAbleToVote, signer])
+  }, [fetchCensus, election, loaded, client, isAbleToVote, signer, loading])
 
   // auto update metadata (if enabled)
   useEffect(() => {
@@ -106,7 +107,8 @@ export const useElectionProvider = ({
     const interval = setInterval(() => fetchElection(election.id), autoUpdateInterval || 30000)
 
     return () => clearInterval(interval)
-  }, [autoUpdate, autoUpdateInterval])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoUpdate, autoUpdateInterval, election])
 
   // context vote function (the one to be used with the given components)
   const vote = async (values: FieldValues) => {

@@ -43,7 +43,8 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
     if (state.loaded && areEqualHexStrings(state.organization?.address, id)) return
 
     fetch()
-  }, [state.organization, id, client])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.organization, id, client, state.loading, state.loaded])
 
   return {
     ...state,

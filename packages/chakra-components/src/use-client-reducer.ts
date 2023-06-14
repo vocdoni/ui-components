@@ -228,8 +228,9 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         connected: !!client.wallet,
       }
     }
+    default:
+      return state
   }
-  return state
 }
 
 export const useClientReducer = ({ env, client, signer }: ClientProviderProps) => {

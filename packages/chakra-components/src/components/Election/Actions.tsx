@@ -21,7 +21,7 @@ type LoadingState = {
   cancel: boolean
 }
 
-const BaseLoadingState : LoadingState = {
+const BaseLoadingState: LoadingState = {
   continue: false,
   pause: false,
   end: false,
@@ -30,7 +30,7 @@ const BaseLoadingState : LoadingState = {
 
 export const ElectionActions = (props: ChakraProps) => {
   const toast = useToast()
-  const { client, trans, connected, account, fetchAccount } = useClient()
+  const { client, trans, account } = useClient()
   const { election } = useElection()
   const tRef = useRef<ToastId>()
   const styles = useMultiStyleConfig('ElectionActions')
@@ -45,7 +45,7 @@ export const ElectionActions = (props: ChakraProps) => {
     }
   }
 
-  const load = (key: keyof LoadingState) => setLoading((loading) => ({...loading, [key]: true}))
+  const load = (key: keyof LoadingState) => setLoading((loading) => ({ ...loading, [key]: true }))
 
   const infoToast = (description: string) => {
     tRef.current = toast({
