@@ -50,8 +50,8 @@ const CustomVoteComponent = () => {
 
 This will automatically instance the Election Provider with all the available
 voting components. You can style it following the [instructions below][theming],
-or you can also create your own vote view, based on the components used by the
-`Election` component, and style it directly with props:
+and/or you can also create your own vote view, based on the components used by
+the `Election` component, and style it directly with props:
 
 ~~~tsx
 import {
