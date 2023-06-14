@@ -4,11 +4,13 @@ import { BiChevronDown, BiLogOut } from 'react-icons/bi'
 import { useAccount, useDisconnect } from 'wagmi'
 
 import '@rainbow-me/rainbowkit/styles.css'
+import { useClient } from '@vocdoni/chakra-components'
 
 const addressTextOverflow = (address: string) =>
   `${address.substring(0, 6)}...${address.substring(address.length - 4, address.length)}`
 
 export const Account = () => {
+  const { clear, account, balance } = useClient()
   const { isConnected, address } = useAccount()
   const { disconnect } = useDisconnect()
 
@@ -22,7 +24,13 @@ export const Account = () => {
         {addressTextOverflow(address as string)}
       </MenuButton>
       <MenuList>
-        <MenuItem icon={<BiLogOut />} onClick={() => disconnect()}>
+        <MenuItem
+          icon={<BiLogOut />}
+          onClick={() => {
+            clear()
+            disconnect()
+          }}
+        >
           Logout
         </MenuItem>
       </MenuList>

@@ -36,7 +36,7 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
 
     fetchAccount()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.account, state.connected, state.env])
+  }, [state.account, state.connected, state.env, state.signer])
 
   // fetch balance (only with signer connected)
   useEffect(() => {
@@ -132,6 +132,7 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
 
   return {
     ...state,
+    clear: actions.clear,
     createAccount,
     fetchAccount,
     fetchBalance,
