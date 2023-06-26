@@ -7,7 +7,5 @@ export const ElectionHeader = (props: IPFSImageProps) => {
   const styles = useStyleConfig('ElectionHeader', props)
   const { election } = useElection()
 
-  if (!election || (election && !election.header)) return null
-
-  return <Image src={election.header} sx={styles} {...props} />
+  return <Image src={election?.header} sx={styles} {...props} />
 }
