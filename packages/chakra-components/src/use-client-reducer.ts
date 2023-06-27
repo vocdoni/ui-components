@@ -76,12 +76,10 @@ export interface ClientState {
   }
 }
 
-export const clientStateEmpty = (env: string, signer: Wallet | Signer): ClientState => ({
+export const clientStateEmpty = (env: string, client: VocdoniSDKClient, signer: Wallet | Signer): ClientState => ({
   env,
   signer,
-  client: new VocdoniSDKClient({
-    env: EnvOptions.DEV,
-  }),
+  client,
   account: undefined,
   balance: -1,
   connected: false,
@@ -256,7 +254,10 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
 }
 
 export const useClientReducer = ({ env, client, signer }: ClientProviderProps) => {
-  const [state, dispatch] = useReducer(clientReducer, clientStateEmpty(env as string, signer as Wallet | Signer))
+  const [state, dispatch] = useReducer(
+    clientReducer,
+    clientStateEmpty(env as string, client as VocdoniSDKClient, signer as Wallet | Signer)
+  )
 
   // dispatch helper methods
   const clear = () => dispatch({ type: ClientClear })
