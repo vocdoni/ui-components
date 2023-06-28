@@ -6,3 +6,4 @@ vite.config.ts.timestamp-*.mjs
 .vscode
 .yarn
 .yarnrc*
+packages/rainbowkit-wallets/dist
