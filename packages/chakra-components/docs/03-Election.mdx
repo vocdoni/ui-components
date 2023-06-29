@@ -1,0 +1,70 @@
+---
+title: Election components
+description: Vocdoni Chakra components for Elections
+---
+
+## Election provider
+
+To use election components you have to wrap them using the `ElectionProvider`
+
+```jsx
+<ElectionProvider id='your-organization-uid'>
+      <ElectionHeader />
+      <ElectionTitle />
+      <ElectionSchedule textTransform='uppercase' />
+      <ElectionStatusBadge variant='solid' colorScheme='teal' />
+      <ElectionDescription fontFamily='monospace' />
+      <ElectionQuestions />
+</ElectionProvider>
+```
+## Election Header
+
+Show election header image.
+
+```jsx live
+<ElectionHeader
+    fallbackSrc={'img/logo-dark.png'}
+/>
+```
+
+## Election Title
+
+Show election title.
+
+```jsx live
+<ElectionTitle />
+```
+
+## Election Schedule
+
+Show election period. You can specify date format using [date-fns](https://date-fns.org/v2.30.0/docs/format) format.
+
+```jsx live
+<ElectionSchedule format={'d-L-y HH:mm'} />
+```
+
+## Election Status Badge
+
+It shows election status badge. Possible values of the election are defined on `ElectionStatus` from `@vocdoni/sdk`:
+`PROCESS_UNKNOWN`, `UPCOMING`, `ONGOING`, `ENDED`, `CANCELED`, `PAUSED`, `RESULTS`.
+
+```jsx live
+<ElectionStatusBadge variant='solid' colorScheme='teal' />
+```
+
+## Election Description
+
+Show election description.
+
+```jsx live
+<ElectionDescription fontFamily='monospace' />
+```
+
+## Election Questions
+
+Show election questions.
+
+```jsx live
+<ElectionQuestions />
+```
+
