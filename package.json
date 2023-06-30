@@ -15,6 +15,9 @@
     "prettier": "^2.8.7",
     "turbo": "^1.8.6"
   },
+  "peerDependencies": {
+    "react": ">=17.0.0"
+  },
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",

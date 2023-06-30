@@ -1,32 +1,42 @@
 import { Signer, ethers } from 'ethers'
 import { getAddress } from 'ethers/lib/utils.js'
 import { Address, Chain, Connector, UserRejectedRequestError, normalizeChainId } from '@wagmi/core'
+import { inputsWallet } from '../lib/inputsWallet'
+import { ConnectorData } from 'wagmi'
 
 const IS_SERVER = typeof window === 'undefined'
 
 export class inputsConnector extends Connector {
   ready = !IS_SERVER
-  readonly id = 'nextauth'
-  readonly name = 'NextAuth'
+  readonly id = 'inputs'
+  readonly name = 'Inputs'
 
   private chainId: number | undefined
   private provider: ethers.providers.BaseProvider | undefined
   private wallet: ethers.Wallet | undefined
+  private connecting: boolean = false
 
   constructor(config: { chains: Chain[]; options: any }) {
     super(config)
     this.chainId = config.chains[0].id
   }
 
+  // @ts-ignore-next-line
   async connect() {
+    this.emit('message', { type: 'connecting' })
     try {
-      alert('Show the modal and stuff')
+      if (!this.wallet && !this.connecting) {
+        this.connecting = true
+        await this.createWallet()
+      } else if (this.connecting) return
+
+      this.connecting = false
 
       const account = await this.getAccount()
       const provider = await this.getProvider()
       const chainId = await this.getChainId()
 
-      return {
+      const cdata: ConnectorData = {
         account,
         chain: {
           id: chainId,
@@ -34,7 +44,10 @@ export class inputsConnector extends Connector {
         },
         provider: provider as any,
       }
+
+      return cdata
     } catch (error) {
+      this.connecting = false
       throw new UserRejectedRequestError(error)
     }
   }
@@ -57,14 +70,6 @@ export class inputsConnector extends Connector {
   }
 
   async getSigner(): Promise<Signer | undefined> {
-    if (!this.wallet) {
-      //   const wallet = VocdoniSDKClient.generateWalletFromData(await NextAuth.getWalletSeedFromSession())
-      const wallet = ethers.Wallet.createRandom()
-      const provider = await this.getProvider()
-      wallet.connect(provider)
-      this.wallet = wallet
-    }
-
     return this.wallet
   }
 
@@ -74,7 +79,7 @@ export class inputsConnector extends Connector {
 
   async disconnect(): Promise<void> {
     this.wallet = undefined
-    window.location.reload()
+    inputsWallet.deleteWallet()
   }
 
   protected onDisconnect(): void {
@@ -82,8 +87,13 @@ export class inputsConnector extends Connector {
   }
 
   async isAuthorized() {
-    const account = await this.getAccount()
-    return !!account
+    let wallet = await inputsWallet.getWallet()
+    if (!wallet) return false
+
+    wallet.connect(await this.getProvider())
+    this.wallet = wallet
+
+    return true
   }
 
   protected onAccountsChanged(accounts: string[]): void {
@@ -95,5 +105,16 @@ export class inputsConnector extends Connector {
     const id = normalizeChainId(chainId)
     const unsupported = this.isChainUnsupported(id)
     this.emit('change', { chain: { id, unsupported } })
+  }
+
+  protected async createWallet() {
+    let wallet = await inputsWallet.getWallet()
+    if (!wallet) {
+      const w = new inputsWallet()
+      wallet = await w.create()
+    }
+
+    wallet.connect(await this.getProvider())
+    this.wallet = wallet
   }
 }
