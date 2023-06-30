@@ -1,4 +1,4 @@
-@vocdoni/chakra-components
+UI Components with Chakra UI
 ==========================
 
 Chakra ui components for easily integrating Vocdoni services.
