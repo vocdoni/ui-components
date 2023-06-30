@@ -9,22 +9,21 @@ To use election components you have to wrap them using the `ElectionProvider`
 
 ```jsx
 <ElectionProvider id='your-organization-uid'>
-      <ElectionHeader />
-      <ElectionTitle />
-      <ElectionSchedule textTransform='uppercase' />
-      <ElectionStatusBadge variant='solid' colorScheme='teal' />
-      <ElectionDescription fontFamily='monospace' />
-      <ElectionQuestions />
+  <ElectionHeader />
+  <ElectionTitle />
+  <ElectionSchedule textTransform='uppercase' />
+  <ElectionStatusBadge variant='solid' colorScheme='teal' />
+  <ElectionDescription fontFamily='monospace' />
+  <ElectionQuestions />
 </ElectionProvider>
 ```
+
 ## Election Header
 
 Show election header image.
 
 ```jsx live
-<ElectionHeader
-    fallbackSrc={'img/logo-dark.png'}
-/>
+<ElectionHeader fallbackSrc={'img/logo-dark.png'} />
 ```
 
 ## Election Title
@@ -67,4 +66,3 @@ Show election questions.
 ```jsx live
 <ElectionQuestions />
 ```
-
