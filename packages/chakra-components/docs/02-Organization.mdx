@@ -1,0 +1,49 @@
+---
+title: Organization components
+description: Vocdoni Chakra components for Organizations
+---
+
+## Organization provider
+
+To use organization components you have to wrap them using the `OrganizationProvider`
+
+```jsx
+<OrganizationProvider id='your-organization-uid'>
+  <OrganizationAvatar />
+  <OrganizationHeader />
+  <OrganizationName />
+  <OrganizationDescription />
+</OrganizationProvider>
+```
+
+## Organization Avatar
+
+Show a avatar organization.
+
+```jsx live
+<OrganizationAvatar fallbackSrc={'img/logo-dark.png'} />
+```
+
+## Organization Header
+
+Show organization header image.
+
+```jsx live
+<OrganizationHeader fallbackSrc={'img/logo-dark.png'} />
+```
+
+## Organization Name
+
+Show organization name.
+
+```jsx live
+<OrganizationName />
+```
+
+## Organization Description
+
+Show organization description.
+
+```jsx live
+<OrganizationDescription />
+```
