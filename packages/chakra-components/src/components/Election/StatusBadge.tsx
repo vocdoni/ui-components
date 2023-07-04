@@ -21,7 +21,7 @@ export const ElectionStatusBadge = (props: TagProps) => {
   }
 
   return (
-    <Tag sx={{ textTransform: 'capitalize' }} colorScheme={colorScheme} {...props}>
+    <Tag colorScheme={colorScheme} {...props}>
       {trans(`statuses.${election.status}`)}
     </Tag>
   )
