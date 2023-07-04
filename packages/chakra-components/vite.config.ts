@@ -1,10 +1,10 @@
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
-import { defineConfig } from 'vite'
+import { LibraryFormats, defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
 // under development avoid bundling stuff that we're not gonna use to reduce time
-const formats = ['es']
+const formats: LibraryFormats[] = ['es']
 if (process.env.NODE_ENV !== 'development') {
   formats.push('cjs', 'umd')
 }
