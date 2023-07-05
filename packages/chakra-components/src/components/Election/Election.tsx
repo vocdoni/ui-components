@@ -141,6 +141,9 @@ export const useElectionProvider = ({
       setVotesLeft(votesLeft - 1)
       setIsAbleToVote(isInCensus && votesLeft - 1 > 0)
 
+      // fetch election metadata to retrieve results and other useful updated information
+      fetchElection(election.id)
+
       return vid
     } catch (e: any) {
       if ('reason' in e) {
@@ -152,8 +155,6 @@ export const useElectionProvider = ({
       console.error('could not vote:', e)
     } finally {
       setVoting(false)
-      // fetch election metadata to retrieve results and other useful updated information
-      fetchElection(election.id)
     }
   }
 
