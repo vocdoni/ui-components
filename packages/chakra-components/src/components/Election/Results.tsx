@@ -15,9 +15,7 @@ export const ElectionResults = (props: ChakraProps) => {
   const { localize } = useClient()
   const locale = useDatesLocale()
 
-  if (!election || election instanceof InvalidElection) return null
-
-  const totals = election?.questions.map((el) => el.choices.reduce((acc, curr) => acc + Number(curr.results), 0))
+  if (!election || election instanceof InvalidElection || election?.status === ElectionStatus.CANCELED) return null
 
   if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS) {
     return (
@@ -28,6 +26,8 @@ export const ElectionResults = (props: ChakraProps) => {
       </Text>
     )
   }
+
+  const totals = election?.questions.map((el) => el.choices.reduce((acc, curr) => acc + Number(curr.results), 0))
 
   return (
     <Flex sx={styles.wrapper} {...props}>
