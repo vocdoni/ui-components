@@ -30,7 +30,7 @@ const BaseLoadingState: LoadingState = {
 
 export const ElectionActions = (props: ChakraProps) => {
   const toast = useToast()
-  const { client, trans, account } = useClient()
+  const { client, localize, account } = useClient()
   const { election } = useElection()
   const tRef = useRef<ToastId>()
   const styles = useMultiStyleConfig('ElectionActions')
@@ -49,7 +49,7 @@ export const ElectionActions = (props: ChakraProps) => {
 
   const infoToast = (description: string) => {
     tRef.current = toast({
-      title: trans('actions.waiting_title'),
+      title: localize('actions.waiting_title'),
       description,
       isClosable: false,
       duration: null,
@@ -59,7 +59,7 @@ export const ElectionActions = (props: ChakraProps) => {
   const errorToast = (description: string) => {
     toast({
       description,
-      title: trans('actions.error_title'),
+      title: localize('actions.error_title'),
       duration: 7000,
       status: 'error',
     })
@@ -68,14 +68,14 @@ export const ElectionActions = (props: ChakraProps) => {
   return (
     <ButtonGroup size='sm' isAttached variant='outline' position='relative' sx={styles.group} {...props}>
       <IconButton
-        aria-label={trans('actions.continue')}
-        title={trans('actions.continue')}
+        aria-label={localize('actions.continue')}
+        title={localize('actions.continue')}
         icon={<PlayIcon sx={styles.icons} />}
         isLoading={loading.continue}
         onClick={async () => {
           load('continue')
           infoToast(
-            trans('actions.continue_description', {
+            localize('actions.continue_description', {
               election,
             })
           )
@@ -95,14 +95,14 @@ export const ElectionActions = (props: ChakraProps) => {
         sx={styles.buttons}
       />
       <IconButton
-        aria-label={trans('actions.pause')}
-        title={trans('actions.pause')}
+        aria-label={localize('actions.pause')}
+        title={localize('actions.pause')}
         icon={<PauseIcon sx={styles.icons} />}
         isLoading={loading.pause}
         onClick={async () => {
           load('pause')
           infoToast(
-            trans('actions.pause_description', {
+            localize('actions.pause_description', {
               election,
             })
           )
@@ -122,14 +122,14 @@ export const ElectionActions = (props: ChakraProps) => {
         sx={styles.buttons}
       />
       <IconButton
-        aria-label={trans('actions.end')}
-        title={trans('actions.end')}
+        aria-label={localize('actions.end')}
+        title={localize('actions.end')}
         icon={<StopIcon sx={styles.icons} />}
         isLoading={loading.end}
         onClick={async () => {
           load('end')
           infoToast(
-            trans('actions.end_description', {
+            localize('actions.end_description', {
               election,
             })
           )
@@ -149,14 +149,14 @@ export const ElectionActions = (props: ChakraProps) => {
         sx={styles.buttons}
       />
       <IconButton
-        aria-label={trans('actions.cancel')}
-        title={trans('actions.cancel')}
+        aria-label={localize('actions.cancel')}
+        title={localize('actions.cancel')}
         icon={<CancelIcon sx={styles.icons} />}
         isLoading={loading.cancel}
         onClick={async () => {
           load('cancel')
           infoToast(
-            trans('actions.cancel_description', {
+            localize('actions.cancel_description', {
               election,
             })
           )

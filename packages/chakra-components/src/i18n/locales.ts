@@ -1,4 +1,4 @@
-export const translations = {
+export const locales = {
   // actions component
   actions: {
     cancel_description: 'canceling the "{{ election.title.default }}" election process',
@@ -24,6 +24,7 @@ export const translations = {
   },
   empty: 'Apparently this process has no questions 🤔',
   required: 'This field is required',
+  schedule: 'Voting from {{ begin }} to {{ end }}',
   // results component
   results: {
     date_format: 'd-L-y HH:mm',
@@ -51,4 +52,4 @@ type RecursivePartial<T> = {
     : T[P]
 }
 
-export type Translations = RecursivePartial<typeof translations>
+export type Locale = RecursivePartial<typeof locales>

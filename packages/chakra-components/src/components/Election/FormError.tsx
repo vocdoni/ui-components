@@ -4,7 +4,7 @@ import { chakra, forwardRef, omitThemingProps, useStyleConfig } from '@chakra-ui
 import { useElection } from './Election'
 
 export const ElectionFormError = forwardRef<HeadingProps, 'p'>((props, ref) => {
-  const { formError, trans } = useElection()
+  const { formError, localize } = useElection()
   const styles = useStyleConfig('ElectionFormError', props)
   const rest = omitThemingProps(props)
 
@@ -12,7 +12,7 @@ export const ElectionFormError = forwardRef<HeadingProps, 'p'>((props, ref) => {
 
   return (
     <chakra.p ref={ref} color='red.300' {...rest} __css={styles}>
-      {trans('vote.missing_answers')}
+      {localize('vote.missing_answers')}
     </chakra.p>
   )
 })

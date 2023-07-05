@@ -4,9 +4,8 @@ import { Wallet } from '@ethersproject/wallet'
 import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { PropsWithChildren, createContext, useContext, useEffect } from 'react'
 import merge from 'ts-deepmerge'
-import { TranslationProvider, useTranslate } from './i18n/translate'
-import type { Translations } from './i18n/translations'
-import { translations as ltranslations } from './i18n/translations'
+import { locales } from './i18n/locales'
+import { LocaleProvider, LocaleProviderProps, useLocalize } from './i18n/localize'
 import { useClientReducer } from './use-client-reducer'
 
 export type ClientProviderProps = {
@@ -16,7 +15,7 @@ export type ClientProviderProps = {
 }
 
 export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProviderProps) => {
-  const trans = useTranslate()
+  const localize = useLocalize()
   const { actions, state } = useClientReducer({
     client: c,
     env: e,
@@ -137,7 +136,7 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
     fetchAccount,
     fetchBalance,
     setClient: actions.setClient,
-    trans,
+    localize,
   }
 }
 
@@ -160,35 +159,29 @@ export const useClient = <T extends VocdoniSDKClient>() => {
 }
 
 export type InternalClientProviderComponentProps = PropsWithChildren<ClientProviderProps>
-
-export type ClientProviderComponentProps = InternalClientProviderComponentProps & {
-  defaultLanguage?: string
-  language?: string
-  translations?: Translations
-}
+export type ClientProviderComponentProps = InternalClientProviderComponentProps & LocaleProviderProps
 
 /**
- * Required internal client provider so we can use useTranslate in it.
+ * Required internal client provider so we can use useLocalize in useClientProvider.
  */
-const InternalClientProvider = ({ env, client, signer, ...rest }: ClientProviderComponentProps) => {
+const InternalClientProvider = ({ env, client, signer, ...rest }: InternalClientProviderComponentProps) => {
   const value = useClientProvider({ env, client, signer })
 
   return <ClientContext.Provider value={value} {...rest} />
 }
 
-export const ClientProvider = ({ defaultLanguage, language, translations, ...rest }: ClientProviderComponentProps) => {
-  const trans = {
-    defaultLanguage: defaultLanguage || 'en',
-    language,
-    translations: merge(ltranslations, translations || {}),
+export const ClientProvider = ({ locale, datesLocale, ...rest }: ClientProviderComponentProps) => {
+  const loc = {
+    locale: merge(locales, locale || {}),
+    datesLocale,
   }
 
   return (
-    <TranslationProvider {...trans}>
+    <LocaleProvider {...loc}>
       <>
         <ToastProvider />
         <InternalClientProvider {...rest} />
       </>
-    </TranslationProvider>
+    </LocaleProvider>
   )
 }

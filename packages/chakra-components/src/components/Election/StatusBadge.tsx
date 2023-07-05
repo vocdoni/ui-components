@@ -4,7 +4,7 @@ import { ElectionStatus } from '@vocdoni/sdk'
 import { useElection } from './Election'
 
 export const ElectionStatusBadge = (props: TagProps) => {
-  const { election, trans } = useElection()
+  const { election, localize } = useElection()
 
   if (!election) return null
 
@@ -22,7 +22,7 @@ export const ElectionStatusBadge = (props: TagProps) => {
 
   return (
     <Tag colorScheme={colorScheme} {...props}>
-      {trans(`statuses.${election.status}`)}
+      {localize(`statuses.${election.status}`)}
     </Tag>
   )
 }

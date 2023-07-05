@@ -35,7 +35,7 @@ export const useElectionProvider = ({
   autoUpdate,
   ...rest
 }: ElectionProviderProps) => {
-  const { client, signer, trans } = useClient()
+  const { client, signer, localize } = useClient()
   const [loading, setLoading] = useState<boolean>(false)
   const [voting, setVoting] = useState<boolean>(false)
   const [loaded, setLoaded] = useState<boolean>(false)
@@ -166,7 +166,7 @@ export const useElectionProvider = ({
     loading,
     setFormError,
     signer,
-    trans,
+    localize,
     vote,
     voted,
     votesLeft,

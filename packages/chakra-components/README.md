@@ -266,21 +266,30 @@ You can check out each component's anatomy by checking
 ### i18n
 
 In order to change any of the texts contained in `@vocdoni/chakra-components`,
-you must specify the translations for each language in the ClientProvider:
+you must specify the locales object with all (or some of) the strings already
+translated (you may use an external solution for that, or just set a single
+language):
 
 ~~~tsx
-const translationsObject = {
-  en: {
-    // all english translations
-  },
-  ca: {
-    // catalan translations
+const locales = {
+  actions: {
+    cancel_description: t('Cancel description'),
+    // ... any other translated text, see the locales file for more details
   }
 }
-<ClientProvider translations={translationsObject} />
+<ClientProvider locales={locales} />
 ~~~
 
-Check out the [translations file] in order to see all the available keys.
+Internally we deepmerge these translations, so you can choose to replace
+all of the texts, or just some of them.
+
+Also note that some texts come with variables and you should respect them, i.e.
+
+~~~
+Voting from {{ begin }} to {{ end }}
+~~~
+
+Check out the [locales file] in order to see all the available keys.
 
 LICENSE
 -------
@@ -316,4 +325,4 @@ v3.0][license].
 [chakra template]: ../../templates/chakra/src/theme
 [css props]: #styling-via-props
 [sdk environments]: https://github.com/vocdoni/vocdoni-sdk#environment
-[translations file]: ./src/i18n/translations.ts
+[locales file]: ./src/i18n/locales.ts

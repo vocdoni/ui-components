@@ -12,7 +12,7 @@ import { Markdown } from '../layout'
 import { useElection } from './Election'
 
 export const ElectionQuestions = (props: ChakraProps) => {
-  const { election, vote, voted, error, setFormError, trans, isAbleToVote } = useElection()
+  const { election, vote, voted, error, setFormError, localize, isAbleToVote } = useElection()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
@@ -25,7 +25,7 @@ export const ElectionQuestions = (props: ChakraProps) => {
     return (
       <Alert variant='subtle' status='warning' sx={styles.alert}>
         <AlertIcon />
-        {trans('empty')}
+        {localize('empty')}
       </Alert>
     )
   }
@@ -55,7 +55,7 @@ export const ElectionQuestions = (props: ChakraProps) => {
 
 const Voted = () => {
   const { env } = useClient()
-  const { trans, voted } = useElection()
+  const { localize, voted } = useElection()
   const styles = useMultiStyleConfig('ElectionQuestions')
 
   if (!voted) {
@@ -74,9 +74,9 @@ const Voted = () => {
       sx={styles.alert}
     >
       <AlertIcon />
-      <AlertTitle sx={styles.alertTitle}>{trans('vote.voted_title')}</AlertTitle>
+      <AlertTitle sx={styles.alertTitle}>{localize('vote.voted_title')}</AlertTitle>
       <AlertDescription isTruncated maxW='100%' whiteSpace='initial' sx={styles.alertDescription}>
-        {reactStringReplace(trans('vote.voted_description', { id: voted }), voted, (match, k) => (
+        {reactStringReplace(localize('vote.voted_description', { id: voted }), voted, (match, k) => (
           <Link key={k} href={environment.verifyVote(env, voted)} target='_blank' isTruncated sx={styles.alertLink}>
             {match}
           </Link>
@@ -93,7 +93,7 @@ type QuestionFieldProps = ChakraProps & {
 
 const QuestionField = ({ question, index }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const { election, isAbleToVote, trans } = useElection()
+  const { election, isAbleToVote, localize } = useElection()
   const {
     formState: { errors },
   } = useFormContext()
@@ -111,7 +111,7 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
             </chakra.div>
           )}
           <Controller
-            rules={{ required: trans('required') }}
+            rules={{ required: localize('required') }}
             name={index}
             render={({ field }) => (
               <RadioGroup
