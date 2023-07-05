@@ -46,6 +46,7 @@ export const useElectionProvider = ({
   const [votesLeft, setVotesLeft] = useState<number>(0)
   const [isInCensus, setIsInCensus] = useState<boolean>(false)
   const [formError, setFormError] = useState<boolean>(false)
+  const [voterAddress, setVoterAddress] = useState<string | undefined>(undefined)
 
   const fetchElection = async (id: string) => {
     setLoading(true)
@@ -81,9 +82,13 @@ export const useElectionProvider = ({
 
   // check if logged in user is able to vote
   useEffect(() => {
-    if (!fetchCensus || !signer || !election || !loaded || loading || !client || isAbleToVote !== undefined) return
+    if (!fetchCensus || !signer || !election || !loaded || loading || !client) return
     ;(async () => {
+      const address = await signer.getAddress()
+      if (isAbleToVote !== undefined && areEqualHexStrings(voterAddress, address)) return
+
       setLoading(true)
+      setVoterAddress(address)
       const isIn = await client.isInCensus(election.id)
       setIsInCensus(isIn)
 
@@ -99,7 +104,7 @@ export const useElectionProvider = ({
       setIsAbleToVote(left > 0 && isIn)
       setLoading(false)
     })()
-  }, [fetchCensus, election, loaded, client, isAbleToVote, signer, loading])
+  }, [fetchCensus, election, loaded, client, isAbleToVote, signer, loading, voterAddress])
 
   // auto update metadata (if enabled)
   useEffect(() => {
