@@ -1,13 +1,15 @@
 import { Box, Flex, Text } from '@chakra-ui/layout'
 import { Progress } from '@chakra-ui/progress'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
-import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
+import { ElectionStatus, InvalidElection, formatUnits } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 import { useClient } from '../../client'
 import { useDatesLocale } from '../../i18n/localize'
 import { useElection } from './Election'
 
 const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(0) + '%'
+const results = (result: number, decimals?: number) =>
+  decimals ? parseInt(formatUnits(BigInt(result), decimals), 10) : result
 
 export const ElectionResults = (props: ChakraProps) => {
   const styles = useMultiStyleConfig('ElectionResults')
@@ -27,7 +29,10 @@ export const ElectionResults = (props: ChakraProps) => {
     )
   }
 
-  const totals = election?.questions.map((el) => el.choices.reduce((acc, curr) => acc + Number(curr.results), 0))
+  const decimals = (election.meta as any)?.token?.decimals || 0
+  const totals = election?.questions
+    .map((el) => el.choices.reduce((acc, curr) => acc + Number(curr.results), 0))
+    .map((votes: number) => results(votes, decimals))
 
   return (
     <Flex sx={styles.wrapper} {...props}>
@@ -43,7 +48,10 @@ export const ElectionResults = (props: ChakraProps) => {
                   <>
                     <Text sx={styles.choiceTitle}>{c.title.default}</Text>
                     <Text sx={styles.choiceVotes}>
-                      {localize('results.votes', { votes: c.results || 0, percent: percent(c.results, totals[idx]) })}
+                      {localize('results.votes', {
+                        votes: results(c.results, decimals) || 0,
+                        percent: percent(results(c.results, decimals), totals[idx]),
+                      })}
                     </Text>
                     <Progress sx={styles.progress} value={(Number(c.results) / totals[idx]) * 100 || 0} />
                   </>
