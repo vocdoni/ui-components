@@ -2,6 +2,7 @@ import { HeadingProps } from '@chakra-ui/layout'
 import { chakra, forwardRef, useMultiStyleConfig } from '@chakra-ui/system'
 import { format as dformat } from 'date-fns'
 
+import { InvalidElection } from '@vocdoni/sdk'
 import { useDatesLocale, useLocalize } from '../../i18n/localize'
 import { useElection } from './Election'
 
@@ -15,7 +16,7 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(({ forma
   const locale = useDatesLocale()
   const t = useLocalize()
 
-  if (!election) return null
+  if (!election || election instanceof InvalidElection) return null
 
   return (
     <chakra.h2 __css={styles} {...rest}>

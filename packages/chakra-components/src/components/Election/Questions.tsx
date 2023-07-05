@@ -3,7 +3,7 @@ import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Link, Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
-import { ElectionStatus, IQuestion } from '@vocdoni/sdk'
+import { ElectionStatus, IQuestion, InvalidElection } from '@vocdoni/sdk'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
 import { useClient } from '../../client'
@@ -16,6 +16,8 @@ export const ElectionQuestions = (props: ChakraProps) => {
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
+
+  if (election instanceof InvalidElection) return null
 
   if (voted && !isAbleToVote) {
     return <Voted />

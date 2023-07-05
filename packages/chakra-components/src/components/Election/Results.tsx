@@ -1,7 +1,7 @@
 import { Box, Flex, Text } from '@chakra-ui/layout'
 import { Progress } from '@chakra-ui/progress'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
-import { ElectionStatus } from '@vocdoni/sdk'
+import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 import { useClient } from '../../client'
 import { useDatesLocale } from '../../i18n/localize'
@@ -14,6 +14,9 @@ export const ElectionResults = (props: ChakraProps) => {
   const { election } = useElection()
   const { localize } = useClient()
   const locale = useDatesLocale()
+
+  if (!election || election instanceof InvalidElection) return null
+
   const totals = election?.questions.map((el) => el.choices.reduce((acc, curr) => acc + Number(curr.results), 0))
 
   if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS) {

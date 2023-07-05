@@ -34,13 +34,14 @@ export const locales = {
   },
   // status badge
   statuses: {
-    CANCELED: 'Canceled',
-    ENDED: 'Ended',
-    ONGOING: 'Ongoing',
-    PAUSED: 'Paused',
-    RESULTS: 'Results',
-    UPCOMING: 'Upcoming',
-    PROCESS_UNKNOWN: 'Unknown',
+    canceled: 'Canceled',
+    ended: 'Ended',
+    ongoing: 'Ongoing',
+    paused: 'Paused',
+    results: 'Results',
+    upcoming: 'Upcoming',
+    process_unknown: 'Unknown',
+    invalid: 'Invalid',
   },
 }
 

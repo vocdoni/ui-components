@@ -1,5 +1,5 @@
 import { Tag, TagProps } from '@chakra-ui/tag'
-import { ElectionStatus } from '@vocdoni/sdk'
+import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
 
 import { useElection } from './Election'
 
@@ -15,14 +15,17 @@ export const ElectionStatusBadge = (props: TagProps) => {
     if ([ElectionStatus.PAUSED, ElectionStatus.ENDED].includes(election.status)) {
       colorScheme = 'yellow'
     }
-    if ([ElectionStatus.CANCELED, ElectionStatus.PROCESS_UNKNOWN].includes(election.status)) {
+    if (
+      [ElectionStatus.CANCELED, ElectionStatus.PROCESS_UNKNOWN].includes(election.status) ||
+      election instanceof InvalidElection
+    ) {
       colorScheme = 'red'
     }
   }
 
   return (
     <Tag colorScheme={colorScheme} {...props}>
-      {localize(`statuses.${election.status}`)}
+      {election.status ? localize(`statuses.${election.status.toLowerCase()}`) : localize('statuses.invalid')}
     </Tag>
   )
 }

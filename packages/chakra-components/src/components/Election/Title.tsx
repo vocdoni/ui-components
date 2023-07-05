@@ -9,10 +9,11 @@ export const ElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
   const rest = omitThemingProps(props)
 
   if (!election) return null
+  const title = election.title?.default || election.id
 
   return (
-    <chakra.h1 ref={ref} {...rest} __css={styles}>
-      {election.title.default}
+    <chakra.h1 ref={ref} title={title} __css={styles} {...rest}>
+      {title}
     </chakra.h1>
   )
 })
