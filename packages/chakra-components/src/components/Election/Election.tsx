@@ -53,6 +53,7 @@ export const useElectionProvider = ({
       const e = await client.fetchElection(id)
       setLoaded(true)
       setElection(e)
+      setError('')
     } catch (e) {
       setError((e as Error).message)
     } finally {
