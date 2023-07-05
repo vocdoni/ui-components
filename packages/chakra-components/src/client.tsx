@@ -6,11 +6,11 @@ import { PropsWithChildren, createContext, useContext, useEffect } from 'react'
 import merge from 'ts-deepmerge'
 import { locales } from './i18n/locales'
 import { LocaleProvider, LocaleProviderProps, useLocalize } from './i18n/localize'
-import { useClientReducer } from './use-client-reducer'
+import { ClientEnvSetPayload, useClientReducer } from './use-client-reducer'
 
 export type ClientProviderProps = {
   client?: VocdoniSDKClient
-  env?: Lowercase<keyof typeof EnvOptions>
+  env?: ClientEnvSetPayload
   signer?: Wallet | Signer
 }
 
