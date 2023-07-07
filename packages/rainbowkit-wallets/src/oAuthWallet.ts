@@ -1,17 +1,38 @@
 import { oAuthConnector } from './wagmi/oAuthConnector'
 
-export const oAuthWallet = ({ chains }: any) => ({
+export const oAuthWallet = ({ chains, name, options }: any) => ({
   id: 'oAuth',
-  name: 'OAuth',
-  iconUrl: 'https://svgshare.com/i/iJK.svg',
+  name: name || 'OAuth',
+  iconUrl: 'https://i.ibb.co/Mh7LXsn/social-login-COLOR-2.png',
   iconBackground: '#fff',
   createConnector: () => {
     const connector = new oAuthConnector({
       chains: chains,
-      options: {},
+      options: options || {},
     })
     return {
       connector,
+      mobile: {
+        getUri: async () => {
+          try {
+            await connector.connect()
+            return window.location.href
+          } catch (e) {
+            console.error('Failed to connect')
+          }
+          return ''
+        },
+      },
+      desktop: {
+        getUri: async () => {
+          try {
+            await connector.connect()
+          } catch (e) {
+            console.error('Failed to connect')
+          }
+          return ''
+        },
+      },
     }
   },
 })
