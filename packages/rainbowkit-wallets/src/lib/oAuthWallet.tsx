@@ -1,6 +1,10 @@
 import { ethers } from 'ethers'
 import localStorageWallet from './localStorageWallet'
 
+/**
+ * This class is used to create a wallet from an external service (OAuth)
+ * that will return a seed from a popup message
+ */
 export class oAuthWallet extends localStorageWallet {
   private oAuthServiceUrl: string
   private data: any
