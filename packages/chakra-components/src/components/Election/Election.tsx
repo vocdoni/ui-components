@@ -170,6 +170,7 @@ export const useElectionProvider = ({
     formError,
     isAbleToVote,
     isInCensus,
+    loaded,
     loading,
     setFormError,
     signer,
