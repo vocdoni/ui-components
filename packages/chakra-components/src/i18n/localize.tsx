@@ -5,7 +5,7 @@ import { Locale } from './locales'
 
 type LocalizeFunction = (key: string, substitutions?: any) => string
 export type LocaleProviderProps = {
-  locale: Locale
+  locale?: Locale
   datesLocale?: DLocale
 }
 
