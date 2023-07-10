@@ -70,7 +70,3 @@ v3.0][license].
 [multipart components]: https://chakra-ui.com/docs/styled-system/component-style#styling-multipart-components
 [questions]: #questions
 [theme path]: ./src/theme
-[chakra template]: ../../templates/chakra/src/theme
-[css props]: #styling-via-props
-[sdk environments]: https://github.com/vocdoni/vocdoni-sdk#environment
-[translations file]: ./src/i18n/translations.ts

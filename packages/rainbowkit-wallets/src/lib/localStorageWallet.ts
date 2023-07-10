@@ -11,7 +11,7 @@ export default class localStorageWallet {
 
       return this.createWallet(value)
     } catch (err) {
-      console.log(err)
+      console.error('failed to generate wallet:', err)
     }
 
     return undefined

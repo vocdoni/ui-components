@@ -19,15 +19,15 @@
     "build": "vite build",
     "size": "size-limit",
     "preview": "vite preview",
-    "prepack": "json -f package.json -I -e \"delete this.devDependencies; delete this.dependencies\""
+    "prepack": "json -f package.json -I -e \"delete this.devDependencies\""
   },
   "dependencies": {
     "ethers": "^5",
-    "localforage": "^1.10.0",
-    "react-modal": "^3.16.1",
     "wagmi": "^0.12"
   },
   "devDependencies": {
+    "localforage": "^1.10.0",
+    "react-modal": "^3.16.1",
     "tsconfig": "*",
     "typescript": "^4.9.5",
     "vite": "^4.3.9",
