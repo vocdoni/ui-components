@@ -24,5 +24,14 @@ export default defineConfig({
       formats,
       fileName: (format) => `index.${format}.js`,
     },
+    rollupOptions: {
+      external: ['react-modal', 'localforage'],
+      output: {
+        globals: {
+          'react-modal': 'react-modal',
+          localforage: 'localforage',
+        },
+      },
+    },
   },
 })
