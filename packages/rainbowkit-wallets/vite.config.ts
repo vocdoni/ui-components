@@ -1,17 +1,15 @@
-import react from '@vitejs/plugin-react'
 import path from 'node:path'
-import { defineConfig } from 'vite'
+import { LibraryFormats, defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
 // avoid bundling stuff under development that we're not gonna use to reduce time
-const formats = ['es']
+const formats: LibraryFormats[] = ['es']
 if (process.env.NODE_ENV !== 'development') {
-  formats.push('cjs', 'umd')
+  formats.push('cjs')
 }
 
 export default defineConfig({
   plugins: [
-    react(),
     dts({
       insertTypesEntry: true,
     }),
@@ -20,16 +18,18 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
-      name: 'DotObject',
+      name: 'VocdoniRainbowkitWallets',
       formats,
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
-      external: ['react-modal', 'localforage'],
+      external: ['react', 'react-dom', 'ethers', 'wagmi', 'react/jsx-runtime'],
       output: {
         globals: {
-          'react-modal': 'react-modal',
-          localforage: 'localforage',
+          ethers: 'ethers',
+          react: 'React',
+          'react/jsx-runtime': 'JSX',
+          wagmi: 'wagmi',
         },
       },
     },

@@ -1,6 +1,6 @@
-import { Signer, ethers } from 'ethers'
-import { getAddress } from 'ethers/lib/utils.js'
 import { Address, Chain, Connector, UserRejectedRequestError, normalizeChainId } from '@wagmi/core'
+import { Signer, Wallet, ethers, getDefaultProvider } from 'ethers'
+import { getAddress } from 'ethers/lib/utils'
 import { ConnectorData } from 'wagmi'
 import localStorageWallet from '../lib/localStorageWallet'
 
@@ -16,7 +16,7 @@ export class localStorageConnector extends Connector {
 
   protected chainId: number | undefined
   protected provider: ethers.providers.BaseProvider | undefined
-  protected wallet: ethers.Wallet | undefined
+  protected wallet: Wallet | undefined
   protected connecting: boolean = false
 
   constructor(config: { chains: Chain[]; options: any }) {
@@ -67,7 +67,7 @@ export class localStorageConnector extends Connector {
   async getProvider() {
     if (!this.provider) {
       //TODO: not sure this should be the default provider
-      this.provider = ethers.getDefaultProvider()
+      this.provider = getDefaultProvider()
     }
     return this.provider
   }
