@@ -36,7 +36,7 @@ Show election title.
 
 ## Election Schedule
 
-Show election period. You can specify date format using [date-fns](https://date-fns.org/v2.30.0/docs/format) format.
+Show election period. You can specify date format using [date-fns](https://date-fns.org/v2.30.0/docs/format) format
 
 ```jsx live
 <ElectionSchedule format={'d-L-y HH:mm'} />
@@ -44,12 +44,26 @@ Show election period. You can specify date format using [date-fns](https://date-
 
 ## Election Status Badge
 
-It shows election status badge. Possible values of the election are defined on `ElectionStatus` from `@vocdoni/sdk`:
+It shows election status badge. Possible values of the election are defined on `ElectionStatus` from [`@vocdoni/sdk`](https://github.com/vocdoni/vocdoni-sdk/blob/c1c6fee380c646020db7c0934900296a92309670/src/types/election/published.ts#L6-L18):
 `PROCESS_UNKNOWN`, `UPCOMING`, `ONGOING`, `ENDED`, `CANCELED`, `PAUSED`, `RESULTS`.
 
 ```jsx live
 <ElectionStatusBadge variant='solid' colorScheme='teal' />
 ```
+
+To style the [`ElectionStatusBadge`](https://chakra-ui.com/docs/components/tag) leverage the capabilities of the Chakra
+styled system. By simply adjusting the `colorScheme` property based on the election status will enable you to easily alter the
+color of the badge. This approach mirrors the one employed by the
+[default color scheme](https://github.com/vocdoni/ui-components/blob/2ca7942/packages/chakra-components/src/components/Election/StatusBadge.tsx#L12-L24)
+included on the Vocdoni Chakra Components.
+
+:::info
+
+For a more comprehensive customization, consider reading the
+[`Theming`](https://developer.vocdoni.io/ui-components/Intro#theming) section.
+
+:::
+
 
 ## Election Description
 
@@ -59,10 +73,30 @@ Show election description.
 <ElectionDescription fontFamily='monospace' />
 ```
 
+:::info
+
+This component renderers **Markdown** text.
+
+:::
+
 ## Election Questions
 
 Show election questions.
 
 ```jsx live
 <ElectionQuestions />
+```
+
+:::info
+
+This component renderers **Markdown** text.
+
+:::
+
+## Election Results
+
+Show election results.
+
+```jsx live
+<ElectionResults />
 ```
