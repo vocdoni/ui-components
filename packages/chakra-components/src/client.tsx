@@ -129,6 +129,27 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
     return state.client.createAccount({ account, faucetPackage }).then(actions.setAccount).catch(actions.errorAccount)
   }
 
+  /**
+   * Generates a signer so the implementer can use it to sign transactions.
+   * @param seed
+   * @returns
+   */
+  const generateSigner = (seed?: string | string[]) => {
+    if (!state.client) {
+      throw new Error('No client initialized')
+    }
+
+    let signer: Wallet
+    if (!seed) {
+      state.client.generateRandomWallet()
+      signer = state.client.wallet as Wallet
+    } else {
+      signer = VocdoniSDKClient.generateWalletFromData(seed)
+    }
+
+    return signer
+  }
+
   return {
     ...state,
     clear: actions.clear,
@@ -137,6 +158,8 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
     fetchBalance,
     setClient: actions.setClient,
     localize,
+    setSigner: actions.setSigner,
+    generateSigner,
   }
 }
 
