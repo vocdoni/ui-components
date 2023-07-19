@@ -1,5 +1,5 @@
 import { ChakraProps } from '@chakra-ui/system'
-import { CensusType, CspVote, ElectionStatus, PublishedElection, Vote } from '@vocdoni/sdk'
+import { CensusType, CspVote, PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClient } from '../../client'
@@ -67,6 +67,8 @@ export const useElectionProvider = ({
     }
   }
 
+  // CSP OAuth flow
+  // As vote setting and voting token are async, we need to wait for both to be set
   useEffect(() => {
     if (cspVotingToken && voteInstance) {
       cspVote(cspVotingToken, voteInstance)
@@ -106,7 +108,7 @@ export const useElectionProvider = ({
       setCensusType(censusType)
 
       let left = 0
-      if (isIn || censusType == CensusType.WEIGHTED) {
+      if (isIn || censusType === CensusType.WEIGHTED) {
         // no need to check votes left if member ain't in census
         left = await client.votesLeftCount(election.id)
         setVotesLeft(left)
@@ -114,7 +116,7 @@ export const useElectionProvider = ({
         const voted = await client.hasAlreadyVoted(election.id)
         setVoted(voted)
       }
-      setIsAbleToVote((left > 0 && isIn) || censusType == CensusType.CSP)
+      setIsAbleToVote((left > 0 && isIn) || censusType === CensusType.CSP)
       setLoading(false)
     })()
   }, [fetchCensus, election, loaded, client, isAbleToVote, signer, loading, voterAddress])
@@ -205,6 +207,8 @@ export const useElectionProvider = ({
         setVotesLeft(votesLeft - 1)
         setIsAbleToVote(isInCensus && votesLeft - 1 > 0)
         return vid
+      } else {
+        throw new Error('unknown census type')
       }
     } catch (e: any) {
       if ('reason' in e) {
@@ -238,7 +242,7 @@ export const useElectionProvider = ({
     if (!election) {
       throw new Error('no election initialized')
     }
-    if (censusType != CensusType.CSP) {
+    if (censusType !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
 
@@ -321,12 +325,13 @@ export const useElectionProvider = ({
     }
   }
 
+  // CSP OAuth flow
   const cspVote = async (token: string, vote: Vote) => {
     if (!client) {
       throw new Error('no client initialized')
     }
 
-    if (censusType != CensusType.CSP) {
+    if (censusType !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
 
