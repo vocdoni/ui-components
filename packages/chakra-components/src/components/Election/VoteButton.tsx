@@ -3,12 +3,12 @@ import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
 import { useElection } from './Election'
 
 export const VoteButton = (props: ButtonProps) => {
-  const { signer, voting, ConnectButton, isAbleToVote, election, voted, localize } = useElection()
-  const isDisabled = !signer || !isAbleToVote || election?.status !== ElectionStatus.ONGOING
+  const { client, voting, ConnectButton, isAbleToVote, election, voted, localize } = useElection()
+  const isDisabled = !client.wallet || !isAbleToVote || election?.status !== ElectionStatus.ONGOING
 
   if (election instanceof InvalidElection) return null
 
-  if (!signer && ConnectButton) {
+  if (!client.wallet && ConnectButton) {
     return <ConnectButton />
   }
 

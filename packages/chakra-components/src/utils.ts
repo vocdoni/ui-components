@@ -1,3 +1,5 @@
+import latinize from 'latinize'
+
 /**
  * Ensures a hex (0x) prefix is in the given string.
  *
@@ -36,4 +38,25 @@ export const errorToString = (error: Error | string): string => {
   }
 
   return error
+}
+
+/**
+ * Normalizes text removing spaces and latinizing characters, in order to reduce as much as possible
+ * the possible inputs. So a text like "this is A TèXt" will end up as "thisisatext".
+ *
+ * @param text Text string to be normalized
+ * @returns string
+ */
+export const normalizeText = (text?: string): string => {
+  if (!text) return ''
+
+  const result = text
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[\.·:]/g, '.')
+    .replace(/[`´]/g, "'")
+    .normalize()
+    .toLowerCase()
+
+  return latinize(result)
 }
