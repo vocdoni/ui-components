@@ -22,8 +22,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint:fix": "prettier -c . --write",
-    "lint": "prettier -c .",
-    "prepare": "yarn workspace dotobject build"
+    "lint": "prettier -c ."
   },
   "packageManager": "yarn@1.22.19"
 }

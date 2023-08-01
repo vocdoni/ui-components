@@ -1,5 +1,5 @@
+import { dotobject } from '@vocdoni/sdk'
 import type { Locale as DLocale } from 'date-fns'
-import dotobject from 'dotobject'
 import { createContext, PropsWithChildren, useContext } from 'react'
 import { Locale } from './locales'
 
