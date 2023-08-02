@@ -1,19 +1,18 @@
 import { ChakraProps } from '@chakra-ui/system'
-import { CensusType, CspVote, PublishedElection, VocdoniSDKClient, Vote } from '@vocdoni/sdk'
-import { ComponentType, PropsWithChildren, createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { areEqualHexStrings, CensusType, CspVote, PublishedElection, Vote } from '@vocdoni/sdk'
+import { ComponentType, createContext, PropsWithChildren, useCallback, useContext, useEffect } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClient } from '../../client'
-import { areEqualHexStrings } from '../../utils'
 import { HR } from '../layout'
 import { ElectionActions } from './Actions'
 import { ElectionDescription } from './Description'
-import { ElectionFormError } from './FormError'
 import { ElectionHeader } from './Header'
 import { ElectionQuestions } from './Questions'
 import { ElectionResults } from './Results'
 import { ElectionSchedule } from './Schedule'
 import { ElectionStatusBadge } from './StatusBadge'
 import { ElectionTitle } from './Title'
+import { useElectionReducer } from './use-election-reducer'
 import { VoteButton } from './VoteButton'
 
 export type ElectionProviderProps = {
@@ -36,101 +35,75 @@ export const useElectionProvider = ({
   ...rest
 }: ElectionProviderProps) => {
   const { client: c, localize } = useClient()
-  const [client, setClient] = useState<VocdoniSDKClient>(c)
-  const [loading, setLoading] = useState<boolean>(false)
-  const [voting, setVoting] = useState<boolean>(false)
-  const [loaded, setLoaded] = useState<boolean>(false)
-  const [voted, setVoted] = useState<string | null>(null)
-  const [error, setError] = useState<string>('')
-  const [election, setElection] = useState<PublishedElection | undefined>(data)
-  const [isAbleToVote, setIsAbleToVote] = useState<boolean | undefined>(undefined)
-  const [votesLeft, setVotesLeft] = useState<number>(0)
-  const [isInCensus, setIsInCensus] = useState<boolean>(false)
-  const [formError, setFormError] = useState<boolean>(false)
-  const [voterAddress, setVoterAddress] = useState<string | undefined>(undefined)
-  const [censusType, setCensusType] = useState<CensusType | undefined>(undefined)
-  const [voteInstance, setVoteInstance] = useState<Vote | undefined>(undefined)
-  const [cspVotingToken, setCspVotingToken] = useState<string | undefined>(undefined)
-  const [authToken, setAuthToken] = useState<any>(null)
-  const [handler] = useState<string>('github') // Hardcoded until we let to choose
+  const { state, actions } = useElectionReducer(c, data)
+  const { client, csp, election, loading, loaded } = state
 
   const fetchElection = useCallback(
     async (id: string) => {
-      setLoading(true)
+      actions.load()
       try {
-        const e = await client.fetchElection(id)
-        setLoaded(true)
-        setElection(e)
-        setError('')
+        actions.set(await client.fetchElection(id))
       } catch (e) {
-        setError((e as Error).message)
-      } finally {
-        setLoading(false)
+        actions.error(e)
       }
     },
-    [client]
+    [actions, client]
   )
 
   // CSP OAuth flow
   // As vote setting and voting token are async, we need to wait for both to be set
   useEffect(() => {
-    if (cspVotingToken && voteInstance) {
-      cspVote(cspVotingToken, voteInstance)
+    if (csp.token && csp.vote) {
+      cspVote(csp.token, csp.vote)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cspVotingToken, voteInstance])
+  }, [csp.token, csp.vote])
 
   // fetch election
   useEffect(() => {
-    if (!id || !client || loading) return
-    if (loaded && areEqualHexStrings(election?.id, id)) return
+    if (!id || !client || loading.election) return
+    if (loaded.election && areEqualHexStrings(election?.id, id)) return
 
     fetchElection(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [election, id, client, loading, loaded])
+  }, [election?.id, id, client, loading.election, loaded.election, fetchElection])
 
-  // properly set election data in case it comes from props (and/or updates)
+  // check census information
   useEffect(() => {
-    if (!data) return
-    if (loaded && areEqualHexStrings(election?.id, id)) return
-
-    setElection(data)
-    setLoaded(true)
-  }, [data, election?.id, id, loaded])
-
-  // check if logged in user is able to vote
-  useEffect(() => {
-    if (!fetchCensus || !election || !loaded || loading || !client.wallet) return
+    if (!fetchCensus || !election || !loaded.election || loading.census || !client.wallet) return
     ;(async () => {
       const address = await client.wallet?.getAddress()
-      if (isAbleToVote !== undefined && areEqualHexStrings(voterAddress, address)) return
+      // The condition is just negated so we can return the code execution.
+      // A less mental option is to not negate the entire condition and add
+      // the try/catch code inside the if
+      if (
+        !(
+          !loaded.census ||
+          !areEqualHexStrings(state.voter, address) ||
+          (data && !areEqualHexStrings(data.id, election.id))
+        )
+      ) {
+        return
+      }
 
       try {
-        setLoading(true)
-        setVoterAddress(address)
+        actions.loadCensus(address as string)
         const isIn = await client.isInCensus(election.id)
-        setIsInCensus(isIn)
-        const censusType: CensusType = election.census.type
-        setCensusType(censusType)
+        actions.inCensus(isIn)
+        const censusType = election.census.type as CensusType
 
-        let left = 0
-        if (isIn || censusType === CensusType.WEIGHTED) {
+        if (isIn && censusType === CensusType.WEIGHTED) {
+          actions.voted(await client.hasAlreadyVoted(election.id))
+
           // no need to check votes left if member ain't in census
-          left = await client.votesLeftCount(election.id)
-          setVotesLeft(left)
-
-          const voted = await client.hasAlreadyVoted(election.id)
-          setVoted(voted)
+          actions.votesLeft(await client.votesLeftCount(election.id))
         }
-        setIsAbleToVote((left > 0 && isIn) || censusType === CensusType.CSP)
+        actions.setCensus({ isInCensus: isIn })
       } catch (e) {
-        console.warn('could not check census belonging:', e)
-        setIsAbleToVote(false)
-      } finally {
-        setLoading(false)
+        actions.censusError(e)
       }
     })()
-  }, [fetchCensus, election, loaded, client, isAbleToVote, loading, voterAddress])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote])
 
   // auto update metadata (if enabled)
   useEffect(() => {
@@ -143,16 +116,16 @@ export const useElectionProvider = ({
   }, [autoUpdate, autoUpdateInterval, election])
 
   // CSP OAuth flow
-  // Listening for the popup window meessage (oauth flows)
+  // Listening for the popup window meessage
   useEffect(() => {
     ;(async () => {
       const handleMessage = (event: any) => {
         if (event.data.code && event.data.handler) {
-          getOAuthToken(client, event.data.code, event.data.handler)
+          getOAuthToken(event.data.code, event.data.handler)
         }
       }
 
-      if (window.opener || !client || censusType !== CensusType.CSP) {
+      if (window.opener || !client || election?.census.type !== CensusType.CSP) {
         return
       }
 
@@ -163,7 +136,7 @@ export const useElectionProvider = ({
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, censusType])
+  }, [client, election?.census.type])
 
   // CSP OAuth flow
   // Posting the message to the main window
@@ -197,8 +170,7 @@ export const useElectionProvider = ({
       throw new Error('no election initialized')
     }
 
-    setVoting(true)
-    setError('')
+    actions.voting()
 
     client.setElectionId(election.id)
     // map questions back to expected Vote[] values
@@ -206,32 +178,26 @@ export const useElectionProvider = ({
 
     try {
       const vote = new Vote(mapped)
-      setVoteInstance(vote)
+      actions.setVote(vote)
+      // setVoteInstance(vote)
       if (typeof beforeSubmit === 'function' && !beforeSubmit(vote)) {
         return
       }
 
-      if (censusType === CensusType.CSP) {
-        await cspAuthAndVote()
-      } else if (censusType === CensusType.WEIGHTED) {
-        const vid = await weightedVote(vote)
-        setVoted(vid)
-        setVotesLeft(votesLeft - 1)
-        setIsAbleToVote(isInCensus && votesLeft - 1 > 0)
-        return vid
-      } else {
-        throw new Error('unknown census type')
+      switch (election.census.type) {
+        case CensusType.CSP:
+          await cspAuthAndVote()
+          break
+        case CensusType.WEIGHTED:
+          const vid = await weightedVote(vote)
+          actions.voted(vid)
+          return vid
+
+        default:
+          throw new Error(`unsupported census type "${election.census.type}"`)
       }
-    } catch (e: any) {
-      if ('reason' in e) {
-        return setError(e.reason as string)
-      }
-      if ('message' in e) {
-        return setError(e.message as string)
-      }
-      console.error('could not vote:', e)
-    } finally {
-      setVoting(false)
+    } catch (e) {
+      actions.votingError(e)
     }
   }
 
@@ -239,7 +205,7 @@ export const useElectionProvider = ({
     if (!vote) {
       throw new Error('no vote instance')
     }
-    if (censusType !== CensusType.WEIGHTED) {
+    if (election?.census.type !== CensusType.WEIGHTED) {
       throw new Error('not a Weighted election')
     }
 
@@ -248,13 +214,17 @@ export const useElectionProvider = ({
 
   // CSP OAuth flow
   const cspAuthAndVote = async () => {
+    const {
+      election,
+      csp: { handler },
+    } = state
     if (!client) {
       throw new Error('no client initialized')
     }
     if (!election) {
       throw new Error('no election initialized')
     }
-    if (censusType !== CensusType.CSP) {
+    if (election.census.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
 
@@ -270,17 +240,14 @@ export const useElectionProvider = ({
       window.location.hash
     }`
 
-    let step0: any
     try {
-      step0 = await client.cspStep(0, [handler, redirectURL])
-    } catch (e: any) {
-      if ('reason' in e) {
-        return setError(e.reason as string)
-      }
+      // TODO: properly type when ICspIntermediateStepResponse is exposed from SDK
+      const step0: any = await client.cspStep(0, [handler, redirectURL])
+      actions.csp0(step0.authToken)
+      openLoginPopup(handler, step0['response'][0])
+    } catch (e) {
+      actions.votingError(e)
     }
-
-    setAuthToken(step0.authToken)
-    openLoginPopup(handler, step0['response'][0])
   }
 
   // CSP OAuth flow
@@ -304,38 +271,41 @@ export const useElectionProvider = ({
   }
 
   // CSP OAuth flow
-  const getOAuthToken = async (vocdoniClient: any, code: string, handler: string) => {
-    if (cspVotingToken) {
-      return
-    }
+  const getOAuthToken = useCallback(
+    async (code: string, handler: string) => {
+      if (csp.token) {
+        return
+      }
 
-    if (!code) {
-      throw new Error('no code provided')
-    }
-    if (!handler) {
-      throw new Error('no handler provided')
-    }
+      if (!code) {
+        throw new Error('no code provided')
+      }
+      if (!handler) {
+        throw new Error('no handler provided')
+      }
 
-    // Extract the electionId query param from the redirectURL
-    const existingParams = new URLSearchParams(window.location.search)
-    const electionId = existingParams.get('electionId')
-    const params: URLSearchParams = new URLSearchParams()
-    params.append('electionId', electionId as string)
-    params.append('handler', handler)
+      // Extract the electionId query param from the redirectURL
+      const existingParams = new URLSearchParams(window.location.search)
+      const electionId = existingParams.get('electionId')
+      const params: URLSearchParams = new URLSearchParams()
+      params.append('electionId', electionId as string)
+      params.append('handler', handler)
 
-    const redirectURL = `${window.location.origin}${window.location.pathname}?${params.toString()}${
-      window.location.hash
-    }`
+      const redirectURL = `${window.location.origin}${window.location.pathname}?${params.toString()}${
+        window.location.hash
+      }`
 
-    let step1
-    try {
-      step1 = await vocdoniClient.cspStep(1, [handler, code, redirectURL], authToken)
-      setCspVotingToken(step1.token)
-    } catch (e) {
-      setError('Not authorized to vote')
-      return false
-    }
-  }
+      try {
+        const step1: any = await client.cspStep(1, [handler, code, redirectURL], csp.authToken)
+        actions.csp1(step1.token)
+      } catch (e) {
+        actions.votingError(localize('errors.unauthorized'))
+        console.warn('CSP step 1 error', e)
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [csp.token, csp.authToken, client]
+  )
 
   // CSP OAuth flow
   const cspVote = async (token: string, vote: Vote) => {
@@ -343,7 +313,7 @@ export const useElectionProvider = ({
       throw new Error('no client initialized')
     }
 
-    if (censusType !== CensusType.CSP) {
+    if (election?.census.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
 
@@ -352,34 +322,18 @@ export const useElectionProvider = ({
       const signature: string = await client.cspSign(walletAddress, token)
       const cspVote: CspVote = client.cspVote(vote as Vote, signature)
       const vid: string = await client.submitVote(cspVote)
-      setVoted(vid)
-      setVotesLeft(votesLeft - 1)
-      setCspVotingToken(undefined)
-      setVoteInstance(undefined)
-      return vid
+      actions.voted(vid)
     } catch (e) {
-      setError('Error submitting vote')
-      return false
+      actions.votingError(e)
     }
   }
 
   return {
     ...rest,
-    client,
-    election,
-    error,
-    formError,
-    isAbleToVote,
-    isInCensus,
-    loaded,
-    loading,
-    setClient,
-    setFormError,
+    ...state,
+    setClient: actions.setClient,
     localize,
     vote,
-    voted,
-    votesLeft,
-    voting,
   }
 }
 
@@ -417,7 +371,6 @@ export const Election = (props: ElectionProviderComponentProps) => (
     <ElectionDescription />
     <HR />
     <ElectionQuestions />
-    <ElectionFormError />
     <VoteButton />
     <ElectionResults />
   </ElectionProvider>

@@ -1,12 +1,11 @@
 import { ButtonGroup, IconButton } from '@chakra-ui/button'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { ToastId, useToast } from '@chakra-ui/toast'
-import { ElectionStatus } from '@vocdoni/sdk'
+import { ElectionStatus, areEqualHexStrings } from '@vocdoni/sdk'
 import { useRef, useState } from 'react'
 import { FaPause, FaPlay, FaStop } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { useClient } from '../../client'
-import { areEqualHexStrings } from '../../utils'
 import { useElection } from './Election'
 
 const PlayIcon = chakra(FaPlay)

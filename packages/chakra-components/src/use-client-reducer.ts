@@ -16,7 +16,7 @@ export const ClientEnvSet = 'client:env:set'
 export const ClientSet = 'client:set'
 export const ClientSignerSet = 'client:signer:set'
 
-type ErrorPayload = Error | string
+export type ErrorPayload = any | unknown
 
 export type ClientAccountErrorPayload = ErrorPayload
 export type ClientAccountSetPayload = AccountData
@@ -205,6 +205,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         signer: {} as Signer,
         account: undefined,
         balance: -1,
+        connected: false,
         loaded: {
           account: false,
           balance: false,
@@ -265,8 +266,8 @@ export const useClientReducer = ({ env, client, signer }: ClientProviderProps) =
 
   // dispatch helper methods
   const clear = () => dispatch({ type: ClientClear })
-  const errorAccount = (error: Error | string) => dispatch({ type: ClientAccountError, payload: error })
-  const errorBalance = (error: Error | string) => dispatch({ type: ClientBalanceError, payload: error })
+  const errorAccount = (error: ErrorPayload) => dispatch({ type: ClientAccountError, payload: error })
+  const errorBalance = (error: ErrorPayload) => dispatch({ type: ClientBalanceError, payload: error })
   const fetchAccount = () => dispatch({ type: ClientAccountFetch })
   const fetchBalance = () => dispatch({ type: ClientBalanceFetch })
   const setAccount = (account: AccountData | undefined) => dispatch({ type: ClientAccountSet, payload: account })
