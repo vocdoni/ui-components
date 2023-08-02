@@ -1,3 +1,4 @@
+import { ensure0x } from '@vocdoni/sdk'
 import latinize from 'latinize'
 
 /**
@@ -6,22 +7,7 @@ import latinize from 'latinize'
  * @param address Address string to be hex enforced
  * @returns
  */
-export const enforceHexPrefix = (address?: string) =>
-  !address ? '' : address.startsWith('0x') ? address : `0x${address}`
-
-/**
- * Compares two hex strings checking if they're the same. It ensures both
- * have hex prefix and are lowercase.
- *
- * @param {string} hex1
- * @param {string} hex2
- * @returns {boolean}
- */
-export const areEqualHexStrings = (hex1?: string, hex2?: string) => {
-  if (!hex1 || !hex2) return false
-
-  return enforceHexPrefix(hex1.toLowerCase()) === enforceHexPrefix(hex2.toLowerCase())
-}
+export const enforceHexPrefix = (address?: string) => (!address ? '' : ensure0x(address))
 
 /**
  * Theoretically, all errors from the SDK should be returned as strings, but this is not true
@@ -29,12 +15,15 @@ export const areEqualHexStrings = (hex1?: string, hex2?: string) => {
  * we need to properly cast them to strings. Note we're not using error instanceof Error because
  * it just not works for many signer errors.
  *
- * @param {Error|string} error The error to be casted
+ * @param {any|unknown} error The error to be casted
  * @returns {string}
  */
-export const errorToString = (error: Error | string): string => {
+export const errorToString = (error: any | unknown): string => {
   if (typeof error !== 'string' && 'message' in error) {
     return error.message
+  }
+  if (typeof error !== 'string' && 'reason' in error) {
+    return error.reason
   }
 
   return error

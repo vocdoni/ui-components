@@ -20,7 +20,6 @@ export const locales = {
     button: 'Vote',
     voted_description: 'Your vote id is {{ id }}. You can use it to verify your vote.',
     voted_title: 'Your vote was successfully cast!',
-    missing_answers: 'You have to answer all the questions',
   },
   empty: 'Apparently this process has no questions 🤔',
   required: 'This field is required',
@@ -42,6 +41,9 @@ export const locales = {
     upcoming: 'Upcoming',
     process_unknown: 'Unknown',
     invalid: 'Invalid',
+  },
+  errors: {
+    unauthorized: 'Not authorized to vote',
   },
 }
 

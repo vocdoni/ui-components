@@ -12,7 +12,14 @@ import { Markdown } from '../layout'
 import { useElection } from './Election'
 
 export const ElectionQuestions = (props: ChakraProps) => {
-  const { election, vote, voted, error, setFormError, localize, isAbleToVote } = useElection()
+  const {
+    election,
+    vote,
+    voted,
+    errors: { voting: error },
+    localize,
+    isAbleToVote,
+  } = useElection()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
@@ -36,10 +43,7 @@ export const ElectionQuestions = (props: ChakraProps) => {
     <chakra.div __css={styles.wrapper} {...props}>
       <FormProvider {...fmethods}>
         <Voted />
-        <form
-          onSubmit={fmethods.handleSubmit(vote, (errs) => setFormError(Object.values(errs).length > 0))}
-          id='election-questions-form'
-        >
+        <form onSubmit={fmethods.handleSubmit(vote)} id={`election-questions-${election.id}`}>
           {questions.map((question, qk) => (
             <QuestionField key={qk} index={qk.toString()} question={question} />
           ))}
@@ -95,10 +99,12 @@ type QuestionFieldProps = ChakraProps & {
 
 const QuestionField = ({ question, index }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
+  const { connected } = useClient()
   const { election, isAbleToVote, localize } = useElection()
   const {
     formState: { errors },
   } = useFormContext()
+  const disabled = !connected || election?.status !== ElectionStatus.ONGOING || !isAbleToVote
 
   return (
     <chakra.div __css={styles.question}>
@@ -116,11 +122,7 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
             rules={{ required: localize('required') }}
             name={index}
             render={({ field }) => (
-              <RadioGroup
-                sx={styles.radioGroup}
-                {...field}
-                isDisabled={!isAbleToVote || election?.status !== ElectionStatus.ONGOING}
-              >
+              <RadioGroup sx={styles.radioGroup} {...field} isDisabled={disabled}>
                 <Stack direction='column' sx={styles.stack}>
                   {question.choices.map((choice, ck) => (
                     <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>

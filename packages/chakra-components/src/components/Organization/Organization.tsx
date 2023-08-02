@@ -1,8 +1,7 @@
 import { ChakraProps } from '@chakra-ui/system'
-import { Account, AccountData } from '@vocdoni/sdk'
+import { Account, AccountData, areEqualHexStrings } from '@vocdoni/sdk'
 import { PropsWithChildren, createContext, useContext, useEffect } from 'react'
 import { useClient } from '../../client'
-import { areEqualHexStrings } from '../../utils'
 import { OrganizationName } from './Name'
 import { useOrganizationReducer } from './use-organization-reducer'
 
