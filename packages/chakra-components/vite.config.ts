@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import { LibraryFormats, defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
+import { peerDependencies } from './package.json'
 
 // under development avoid bundling stuff that we're not gonna use to reduce time
 const formats: LibraryFormats[] = ['es']
@@ -25,28 +26,7 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
-      external: [
-        'react',
-        'react-dom',
-        '@chakra-ui/alert',
-        '@chakra-ui/button',
-        '@chakra-ui/card',
-        '@chakra-ui/form-control',
-        '@chakra-ui/image',
-        '@chakra-ui/layout',
-        '@chakra-ui/progress',
-        '@chakra-ui/radio',
-        '@chakra-ui/system',
-        '@chakra-ui/system',
-        '@chakra-ui/table',
-        '@chakra-ui/tag',
-        '@chakra-ui/theme',
-        '@chakra-ui/toast',
-        'react/jsx-runtime',
-        'react-markdown',
-        'remark-gfm',
-        '@vocdoni/sdk',
-      ],
+      external: [...Object.keys(peerDependencies), 'react/jsx-runtime'],
       output: {
         globals: {
           react: 'React',
