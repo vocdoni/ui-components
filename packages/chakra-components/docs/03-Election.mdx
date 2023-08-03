@@ -26,6 +26,11 @@ Show election header image.
 <ElectionHeader fallbackSrc={'img/logo-dark.png'} />
 ```
 
+`fallbackSrc` is a chakra prop to get a fallback in case of error. In the case of the `<ElectionHeader />` component
+it will also be used in case no header image is defined in the current election.
+
+`ElectionHeader` extends chakra's [`Image` component](https://chakra-ui.com/docs/components/image).
+
 ## Election Title
 
 Show election title.
