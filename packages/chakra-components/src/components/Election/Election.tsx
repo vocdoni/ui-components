@@ -331,6 +331,7 @@ export const useElectionProvider = ({
   return {
     ...rest,
     ...state,
+    fetchElection,
     setClient: actions.setClient,
     localize,
     vote,
