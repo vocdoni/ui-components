@@ -53,11 +53,11 @@ export const useElectionProvider = ({
   // CSP OAuth flow
   // As vote setting and voting token are async, we need to wait for both to be set
   useEffect(() => {
-    if (csp.token && csp.vote) {
-      cspVote(csp.token, csp.vote)
+    if (csp.token && state.vote) {
+      cspVote(csp.token, state.vote)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [csp.token, csp.vote])
+  }, [csp.token, state.vote])
 
   // fetch election
   useEffect(() => {

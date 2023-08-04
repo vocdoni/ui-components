@@ -80,6 +80,7 @@ export interface ElectionReducerState {
   isAbleToVote: boolean | undefined
   isInCensus: boolean
   election: PublishedElection | undefined
+  vote: Vote | undefined
   voter: string | undefined
   votesLeft: number
   voted: string | null
@@ -99,7 +100,6 @@ export interface ElectionReducerState {
   }
   csp: {
     handler: 'github'
-    vote: Vote | undefined
     token: string | undefined
     authToken: string | undefined
   }
@@ -116,6 +116,7 @@ export const ElectionStateEmpty = ({
   isAbleToVote: undefined,
   isInCensus: false,
   election,
+  vote: undefined,
   voter: undefined,
   votesLeft: 0,
   voted: null,
@@ -135,7 +136,6 @@ export const ElectionStateEmpty = ({
   },
   csp: {
     handler: 'github',
-    vote: undefined,
     token: undefined,
     authToken: undefined,
   },
@@ -300,6 +300,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       return {
         ...state,
         voted,
+        vote: undefined,
         loaded: {
           ...state.loaded,
           census: true,
@@ -314,7 +315,6 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
           ...state.csp,
           authToken: undefined,
           token: undefined,
-          vote: undefined,
         },
       }
     }
@@ -323,10 +323,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       const vote = action.payload as ElectionVoteSetPayload
       return {
         ...state,
-        csp: {
-          ...state.csp,
-          vote,
-        },
+        vote,
       }
     }
 
