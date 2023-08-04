@@ -1,5 +1,6 @@
 import { AccountData } from '@vocdoni/sdk'
 import { Reducer, useReducer } from 'react'
+import { ErrorPayload } from '../../use-client-reducer'
 import { errorToString } from '../../utils'
 
 export const OrganizationLoadError = 'organization:load:error'
@@ -10,10 +11,12 @@ export const OrganizationUpdateError = 'organization:update:error'
 
 export type OrganizationSetPayload = AccountData
 export type OrganizationUpdatePayload = Partial<AccountData>
-export type OrganizationLoadErrorPayload = string | Error
-export type OrganizationUpdateErrorPayload = string | Error
+export type OrganizationLoadErrorPayload = ErrorPayload
+export type OrganizationUpdateErrorPayload = ErrorPayload
+export type OrganizationLoadingPayload = string | undefined
 
 export type OrganizationActionPayload =
+  | OrganizationLoadingPayload
   | OrganizationSetPayload
   | OrganizationUpdatePayload
   | OrganizationUpdateErrorPayload
@@ -34,6 +37,7 @@ export interface OrganizationAction {
 export interface OrganizationReducerState {
   loading: boolean
   loaded: boolean
+  id: string | undefined
   errors: {
     load: string | null
     update: string | null
@@ -44,6 +48,7 @@ export interface OrganizationReducerState {
 export const OrganizationStateEmpty: OrganizationReducerState = {
   loading: false,
   loaded: false,
+  id: undefined,
   errors: {
     load: null,
     update: null,
@@ -57,8 +62,10 @@ const organizationReducer: Reducer<OrganizationReducerState, OrganizationAction>
 ) => {
   switch (action.type) {
     case OrganizationLoading:
+      const id = action.payload as OrganizationLoadingPayload
       return {
         ...state,
+        id,
         loading: true,
       }
 
@@ -95,7 +102,7 @@ const organizationReducer: Reducer<OrganizationReducerState, OrganizationAction>
       return {
         ...state,
         loading: false,
-        loaded: false,
+        loaded: true,
         errors: {
           ...state.errors,
           load: errorToString(error),
@@ -108,7 +115,7 @@ const organizationReducer: Reducer<OrganizationReducerState, OrganizationAction>
       return {
         ...state,
         loading: false,
-        loaded: false,
+        loaded: true,
         errors: {
           ...state.errors,
           update: errorToString(error),
@@ -130,7 +137,7 @@ export const useOrganizationReducer = (organization?: AccountData) => {
   return {
     state,
     dispatch,
-    loading: () => dispatch({ type: OrganizationLoading }),
+    loading: (id?: string) => dispatch({ type: OrganizationLoading, payload: id }),
     updateOrganization: (organization: Partial<AccountData>) =>
       dispatch({ type: OrganizationUpdate, payload: organization }),
     setOrganization: (organization: AccountData) => dispatch({ type: OrganizationSet, payload: organization }),

@@ -16,7 +16,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
 
   // fetches organization info, and sets it to the state
   const fetch = () => {
-    loading()
+    loading(id)
     return client.fetchAccountInfo(id).then(setOrganization).catch(loadError)
   }
 
@@ -29,7 +29,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
       throw new Error("You're not the owner of this account")
     }
 
-    loading()
+    loading(id)
     return client
       .updateAccountInfo(account instanceof Account ? account : new Account(account))
       .then(setOrganization)
@@ -39,7 +39,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
   // fetch organization
   useEffect(() => {
     if (!id || !client || state.loading) return
-    if (state.loaded && areEqualHexStrings(state.organization?.address, id)) return
+    if (state.loaded && areEqualHexStrings(state.id, id)) return
 
     fetch()
     // eslint-disable-next-line react-hooks/exhaustive-deps

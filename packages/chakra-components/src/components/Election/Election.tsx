@@ -1,6 +1,7 @@
+import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/alert'
 import { ChakraProps } from '@chakra-ui/system'
-import { areEqualHexStrings, CensusType, CspVote, PublishedElection, Vote } from '@vocdoni/sdk'
-import { ComponentType, createContext, PropsWithChildren, useCallback, useContext, useEffect } from 'react'
+import { CensusType, CspVote, PublishedElection, Vote, areEqualHexStrings } from '@vocdoni/sdk'
+import { ComponentType, PropsWithChildren, createContext, useCallback, useContext, useEffect } from 'react'
 import { FieldValues } from 'react-hook-form'
 import { useClient } from '../../client'
 import { HR } from '../layout'
@@ -12,8 +13,8 @@ import { ElectionResults } from './Results'
 import { ElectionSchedule } from './Schedule'
 import { ElectionStatusBadge } from './StatusBadge'
 import { ElectionTitle } from './Title'
-import { useElectionReducer } from './use-election-reducer'
 import { VoteButton } from './VoteButton'
+import { useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
@@ -40,7 +41,7 @@ export const useElectionProvider = ({
 
   const fetchElection = useCallback(
     async (id: string) => {
-      actions.load()
+      actions.load(id)
       try {
         actions.set(await client.fetchElection(id))
       } catch (e) {
@@ -62,10 +63,10 @@ export const useElectionProvider = ({
   // fetch election
   useEffect(() => {
     if (!id || !client || loading.election) return
-    if (loaded.election && areEqualHexStrings(election?.id, id)) return
+    if (loaded.election && areEqualHexStrings(state.id, id)) return
 
     fetchElection(id)
-  }, [election?.id, id, client, loading.election, loaded.election, fetchElection])
+  }, [state.id, id, client, loading.election, loaded.election, fetchElection])
 
   // check census information
   useEffect(() => {
@@ -364,16 +365,39 @@ ElectionProvider.displayName = 'ElectionProvider'
 
 export const Election = (props: ElectionProviderComponentProps) => (
   <ElectionProvider {...props} fetchCensus>
-    <ElectionHeader />
-    <ElectionTitle />
-    <ElectionSchedule />
-    <ElectionStatusBadge />
-    <ElectionActions />
-    <ElectionDescription />
-    <HR />
-    <ElectionQuestions />
-    <VoteButton />
-    <ElectionResults />
+    <ElectionBody />
   </ElectionProvider>
 )
 Election.displayName = 'Election'
+
+// Not exported since we're not allowing it to be configured. If you want to customize it past
+// this level, create a custom Election component with the provided election components.
+const ElectionBody = () => {
+  const {
+    errors: { election: error },
+  } = useElection()
+
+  if (error) {
+    return (
+      <Alert status='error'>
+        <AlertIcon />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    )
+  }
+
+  return (
+    <>
+      <ElectionHeader />
+      <ElectionTitle />
+      <ElectionSchedule />
+      <ElectionStatusBadge />
+      <ElectionActions />
+      <ElectionDescription />
+      <HR />
+      <ElectionQuestions />
+      <VoteButton />
+      <ElectionResults />
+    </>
+  )
+}
