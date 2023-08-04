@@ -91,7 +91,7 @@ export const ElectionActions = (props: ChakraProps) => {
             closeToast()
           }
         }}
-        isDisabled={[ElectionStatus.ONGOING, ElectionStatus.CANCELED].includes(election.status)}
+        isDisabled={election.status !== ElectionStatus.PAUSED}
         sx={styles.buttons}
       />
       <IconButton
@@ -119,7 +119,7 @@ export const ElectionActions = (props: ChakraProps) => {
             closeToast()
           }
         }}
-        isDisabled={[ElectionStatus.PAUSED, ElectionStatus.CANCELED].includes(election.status)}
+        isDisabled={election.status !== ElectionStatus.ONGOING}
         sx={styles.buttons}
       />
       <IconButton
@@ -147,7 +147,12 @@ export const ElectionActions = (props: ChakraProps) => {
             closeToast()
           }
         }}
-        isDisabled={election.status !== ElectionStatus.ONGOING}
+        isDisabled={[
+          ElectionStatus.RESULTS,
+          ElectionStatus.ENDED,
+          ElectionStatus.CANCELED,
+          ElectionStatus.UPCOMING,
+        ].includes(election.status)}
         sx={styles.buttons}
       />
       <IconButton
@@ -175,7 +180,7 @@ export const ElectionActions = (props: ChakraProps) => {
             closeToast()
           }
         }}
-        isDisabled={election.status === ElectionStatus.CANCELED}
+        isDisabled={[ElectionStatus.CANCELED, ElectionStatus.ENDED, ElectionStatus.RESULTS].includes(election.status)}
         sx={styles.buttons}
       />
     </ButtonGroup>
