@@ -29,8 +29,8 @@ const BaseLoadingState: LoadingState = {
 
 export const ElectionActions = (props: ChakraProps) => {
   const toast = useToast()
-  const { client, localize, account } = useClient()
-  const { election } = useElection()
+  const { localize, account } = useClient()
+  const { client, election, fetchElection } = useElection()
   const tRef = useRef<ToastId>()
   const styles = useMultiStyleConfig('ElectionActions')
   const [loading, setLoading] = useState<LoadingState>(BaseLoadingState)
@@ -81,6 +81,7 @@ export const ElectionActions = (props: ChakraProps) => {
 
           try {
             await client.continueElection(election.id)
+            await fetchElection(election.id)
           } catch (e: any) {
             if (typeof e === 'string') {
               return errorToast(e)
@@ -108,6 +109,7 @@ export const ElectionActions = (props: ChakraProps) => {
 
           try {
             await client.pauseElection(election.id)
+            await fetchElection(election.id)
           } catch (e: any) {
             if (typeof e === 'string') {
               return errorToast(e)
@@ -135,6 +137,7 @@ export const ElectionActions = (props: ChakraProps) => {
 
           try {
             await client.endElection(election.id)
+            await fetchElection(election.id)
           } catch (e: any) {
             if (typeof e === 'string') {
               return errorToast(e)
@@ -162,6 +165,7 @@ export const ElectionActions = (props: ChakraProps) => {
 
           try {
             await client.cancelElection(election.id)
+            await fetchElection(election.id)
           } catch (e: any) {
             if (typeof e === 'string') {
               return errorToast(e)
