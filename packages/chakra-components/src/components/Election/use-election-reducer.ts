@@ -1,5 +1,6 @@
 import { CensusType, PublishedElection, VocdoniSDKClient, Vote, areEqualHexStrings } from '@vocdoni/sdk'
 import { Reducer, useEffect, useReducer } from 'react'
+import { useClient } from '../../client'
 import { ClientSetPayload, ErrorPayload } from '../../use-client-reducer'
 import { errorToString } from '../../utils'
 
@@ -9,6 +10,7 @@ export const ElectionSet = 'election:set'
 export const CensusLoad = 'election:census:load'
 export const CensusError = 'election:census:error'
 export const CensusSet = 'election:census:set'
+export const CensusClear = 'election:census:clear'
 export const ElectionCspStep0 = 'election:csp:step_0'
 export const ElectionCspStep1 = 'election:csp:step_1'
 export const ElectionInCensus = 'election:in_census'
@@ -20,6 +22,7 @@ export const ElectionVotingError = 'election:voting:error'
 export const ElectionClientSet = 'election:client:set'
 
 export type ElectionActionType =
+  | typeof CensusClear
   | typeof CensusError
   | typeof CensusLoad
   | typeof CensusSet
@@ -143,6 +146,22 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
   action: ElectionAction
 ) => {
   switch (action.type) {
+    case CensusClear: {
+      return {
+        ...state,
+        voted: null,
+        loading: {
+          ...state.loading,
+          census: false,
+        },
+        loaded: {
+          ...state.loaded,
+          census: false,
+        },
+        votesLeft: 0,
+        isAbleToVote: false,
+      }
+    }
     case CensusError: {
       const payload = action.payload as CensusErrorPayload
       return {
@@ -364,6 +383,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
 export const useElectionReducer = (client: VocdoniSDKClient, election?: PublishedElection) => {
   const initial = ElectionStateEmpty({ client, election })
+  const { connected } = useClient()
   const [state, dispatch] = useReducer(electionReducer, {
     ...initial,
     election,
@@ -373,6 +393,7 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
     },
   })
 
+  const clear = () => dispatch({ type: CensusClear })
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ElectionClientSet, payload: client })
   const set = (election: PublishedElection) => dispatch({ type: ElectionSet, payload: election })
 
@@ -392,19 +413,27 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [election?.id, state.loaded.election])
 
+  // ensure user data is cleared on logout
+  useEffect(() => {
+    if (connected) return
+
+    clear()
+  }, [connected])
+
   return {
     state,
     dispatch,
     actions: {
+      clear,
+      set,
+      setClient,
       load: () => dispatch({ type: ElectionLoad }),
       csp0: (token: string) => dispatch({ type: ElectionCspStep0, payload: token }),
       csp1: (token: string) => dispatch({ type: ElectionCspStep1, payload: token }),
-      set,
       error: (error: ElectionErrorPayload) => dispatch({ type: ElectionError, payload: error }),
       loadCensus: (voter: string) => dispatch({ type: CensusLoad, payload: voter }),
       censusError: (error: CensusErrorPayload) => dispatch({ type: CensusError, payload: error }),
       setCensus: (info?: CensusSetPayload) => dispatch({ type: CensusSet, payload: info }),
-      setClient,
       setVote: (vote: Vote) => dispatch({ type: ElectionVoteSet, payload: vote }),
       inCensus: (isIn: boolean) => dispatch({ type: ElectionInCensus, payload: isIn }),
       voted: (voted: string) => dispatch({ type: ElectionVoted, payload: voted }),
