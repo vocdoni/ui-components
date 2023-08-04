@@ -189,6 +189,14 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       const payload = action.payload as CensusIsAbleToVotePayload
       return {
         ...state,
+        loading: {
+          ...state.loading,
+          census: false,
+        },
+        loaded: {
+          ...state.loaded,
+          census: true,
+        },
         isAbleToVote:
           payload || (state.votesLeft > 0 && state.isInCensus) || state.election?.census.type === CensusType.CSP,
       }
