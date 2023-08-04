@@ -201,6 +201,7 @@ export const useElectionProvider = ({
     }
   }
 
+  // internal method used by vote for weighted type votes
   const weightedVote = async (vote: Vote): Promise<string> => {
     if (!vote) {
       throw new Error('no vote instance')
