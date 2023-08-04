@@ -28,6 +28,8 @@ future, or create new ones for other frameworks:
 
 - [`@vocdoni/chakra-components`] React components and hooks built with chakra
   for easily integrating Vocdoni services.
+- [`@vocdoni/rainbowkit-wallets`] A set of wallets for rainbowkit, reducing the
+  technical gap for users, not requiring them to have a Web3 wallet.
 
 Development
 -----------
@@ -75,3 +77,4 @@ with them.
 [`packages`]: ./packages
 [`templates`]: ./templates
 [`@vocdoni/chakra-components`]: ./packages/chakra-components/README.md
+[`@vocdoni/rainbowkit-wallets`]: ./packages/rainbowkit-wallets/README.md

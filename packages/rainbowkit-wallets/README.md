@@ -1,5 +1,5 @@
 @vocdoni/rainbowkit-wallets
-==========================
+===========================
 
 Rainbowkit wallets & wagmi connectors for easily extending web3 connectivity.
 
