@@ -97,7 +97,7 @@ export const useElectionProvider = ({
           // no need to check votes left if member ain't in census
           actions.votesLeft(await client.votesLeftCount(election.id))
         }
-        actions.setCensus({ isInCensus: isIn })
+        actions.isAbleToVote()
       } catch (e) {
         actions.censusError(e)
       }

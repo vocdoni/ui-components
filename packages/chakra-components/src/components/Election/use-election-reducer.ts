@@ -6,8 +6,8 @@ import { errorToString } from '../../utils'
 
 export const CensusClear = 'election:census:clear'
 export const CensusError = 'election:census:error'
+export const CensusIsAbleToVote = 'election:census:is_able_to_vote'
 export const CensusLoad = 'election:census:load'
-export const CensusSet = 'election:census:set'
 export const ElectionClientSet = 'election:client:set'
 export const ElectionCspStep0 = 'election:csp:step_0'
 export const ElectionCspStep1 = 'election:csp:step_1'
@@ -24,8 +24,8 @@ export const ElectionVotingError = 'election:voting:error'
 export type ElectionActionType =
   | typeof CensusClear
   | typeof CensusError
+  | typeof CensusIsAbleToVote
   | typeof CensusLoad
-  | typeof CensusSet
   | typeof ElectionClientSet
   | typeof ElectionCspStep0
   | typeof ElectionCspStep1
@@ -40,13 +40,8 @@ export type ElectionActionType =
   | typeof ElectionVotingError
 
 export type CensusErrorPayload = ErrorPayload
+export type CensusIsAbleToVotePayload = undefined | boolean
 export type CensusLoadPayload = string
-export type CensusSetPayload = {
-  isAbleToVote?: boolean
-  isInCensus?: boolean
-  voted?: string
-  votesLeft?: number
-}
 export type ElectionClientSetPayload = VocdoniSDKClient
 export type ElectionCspStep0Payload = string
 export type ElectionCspStep1Payload = string
@@ -61,7 +56,6 @@ export type ElectionVotingErrorPayload = ErrorPayload
 export type ElectionActionPayload =
   | CensusErrorPayload
   | CensusLoadPayload
-  | CensusSetPayload
   | ElectionErrorPayload
   | ElectionInCensusPayload
   | ElectionSetPayload
@@ -191,29 +185,12 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       }
     }
 
-    case CensusSet: {
-      const payload = action.payload as CensusSetPayload
-      const nstate = {
-        ...state,
-        ...payload,
-      }
-      // clear information related to census
-      if (!nstate.isInCensus) {
-        // we do this here, so it's available for the isAbleToVote calculation below
-        nstate.voted = null
-        nstate.votesLeft = 0
-      }
+    case CensusIsAbleToVote: {
+      const payload = action.payload as CensusIsAbleToVotePayload
       return {
-        ...nstate,
-        loading: {
-          ...state.loading,
-          census: false,
-        },
-        loaded: {
-          ...state.loaded,
-          census: true,
-        },
-        isAbleToVote: (nstate.votesLeft > 0 && nstate.isInCensus) || state.election?.census.type === CensusType.CSP,
+        ...state,
+        isAbleToVote:
+          payload || (state.votesLeft > 0 && state.isInCensus) || state.election?.census.type === CensusType.CSP,
       }
     }
 
@@ -430,9 +407,9 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
       error: (error: ElectionErrorPayload) => dispatch({ type: ElectionError, payload: error }),
       loadCensus: (voter: string) => dispatch({ type: CensusLoad, payload: voter }),
       censusError: (error: CensusErrorPayload) => dispatch({ type: CensusError, payload: error }),
-      setCensus: (info?: CensusSetPayload) => dispatch({ type: CensusSet, payload: info }),
       setVote: (vote: Vote) => dispatch({ type: ElectionVoteSet, payload: vote }),
       inCensus: (isIn: boolean) => dispatch({ type: ElectionInCensus, payload: isIn }),
+      isAbleToVote: (isAble?: boolean) => dispatch({ type: CensusIsAbleToVote, payload: isAble }),
       voted: (voted: string) => dispatch({ type: ElectionVoted, payload: voted }),
       voting: () => dispatch({ type: ElectionVoting }),
       votesLeft: (votesLeft: number) => dispatch({ type: ElectionVotesLeft, payload: votesLeft }),
