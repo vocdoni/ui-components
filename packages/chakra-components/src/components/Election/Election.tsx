@@ -179,7 +179,6 @@ export const useElectionProvider = ({
     try {
       const vote = new Vote(mapped)
       actions.setVote(vote)
-      // setVoteInstance(vote)
       if (typeof beforeSubmit === 'function' && !beforeSubmit(vote)) {
         return
       }
