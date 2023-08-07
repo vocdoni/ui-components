@@ -26,10 +26,12 @@ Included packages
 For now, there's only a single package published, but we may split it in the
 future, or create new ones for other frameworks:
 
-- [`@vocdoni/chakra-components`] React components and hooks built with chakra
-  for easily integrating Vocdoni services.
+- [`@vocdoni/chakra-components`] React components built with chakra for easily
+  integrating Vocdoni services.
 - [`@vocdoni/rainbowkit-wallets`] A set of wallets for rainbowkit, reducing the
   technical gap for users, not requiring them to have a Web3 wallet.
+- [`@vocdoni/react-providers`] React providers and hooks, where most of the magic
+  of react apps happens (and for other packages like [`@vocdoni/chakra-components`])
 
 Development
 -----------
@@ -78,3 +80,4 @@ with them.
 [`templates`]: ./templates
 [`@vocdoni/chakra-components`]: ./packages/chakra-components/README.md
 [`@vocdoni/rainbowkit-wallets`]: ./packages/rainbowkit-wallets/README.md
+[`@vocdoni/react-providers`]: ./packages/react-providers/README.md

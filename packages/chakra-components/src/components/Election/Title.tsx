@@ -1,7 +1,6 @@
 import { HeadingProps } from '@chakra-ui/layout'
 import { chakra, forwardRef, omitThemingProps, useStyleConfig } from '@chakra-ui/system'
-
-import { useElection } from './Election'
+import { useElection } from '@vocdoni/react-providers'
 
 export const ElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
   const { election } = useElection()

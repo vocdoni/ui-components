@@ -1,6 +1,6 @@
 import { HeadingProps } from '@chakra-ui/layout'
 import { chakra, forwardRef, omitThemingProps, useStyleConfig } from '@chakra-ui/system'
-import { useOrganization } from './Organization'
+import { useOrganization } from '@vocdoni/react-providers'
 
 export const OrganizationName = forwardRef<HeadingProps, 'h1'>((props, ref) => {
   const { organization } = useOrganization()

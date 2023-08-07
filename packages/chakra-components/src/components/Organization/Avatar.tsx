@@ -1,6 +1,6 @@
 import { useStyleConfig } from '@chakra-ui/system'
+import { useOrganization } from '@vocdoni/react-providers'
 import { Image, IPFSImageProps } from '../layout'
-import { useOrganization } from './Organization'
 
 export const OrganizationAvatar = (props: IPFSImageProps) => {
   const styles = useStyleConfig('OrganizationAvatar', props)

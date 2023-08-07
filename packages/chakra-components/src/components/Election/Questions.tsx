@@ -3,18 +3,17 @@ import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Link, Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, IQuestion, InvalidElection } from '@vocdoni/sdk'
-import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { Controller, FieldValues, FormProvider, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
-import { useClient } from '../../client'
 import { environment } from '../../environment'
 import { Markdown } from '../layout'
-import { useElection } from './Election'
 
 export const ElectionQuestions = (props: ChakraProps) => {
   const {
     election,
-    vote,
+    vote: bvote,
     voted,
     errors: { voting: error },
     localize,
@@ -38,6 +37,8 @@ export const ElectionQuestions = (props: ChakraProps) => {
       </Alert>
     )
   }
+
+  const vote = (values: FieldValues) => bvote(election.questions.map((q, k) => parseInt(values[k.toString()], 10)))
 
   return (
     <chakra.div __css={styles.wrapper} {...props}>

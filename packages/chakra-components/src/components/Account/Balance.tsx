@@ -1,5 +1,5 @@
 import { Tag, TagProps } from '@chakra-ui/tag'
-import { useClient } from '../../client'
+import { useClient } from '@vocdoni/react-providers'
 
 export const Balance = (props: TagProps) => {
   const { balance } = useClient()

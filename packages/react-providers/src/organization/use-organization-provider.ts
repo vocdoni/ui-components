@@ -1,8 +1,6 @@
-import { ChakraProps } from '@chakra-ui/system'
 import { Account, AccountData, areEqualHexStrings } from '@vocdoni/sdk'
-import { PropsWithChildren, createContext, useContext, useEffect } from 'react'
-import { useClient } from '../../client'
-import { OrganizationName } from './Name'
+import { useEffect } from 'react'
+import { useClient } from '../client'
 import { useOrganizationReducer } from './use-organization-reducer'
 
 export type OrganizationProviderProps = {
@@ -51,34 +49,3 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
     update,
   }
 }
-
-export type OrganizationState = ReturnType<typeof useOrganizationProvider>
-
-export const OrganizationContext = createContext<OrganizationState | undefined>(undefined)
-
-export const useOrganization = () => {
-  const ctxt = useContext(OrganizationContext)
-  if (!ctxt) {
-    throw new Error(
-      'useElection returned `undefined`, maybe you forgot to wrap the component within <ElectionProvider />?'
-    )
-  }
-
-  return ctxt
-}
-
-export type OrganizationProviderComponentProps = OrganizationProviderProps & ChakraProps
-
-export const OrganizationProvider = ({ children, ...rest }: PropsWithChildren<OrganizationProviderComponentProps>) => {
-  const value = useOrganizationProvider(rest)
-
-  return <OrganizationContext.Provider value={value}>{children}</OrganizationContext.Provider>
-}
-OrganizationProvider.displayName = 'OrganizationProvider'
-
-export const Organization = (props: OrganizationProviderComponentProps) => (
-  <OrganizationProvider {...props}>
-    <OrganizationName />
-  </OrganizationProvider>
-)
-Organization.displayName = 'Election'

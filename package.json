@@ -24,5 +24,8 @@
     "lint:fix": "prettier -c . --write",
     "lint": "prettier -c ."
   },
+  "dependencies": {
+    "tsup": "^7.2.0"
+  },
   "packageManager": "yarn@1.22.19"
 }

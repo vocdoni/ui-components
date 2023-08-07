@@ -1,4 +1,4 @@
-import { defineStyleConfig } from '@chakra-ui/system'
+import { defineStyleConfig } from '@chakra-ui/styled-system'
 
 export const HorizontalRuler = defineStyleConfig({
   baseStyle: {

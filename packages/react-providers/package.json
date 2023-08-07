@@ -1,0 +1,47 @@
+{
+  "name": "@vocdoni/react-providers",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/react-providers#readme",
+  "bugs": "https://github.com/vocdoni/ui-components/issues",
+  "repository": "github.com:vocdoni/ui-components",
+  "description": "Vocdoni's react providers",
+  "keywords": [
+    "react",
+    "context",
+    "blockchain",
+    "voting"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "lint": "tsc",
+    "build": "tsup src --dts",
+    "prepack": "clean-package"
+  },
+  "main": "src/index.ts",
+  "dependencies": {
+    "@vocdoni/sdk": "^0.0.18"
+  },
+  "peerDependencies": {
+    "@vocdoni/sdk": "^0.0.18",
+    "react": ">= 16.8.0"
+  },
+  "devDependencies": {
+    "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/wallet": "^5.7.0",
+    "@types/react": "^18.0.30",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "latinize": "^0.5.0",
+    "react": "18.2.0",
+    "ts-deepmerge": "^6.2.0",
+    "tsconfig": "*",
+    "typescript": "^4.9.5"
+  },
+  "clean-package": "../../clean-package.config.json"
+}

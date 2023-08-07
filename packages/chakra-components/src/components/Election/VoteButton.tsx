@@ -1,7 +1,6 @@
 import { Button, ButtonProps } from '@chakra-ui/button'
+import { useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
-import { useClient } from '../../client'
-import { useElection } from './Election'
 
 export const VoteButton = (props: ButtonProps) => {
   const { connected } = useClient()

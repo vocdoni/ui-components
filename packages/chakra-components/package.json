@@ -1,6 +1,6 @@
 {
   "name": "@vocdoni/chakra-components",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/chakra-components#readme",
   "bugs": "https://github.com/vocdoni/ui-components/issues",
@@ -17,30 +17,13 @@
     "dist"
   ],
   "scripts": {
-    "dev": "NODE_ENV=development yarn build --watch",
     "lint": "tsc",
-    "build": "vite build",
-    "size": "size-limit",
-    "preview": "vite preview",
-    "prepack": "json -f package.json -I -e \"delete this.devDependencies; delete this.dependencies\""
+    "build": "tsup src --dts",
+    "prepack": "clean-package"
   },
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    "import": "./dist/index.es.js",
-    "require": "./dist/index.cjs.js"
-  },
+  "main": "src/index.ts",
   "dependencies": {
-    "@vocdoni/sdk": "^0.0.18",
-    "date-fns": "^2.29.3",
-    "latinize": "^0.5.0",
-    "react-hook-form": "^7.43.8",
-    "react-icons": "^4.8.0",
-    "react-markdown": "^8.0.6",
-    "react-string-replace": "^1.1.0",
-    "remark-gfm": "^3.0.1",
-    "ts-deepmerge": "^6.0.3"
+    "@vocdoni/react-providers": "0.1.0"
   },
   "peerDependencies": {
     "@chakra-ui/alert": "^2.0.18",
@@ -68,6 +51,7 @@
     "@chakra-ui/form-control": "^2.0.18",
     "@chakra-ui/image": "^2.0.13",
     "@chakra-ui/layout": "^2.1.17",
+    "@chakra-ui/progress": "^2.1.6",
     "@chakra-ui/radio": "^2.0.22",
     "@chakra-ui/system": "2.5.5",
     "@chakra-ui/table": "^2.0.17",
@@ -76,32 +60,26 @@
     "@chakra-ui/toast": "^6.1.1",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
-    "@size-limit/file": "^8.2.4",
-    "@types/latinize": "^0.2.15",
     "@types/react": "^18.0.30",
     "@types/react-dom": "^18.0.11",
-    "@vitejs/plugin-react": "^3.0.0",
+    "@vocdoni/react-providers": "*",
+    "@vocdoni/sdk": "^0.0.18",
+    "clean-package": "^2.2.0",
+    "date-fns": "^2.29.3",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-prettier": "^4.2.1",
-    "json": "^11.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "size-limit": "^8.2.4",
+    "react-hook-form": "^7.43.8",
+    "react-icons": "^4.8.0",
+    "react-markdown": "^8.0.6",
+    "react-string-replace": "^1.1.0",
+    "remark-gfm": "^3.0.1",
+    "ts-deepmerge": "^6.0.3",
     "tsconfig": "*",
-    "typescript": "^4.9.5",
-    "vite": "^4.2.1",
-    "vite-plugin-dts": "^2.1.0"
+    "typescript": "^4.9.5"
   },
-  "size-limit": [
-    {
-      "path": "dist/index.es.js",
-      "limit": "50 KB"
-    },
-    {
-      "path": "dist/index.cjs.js",
-      "limit": "50 KB"
-    }
-  ]
+  "clean-package": "../../clean-package.config.json"
 }

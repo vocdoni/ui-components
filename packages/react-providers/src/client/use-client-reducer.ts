@@ -2,8 +2,16 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { Reducer, useReducer } from 'react'
-import { ClientProviderProps } from './client'
-import { errorToString } from './utils'
+import type { ErrorPayload } from '../types'
+import { errorToString } from '../utils'
+
+export type ClientEnv = `${EnvOptions}` | EnvOptions
+
+export type ClientReducerProps = {
+  client?: VocdoniSDKClient
+  env?: ClientEnv
+  signer?: Wallet | Signer
+}
 
 export const ClientAccountError = 'client:account:error'
 export const ClientAccountFetch = 'client:account:fetch'
@@ -16,13 +24,11 @@ export const ClientEnvSet = 'client:env:set'
 export const ClientSet = 'client:set'
 export const ClientSignerSet = 'client:signer:set'
 
-export type ErrorPayload = any | unknown
-
 export type ClientAccountErrorPayload = ErrorPayload
 export type ClientAccountSetPayload = AccountData
 export type ClientBalanceErrorPayload = ErrorPayload
 export type ClientBalanceSetPayload = number
-export type ClientEnvSetPayload = `${EnvOptions}` | EnvOptions
+export type ClientEnvSetPayload = ClientEnv
 export type ClientSetPayload = VocdoniSDKClient
 export type ClientSignerSetPayload = Signer | Wallet
 
@@ -258,7 +264,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
   }
 }
 
-export const useClientReducer = ({ env, client, signer }: ClientProviderProps) => {
+export const useClientReducer = ({ env, client, signer }: ClientReducerProps) => {
   const [state, dispatch] = useReducer(
     clientReducer,
     clientStateEmpty(env as EnvOptions, client as VocdoniSDKClient, signer as Wallet | Signer)
