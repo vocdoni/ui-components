@@ -1,3 +1,5 @@
+import type { RecursivePartial } from '@vocdoni/react-providers'
+
 export const locales = {
   // actions component
   actions: {
@@ -42,17 +44,6 @@ export const locales = {
     process_unknown: 'Unknown',
     invalid: 'Invalid',
   },
-  errors: {
-    unauthorized: 'Not authorized to vote',
-  },
-}
-
-type RecursivePartial<T> = {
-  [P in keyof T]?: T[P] extends (infer U)[]
-    ? RecursivePartial<U>[]
-    : T[P] extends object
-    ? RecursivePartial<T[P]>
-    : T[P]
 }
 
 export type Locale = RecursivePartial<typeof locales>

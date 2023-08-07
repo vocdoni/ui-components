@@ -1,7 +1,7 @@
 import Error404 from '@elements/Error404'
 import RouteError from '@elements/RouteError'
 import Layout from '@src/Layout'
-import { useClient } from '@vocdoni/chakra-components'
+import { useClient } from '@vocdoni/react-providers'
 import { lazy } from 'react'
 import { createHashRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
 import { SuspenseLoader } from './SuspenseLoader'

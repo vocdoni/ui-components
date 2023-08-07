@@ -1,7 +1,6 @@
 import { Tag, TagProps } from '@chakra-ui/tag'
+import { useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
-
-import { useElection } from './Election'
 
 export const ElectionStatusBadge = (props: TagProps) => {
   const { election, localize } = useElection()

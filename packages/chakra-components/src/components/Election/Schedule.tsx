@@ -1,10 +1,8 @@
 import { HeadingProps } from '@chakra-ui/layout'
 import { chakra, forwardRef, useMultiStyleConfig } from '@chakra-ui/system'
-import { format as dformat } from 'date-fns'
-
+import { useDatesLocale, useElection, useLocalize } from '@vocdoni/react-providers'
 import { InvalidElection } from '@vocdoni/sdk'
-import { useDatesLocale, useLocalize } from '../../i18n/localize'
-import { useElection } from './Election'
+import { format as dformat } from 'date-fns'
 
 export type ElectionScheduleProps = HeadingProps & {
   format?: string

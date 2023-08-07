@@ -34,6 +34,10 @@ const App = () => {
 }
 ~~~
 
+> Beware that you'll also see a `ClientProvider` also from
+> `@vocdoni/react-providers`. You should always be using the one included with
+> chakra components in order to have all the features they provide.
+
 Note `env` can be any of the [SDK available environments][sdk environments],
 either in string format, or using the SDK `EnvOptions` enum.
 

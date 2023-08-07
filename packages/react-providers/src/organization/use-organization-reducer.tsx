@@ -1,7 +1,7 @@
 import { AccountData } from '@vocdoni/sdk'
 import { Reducer, useReducer } from 'react'
-import { ErrorPayload } from '../../use-client-reducer'
-import { errorToString } from '../../utils'
+import { ErrorPayload } from '../types'
+import { errorToString } from '../utils'
 
 export const OrganizationLoadError = 'organization:load:error'
 export const OrganizationLoading = 'organization:loading'

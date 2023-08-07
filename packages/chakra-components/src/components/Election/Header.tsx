@@ -1,7 +1,6 @@
 import { useStyleConfig } from '@chakra-ui/system'
-
+import { useElection } from '@vocdoni/react-providers'
 import { Image, IPFSImageProps } from '../layout'
-import { useElection } from './Election'
 
 export const ElectionHeader = (props: IPFSImageProps) => {
   const styles = useStyleConfig('ElectionHeader', props)

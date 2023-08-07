@@ -6,3 +6,5 @@ vite.config.ts.timestamp-*.mjs
 .vscode
 .yarn
 .yarnrc*
+
+package.json.backup

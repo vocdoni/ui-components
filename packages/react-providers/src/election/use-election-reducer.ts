@@ -1,8 +1,9 @@
 import { CensusType, PublishedElection, VocdoniSDKClient, Vote, areEqualHexStrings } from '@vocdoni/sdk'
 import { Reducer, useEffect, useReducer } from 'react'
-import { useClient } from '../../client'
-import { ClientSetPayload, ErrorPayload } from '../../use-client-reducer'
-import { errorToString } from '../../utils'
+import { useClient } from '../client'
+import { ClientSetPayload } from '../client/use-client-reducer'
+import type { ErrorPayload } from '../types'
+import { errorToString } from '../utils'
 
 export const CensusClear = 'election:census:clear'
 export const CensusError = 'election:census:error'
