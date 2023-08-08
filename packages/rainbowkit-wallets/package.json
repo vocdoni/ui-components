@@ -10,7 +10,8 @@
   "scripts": {
     "lint": "tsc",
     "build": "tsup src --dts",
-    "prepack": "clean-package"
+    "prepack": "clean-package",
+    "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {
     "ethers": "^5",

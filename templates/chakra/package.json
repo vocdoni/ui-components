@@ -1,5 +1,5 @@
 {
-  "name": "@vocdoni/templates-react",
+  "name": "vocdoni-vite-react-app-template",
   "private": true,
   "license": "unlicense",
   "version": "0.0.1",
