@@ -1,36 +1,33 @@
 {
   "name": "@vocdoni/rainbowkit-wallets",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    "import": "./dist/index.es.js",
-    "require": "./dist/index.cjs.js"
-  },
+  "main": "src/index.ts",
   "type": "module",
   "files": [
     "dist"
   ],
   "scripts": {
-    "dev": "NODE_ENV=development yarn build --watch",
     "lint": "tsc",
-    "build": "vite build",
-    "size": "size-limit",
-    "preview": "vite preview",
-    "prepack": "json -f package.json -I -e \"delete this.devDependencies\""
+    "build": "tsup src --dts",
+    "prepack": "clean-package"
   },
-  "dependencies": {
+  "peerDependencies": {
     "ethers": "^5",
-    "wagmi": "^0.12"
+    "wagmi": "^0.12",
+    "@wagmi/core": "^0.10.17"
   },
   "devDependencies": {
+    "@types/react-modal": "^3.16.0",
+    "clean-package": "^2.2.0",
+    "ethers": "^5",
     "localforage": "^1.10.0",
     "react-modal": "^3.16.1",
     "tsconfig": "*",
     "typescript": "^4.9.5",
     "vite": "^4.4.2",
-    "vite-plugin-dts": "^3.2.0"
-  }
+    "vite-plugin-dts": "^3.2.0",
+    "wagmi": "^0.12"
+  },
+  "clean-package": "../../clean-package.config.json"
 }
