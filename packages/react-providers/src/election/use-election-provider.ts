@@ -190,7 +190,7 @@ export const useElectionProvider = ({
     if (!vote) {
       throw new Error('no vote instance')
     }
-    if (election.census.type !== CensusType.WEIGHTED) {
+    if (election?.census?.type !== CensusType.WEIGHTED) {
       throw new Error('not a Weighted election')
     }
 
@@ -200,7 +200,6 @@ export const useElectionProvider = ({
   // CSP OAuth flow
   const cspAuthAndVote = async () => {
     const {
-      election,
       csp: { handler },
     } = state
     if (!client) {
@@ -209,7 +208,7 @@ export const useElectionProvider = ({
     if (!election) {
       throw new Error('no election initialized')
     }
-    if (election.census.type !== CensusType.CSP) {
+    if (election?.census?.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
 
