@@ -126,7 +126,7 @@ export const useElectionProvider = ({
         }
       }
 
-      if (window.opener || !client || election?.census.type !== CensusType.CSP) {
+      if (window.opener || !client || election?.census?.type !== CensusType.CSP) {
         return
       }
 
@@ -137,7 +137,7 @@ export const useElectionProvider = ({
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, election?.census.type])
+  }, [client, election?.census?.type])
 
   // CSP OAuth flow
   // Posting the message to the main window
@@ -206,7 +206,7 @@ export const useElectionProvider = ({
     if (!vote) {
       throw new Error('no vote instance')
     }
-    if (election?.census.type !== CensusType.WEIGHTED) {
+    if (election?.census?.type !== CensusType.WEIGHTED) {
       throw new Error('not a Weighted election')
     }
 
@@ -314,7 +314,7 @@ export const useElectionProvider = ({
       throw new Error('no client initialized')
     }
 
-    if (election?.census.type !== CensusType.CSP) {
+    if (election?.census?.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
 
