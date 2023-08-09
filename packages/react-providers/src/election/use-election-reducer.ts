@@ -9,6 +9,7 @@ export const CensusClear = 'election:census:clear'
 export const CensusError = 'election:census:error'
 export const CensusIsAbleToVote = 'election:census:is_able_to_vote'
 export const CensusLoad = 'election:census:load'
+export const ElectionConnect = 'election:connect'
 export const ElectionClientSet = 'election:client:set'
 export const ElectionCspStep0 = 'election:csp:step_0'
 export const ElectionCspStep1 = 'election:csp:step_1'
@@ -30,6 +31,7 @@ export type ElectionActionType =
   | typeof ElectionClientSet
   | typeof ElectionCspStep0
   | typeof ElectionCspStep1
+  | typeof ElectionConnect
   | typeof ElectionError
   | typeof ElectionInCensus
   | typeof ElectionLoad
@@ -74,6 +76,7 @@ export interface ElectionAction {
 
 export interface ElectionReducerState {
   client: VocdoniSDKClient
+  connected: boolean
   id: string | undefined
   isAbleToVote: boolean | undefined
   isInCensus: boolean
@@ -111,6 +114,7 @@ export const ElectionStateEmpty = ({
   election?: PublishedElection
 }): ElectionReducerState => ({
   client,
+  connected: false,
   id: election?.id || undefined,
   isAbleToVote: undefined,
   isInCensus: false,
@@ -148,6 +152,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
     case CensusClear: {
       return {
         ...state,
+        connected: false,
         voted: null,
         loading: {
           ...state.loading,
@@ -226,6 +231,13 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
           ...state.csp,
           token,
         },
+      }
+    }
+
+    case ElectionConnect: {
+      return {
+        ...state,
+        connected: true,
       }
     }
 
@@ -421,6 +433,7 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
         setClient(client)
       },
       load: (id?: string) => dispatch({ type: ElectionLoad, payload: id }),
+      login: () => dispatch({ type: ElectionConnect }),
       csp0: (token: string) => dispatch({ type: ElectionCspStep0, payload: token }),
       csp1: (token: string) => dispatch({ type: ElectionCspStep1, payload: token }),
       error: (error: ElectionErrorPayload) => dispatch({ type: ElectionError, payload: error }),

@@ -1,12 +1,14 @@
 import { Button, ButtonProps } from '@chakra-ui/button'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
+import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 export const VoteButton = (props: ButtonProps) => {
   const { connected } = useClient()
   const {
     client,
     loading: { voting },
+    connected: lconnected,
     ConnectButton,
     isAbleToVote,
     election,
@@ -17,8 +19,12 @@ export const VoteButton = (props: ButtonProps) => {
 
   if (election instanceof InvalidElection) return null
 
-  if (!connected && ConnectButton) {
+  if (!connected && election?.get('census.type') !== 'spreadsheet' && ConnectButton) {
     return <ConnectButton />
+  }
+
+  if (!lconnected && election?.get('census.type') === 'spreadsheet') {
+    return <SpreadsheetAccess />
   }
 
   return (

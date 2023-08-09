@@ -316,9 +316,10 @@ export const useElectionProvider = ({
     ...rest,
     ...state,
     fetchElection,
-    clearClient: actions.clearClient,
-    setClient: actions.setClient,
     localize,
     vote,
+    clearClient: actions.clearClient,
+    login: actions.login,
+    setClient: actions.setClient,
   }
 }

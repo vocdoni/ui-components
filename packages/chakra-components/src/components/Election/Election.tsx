@@ -12,6 +12,7 @@ import {
   ElectionTitle,
   VoteButton,
 } from './'
+import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 export const Election = (props: ElectionProviderComponentProps) => (
   <ElectionProvider {...props} fetchCensus>
@@ -25,6 +26,8 @@ Election.displayName = 'Election'
 const ElectionBody = () => {
   const {
     errors: { election: error },
+    election,
+    connected,
   } = useElection()
 
   if (error) {
@@ -47,6 +50,7 @@ const ElectionBody = () => {
       <HR />
       <ElectionQuestions />
       <VoteButton />
+      {election?.get('census.type') === 'spreadsheet' && connected && <SpreadsheetAccess />}
       <ElectionResults />
     </>
   )

@@ -1,4 +1,4 @@
-import { ensure0x } from '@vocdoni/sdk'
+import { VocdoniSDKClient, ensure0x } from '@vocdoni/sdk'
 import latinize from 'latinize'
 
 /**
@@ -48,4 +48,10 @@ export const normalizeText = (text?: string): string => {
     .toLowerCase()
 
   return latinize(result)
+}
+
+export const walletFromRow = (organization: string, row: string[]) => {
+  const normalized = row.map(normalizeText)
+  normalized.push(organization)
+  return VocdoniSDKClient.generateWalletFromData(normalized)
 }

@@ -24,6 +24,10 @@ export const locales = {
     voted_title: 'Your vote was successfully cast!',
   },
   empty: 'Apparently this process has no questions 🤔',
+  errors: {
+    wrong_data_title: 'Wrong data',
+    wrong_data_description: 'The specified data is not correct',
+  },
   required: 'This field is required',
   schedule: 'Voting from {{ begin }} to {{ end }}',
   // results component
@@ -43,6 +47,11 @@ export const locales = {
     upcoming: 'Upcoming',
     process_unknown: 'Unknown',
     invalid: 'Invalid',
+  },
+  spreadsheet: {
+    access_button: 'Identify',
+    close: 'Close',
+    modal_title: 'You must identify first',
   },
 }
 
