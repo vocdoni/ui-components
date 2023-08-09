@@ -1,4 +1,4 @@
-import { CensusType, CspVote, PublishedElection, Vote, areEqualHexStrings } from '@vocdoni/sdk'
+import { areEqualHexStrings, CensusType, CspVote, PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect } from 'react'
 import { useClient } from '../client'
 import { useElectionReducer } from './use-election-reducer'
@@ -316,6 +316,7 @@ export const useElectionProvider = ({
     ...rest,
     ...state,
     fetchElection,
+    clearClient: actions.clearClient,
     setClient: actions.setClient,
     localize,
     vote,
