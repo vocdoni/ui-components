@@ -7,6 +7,7 @@ import { createHashRouter, createRoutesFromElements, Route, RouterProvider } fro
 import { SuspenseLoader } from './SuspenseLoader'
 
 const Home = lazy(() => import('@elements/Home'))
+const Organization = lazy(() => import('@elements/Organization'))
 const Vote = lazy(() => import('@elements/Vote'))
 
 export const RoutesProvider = () => {
@@ -30,6 +31,15 @@ export const RoutesProvider = () => {
           }
           path='/process/:pid'
           loader={async ({ params }) => await client.fetchElection(params.pid)}
+        />
+        <Route
+          element={
+            <SuspenseLoader>
+              <Organization />
+            </SuspenseLoader>
+          }
+          path='/organization/:pid'
+          loader={async ({ params }) => await client.fetchAccountInfo(params.pid)}
         />
         <Route path='*' element={<Error404 />} />
       </Route>
