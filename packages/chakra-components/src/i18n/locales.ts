@@ -16,10 +16,16 @@ export const locales = {
       'Pause the voting process temporarily, until resumed manually. While the process is paused, voters cannot submit votes.',
     waiting_title: 'Waiting for transaction confirmation...',
   },
+  confirm: {
+    title: 'Confirm',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+  },
   // questions and vote button
   vote: {
     button_update: 'Re-submit vote',
     button: 'Vote',
+    confirm: 'Please confirm your choices:',
     voted_description: 'Your vote id is {{ id }}. You can use it to verify your vote.',
     voted_title: 'Your vote was successfully cast!',
   },
@@ -52,6 +58,7 @@ export const locales = {
     access_button: 'Identify',
     close: 'Close',
     modal_title: 'You must identify first',
+    logout: 'Logout',
   },
 }
 

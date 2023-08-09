@@ -1,13 +1,14 @@
 import { Alert, AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/alert'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
-import { Link, Stack } from '@chakra-ui/layout'
+import { Box, Link, Stack, Text } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
-import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { ChakraProps, chakra, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, IQuestion, InvalidElection } from '@vocdoni/sdk'
 import { Controller, FieldValues, FormProvider, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
 import { environment } from '../../environment'
+import useConfirm from '../../utils/use-confirm'
 import { Markdown } from '../layout'
 
 export const ElectionQuestions = (props: ChakraProps) => {
@@ -22,6 +23,7 @@ export const ElectionQuestions = (props: ChakraProps) => {
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
+  const { isConfirmed } = useConfirm()
 
   if (election instanceof InvalidElection) return null
 
@@ -38,7 +40,16 @@ export const ElectionQuestions = (props: ChakraProps) => {
     )
   }
 
-  const vote = (values: FieldValues) => bvote(election.questions.map((q, k) => parseInt(values[k.toString()], 10)))
+  const vote = async (values: FieldValues) => {
+    if (
+      election.get('census.type') === 'spreadsheet' &&
+      !(await isConfirmed(<QuestionsConfirmation questions={questions} answers={values} />))
+    ) {
+      return false
+    }
+
+    return bvote(election.questions.map((q, k) => parseInt(values[k.toString()], 10)))
+  }
 
   return (
     <chakra.div __css={styles.wrapper} {...props}>
@@ -57,6 +68,32 @@ export const ElectionQuestions = (props: ChakraProps) => {
         </form>
       </FormProvider>
     </chakra.div>
+  )
+}
+
+type QuestionsConfirmationProps = {
+  answers: FieldValues
+  questions: IQuestion[]
+}
+
+export const QuestionsConfirmation = ({ answers, questions, ...rest }: QuestionsConfirmationProps) => {
+  const styles = useMultiStyleConfig('QuestionsConfirmation', rest)
+  const props = omitThemingProps(rest)
+  const { localize } = useClient()
+
+  return (
+    <Box {...props} sx={styles.box}>
+      <Text sx={styles.description}>{localize('vote.confirm')}</Text>
+      {questions.map((q, k) => {
+        const choice = q.choices.find((v) => v.value === parseInt(answers[k.toString()], 10))
+        return (
+          <chakra.div key={k} __css={styles.question}>
+            <chakra.div __css={styles.title}>{q.title.default}</chakra.div>
+            <chakra.div __css={styles.answer}>{choice?.title.default}</chakra.div>
+          </chakra.div>
+        )
+      })}
+    </Box>
   )
 }
 

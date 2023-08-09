@@ -1,6 +1,7 @@
+import { ConfirmModalTheme } from './confirm'
 import { ElectionScheduleTheme as ElectionSchedule, ElectionTitleTheme as ElectionTitle } from './election'
-import { HorizontalRuler } from './layout'
-import { QuestionsTheme as ElectionQuestions } from './questions'
+import { HorizontalRulerTheme } from './layout'
+import { QuestionsTheme as ElectionQuestions, QuestionsConfirmationTheme } from './questions'
 import { ResultsTheme as ElectionResults } from './results'
 import { SpreadsheetAccessTheme } from './spreadsheet'
 
@@ -10,8 +11,10 @@ export const theme = {
     ElectionResults,
     ElectionSchedule,
     ElectionTitle,
-    HorizontalRuler,
+    HorizontalRuler: HorizontalRulerTheme,
     SpreadsheetAccess: SpreadsheetAccessTheme,
+    ConfirmModal: ConfirmModalTheme,
+    QuestionsConfirmation: QuestionsConfirmationTheme,
   } as any,
 }
 

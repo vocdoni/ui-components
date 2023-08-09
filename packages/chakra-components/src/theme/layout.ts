@@ -1,6 +1,6 @@
 import { defineStyleConfig } from '@chakra-ui/styled-system'
 
-export const HorizontalRuler = defineStyleConfig({
+export const HorizontalRulerTheme = defineStyleConfig({
   baseStyle: {
     width: '100%',
     height: '2px',

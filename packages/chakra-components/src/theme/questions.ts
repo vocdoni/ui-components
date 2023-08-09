@@ -28,6 +28,17 @@ export const questionsAnatomy = [
   'error',
 ]
 
+export const questionsConfirmationAnatomy = [
+  // confirmation wrapper box
+  'box',
+  // description text
+  'description',
+  // question wrapper
+  'question',
+  'title',
+  'answer',
+]
+
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsAnatomy)
 
 const baseStyle = definePartsStyle({
@@ -46,4 +57,23 @@ const baseStyle = definePartsStyle({
 
 export const QuestionsTheme = defineMultiStyleConfig({
   baseStyle,
+})
+
+const { defineMultiStyleConfig: defineConfirmStyle, definePartsStyle: defineConfirmParts } =
+  createMultiStyleConfigHelpers(questionsConfirmationAnatomy)
+
+export const QuestionsConfirmationTheme = defineConfirmStyle({
+  baseStyle: defineConfirmParts({
+    question: {
+      '& + &': {
+        marginTop: 4,
+      },
+    },
+    description: {
+      marginBottom: 4,
+    },
+    title: {
+      fontWeight: 'bold',
+    },
+  }),
 })
