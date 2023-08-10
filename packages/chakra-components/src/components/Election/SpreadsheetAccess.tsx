@@ -25,7 +25,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
   const { env } = useClient()
-  const { election, setClient, localize, login } = useElection()
+  const { election, setClient, localize } = useElection()
   const fields: string[] = dotobject(election, 'meta.census.fields')
   const {
     register,
@@ -53,7 +53,6 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       }
       // in case of success, set current client
       setClient(client)
-      login()
       // also, close the modal
       onClose()
     } catch (e) {

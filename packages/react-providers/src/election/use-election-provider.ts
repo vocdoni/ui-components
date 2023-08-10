@@ -319,7 +319,6 @@ export const useElectionProvider = ({
     localize,
     vote,
     clearClient: actions.clearClient,
-    login: actions.login,
     setClient: actions.setClient,
   }
 }
