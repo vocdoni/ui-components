@@ -1,6 +1,6 @@
 import { Address, Chain, Connector, UserRejectedRequestError, normalizeChainId } from '@wagmi/core'
 import { Signer, Wallet, ethers, getDefaultProvider } from 'ethers'
-import { getAddress } from 'ethers/lib/utils'
+import { getAddress } from 'ethers/lib/utils.js'
 import { ConnectorData } from 'wagmi'
 import localStorageWallet from '../lib/localStorageWallet'
 
