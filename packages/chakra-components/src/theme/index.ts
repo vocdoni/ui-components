@@ -19,6 +19,9 @@ export const theme = {
 }
 
 export * from './actions'
+export * from './confirm'
 export * from './election'
+export * from './layout'
 export * from './questions'
 export * from './results'
+export * from './spreadsheet'
