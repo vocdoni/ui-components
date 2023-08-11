@@ -22,7 +22,7 @@
     "build": "turbo build --filter=@vocdoni*",
     "lint:fix": "prettier -c . --write",
     "lint": "prettier -c .",
-    "clean": "turbo clean --filter=@vocdoni*"
+    "clean": "turbo clean --filter=@vocdoni* && rm -fr node_modules"
   },
   "dependencies": {
     "tsup": "^7.2.0"
