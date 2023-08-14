@@ -24,7 +24,7 @@
   },
   "main": "src/index.ts",
   "dependencies": {
-    "@vocdoni/react-providers": "0.1.1"
+    "@vocdoni/react-providers": "*"
   },
   "peerDependencies": {
     "@chakra-ui/alert": "^2.0.18",
@@ -69,7 +69,6 @@
     "@ethersproject/wallet": "^5.7.0",
     "@types/react": "^18.0.30",
     "@types/react-dom": "^18.0.11",
-    "@vocdoni/react-providers": "*",
     "@vocdoni/sdk": "^0.0.18",
     "clean-package": "^2.2.0",
     "date-fns": "^2.29.3",
