@@ -395,7 +395,7 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
     if (!client) return
 
     // only propagate the client when census type !== spreadsheet (since it uses a locally instanced client)
-    if (state.election?.get('census.type') === 'spreadsheet') {
+    if (state.election?.meta && state.election?.get('census.type') === 'spreadsheet') {
       return
     }
 
