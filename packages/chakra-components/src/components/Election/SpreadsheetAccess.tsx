@@ -72,6 +72,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     message: localize('required'),
   }
 
+  if (election?.get('census.type') !== 'spreadsheet') return null
+
   if (connected) {
     return (
       <Button onClick={clearClient} sx={styles.disconnect}>
