@@ -208,7 +208,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
         isAbleToVote:
           payload ||
           (state.isInCensus && state.votesLeft > 0) ||
-          (state.isInCensus && state.election?.census.type === CensusType.ANONYMOUS) ||
+          (state.isInCensus && state.election?.electionType.anonymous) ||
           state.election?.census.type === CensusType.CSP,
       }
     }

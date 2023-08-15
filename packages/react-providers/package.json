@@ -24,10 +24,10 @@
   },
   "main": "src/index.ts",
   "dependencies": {
-    "@vocdoni/sdk": "^0.0.18"
+    "@vocdoni/sdk": "^0.1.1"
   },
   "peerDependencies": {
-    "@vocdoni/sdk": "^0.0.18",
+    "@vocdoni/sdk": "^0.1.1",
     "react": ">= 16.8.0"
   },
   "devDependencies": {

@@ -25,7 +25,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
   const { env } = useClient()
-  const { election, setClient, localize } = useElection()
+  const { election, setClient, localize, fetchCensus } = useElection()
   const fields: string[] = dotobject(election, 'meta.census.fields')
   const {
     register,
@@ -51,6 +51,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
           description: localize('errors.wrong_data_description'),
         })
       }
+      // use provider method to set related census state info
+      fetchCensus()
       // in case of success, set current client
       setClient(client)
       // also, close the modal

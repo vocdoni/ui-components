@@ -38,6 +38,28 @@ export const useElectionProvider = ({
     [actions, client]
   )
 
+  const censusFetch = useCallback(async () => {
+    const address = await client.wallet?.getAddress()
+    if (!election) return
+
+    try {
+      actions.loadCensus(address as string)
+      const isIn = await client.isInCensus(election.id)
+      actions.inCensus(isIn)
+      const censusType = election.census.type as CensusType
+
+      if (isIn && censusType === CensusType.WEIGHTED && !election.electionType.anonymous) {
+        actions.voted(await client.hasAlreadyVoted(election.id))
+
+        // no need to check votes left if member ain't in census
+        actions.votesLeft(await client.votesLeftCount(election.id))
+      }
+      actions.isAbleToVote()
+    } catch (e) {
+      actions.censusError(e)
+    }
+  }, [actions, client, election])
+
   // CSP OAuth flow
   // As vote setting and voting token are async, we need to wait for both to be set
   useEffect(() => {
@@ -73,22 +95,7 @@ export const useElectionProvider = ({
         return
       }
 
-      try {
-        actions.loadCensus(address as string)
-        const isIn = await client.isInCensus(election.id)
-        actions.inCensus(isIn)
-        const censusType = election.census.type as CensusType
-
-        if (isIn && censusType === CensusType.WEIGHTED) {
-          actions.voted(await client.hasAlreadyVoted(election.id))
-
-          // no need to check votes left if member ain't in census
-          actions.votesLeft(await client.votesLeftCount(election.id))
-        }
-        actions.isAbleToVote()
-      } catch (e) {
-        actions.censusError(e)
-      }
+      await censusFetch()
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote])
@@ -319,6 +326,7 @@ export const useElectionProvider = ({
     fetchElection,
     localize,
     vote,
+    fetchCensus: censusFetch,
     clearClient: actions.clearClient,
     setClient: actions.setClient,
   }
