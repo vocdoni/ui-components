@@ -429,8 +429,8 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
       set,
       setClient,
       clearClient: () => {
-        clear()
         setClient(client)
+        clear()
       },
       load: (id?: string) => dispatch({ type: ElectionLoad, payload: id }),
       csp0: (token: string) => dispatch({ type: ElectionCspStep0, payload: token }),
