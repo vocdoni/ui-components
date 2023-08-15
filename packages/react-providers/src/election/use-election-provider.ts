@@ -172,6 +172,7 @@ export const useElectionProvider = ({
         case CensusType.CSP:
           await cspAuthAndVote()
           break
+        case CensusType.ANONYMOUS:
         case CensusType.WEIGHTED:
           const vid = await weightedVote(vote)
           actions.voted(vid)
@@ -190,7 +191,7 @@ export const useElectionProvider = ({
     if (!vote) {
       throw new Error('no vote instance')
     }
-    if (election?.census?.type !== CensusType.WEIGHTED) {
+    if (![CensusType.WEIGHTED, CensusType.ANONYMOUS].includes(election!.census?.type)) {
       throw new Error('not a Weighted election')
     }
 
