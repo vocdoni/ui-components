@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
-import { AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { AccountData, EnvOptions, VocdoniCensus3Client, VocdoniSDKClient } from '@vocdoni/sdk'
 import { Reducer, useReducer } from 'react'
 import type { ErrorPayload } from '../types'
 import { errorToString } from '../utils'
@@ -60,6 +60,7 @@ export interface ClientAction {
 
 export interface ClientState {
   client: VocdoniSDKClient
+  census3: VocdoniCensus3Client
   env: EnvOptions
   account: AccountData | undefined
   signer: Wallet | Signer
@@ -90,6 +91,7 @@ export const clientStateEmpty = (env: EnvOptions, client: VocdoniSDKClient, sign
     new VocdoniSDKClient({
       env,
     }),
+  census3: new VocdoniCensus3Client({ env }),
   account: undefined,
   balance: -1,
   connected: false,
@@ -205,9 +207,13 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       const client = new VocdoniSDKClient({
         env: state.env,
       })
+      const census3 = new VocdoniCensus3Client({
+        env: state.env,
+      })
       return {
         ...state,
         client,
+        census3,
         signer: {} as Signer,
         account: undefined,
         balance: -1,
@@ -237,11 +243,13 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         env,
         wallet: state.signer,
       })
+      const census3 = new VocdoniCensus3Client({ env })
       return {
         ...state,
         account: undefined,
         balance: -1,
         client,
+        census3,
         env,
         connected: !!client.wallet,
       }
