@@ -427,9 +427,9 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
     if (state.connected && connected) return
     if (
       // we don't want to disconnect the local client on spreadsheet elections when the main client gets disconnected
-      (!connected && state.election?.get('census.type') === 'spreadsheet') ||
+      (!connected && state.election?.meta?.census && state.election?.get('census.type') === 'spreadsheet') ||
       // we don't want to clear the local client on non spreadsheet elections
-      (!state.connected && state.election?.get('census.type') !== 'spreadsheet')
+      (!state.connected && state.election?.meta?.census && state.election?.get('census.type') !== 'spreadsheet')
     )
       return
 
