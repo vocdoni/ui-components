@@ -183,11 +183,12 @@ export const useElectionProvider = ({
         case CensusType.WEIGHTED:
           const vid = await weightedVote(vote)
           actions.voted(vid)
-          return vid
-
+          break
         default:
           throw new Error(`unsupported census type "${election.census.type}"`)
       }
+      // refetch election info
+      await fetchElection(election.id)
     } catch (e) {
       actions.votingError(e)
     }

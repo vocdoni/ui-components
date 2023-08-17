@@ -142,6 +142,12 @@ export const ElectionStateEmpty = ({
   },
 })
 
+const isAbleToVote = (state: ElectionReducerState, payload?: boolean) =>
+  payload ||
+  (state.isInCensus && state.votesLeft > 0) ||
+  (state.isInCensus && state.election?.electionType.anonymous) ||
+  state.election?.census.type === CensusType.CSP
+
 const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
   state: ElectionReducerState,
   action: ElectionAction
@@ -205,11 +211,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
           ...state.loaded,
           census: true,
         },
-        isAbleToVote:
-          payload ||
-          (state.isInCensus && state.votesLeft > 0) ||
-          (state.isInCensus && state.election?.electionType.anonymous) ||
-          state.election?.census.type === CensusType.CSP,
+        isAbleToVote: isAbleToVote(state, payload),
       }
     }
 
@@ -295,25 +297,30 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
     case ElectionVoted: {
       const voted = action.payload as ElectionVotedPayload
-      return {
+      // update the votes beforehand so `isAbleToVote` is properly calculated
+      const rstate = {
         ...state,
+        votesLeft: state.votesLeft - 1,
+      }
+      return {
+        ...rstate,
         voted,
         vote: undefined,
         loaded: {
-          ...state.loaded,
+          ...rstate.loaded,
           census: true,
         },
         loading: {
-          ...state.loading,
+          ...rstate.loading,
           census: false,
           voting: false,
         },
-        votesLeft: state.votesLeft - 1,
         csp: {
-          ...state.csp,
+          ...rstate.csp,
           authToken: undefined,
           token: undefined,
         },
+        isAbleToVote: isAbleToVote(rstate, false),
       }
     }
 
@@ -416,10 +423,18 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
 
   // ensure user data is cleared on logout
   useEffect(() => {
-    if (connected) return
+    // we don't want to clear the session when we're connected everywhere
+    if (state.connected && connected) return
+    if (
+      // we don't want to disconnect the local client on spreadsheet elections when the main client gets disconnected
+      (!connected && state.election?.get('census.type') === 'spreadsheet') ||
+      // we don't want to clear the local client on non spreadsheet elections
+      (!state.connected && state.election?.get('census.type') !== 'spreadsheet')
+    )
+      return
 
     clear()
-  }, [connected])
+  }, [state.connected, connected, state.election])
 
   return {
     state,
