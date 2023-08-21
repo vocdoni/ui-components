@@ -7,4 +7,6 @@ extends:
 parserOptions:
   ecmaVersion: latest
   sourceType: module
+plugins:
+  - testing-library
 rules: {}

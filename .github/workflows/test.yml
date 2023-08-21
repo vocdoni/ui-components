@@ -1,4 +1,4 @@
-name: lint and type checks
+name: lint and test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,8 +18,7 @@ jobs:
           node-version: 18
       - name: Install dependencies
         run: yarn
-      - name: Run prettier in whole project
+      - name: Run all lint tasks
         run: yarn lint
-      - name: Run type checks in packages
-        run: yarn lint
-        working-directory: packages/chakra-components
+      - name: Test everything
+        run: yarn test --verbose

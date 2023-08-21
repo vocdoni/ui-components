@@ -433,6 +433,11 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
     )
       return
 
+    // if there's no meta census information, avoid clearing it from state (process does not follow our way to create them)
+    if (!state.election?.meta?.census) {
+      return
+    }
+
     clear()
   }, [state.connected, connected, state.election])
 

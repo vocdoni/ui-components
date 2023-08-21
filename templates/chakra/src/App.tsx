@@ -9,7 +9,7 @@ export const App = () => {
   const { data: signer } = useSigner()
 
   return (
-    <ClientProvider env={VocdoniEnvironment as EnvOptions} signer={signer}>
+    <ClientProvider env={VocdoniEnvironment as EnvOptions} signer={signer || undefined}>
       <RoutesProvider />
       <ColorModeScript />
     </ClientProvider>
