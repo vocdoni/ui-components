@@ -84,14 +84,14 @@ export interface ClientState {
 }
 
 export const clientStateEmpty = (env: EnvOptions, client: VocdoniSDKClient, signer: Wallet | Signer): ClientState => ({
-  env,
+  env: env || EnvOptions.PROD,
   signer,
   client:
     client ||
     new VocdoniSDKClient({
-      env,
+      env: env || EnvOptions.PROD,
     }),
-  census3: new VocdoniCensus3Client({ env }),
+  census3: new VocdoniCensus3Client({ env: env || EnvOptions.PROD }),
   account: undefined,
   balance: -1,
   connected: false,
