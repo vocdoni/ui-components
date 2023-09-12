@@ -1,5 +1,6 @@
 import { Wallet } from 'ethers'
 import { keccak256 } from 'ethers/lib/utils.js'
+import { Buffer } from 'buffer'
 
 export default class localStorageWallet {
   static storageItemName = 'localstorage-wallet-seed'
