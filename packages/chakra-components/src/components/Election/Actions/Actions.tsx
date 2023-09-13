@@ -1,0 +1,59 @@
+import { ButtonGroup, IconButton } from '@chakra-ui/button'
+import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { useClient, useElection } from '@vocdoni/react-providers'
+import { areEqualHexStrings } from '@vocdoni/sdk'
+import { FaPause, FaPlay, FaStop } from 'react-icons/fa'
+import { ImCross } from 'react-icons/im'
+import { ActionsProvider } from './ActionsProvider'
+import { ActionCancel } from './Cancel'
+import { ActionContinue } from './Continue'
+import { ActionEnd } from './End'
+import { ActionPause } from './Pause'
+
+const Cancel = chakra(ImCross)
+const Play = chakra(FaPlay)
+const Pause = chakra(FaPause)
+const Stop = chakra(FaStop)
+
+export const ElectionActions = (props: ChakraProps) => {
+  const { localize, account } = useClient()
+  const { election } = useElection()
+  const styles = useMultiStyleConfig('ElectionActions')
+
+  if (!election || (election && !areEqualHexStrings(election.organizationId, account?.address))) return null
+
+  return (
+    <ButtonGroup size='sm' isAttached variant='outline' position='relative' sx={styles.group} {...props}>
+      <ActionsProvider>
+        <ActionContinue
+          as={IconButton}
+          aria-label={localize('actions.continue')}
+          title={localize('actions.continue')}
+          sx={styles.buttons}
+          icon={<Play sx={styles.icons} />}
+        />
+        <ActionPause
+          as={IconButton}
+          aria-label={localize('actions.pause')}
+          title={localize('actions.pause')}
+          sx={styles.buttons}
+          icon={<Pause sx={styles.icons} />}
+        />
+        <ActionEnd
+          as={IconButton}
+          aria-label={localize('actions.end')}
+          title={localize('actions.end')}
+          sx={styles.buttons}
+          icon={<Stop sx={styles.icons} />}
+        />
+        <ActionCancel
+          as={IconButton}
+          aria-label={localize('actions.cancel')}
+          title={localize('actions.cancel')}
+          sx={styles.buttons}
+          icon={<Cancel sx={styles.icons} />}
+        />
+      </ActionsProvider>
+    </ButtonGroup>
+  )
+}

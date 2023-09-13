@@ -3,6 +3,6 @@ export const actionsAnatomy = [
   'group',
   // button themselves
   'buttons',
-  // icons used in buttons
+  // icon styles
   'icons',
 ]
