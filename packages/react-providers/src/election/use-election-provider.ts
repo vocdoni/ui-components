@@ -190,6 +190,7 @@ export const useElectionProvider = ({
       // refetch election info
       await fetchElection(election.id)
     } catch (e) {
+      console.error('there was an error voting:', e)
       actions.votingError(e)
     }
   }
