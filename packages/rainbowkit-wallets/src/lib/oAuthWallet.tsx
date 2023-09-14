@@ -7,17 +7,20 @@ import localStorageWallet from './localStorageWallet'
  */
 export class oAuthWallet extends localStorageWallet {
   private oAuthServiceUrl: string
+  private oAuthServiceProvider: string
   private data: any
   private cancel: boolean = false
 
-  constructor(oAuthServiceUrl: string) {
+  constructor(oAuthServiceUrl: string, oAuthServiceProvider: string) {
     super()
     this.oAuthServiceUrl = oAuthServiceUrl
+    this.oAuthServiceProvider = oAuthServiceProvider
   }
 
   async create(): Promise<ethers.Wallet> {
     // Open the login popup
-    this.openLoginPopup(this.oAuthServiceUrl)
+    const url = this.oAuthServiceUrl + (this.oAuthServiceProvider ? `?provider=${this.oAuthServiceProvider}` : '')
+    this.openLoginPopup(url)
 
     // Create the event listener to receive the seed from the popup
     window.addEventListener('message', this.handlePopupMessage.bind(this))
