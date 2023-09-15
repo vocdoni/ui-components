@@ -80,9 +80,12 @@ describe('<ClientProvider />', () => {
     // @ts-ignore
     rerender({ signer: newsigner })
 
+    await waitFor(() => {
+      expect(result.current.client.wallet).toEqual(newsigner)
+    })
+
     expect(result.current.signer).not.toEqual(signer)
     expect(result.current.signer).toEqual(newsigner)
-    expect(result.current.client.wallet).toEqual(newsigner)
     // ensure env has not changed after changing the signer
     expect(result.current.env).toEqual('dev')
     expect(result.current.client.url).toEqual(ApiUrl.dev)
