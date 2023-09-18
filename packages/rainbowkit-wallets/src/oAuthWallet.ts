@@ -1,9 +1,9 @@
 import { oAuthConnector } from './wagmi/oAuthConnector'
 
-export const oAuthWallet = ({ chains, name, options }: any) => ({
+export const oAuthWallet = ({ chains, name, iconUrl, options }: any) => ({
   id: 'oAuth',
   name: name || 'OAuth',
-  iconUrl: 'https://i.ibb.co/Mh7LXsn/social-login-COLOR-2.png',
+  iconUrl: iconUrl || 'https://i.ibb.co/Mh7LXsn/social-login-COLOR-2.png',
   iconBackground: '#fff',
   createConnector: () => {
     const connector = new oAuthConnector({

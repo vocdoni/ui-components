@@ -81,6 +81,7 @@ export class localStorageConnector extends Connector {
   }
 
   async disconnect(): Promise<void> {
+    this.wallet = undefined
     localStorageWallet.deleteWallet()
   }
 

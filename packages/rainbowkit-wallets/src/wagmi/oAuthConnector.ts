@@ -10,18 +10,21 @@ export class oAuthConnector extends localStorageConnector {
   readonly name = 'OAuth'
 
   private oAuthServiceUrl: string = ''
+  private oAuthServiceProvider: string = ''
 
   constructor(config: { chains: Chain[]; options: any }) {
     super(config)
 
     if (!config.options.oAuthServiceUrl) throw new Error('oAuthServiceUrl is required')
     this.oAuthServiceUrl = config.options.oAuthServiceUrl
+
+    if (config.options.oAuthServiceProvider) this.oAuthServiceProvider = config.options.oAuthServiceProvider
   }
 
   protected async createWallet() {
     let wallet = await oAuthWallet.getWallet()
     if (!wallet) {
-      const w = new oAuthWallet(this.oAuthServiceUrl)
+      const w = new oAuthWallet(this.oAuthServiceUrl, this.oAuthServiceProvider)
       wallet = await w.create()
     }
 
