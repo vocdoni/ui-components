@@ -17,7 +17,6 @@ export class localStorageConnector extends Connector {
   protected chainId: number | undefined
   protected provider: ethers.providers.BaseProvider | undefined
   protected wallet: Wallet | undefined
-  protected connecting: boolean = false
 
   constructor(config: { chains: Chain[]; options: any }) {
     super(config)
@@ -28,13 +27,9 @@ export class localStorageConnector extends Connector {
   async connect() {
     this.emit('message', { type: 'connecting' })
     try {
-      if (!this.wallet && !this.connecting) {
-        this.connecting = true
+      if (!this.wallet) {
         await this.createWallet()
-      } else if (this.connecting) return
-
-      this.connecting = false
-
+      }
       const account = await this.getAccount()
       const provider = await this.getProvider()
       const chainId = await this.getChainId()
@@ -50,7 +45,6 @@ export class localStorageConnector extends Connector {
 
       return cdata
     } catch (error) {
-      this.connecting = false
       throw new UserRejectedRequestError(error)
     }
   }
