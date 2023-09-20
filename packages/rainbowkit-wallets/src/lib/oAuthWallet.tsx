@@ -70,5 +70,10 @@ export class oAuthWallet extends localStorageWallet {
       this.data = event.data.seed
       window.removeEventListener('message', this.handlePopupMessage)
     }
+
+    if (event.data.error) {
+      window.removeEventListener('message', this.handlePopupMessage)
+      throw new Error(event.data.error)
+    }
   }
 }
