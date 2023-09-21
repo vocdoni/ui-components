@@ -1,7 +1,20 @@
-import { oAuthConnector } from './wagmi/oAuthConnector'
+import { Chain } from 'wagmi'
+import { oAuthConnector, oAuthConnectorOptions } from './wagmi/oAuthConnector'
 
-export const oAuthWallet = ({ chains, name, iconUrl, options }: any) => ({
-  id: 'oAuth',
+export const oAuthWallet = ({
+  id,
+  chains,
+  name,
+  iconUrl,
+  options,
+}: {
+  id: string
+  chains: Chain[]
+  name: string
+  iconUrl: string
+  options: oAuthConnectorOptions
+}) => ({
+  id: id || 'oAuth',
   name: name || 'OAuth',
   iconUrl: iconUrl || 'https://i.ibb.co/Mh7LXsn/social-login-COLOR-2.png',
   iconBackground: '#fff',
