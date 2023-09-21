@@ -4,6 +4,11 @@ import { localStorageConnector } from './localStorageConnector'
 
 const IS_SERVER = typeof window === 'undefined'
 
+export type oAuthConnectorOptions = {
+  oAuthServiceUrl: string
+  oAuthServiceProvider?: string
+}
+
 export class oAuthConnector extends localStorageConnector {
   ready = !IS_SERVER
   readonly id = 'oauth'
@@ -12,7 +17,7 @@ export class oAuthConnector extends localStorageConnector {
   private oAuthServiceUrl: string = ''
   private oAuthServiceProvider: string = ''
 
-  constructor(config: { chains: Chain[]; options: any }) {
+  constructor(config: { chains: Chain[]; options: oAuthConnectorOptions }) {
     super(config)
 
     if (!config.options.oAuthServiceUrl) throw new Error('oAuthServiceUrl is required')

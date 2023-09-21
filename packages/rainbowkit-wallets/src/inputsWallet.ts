@@ -1,6 +1,7 @@
+import { Chain } from 'wagmi'
 import { inputsConnector } from './wagmi/inputsConnector'
 
-export const inputsWallet = ({ chains, name }: any) => ({
+export const inputsWallet = ({ chains, name }: { chains: Chain[]; name: string }) => ({
   id: 'inputs',
   name: name || 'Inputs',
   iconUrl: 'https://svgshare.com/i/upy.svg',
