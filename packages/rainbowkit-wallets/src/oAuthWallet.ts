@@ -23,7 +23,7 @@ export const oAuthWallet = ({
     createConnector: () => {
       const connector = new oAuthConnector({
         chains: chains,
-        options: options || {},
+        options: options || { oAuthServiceUrl: 'https://oauth.vocdoni.io' },
       })
       return {
         connector,
