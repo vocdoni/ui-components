@@ -17,9 +17,10 @@
     "clean": "rm -rf dist .turbo node_modules"
   },
   "peerDependencies": {
+    "@rainbow-me/rainbowkit": "^0.12.18",
+    "@wagmi/core": "^0.10.17",
     "ethers": "^5",
-    "wagmi": "^0.12",
-    "@wagmi/core": "^0.10.17"
+    "wagmi": "^0.12"
   },
   "devDependencies": {
     "@types/react-modal": "^3.16.0",
