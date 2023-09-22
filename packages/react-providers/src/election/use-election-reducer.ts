@@ -145,7 +145,11 @@ export const ElectionStateEmpty = ({
 const isAbleToVote = (state: ElectionReducerState, payload?: boolean) =>
   payload ||
   (state.isInCensus && state.votesLeft > 0) ||
-  (state.isInCensus && state.election?.electionType.anonymous) ||
+  // TODO: the following two cases should be reviewed/improved. The anonymous one is a trick
+  // to allow users to vote, and should be properly done when the SIK flow is completelly implemented.
+  // The CSP case is similar, since we're allowing everyone to vote here, and maybe it should be defined
+  // separately, based on async operations the CSP requires.
+  (state.isInCensus && state.election?.electionType.anonymous && !state.voted) ||
   state.election?.census.type === CensusType.CSP
 
 const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
@@ -297,29 +301,29 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
     case ElectionVoted: {
       const voted = action.payload as ElectionVotedPayload
-      // update the votes beforehand so `isAbleToVote` is properly calculated
+      // update state beforehand so `isAbleToVote` is properly calculated
       const rstate = {
         ...state,
-        votesLeft: state.votesLeft - 1,
-      }
-      return {
-        ...rstate,
         voted,
+        votesLeft: state.votesLeft - 1,
         vote: undefined,
         loaded: {
-          ...rstate.loaded,
+          ...state.loaded,
           census: true,
         },
         loading: {
-          ...rstate.loading,
+          ...state.loading,
           census: false,
           voting: false,
         },
         csp: {
-          ...rstate.csp,
+          ...state.csp,
           authToken: undefined,
           token: undefined,
         },
+      }
+      return {
+        ...rstate,
         isAbleToVote: isAbleToVote(rstate, false),
       }
     }
