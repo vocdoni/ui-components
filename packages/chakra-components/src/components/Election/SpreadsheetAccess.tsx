@@ -94,11 +94,11 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
             <ModalHeader sx={styles.header}>{localize('spreadsheet.modal_title')}</ModalHeader>
             <ModalCloseButton isDisabled={loading} sx={styles.top_close} />
             <ModalBody sx={styles.body}>
-              {fields.map((field) => (
-                <FormControl key={field} isInvalid={!!errors[field]} sx={styles.control}>
+              {fields.map((field, key) => (
+                <FormControl key={key} isInvalid={!!errors[key]} sx={styles.control}>
                   <FormLabel sx={styles.label}>{field}</FormLabel>
-                  <Input {...register(field, { required })} sx={styles.input} />
-                  <FormErrorMessage sx={styles.error}>{errors[field]?.message?.toString()}</FormErrorMessage>
+                  <Input {...register(key.toString(), { required })} sx={styles.input} />
+                  <FormErrorMessage sx={styles.error}>{errors[key]?.message?.toString()}</FormErrorMessage>
                 </FormControl>
               ))}
             </ModalBody>
