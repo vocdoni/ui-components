@@ -16,9 +16,6 @@ export type ClientReducerProps = {
 export const ClientAccountError = 'client:account:error'
 export const ClientAccountFetch = 'client:account:fetch'
 export const ClientAccountSet = 'client:account:set'
-export const ClientBalanceError = 'client:balance:error'
-export const ClientBalanceFetch = 'client:balance:fetch'
-export const ClientBalanceSet = 'client:balance:set'
 export const ClientClear = 'client:clear'
 export const ClientEnvSet = 'client:env:set'
 export const ClientSet = 'client:set'
@@ -26,8 +23,6 @@ export const ClientSignerSet = 'client:signer:set'
 
 export type ClientAccountErrorPayload = ErrorPayload
 export type ClientAccountSetPayload = AccountData
-export type ClientBalanceErrorPayload = ErrorPayload
-export type ClientBalanceSetPayload = number
 export type ClientEnvSetPayload = ClientEnv
 export type ClientSetPayload = VocdoniSDKClient
 export type ClientSignerSetPayload = Signer | Wallet
@@ -35,8 +30,6 @@ export type ClientSignerSetPayload = Signer | Wallet
 export type ClientActionPayload =
   | ClientAccountErrorPayload
   | ClientAccountSetPayload
-  | ClientBalanceErrorPayload
-  | ClientBalanceSetPayload
   | ClientEnvSetPayload
   | ClientSetPayload
   | ClientSignerSetPayload
@@ -45,9 +38,6 @@ export type ClientActionType =
   | typeof ClientAccountError
   | typeof ClientAccountFetch
   | typeof ClientAccountSet
-  | typeof ClientBalanceError
-  | typeof ClientBalanceFetch
-  | typeof ClientBalanceSet
   | typeof ClientClear
   | typeof ClientEnvSet
   | typeof ClientSet
@@ -70,16 +60,13 @@ export interface ClientState {
   // loaded status
   loaded: {
     account: boolean
-    balance: boolean
   }
   // loading status
   loading: {
     account: boolean
-    balance: boolean
   }
   errors: {
     account: string | null
-    balance: string | null
   }
 }
 
@@ -97,15 +84,12 @@ export const clientStateEmpty = (env: EnvOptions, client: VocdoniSDKClient, sign
   connected: false,
   loading: {
     account: false,
-    balance: false,
   },
   loaded: {
     account: false,
-    balance: false,
   },
   errors: {
     account: null,
-    balance: null,
   },
 })
 
@@ -143,6 +127,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       return {
         ...state,
         account,
+        balance: account.balance,
         loading: {
           ...state.loading,
           account: false,
@@ -157,52 +142,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         },
       }
     }
-    case ClientBalanceError: {
-      const error = action.payload as ClientBalanceErrorPayload
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          balance: false,
-        },
-        loaded: {
-          ...state.loaded,
-          balance: true,
-        },
-        errors: {
-          ...state.errors,
-          balance: errorToString(error),
-        },
-      }
-    }
-    case ClientBalanceFetch: {
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          balance: true,
-        },
-      }
-    }
-    case ClientBalanceSet: {
-      const balance = action.payload as ClientBalanceSetPayload
-      return {
-        ...state,
-        balance,
-        loading: {
-          ...state.loading,
-          balance: false,
-        },
-        loaded: {
-          ...state.loaded,
-          balance: true,
-        },
-        errors: {
-          ...state.errors,
-          balance: null,
-        },
-      }
-    }
+
     case ClientClear: {
       const client = new VocdoniSDKClient({
         env: state.env,
@@ -220,11 +160,9 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         connected: false,
         loaded: {
           account: false,
-          balance: false,
         },
         errors: {
           account: null,
-          balance: null,
         },
       }
     }
@@ -281,11 +219,8 @@ export const useClientReducer = ({ env, client, signer }: ClientReducerProps) =>
   // dispatch helper methods
   const clear = () => dispatch({ type: ClientClear })
   const errorAccount = (error: ErrorPayload) => dispatch({ type: ClientAccountError, payload: error })
-  const errorBalance = (error: ErrorPayload) => dispatch({ type: ClientBalanceError, payload: error })
   const fetchAccount = () => dispatch({ type: ClientAccountFetch })
-  const fetchBalance = () => dispatch({ type: ClientBalanceFetch })
   const setAccount = (account: AccountData | undefined) => dispatch({ type: ClientAccountSet, payload: account })
-  const setBalance = (balance: number) => dispatch({ type: ClientBalanceSet, payload: balance })
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ClientSet, payload: client })
   const setEnv = (env: ClientEnvSetPayload) => dispatch({ type: ClientEnvSet, payload: env })
   const setSigner = (signer: Wallet | Signer) => dispatch({ type: ClientSignerSet, payload: signer })
@@ -296,11 +231,8 @@ export const useClientReducer = ({ env, client, signer }: ClientReducerProps) =>
     actions: {
       clear,
       errorAccount,
-      errorBalance,
       fetchAccount,
-      fetchBalance,
       setAccount,
-      setBalance,
       setClient,
       setEnv,
       setSigner,

@@ -29,14 +29,6 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.account, state.connected, state.env, state.signer])
 
-  // fetch balance (only with signer connected)
-  useEffect(() => {
-    if (!state.connected || !state.account) return
-
-    fetchBalance()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.account, state.connected])
-
   // update signer on updates
   useEffect(() => {
     if (!s) return
@@ -80,36 +72,6 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
   }
 
   /**
-   * Fetches and sets to state current account balance.
-   *
-   * @returns {Promise<number>}
-   */
-  const fetchBalance = async () => {
-    if (state.loading.balance) return
-
-    try {
-      if (!state.account) {
-        throw new Error('Account not available')
-      }
-      // tell state machine we're fetching balance
-      actions.fetchBalance()
-
-      if (state.account.balance <= 10 && state.env !== 'prod') {
-        await state.client.collectFaucetTokens()
-        const acc = await state.client.fetchAccountInfo()
-        actions.setBalance(acc.balance)
-
-        return acc.balance
-      }
-
-      actions.setBalance(state.account.balance)
-      return state.account.balance
-    } catch (e: any) {
-      actions.errorBalance(e)
-    }
-  }
-
-  /**
    * Creates an account.
    *
    * @returns {Promise<AccountData>}
@@ -147,7 +109,6 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
     clear: actions.clear,
     createAccount,
     fetchAccount,
-    fetchBalance,
     setClient: actions.setClient,
     localize,
     setSigner: actions.setSigner,

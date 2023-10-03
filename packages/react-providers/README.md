@@ -42,7 +42,6 @@ ensure you initialize that one as the parent.
   context/state:
     + `fetchAccount`
     + `createAccount`
-    + `fetchBalance`
     + `setClient`: allows you to change the client during runtime
     + `localize`: internal method used for localization
     + `setSigner`: allows you to change the signer during runtime
