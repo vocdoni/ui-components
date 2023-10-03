@@ -1,5 +1,3 @@
-import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
-
 export const spreadsheetAccessAnatomy = [
   // main action button
   'button',
@@ -21,15 +19,3 @@ export const spreadsheetAccessAnatomy = [
   'error',
   'submit',
 ]
-
-const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(spreadsheetAccessAnatomy)
-
-const baseStyle = definePartsStyle({
-  label: {
-    textTransform: 'capitalize',
-  },
-})
-
-export const SpreadsheetAccessTheme = defineMultiStyleConfig({
-  baseStyle,
-})
