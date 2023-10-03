@@ -7,6 +7,7 @@ const config = {
     '^.+\\.(ts|tsx|js|jsx)?$': '@swc-node/jest',
   },
   transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
+  testPathIgnorePatterns: ['[/\\\\]dist[/\\\\].+\\.(js|jsx)$'],
   setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect', './setup-tests.ts'],
   globals: {
     'ts-jest': {
