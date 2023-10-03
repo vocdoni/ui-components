@@ -2,6 +2,7 @@ import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
 
 export const confirmAnatomy = [
   // modal parts
+  'overlay',
   'content',
   'header',
   'body',
@@ -9,6 +10,7 @@ export const confirmAnatomy = [
   // action buttons
   'confirm',
   'cancel',
+  'close',
 ]
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(confirmAnatomy)

@@ -1,5 +1,13 @@
 import { Button } from '@chakra-ui/button'
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from '@chakra-ui/modal'
+import {
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+} from '@chakra-ui/modal'
 import { useMultiStyleConfig } from '@chakra-ui/system'
 import { useClient } from '@vocdoni/react-providers'
 import useConfirm from './use-confirm'
@@ -11,9 +19,10 @@ const ConfirmModal = () => {
 
   return (
     <Modal isOpen={isOpen} onClose={cancel!}>
-      <ModalOverlay />
+      <ModalOverlay sx={styles.overlay} />
       <ModalContent sx={styles.content}>
         <ModalHeader sx={styles.header}>{localize('confirm.title')}</ModalHeader>
+        <ModalCloseButton sx={styles.close} />
         <ModalBody sx={styles.body}>{prompt}</ModalBody>
         <ModalFooter sx={styles.footer}>
           <Button onClick={cancel!} variant='ghost' sx={styles.cancel}>
