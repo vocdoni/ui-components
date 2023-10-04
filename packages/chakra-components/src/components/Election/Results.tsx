@@ -51,7 +51,10 @@ export const ElectionResults = (props: ChakraProps) => {
                         percent: percent(results(c.results, decimals), totals[idx]),
                       })}
                     </Text>
-                    <Progress sx={styles.progress} value={(Number(c.results) / totals[idx]) * 100 || 0} />
+                    <Progress
+                      sx={styles.progress}
+                      value={((Number(c.results) / totals[idx]) * 100) / 10 ** decimals || 0}
+                    />
                   </>
                 )}
               </Box>
