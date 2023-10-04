@@ -83,7 +83,7 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
   )
 }
 
-type QuestionsConfirmationProps = {
+export type QuestionsConfirmationProps = {
   answers: FieldValues
   questions: IQuestion[]
 }
