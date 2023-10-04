@@ -5,13 +5,18 @@ import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { ChakraProps, chakra, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, IQuestion, InvalidElection } from '@vocdoni/sdk'
-import { Controller, FieldValues, FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { ReactNode } from 'react'
+import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
 import { environment } from '../../environment'
-import useConfirm from '../../utils/use-confirm'
-import { Markdown } from '../layout'
+import { Markdown, useConfirm } from '../layout'
 
-export const ElectionQuestions = (props: ChakraProps) => {
+type ElectionQuestionsProps = ChakraProps & {
+  confirmContents?: (questions: IQuestion[], answers: FieldValues) => ReactNode
+  onInvalid?: SubmitErrorHandler<FieldValues>
+}
+
+export const ElectionQuestions = (props: ElectionQuestionsProps) => {
   const {
     election,
     vote: bvote,
@@ -23,7 +28,8 @@ export const ElectionQuestions = (props: ChakraProps) => {
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
-  const { isConfirmed } = useConfirm()
+  const { confirm } = useConfirm()
+  const { confirmContents, onInvalid, ...rest } = props
 
   if (election instanceof InvalidElection) return null
 
@@ -43,7 +49,13 @@ export const ElectionQuestions = (props: ChakraProps) => {
   const vote = async (values: FieldValues) => {
     if (
       election.get('census.type') === 'spreadsheet' &&
-      !(await isConfirmed(<QuestionsConfirmation questions={questions} answers={values} />))
+      !(await confirm(
+        typeof confirmContents === 'function' ? (
+          confirmContents(questions, values)
+        ) : (
+          <QuestionsConfirmation questions={questions} answers={values} />
+        )
+      ))
     ) {
       return false
     }
@@ -52,10 +64,10 @@ export const ElectionQuestions = (props: ChakraProps) => {
   }
 
   return (
-    <chakra.div __css={styles.wrapper} {...props}>
+    <chakra.div __css={styles.wrapper} {...rest}>
       <FormProvider {...fmethods}>
         <Voted />
-        <form onSubmit={fmethods.handleSubmit(vote)} id={`election-questions-${election.id}`}>
+        <form onSubmit={fmethods.handleSubmit(vote, onInvalid)} id={`election-questions-${election.id}`}>
           {questions.map((question, qk) => (
             <QuestionField key={qk} index={qk.toString()} question={question} />
           ))}

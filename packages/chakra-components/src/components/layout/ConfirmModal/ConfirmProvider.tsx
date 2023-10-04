@@ -1,5 +1,5 @@
 import { PropsWithChildren, ReactNode, createContext, useContext, useState } from 'react'
-import ConfirmModal from './ConfirmModal'
+import { ConfirmModal } from './ConfirmModal'
 
 type ConfirmContextState = {
   prompt: null | ReactNode
@@ -9,31 +9,50 @@ type ConfirmContextState = {
 }
 
 const useConfirmProvider = () => {
-  const [confirm, setConfirm] = useState<ConfirmContextState>({
+  const [state, setState] = useState<ConfirmContextState>({
     prompt: null,
     isOpen: false,
     proceed: null,
     cancel: null,
   })
 
-  return { confirm, setConfirm }
+  const confirm = (prompt: ReactNode) =>
+    new Promise((resolve, reject) => {
+      setState({
+        prompt,
+        isOpen: true,
+        proceed: resolve,
+        cancel: reject,
+      })
+    }).then(
+      () => {
+        setState({ ...state, isOpen: false })
+        return true
+      },
+      () => {
+        setState({ ...state, isOpen: false })
+        return false
+      }
+    )
+
+  return { ...state, confirm }
 }
 
 type ConfirmState = ReturnType<typeof useConfirmProvider>
 
 const ConfirmContext = createContext<ConfirmState | undefined>(undefined)
 
-export const useConfirmContext = () => {
+export const useConfirm = () => {
   const ctxt = useContext(ConfirmContext)
   if (!ctxt) {
     throw new Error(
-      'useConfirmContext returned `undefined`, maybe you forgot to wrap the component within <ConfirmProvider />?'
+      'useConfirm returned `undefined`, maybe you forgot to wrap the component within <ConfirmProvider />?'
     )
   }
   return ctxt
 }
 
-const ConfirmProvider = ({ children }: PropsWithChildren<any>) => {
+export const ConfirmProvider = ({ children }: PropsWithChildren<any>) => {
   const value = useConfirmProvider()
   return (
     <ConfirmContext.Provider value={value}>
@@ -42,4 +61,3 @@ const ConfirmProvider = ({ children }: PropsWithChildren<any>) => {
     </ConfirmContext.Provider>
   )
 }
-export default ConfirmProvider
