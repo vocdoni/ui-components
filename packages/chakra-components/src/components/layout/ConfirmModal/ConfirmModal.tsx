@@ -10,9 +10,9 @@ import {
 } from '@chakra-ui/modal'
 import { useMultiStyleConfig } from '@chakra-ui/system'
 import { useClient } from '@vocdoni/react-providers'
-import useConfirm from './use-confirm'
+import { useConfirm } from './ConfirmProvider'
 
-const ConfirmModal = () => {
+export const ConfirmModal = () => {
   const styles = useMultiStyleConfig('ConfirmModal')
   const { prompt, isOpen, proceed, cancel } = useConfirm()
   const { localize } = useClient()
@@ -36,4 +36,3 @@ const ConfirmModal = () => {
     </Modal>
   )
 }
-export default ConfirmModal

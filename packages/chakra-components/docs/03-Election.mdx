@@ -91,9 +91,30 @@ Show election questions.
 <ElectionQuestions />
 ```
 
+Questions have some preconfigured behaviors you should be aware of:
+
+- When census strategy is any oauth type or spreadsheet, a confirm modal is shown before sending a vote. You can
+  customize both the contents and the theme of this modal.
+- A basic validation is configured in the questions form (no empty questions mainly). There's a method invoked when
+  there are errors in the questions form.
+
+```jsx live
+<ElectionQuestions
+  onInvalid={(errors) => console.error(errors)}
+  confirmContents={(questions, answers) => (
+    <>
+      <p>Customizing contents is quite easy</p>
+      <QuestionsConfirmation questions={questions} answers={values} />
+    </>
+  )}
+/>
+```
+
+The `<QuestionsConfirmation />` component is the default one used, but you can overwrite that with your own components.
+
 :::info
 
-This component renderers **Markdown** text.
+This component renders **Markdown** text in the question descriptions.
 
 :::
 
