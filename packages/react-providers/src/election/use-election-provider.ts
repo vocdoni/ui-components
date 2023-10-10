@@ -60,6 +60,25 @@ export const useElectionProvider = ({
     }
   }, [actions, client, election])
 
+  const fetchAnonCircuits = useCallback(() => {
+    const hasOverwriteEnabled =
+      typeof election !== 'undefined' &&
+      typeof election.voteType.maxVoteOverwrites !== 'undefined' &&
+      election.voteType.maxVoteOverwrites > 0
+
+    const votable = state.isAbleToVote || (hasOverwriteEnabled && state.isInCensus && state.voted)
+
+    if (votable && election?.census.type === CensusType.ANONYMOUS) {
+      client.anonymousService.fetchCircuits()
+    }
+  }, [election, state.isAbleToVote, state.isInCensus, state.voted, client.anonymousService])
+
+  // pre-fetches circuits needed for voting in anonymous elections
+  useEffect(() => {
+    if (!fetchCensus || !election || loading.census || !client.wallet) return
+    fetchAnonCircuits()
+  }, [fetchAnonCircuits, client.wallet, election, loading.census, fetchCensus])
+
   // CSP OAuth flow
   // As vote setting and voting token are async, we need to wait for both to be set
   useEffect(() => {
