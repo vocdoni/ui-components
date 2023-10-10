@@ -1,6 +1,6 @@
 {
   "name": "@vocdoni/chakra-components",
-  "version": "0.5.16",
+  "version": "0.5.17",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/chakra-components#readme",
   "bugs": "https://github.com/vocdoni/ui-components/issues",
@@ -24,7 +24,7 @@
   },
   "main": "src/index.ts",
   "dependencies": {
-    "@vocdoni/react-providers": "0.1.11"
+    "@vocdoni/react-providers": "0.1.12"
   },
   "peerDependencies": {
     "@chakra-ui/alert": "^2.0.18",
