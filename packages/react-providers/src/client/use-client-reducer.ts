@@ -127,7 +127,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       return {
         ...state,
         account,
-        balance: account.balance,
+        balance: account?.balance,
         loading: {
           ...state.loading,
           account: false,
