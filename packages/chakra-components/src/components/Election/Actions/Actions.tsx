@@ -1,5 +1,5 @@
 import { ButtonGroup, IconButton } from '@chakra-ui/button'
-import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { areEqualHexStrings } from '@vocdoni/sdk'
 import { FaPause, FaPlay, FaStop } from 'react-icons/fa'

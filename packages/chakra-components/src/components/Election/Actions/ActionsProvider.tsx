@@ -1,27 +1,19 @@
-import { PropsWithChildren, createContext, useContext } from 'react'
-import { useActionsProvider } from './use-actions-provider'
+import { ActionsProvider as RActionsProvider } from '@vocdoni/react-providers'
+import { PropsWithChildren, ReactElement } from 'react'
+import { useActionsToast } from './use-actions-toast'
 
-export type ActionsState = ReturnType<typeof useActionsProvider>
-
-export const ActionsContext = createContext<ActionsState | undefined>(undefined)
-
-export const useActions = () => {
-  const ctxt = useContext(ActionsContext)
-  if (!ctxt) {
-    throw new Error(
-      'useActions returned `undefined`, maybe you forgot to wrap the component within <ActionsProvider />?'
-    )
-  }
-
-  return ctxt
+export const ActionsProvider = (props: PropsWithChildren) => {
+  return (
+    <RActionsProvider>
+      <ChakraInternalActionsProvider {...props} />
+    </RActionsProvider>
+  )
 }
 
-export type ActionsProviderComponentProps = PropsWithChildren
+// We need to define an "internal" component in order to be able to use the
+// hooks, otherwise they wouldn't have access to the ActionsProvider context
+const ChakraInternalActionsProvider = ({ children }: PropsWithChildren) => {
+  useActionsToast()
 
-export const ActionsProvider = ({ children }: ActionsProviderComponentProps) => {
-  const value = useActionsProvider()
-
-  return <ActionsContext.Provider value={value}>{children}</ActionsContext.Provider>
+  return children as ReactElement
 }
-
-ActionsProvider.displayName = 'ActionsProvider'

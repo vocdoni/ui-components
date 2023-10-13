@@ -1,8 +1,7 @@
 import { IconButtonProps } from '@chakra-ui/button'
 import { chakra, forwardRef } from '@chakra-ui/system'
-import { useClient, useElection } from '@vocdoni/react-providers'
-import { ElectionStatus, areEqualHexStrings } from '@vocdoni/sdk'
-import { useActions } from './ActionsProvider'
+import { useActions, useClient, useElection } from '@vocdoni/react-providers'
+import { areEqualHexStrings, ElectionStatus } from '@vocdoni/sdk'
 
 export const ActionContinue = forwardRef<IconButtonProps, 'button'>((props, ref) => {
   const { account, localize } = useClient()
