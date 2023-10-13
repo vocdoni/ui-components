@@ -1,6 +1,5 @@
-import { ToastId, useToast } from '@chakra-ui/toast'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { useRef, useState } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 
 type LoadingState = {
   continue: boolean
@@ -16,37 +15,36 @@ const BaseLoadingState: LoadingState = {
   cancel: false,
 }
 
+export type ActionsStatusMessage = {
+  title: string
+  description?: string
+}
+
 export const useActionsProvider = () => {
-  const toast = useToast()
-  const tRef = useRef<ToastId>()
   const { localize } = useClient()
   const { client, election, fetchElection } = useElection()
   const [loading, setLoading] = useState<LoadingState>(BaseLoadingState)
+  const [error, setError] = useState<ActionsStatusMessage | null>(null)
+  const [info, setInfo] = useState<ActionsStatusMessage | null>(null)
 
   const load = (key: keyof LoadingState) => setLoading((loading) => ({ ...loading, [key]: true }))
 
   const close = () => {
     setLoading(BaseLoadingState)
-    if (tRef.current) {
-      toast.close(tRef.current)
-    }
+    setInfo(null)
   }
 
-  const info = (description: string) => {
-    tRef.current = toast({
+  const infostate = (description: string) => {
+    setInfo({
       title: localize('actions.waiting_title'),
       description,
-      isClosable: false,
-      duration: null,
     })
   }
 
-  const error = (description: string) => {
-    toast({
-      description,
+  const errorstate = (description: string) => {
+    setError({
       title: localize('actions.error_title'),
-      duration: 7000,
-      status: 'error',
+      description,
     })
   }
 
@@ -56,7 +54,7 @@ export const useActionsProvider = () => {
     }
 
     load('cancel')
-    info(
+    infostate(
       localize('actions.cancel_description', {
         election,
       })
@@ -67,7 +65,7 @@ export const useActionsProvider = () => {
       await fetchElection(election.id)
     } catch (e: any) {
       if (typeof e === 'string') {
-        return error(e)
+        return errorstate(e)
       }
       console.warn('catched error in "cancel" action', e)
     } finally {
@@ -81,7 +79,7 @@ export const useActionsProvider = () => {
     }
 
     load('end')
-    info(
+    infostate(
       localize('actions.end_description', {
         election,
       })
@@ -92,7 +90,7 @@ export const useActionsProvider = () => {
       await fetchElection(election.id)
     } catch (e: any) {
       if (typeof e === 'string') {
-        return error(e)
+        return errorstate(e)
       }
       console.warn('catched error in "end" action', e)
     } finally {
@@ -106,7 +104,7 @@ export const useActionsProvider = () => {
     }
 
     load('pause')
-    info(
+    infostate(
       localize('actions.pause_description', {
         election,
       })
@@ -117,7 +115,7 @@ export const useActionsProvider = () => {
       await fetchElection(election.id)
     } catch (e: any) {
       if (typeof e === 'string') {
-        return error(e)
+        return errorstate(e)
       }
       console.warn('catched error in "pause" action', e)
     } finally {
@@ -131,7 +129,7 @@ export const useActionsProvider = () => {
     }
 
     load('continue')
-    info(
+    infostate(
       localize('actions.continue_description', {
         election,
       })
@@ -142,7 +140,7 @@ export const useActionsProvider = () => {
       await fetchElection(election.id)
     } catch (e: any) {
       if (typeof e === 'string') {
-        return error(e)
+        return errorstate(e)
       }
       console.warn('catched error in "continue" action', e)
     } finally {
@@ -150,12 +148,46 @@ export const useActionsProvider = () => {
     }
   }
 
+  const disabled = Object.values(loading).some((value) => value === true)
+
+  // clear errors when election or loading status change
+  useEffect(() => {
+    if (election && !disabled) {
+      setError(null)
+    }
+  }, [disabled, election])
+
   return {
-    disabled: Object.values(loading).some((value) => value === true),
+    disabled,
     cancel,
     end,
+    error,
+    info,
     loading,
     pause,
     resume,
   }
 }
+
+export type ActionsState = ReturnType<typeof useActionsProvider>
+
+export const ActionsContext = createContext<ActionsState | undefined>(undefined)
+
+export const useActions = () => {
+  const ctxt = useContext(ActionsContext)
+  if (!ctxt) {
+    throw new Error(
+      'useActions returned `undefined`, maybe you forgot to wrap the component within <ActionsProvider />?'
+    )
+  }
+
+  return ctxt
+}
+
+export const ActionsProvider = (props: PropsWithChildren) => {
+  const value = useActionsProvider()
+
+  return <ActionsContext.Provider value={value} {...props} />
+}
+
+ActionsProvider.displayName = 'ActionsProvider'
