@@ -13,9 +13,10 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
   const { state, loading, setOrganization, loadError, updateError } = useOrganizationReducer(organization)
 
   // fetches organization info, and sets it to the state
-  const fetch = () => {
-    loading(id)
-    return client.fetchAccountInfo(id).then(setOrganization).catch(loadError)
+  const fetch = (id?: string) => {
+    const identifier = id || state.id
+    loading(identifier)
+    return client.fetchAccountInfo(identifier).then(setOrganization).catch(loadError)
   }
 
   // updates organization info, and sets the new result to state
@@ -39,7 +40,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
     if (!id || !client || state.loading) return
     if (state.loaded && areEqualHexStrings(state.id, id)) return
 
-    fetch()
+    fetch(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.organization, id, client, state.loading, state.loaded])
 
