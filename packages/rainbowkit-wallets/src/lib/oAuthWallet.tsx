@@ -1,5 +1,6 @@
-import { ethers } from 'ethers'
 import localStorageWallet from './localStorageWallet'
+import { WalletClient } from 'viem'
+import { WindowProvider } from '@wagmi/connectors'
 
 /**
  * This class is used to create a wallet from an external service (OAuth)
@@ -17,7 +18,7 @@ export class oAuthWallet extends localStorageWallet {
     this.oAuthServiceProvider = oAuthServiceProvider
   }
 
-  async create(): Promise<ethers.Wallet> {
+  async create(provider: WindowProvider): Promise<WalletClient> {
     // Open the login popup
     const url = this.oAuthServiceUrl + (this.oAuthServiceProvider ? `?provider=${this.oAuthServiceProvider}` : '')
     this.openLoginPopup(url)
@@ -44,7 +45,7 @@ export class oAuthWallet extends localStorageWallet {
       throw new Error('User cancelled')
     }
 
-    return await localStorageWallet.createWallet(JSON.stringify(this.data))
+    return await localStorageWallet.createWallet(JSON.stringify(this.data), provider)
   }
 
   private async openLoginPopup(url: string) {

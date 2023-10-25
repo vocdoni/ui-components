@@ -1,7 +1,7 @@
-import { Address, Chain, Connector, UserRejectedRequestError, normalizeChainId } from '@wagmi/core'
-import { Signer, Wallet, ethers, getDefaultProvider } from 'ethers'
-import { getAddress } from 'ethers/lib/utils.js'
-import { ConnectorData } from 'wagmi'
+import { type Address, UserRejectedRequestError, getAddress, Account, Chain } from 'viem'
+import { ConnectorData, ConnectorNotFoundError, Connector } from 'wagmi'
+import { InjectedConnector } from '@wagmi/connectors/injected'
+import { WindowProvider, normalizeChainId } from '@wagmi/connectors'
 import localStorageWallet from '../lib/localStorageWallet'
 
 const IS_SERVER = typeof window === 'undefined'
@@ -9,14 +9,14 @@ const IS_SERVER = typeof window === 'undefined'
 /**
  * A connector that uses the local storage to store seed for a deterministic wallet generation
  */
-export class localStorageConnector extends Connector {
+export class localStorageConnector extends InjectedConnector {
   ready = !IS_SERVER
   readonly id: string = 'localStorageConnector'
   readonly name: string = 'localStorage'
 
   protected chainId: number | undefined
-  protected provider: ethers.providers.BaseProvider | undefined
-  protected wallet: Wallet | undefined
+  protected provider: WindowProvider | undefined
+  protected wallet: Account | undefined
 
   constructor(config: { chains: Chain[]; options: any }) {
     super(config)
@@ -30,6 +30,7 @@ export class localStorageConnector extends Connector {
       if (!this.wallet) {
         await this.createWallet()
       }
+
       const account = await this.getAccount()
       const provider = await this.getProvider()
       const chainId = await this.getChainId()
@@ -45,7 +46,7 @@ export class localStorageConnector extends Connector {
 
       return cdata
     } catch (error) {
-      throw new UserRejectedRequestError(error)
+      throw new UserRejectedRequestError(error as Error)
     }
   }
 
@@ -53,20 +54,12 @@ export class localStorageConnector extends Connector {
     const signer = await this.getSigner()
     if (!signer) throw new Error('No signer available')
 
-    const account = await signer.getAddress()
+    const account = signer.address
     if (account.startsWith('0x')) return account as Address
     return `0x${account}`
   }
 
-  async getProvider() {
-    if (!this.provider) {
-      //TODO: not sure this should be the default provider
-      this.provider = getDefaultProvider()
-    }
-    return this.provider
-  }
-
-  async getSigner(): Promise<Signer | undefined> {
+  async getSigner(): Promise<Account | undefined> {
     return this.wallet
   }
 
@@ -80,27 +73,31 @@ export class localStorageConnector extends Connector {
   }
 
   async isAuthorized() {
-    let wallet = await localStorageWallet.getWallet()
+    let wallet = await localStorageWallet.getWallet(this.provider as WindowProvider)
     if (!wallet) return false
 
-    wallet.connect(await this.getProvider())
-    this.wallet = wallet
+    this.wallet = wallet.account
 
-    return true
+    const provider = await this.getProvider()
+    if (!provider) throw new ConnectorNotFoundError()
+    const account = await this.getAccount()
+    return !!account
   }
 
-  protected onDisconnect(): void {
+  onDisconnect = async (error: Error): Promise<void> => {
     this.emit('disconnect')
+    return Promise.resolve()
   }
 
-  protected onAccountsChanged(accounts: string[]): void {
+  onAccountsChanged = (accounts: string[]): void => {
     if (accounts.length === 0) this.emit('disconnect')
     else this.emit('change', { account: getAddress(accounts[0]) })
   }
 
-  protected onChainChanged(chainId: string | number): void {
+  onChainChanged = (chainId: string | number): void => {
     const id = normalizeChainId(chainId)
-    const unsupported = this.isChainUnsupported(id)
+
+    const unsupported = Connector.isChainUnsupported(id)
     this.emit('change', { chain: { id, unsupported } })
   }
 

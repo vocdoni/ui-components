@@ -1,16 +1,18 @@
-import { Wallet } from 'ethers'
-import { keccak256 } from 'ethers/lib/utils.js'
 import { Buffer } from 'buffer'
+import { keccak256, createWalletClient, custom, publicActions, WalletClient } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import { mainnet } from 'wagmi'
+import { WindowProvider } from '@wagmi/connectors'
 
 export default class localStorageWallet {
   static storageItemName = 'localstorage-wallet-seed'
 
-  public static async getWallet(): Promise<Wallet | undefined> {
+  public static async getWallet(provider: WindowProvider): Promise<WalletClient | undefined> {
     try {
       const value: string = localStorage.getItem(this.storageItemName) as string
       if (!value) return undefined
 
-      return this.createWallet(value)
+      return this.createWallet(value, provider)
     } catch (err) {
       console.error('failed to generate wallet:', err)
     }
@@ -18,13 +20,20 @@ export default class localStorageWallet {
     return undefined
   }
 
-  public static async createWallet(data: string | string[]): Promise<Wallet> {
+  public static async createWallet(data: string | string[], provider: WindowProvider): Promise<WalletClient> {
     const inputs = Array.isArray(data) ? data : [data]
     const hash = inputs.reduce((acc, curr) => acc + curr, '')
 
     localStorage.setItem(this.storageItemName, hash)
 
-    return new Wallet(keccak256(Buffer.from(hash)))
+    const account = privateKeyToAccount(keccak256(Buffer.from(hash)))
+    const client = createWalletClient({
+      account,
+      chain: mainnet,
+      transport: custom(provider),
+    }).extend(publicActions)
+
+    return client
   }
 
   public static async deleteWallet(): Promise<void> {
