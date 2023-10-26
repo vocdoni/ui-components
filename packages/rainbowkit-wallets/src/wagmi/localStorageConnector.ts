@@ -73,13 +73,14 @@ export class localStorageConnector extends InjectedConnector {
   }
 
   async isAuthorized() {
-    let wallet = await localStorageWallet.getWallet(this.provider as WindowProvider)
+    const provider = await this.getProvider()
+    if (!provider) throw new ConnectorNotFoundError()
+
+    let wallet = await localStorageWallet.getWallet(provider)
     if (!wallet) return false
 
     this.wallet = wallet.account
 
-    const provider = await this.getProvider()
-    if (!provider) throw new ConnectorNotFoundError()
     const account = await this.getAccount()
     return !!account
   }
