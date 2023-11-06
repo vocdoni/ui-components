@@ -2,12 +2,12 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
-      "@components/*": ["components/*"],
-      "@constants": ["constants/index.ts"],
-      "@constants/*": ["constants/*"],
-      "@elements/*": ["elements/*"],
-      "@hooks/*": ["hooks/*"],
-      "@src/*": ["./*"]
+      "~components/*": ["components/*"],
+      "~constants": ["constants/index.ts"],
+      "~constants/*": ["constants/*"],
+      "~elements/*": ["elements/*"],
+      "~hooks/*": ["hooks/*"],
+      "~src/*": ["./*"]
     }
   }
 }

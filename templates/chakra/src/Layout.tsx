@@ -1,8 +1,8 @@
 import { Box, Grid, Stack } from '@chakra-ui/react'
-import { Account } from '@components/Account'
-import { ColorModeSwitcher } from '@components/ColorModeSwitcher'
 import { Balance } from '@vocdoni/chakra-components'
 import { Outlet } from 'react-router-dom'
+import { Account } from '~components/Account'
+import { ColorModeSwitcher } from '~components/ColorModeSwitcher'
 
 const Layout = () => (
   <Box>
