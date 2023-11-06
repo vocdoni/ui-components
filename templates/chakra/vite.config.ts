@@ -10,7 +10,7 @@ if (!vocdoniEnvironment) {
 // https://vitejs.dev/config/
 export default defineConfig({
   define: {
-    'process.env.VOCDONI_ENVIRONMENT': `"${vocdoniEnvironment}"`,
+    'import.meta.env.VOCDONI_ENVIRONMENT': `"${vocdoniEnvironment}"`,
   },
   plugins: [tsconfigPaths(), react()],
   build: {
