@@ -16,6 +16,7 @@ export const locales = {
       'Pause the voting process temporarily, until resumed manually. While the process is paused, voters cannot submit votes.',
     waiting_title: 'Waiting for transaction confirmation...',
   },
+  balance: '{{ balance }} VOC tokens',
   confirm: {
     title: 'Confirm',
     cancel: 'Cancel',

@@ -2,7 +2,7 @@ import { Tag, TagProps } from '@chakra-ui/tag'
 import { useClient } from '@vocdoni/react-providers'
 
 export const Balance = (props: TagProps) => {
-  const { balance } = useClient()
+  const { balance, localize } = useClient()
 
   if (balance < 0) {
     return null
@@ -17,7 +17,7 @@ export const Balance = (props: TagProps) => {
 
   return (
     <Tag size='sm' colorScheme={color} {...props}>
-      {balance} votokens
+      {localize('balance', { balance })}
     </Tag>
   )
 }
