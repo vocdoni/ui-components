@@ -1,5 +1,5 @@
 import { Button } from '@chakra-ui/button'
-import { FormControl, FormErrorMessage, FormLabel } from '@chakra-ui/form-control'
+import { FormControl, FormErrorMessage, FormHelperText, FormLabel } from '@chakra-ui/form-control'
 import { Input } from '@chakra-ui/input'
 import {
   Modal,
@@ -24,7 +24,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const { connected, clearClient } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
-  const { env } = useClient()
+  const { env, setSik } = useClient()
   const { election, setClient, localize, fetchCensus } = useElection()
   const fields: string[] = dotobject(election, 'meta.census.fields')
   const {
@@ -36,6 +36,14 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const onSubmit = async (vals: any) => {
     try {
       setLoading(true)
+
+      // grab sik passworrd if anon election
+      let sikp: null | string = null
+      if (election?.electionType.anonymous) {
+        sikp = vals.sik_password
+        delete vals.sik_password
+      }
+
       // create wallet and client
       const wallet = walletFromRow(election!.organizationId, Object.values(vals))
       const client = new VocdoniSDKClient({
@@ -53,6 +61,10 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       }
       // use provider method to set related census state info
       fetchCensus()
+      // store sik password to client on anon elections
+      if (election?.electionType.anonymous && sikp) {
+        setSik(sikp)
+      }
       // in case of success, set current client
       setClient(client)
       // also, close the modal
@@ -88,7 +100,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
         {localize('spreadsheet.access_button')}
       </Button>
       <Modal isOpen={isOpen} onClose={() => !loading && onClose()}>
-        <ModalOverlay />
+        <ModalOverlay sx={styles.overlay} />
         <ModalContent sx={styles.content}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <ModalHeader sx={styles.header}>{localize('spreadsheet.modal_title')}</ModalHeader>
@@ -101,8 +113,18 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
                   <FormErrorMessage sx={styles.error}>{errors[key]?.message?.toString()}</FormErrorMessage>
                 </FormControl>
               ))}
+              {election.electionType.anonymous && (
+                <FormControl isInvalid={!!errors.sik_password} sx={styles.sik_control}>
+                  <FormLabel sx={styles.label}>{localize('spreadsheet.anon_sik_label')}</FormLabel>
+                  <Input {...register('sik_password', { required })} type='password' sx={styles.input} />
+                  {!!errors.sik_password ? (
+                    <FormErrorMessage sx={styles.error}>{errors.sik_password?.message?.toString()}</FormErrorMessage>
+                  ) : (
+                    <FormHelperText sx={styles.helper}>{localize('spreadsheet.anon_sik_helper')}</FormHelperText>
+                  )}
+                </FormControl>
+              )}
             </ModalBody>
-
             <ModalFooter sx={styles.footer}>
               <Button variant='ghost' mr={3} onClick={onClose} sx={styles.close} isDisabled={loading}>
                 {localize('spreadsheet.close')}

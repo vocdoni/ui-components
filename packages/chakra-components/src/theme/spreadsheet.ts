@@ -4,6 +4,7 @@ export const spreadsheetAccessAnatomy = [
   // disconnect/logout button
   'disconnect',
   // modal parts
+  'overlay',
   'content',
   'header',
   'body',
@@ -18,4 +19,7 @@ export const spreadsheetAccessAnatomy = [
   'input',
   'error',
   'submit',
+  'helper',
+  // sik field wrapper
+  'sik_control',
 ]

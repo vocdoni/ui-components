@@ -1,5 +1,5 @@
 import { Wallet } from '@ethersproject/wallet'
-import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect } from 'react'
 import { useLocalize } from '../i18n/localize'
 import { ClientReducerProps, newVocdoniSDKClient, useClientReducer } from './use-client-reducer'
@@ -72,14 +72,11 @@ export const useClientProvider = ({ client: c, env: e, signer: s, options: o }: 
    *
    * @returns {Promise<AccountData>}
    */
-  const createAccount = (account?: Account, faucetPackage?: string) => {
+  const createAccount = (options?: { account?: Account; faucetPackage?: string; sik?: boolean; password?: string }) => {
     if (state.loading.create) return
 
     actions.createAccount()
-    return state.client
-      .createAccount({ account, faucetPackage })
-      .then(actions.setAccountCreate)
-      .catch(actions.errorAccountCreate)
+    return state.client.createAccount(options).then(actions.setAccountCreate).catch(actions.errorAccountCreate)
   }
 
   /**
@@ -106,11 +103,12 @@ export const useClientProvider = ({ client: c, env: e, signer: s, options: o }: 
   return {
     ...state,
     clear: actions.clear,
+    setClient: actions.setClient,
+    setSigner: actions.setSigner,
+    setSik: actions.setSik,
     createAccount,
     fetchAccount,
-    setClient: actions.setClient,
-    localize,
-    setSigner: actions.setSigner,
     generateSigner,
+    localize,
   }
 }
