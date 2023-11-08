@@ -1,5 +1,6 @@
 import { inputsWallet } from '../lib/inputsWallet'
 import { localStorageConnector } from './localStorageConnector'
+import { WindowProvider } from '@wagmi/connectors'
 
 const IS_SERVER = typeof window === 'undefined'
 
@@ -9,13 +10,13 @@ export class inputsConnector extends localStorageConnector {
   readonly name = 'Inputs'
 
   protected async createWallet() {
-    let wallet = await inputsWallet.getWallet()
+    const provider = (await this.getProvider()) as WindowProvider
+    let wallet = await inputsWallet.getWallet(provider)
     if (!wallet) {
       const w = new inputsWallet()
-      wallet = await w.create()
+      wallet = await w.create(provider)
     }
 
-    wallet.connect(await this.getProvider())
-    this.wallet = wallet
+    this.wallet = wallet?.account
   }
 }

@@ -1,7 +1,8 @@
-import { ethers } from 'ethers'
 import { createRoot } from 'react-dom/client'
 import { CreateWalletModal } from '../components/CreateWalletModal'
 import localStorageWallet from './localStorageWallet'
+import { WalletClient } from 'viem'
+import { WindowProvider } from 'wagmi'
 
 /**
  * This class is used to create a wallet from a form
@@ -10,7 +11,7 @@ export class inputsWallet extends localStorageWallet {
   private data: any
   private cancel: boolean = false
 
-  async create(): Promise<ethers.Wallet> {
+  async create(provider: WindowProvider): Promise<WalletClient> {
     // Create a div to render the modal
     const myDiv = document.createElement('div')
     myDiv.setAttribute('id', 'myDiv' + Math.random())
@@ -37,6 +38,6 @@ export class inputsWallet extends localStorageWallet {
       throw new Error('User cancelled')
     }
 
-    return await localStorageWallet.createWallet(JSON.stringify(this.data))
+    return await localStorageWallet.createWallet(JSON.stringify(this.data), provider)
   }
 }

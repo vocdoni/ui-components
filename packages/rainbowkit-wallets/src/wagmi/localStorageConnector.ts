@@ -32,7 +32,6 @@ export class localStorageConnector extends InjectedConnector {
       }
 
       const account = await this.getAccount()
-      const provider = await this.getProvider()
       const chainId = await this.getChainId()
 
       const cdata: ConnectorData = {
@@ -41,7 +40,6 @@ export class localStorageConnector extends InjectedConnector {
           id: chainId,
           unsupported: false,
         },
-        provider: provider as any,
       }
 
       return cdata
@@ -98,7 +96,7 @@ export class localStorageConnector extends InjectedConnector {
   onChainChanged = (chainId: string | number): void => {
     const id = normalizeChainId(chainId)
 
-    const unsupported = Connector.isChainUnsupported(id)
+    const unsupported = this.isChainUnsupported(id)
     this.emit('change', { chain: { id, unsupported } })
   }
 
