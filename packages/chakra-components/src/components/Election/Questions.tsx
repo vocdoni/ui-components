@@ -25,6 +25,7 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
     errors: { voting: error },
     localize,
     isAbleToVote,
+    client,
   } = useElection()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
@@ -49,7 +50,7 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
 
   const vote = async (values: FieldValues) => {
     if (
-      election.get('census.type') === 'spreadsheet' &&
+      client.wallet instanceof Wallet &&
       !(await confirm(
         typeof confirmContents === 'function' ? (
           confirmContents(questions, values)

@@ -30,12 +30,14 @@ export const ClientClear = 'client:clear'
 export const ClientEnvSet = 'client:env:set'
 export const ClientSet = 'client:set'
 export const ClientSignerSet = 'client:signer:set'
+export const ClientSikPasswordSet = 'client:sikp:set'
 
 export type ClientAccountErrorPayload = ErrorPayload
 export type ClientAccountSetPayload = AccountData
 export type ClientEnvSetPayload = ClientEnv
 export type ClientSetPayload = VocdoniSDKClient
 export type ClientSignerSetPayload = Signer | Wallet
+export type ClientSikPasswordSetPayload = string
 
 export type ClientActionPayload =
   | ClientAccountErrorPayload
@@ -43,6 +45,7 @@ export type ClientActionPayload =
   | ClientEnvSetPayload
   | ClientSetPayload
   | ClientSignerSetPayload
+  | ClientSikPasswordSetPayload
 
 export type ClientActionType =
   | typeof ClientAccountCreate
@@ -56,6 +59,7 @@ export type ClientActionType =
   | typeof ClientEnvSet
   | typeof ClientSet
   | typeof ClientSignerSet
+  | typeof ClientSikPasswordSet
 
 export interface ClientAction {
   type: ClientActionType
@@ -236,6 +240,13 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         connected: !!client.wallet,
       }
     }
+    case ClientSikPasswordSet: {
+      const sikp = action.payload as ClientSikPasswordSetPayload
+      return {
+        ...state,
+        sikp,
+      }
+    }
     default:
       return state
   }
@@ -272,6 +283,7 @@ export const useClientReducer = ({ env, client, signer, options }: ClientReducer
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ClientSet, payload: client })
   const setEnv = (env: ClientEnvSetPayload) => dispatch({ type: ClientEnvSet, payload: env })
   const setSigner = (signer: Wallet | Signer) => dispatch({ type: ClientSignerSet, payload: signer })
+  const setSik = (sikp: string) => dispatch({ type: ClientSikPasswordSet, payload: sikp })
 
   return {
     state,
@@ -287,6 +299,7 @@ export const useClientReducer = ({ env, client, signer, options }: ClientReducer
       setClient,
       setEnv,
       setSigner,
+      setSik,
     },
   }
 }

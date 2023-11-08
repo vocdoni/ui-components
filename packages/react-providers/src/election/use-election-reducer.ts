@@ -1,4 +1,4 @@
-import { CensusType, PublishedElection, VocdoniSDKClient, Vote, areEqualHexStrings } from '@vocdoni/sdk'
+import { areEqualHexStrings, CensusType, PublishedElection, VocdoniSDKClient, Vote } from '@vocdoni/sdk'
 import { Reducer, useEffect, useReducer } from 'react'
 import { useClient } from '../client'
 import { ClientSetPayload } from '../client/use-client-reducer'
@@ -429,16 +429,18 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   useEffect(() => {
     // we don't want to clear the session when we're connected everywhere
     if (state.connected && connected) return
-    if (
-      // we don't want to disconnect the local client on spreadsheet elections when the main client gets disconnected
-      (!connected && state.election?.meta?.census && state.election?.get('census.type') === 'spreadsheet') ||
-      // we don't want to clear the local client on non spreadsheet elections
-      (!state.connected && state.election?.meta?.census && state.election?.get('census.type') !== 'spreadsheet')
-    )
-      return
 
     // if there's no meta census information, avoid clearing it from state (process does not follow our way to create them)
     if (!state.election?.meta?.census) {
+      return
+    }
+
+    if (
+      // we don't want to disconnect the local client for Wallet sessions when the main client gets disconnected
+      (!connected && state.election?.meta?.census && state.election?.get('census.type') === 'spreadsheet') ||
+      // we don't want to clear the local client on Signer sessions (non wallet ones)
+      (!state.connected && state.election?.meta?.census && state.election?.get('census.type') !== 'spreadsheet')
+    ) {
       return
     }
 

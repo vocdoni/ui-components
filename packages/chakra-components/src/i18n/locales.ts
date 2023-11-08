@@ -57,9 +57,11 @@ export const locales = {
   },
   spreadsheet: {
     access_button: 'Identify',
+    anon_sik_label: 'Define a password for your vote',
+    anon_sik_helper: 'This ensures the vote to be anonymous',
     close: 'Close',
-    modal_title: 'You must identify first',
     logout: 'Logout',
+    modal_title: 'You must identify first',
   },
 }
 

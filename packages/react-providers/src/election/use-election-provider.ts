@@ -1,4 +1,4 @@
-import { areEqualHexStrings, CensusType, CspVote, PublishedElection, Vote } from '@vocdoni/sdk'
+import { AnonymousVote, areEqualHexStrings, CensusType, CspVote, PublishedElection, Vote } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect } from 'react'
 import { useClient } from '../client'
 import { useElectionReducer } from './use-election-reducer'
@@ -22,7 +22,7 @@ export const useElectionProvider = ({
   autoUpdate,
   ...rest
 }: ElectionProviderProps) => {
-  const { client: c, localize } = useClient()
+  const { client: c, localize, sikp } = useClient()
   const { state, actions } = useElectionReducer(c, data)
   const { client, csp, election, loading, loaded } = state
 
@@ -188,7 +188,11 @@ export const useElectionProvider = ({
     client.setElectionId(election.id)
 
     try {
-      const vote = new Vote(values)
+      let vote: Vote | AnonymousVote = new Vote(values)
+      if (election.electionType.anonymous && sikp) {
+        vote = new AnonymousVote(values, sikp)
+      }
+
       actions.setVote(vote)
       if (typeof beforeSubmit === 'function' && !beforeSubmit(vote)) {
         return
