@@ -1,6 +1,6 @@
 {
   "name": "@vocdoni/rainbowkit-wallets",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/rainbowkit-wallets#readme",
   "bugs": "https://github.com/vocdoni/ui-components/issues",
@@ -17,14 +17,14 @@
     "clean": "rm -rf dist .turbo node_modules"
   },
   "peerDependencies": {
-    "@rainbow-me/rainbowkit": "^1.1.3",
-    "@wagmi/core": "^1.4.5",
-    "wagmi": "^1.4.5"
+    "@rainbow-me/rainbowkit": "^1.2.0",
+    "@wagmi/core": "^1.4.6",
+    "wagmi": "^1.4.6"
   },
   "devDependencies": {
-    "@rainbow-me/rainbowkit": "^1.1.3",
+    "@rainbow-me/rainbowkit": "^1.2.0",
     "@types/react-modal": "^3.16.0",
-    "@wagmi/core": "^1.4.5",
+    "@wagmi/core": "^1.4.6",
     "clean-package": "^2.2.0",
     "localforage": "^1.10.0",
     "react-modal": "^3.16.1",
@@ -32,7 +32,7 @@
     "typescript": "5.0.2",
     "vite": "^4.4.2",
     "vite-plugin-dts": "^3.2.0",
-    "wagmi": "^1.4.5"
+    "wagmi": "^1.4.6"
   },
   "clean-package": "../../clean-package.config.json"
 }
