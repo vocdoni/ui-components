@@ -1,7 +1,7 @@
 import { rest } from 'msw'
 
 export const handlers = [
-  rest.get('https://api*.vocdoni.net/v2/accounts/*', (req, res, ctx) => {
+  rest.get('https://api*.vocdoni.*/v2/accounts/*', (req, res, ctx) => {
     const id = req.params[1]
     return res(
       ctx.status(200),
@@ -22,7 +22,7 @@ export const handlers = [
       })
     )
   }),
-  rest.get('https://api*.vocdoni.net/v2/elections/*', (req, res, ctx) => {
+  rest.get('https://api*.vocdoni.*/v2/elections/*', (req, res, ctx) => {
     const id = req.params[1]
     return res(
       ctx.status(200),
@@ -92,7 +92,7 @@ export const handlers = [
       })
     )
   }),
-  rest.get('https://api*.vocdoni.net/v2/censuses/*/size', (req, res, ctx) => {
+  rest.get('https://api*.vocdoni.*/v2/censuses/*/size', (req, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
@@ -100,7 +100,7 @@ export const handlers = [
       })
     )
   }),
-  rest.get('https://api*.vocdoni.net/v2/censuses/*/weight', (req, res, ctx) => {
+  rest.get('https://api*.vocdoni.*/v2/censuses/*/weight', (req, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
@@ -108,7 +108,7 @@ export const handlers = [
       })
     )
   }),
-  rest.get('https://api*.vocdoni.net/v2/censuses/*/type', (req, res, ctx) => {
+  rest.get('https://api*.vocdoni.*/v2/censuses/*/type', (req, res, ctx) => {
     return res(
       ctx.status(200),
       ctx.json({
