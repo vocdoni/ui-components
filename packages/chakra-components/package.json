@@ -24,7 +24,7 @@
   },
   "main": "src/index.ts",
   "dependencies": {
-    "@vocdoni/react-providers": "0.1.13"
+    "@vocdoni/react-providers": "0.1.14"
   },
   "peerDependencies": {
     "@chakra-ui/alert": "^2.0.18",
@@ -43,7 +43,7 @@
     "@chakra-ui/tag": "^3.0.0",
     "@chakra-ui/theme": "^3.0.0",
     "@chakra-ui/toast": "^6.1.1",
-    "@vocdoni/sdk": ">= 0.3.1",
+    "@vocdoni/sdk": ">= 0.4.1",
     "react": ">= 16.8.0",
     "react-dom": ">= 16.8.0",
     "react-markdown": ">= 8.0.0",
