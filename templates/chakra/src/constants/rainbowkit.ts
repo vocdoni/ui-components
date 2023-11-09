@@ -1,6 +1,6 @@
 import { getDefaultWallets } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
-import { configureChains, createClient } from 'wagmi'
+import { configureChains, createConfig } from 'wagmi'
 import type { Chain } from 'wagmi/chains'
 import { mainnet } from 'wagmi/chains'
 import { publicProvider } from 'wagmi/providers/public'
@@ -13,7 +13,7 @@ const vocdoni = {
   network: 'none',
 } as const satisfies Chain
 
-export const { chains, provider } = configureChains([vocdoni], [publicProvider()])
+export const { chains, publicClient } = configureChains([vocdoni], [publicProvider()])
 
 export const { connectors } = getDefaultWallets({
   appName: "Vocdoni's Voting Protocol",
@@ -21,8 +21,8 @@ export const { connectors } = getDefaultWallets({
   chains,
 })
 
-export const wagmiClient = createClient({
+export const wagmiConfig = createConfig({
   autoConnect: true,
   connectors,
-  provider,
+  publicClient,
 })

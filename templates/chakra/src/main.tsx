@@ -1,5 +1,5 @@
 import { ChakraProvider } from '@chakra-ui/react'
-import { chains, wagmiClient } from '@constants/rainbowkit'
+import { chains, wagmiConfig } from '@constants/rainbowkit'
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { StrictMode } from 'react'
 import * as ReactDOM from 'react-dom/client'
@@ -16,7 +16,7 @@ const root = ReactDOM.createRoot(container)
 root.render(
   <StrictMode>
     <ChakraProvider theme={theme}>
-      <WagmiConfig client={wagmiClient}>
+      <WagmiConfig config={wagmiConfig}>
         <RainbowKitProvider chains={chains}>
           <App />
         </RainbowKitProvider>

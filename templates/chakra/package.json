@@ -14,7 +14,7 @@
     "@chakra-ui/react": "2.5.5",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
-    "@rainbow-me/rainbowkit": "^0.12.4",
+    "@rainbow-me/rainbowkit": "^1.2.0",
     "@vocdoni/chakra-components": "*",
     "@vocdoni/sdk": "^0.3.1",
     "date-fns": "^2.29.3",
@@ -27,7 +27,8 @@
     "react-markdown": "^8.0.6",
     "react-router-dom": "^6.9.0",
     "remark-gfm": "^3.0.1",
-    "wagmi": "^0.12.7",
+    "viem": "^1.18.9",
+    "wagmi": "^1.4.6",
     "web-vitals": "^3.3.0",
     "yup": "^0.32.11"
   },
