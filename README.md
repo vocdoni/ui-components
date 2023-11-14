@@ -3,7 +3,7 @@
 ![vocdoni logo]
 
 
-![GitHub commit activity (develop)][commit activity badge]
+[![GitHub commit activity (develop)][commit activity badge]][github commits]
 [![GitHub issues][github issues badge]][github issues]
 [![lint and test][lint and test badge]][lint and test]
 [![Join Discord][discord badge]][discord invite]
@@ -104,3 +104,4 @@ with them.
 [twitter follow]: https://twitter.com/intent/user?screen_name=vocdoni
 [lint and test]: https://github.com/vocdoni/ui-components/actions/workflows/test.yml
 [github issues]: https://github.com/vocdoni/ui-components/issues
+[github commits]: https://github.com/vocdoni/ui-components/commits/main
