@@ -1,6 +1,6 @@
-import localStorageWallet from './localStorageWallet'
-import { WalletClient } from 'viem'
 import { WindowProvider } from '@wagmi/connectors'
+import { WalletClient } from 'viem'
+import localStorageWallet from './localStorageWallet'
 
 /**
  * This class is used to create a wallet from an external service (OAuth)

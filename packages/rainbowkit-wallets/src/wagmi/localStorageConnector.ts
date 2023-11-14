@@ -1,7 +1,7 @@
-import { type Address, UserRejectedRequestError, getAddress, Account, Chain } from 'viem'
-import { ConnectorData, ConnectorNotFoundError, Connector } from 'wagmi'
+import { normalizeChainId, WindowProvider } from '@wagmi/connectors'
 import { InjectedConnector } from '@wagmi/connectors/injected'
-import { WindowProvider, normalizeChainId } from '@wagmi/connectors'
+import { Account, Chain, getAddress, UserRejectedRequestError, type Address } from 'viem'
+import { ConnectorData, ConnectorNotFoundError } from 'wagmi'
 import localStorageWallet from '../lib/localStorageWallet'
 
 const IS_SERVER = typeof window === 'undefined'

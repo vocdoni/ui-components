@@ -1,7 +1,7 @@
+import { WindowProvider } from '@wagmi/connectors'
 import { Chain } from 'wagmi'
 import { oAuthWallet } from '../lib/oAuthWallet'
 import { localStorageConnector } from './localStorageConnector'
-import { WindowProvider } from '@wagmi/connectors'
 
 const IS_SERVER = typeof window === 'undefined'
 

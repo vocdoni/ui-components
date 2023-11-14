@@ -1,8 +1,8 @@
+import { WindowProvider } from '@wagmi/connectors'
 import { Buffer } from 'buffer'
-import { keccak256, createWalletClient, custom, WalletClient } from 'viem'
+import { createWalletClient, custom, keccak256, WalletClient } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { mainnet } from 'wagmi'
-import { WindowProvider } from '@wagmi/connectors'
 
 export default class localStorageWallet {
   static storageItemName = 'localstorage-wallet-seed'
