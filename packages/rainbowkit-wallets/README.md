@@ -1,3 +1,13 @@
+<div align="center">
+
+![vocdoni logo]
+
+[![rainbowkit-wallets badge]][npm link]
+[![Join Discord][discord badge]][discord invite]
+[![Twitter Follow][twitter badge]][twitter follow]
+
+</div>
+
 @vocdoni/rainbowkit-wallets
 ===========================
 
@@ -70,3 +80,12 @@ v3.0][license].
 [multipart components]: https://chakra-ui.com/docs/styled-system/component-style#styling-multipart-components
 [questions]: #questions
 [theme path]: ./src/theme
+
+[vocdoni logo]: https://docs.vocdoni.io/Logotype.svg
+[rainbowkit-wallets badge]: https://img.shields.io/npm/v/%40vocdoni%2Frainbowkit-wallets?label=%40vocdoni%2Frainbowkit-wallets
+[discord badge]: https://img.shields.io/badge/discord-join%20chat-blue.svg
+[twitter badge]: https://img.shields.io/twitter/follow/vocdoni?style=social&label=Follow
+
+[discord invite]: https://discord.gg/xFTh8Np2ga
+[twitter follow]: https://twitter.com/intent/user?screen_name=vocdoni
+[npm link]: https://www.npmjs.com/package/@vocdoni/rainbowkit-wallets

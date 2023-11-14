@@ -1,3 +1,13 @@
+<div align="center">
+
+![vocdoni logo]
+
+[![react-providers badge]][npm link]
+[![Join Discord][discord badge]][discord invite]
+[![Twitter Follow][twitter badge]][twitter follow]
+
+</div>
+
 @vocdoni/react-providers
 ========================
 
@@ -147,3 +157,12 @@ v3.0][license].
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [license]: ./LICENSE
+
+[vocdoni logo]: https://docs.vocdoni.io/Logotype.svg
+[react-providers badge]: https://img.shields.io/npm/v/%40vocdoni%2Freact-providers?label=%40vocdoni%2Freact-providers
+[discord badge]: https://img.shields.io/badge/discord-join%20chat-blue.svg
+[twitter badge]: https://img.shields.io/twitter/follow/vocdoni?style=social&label=Follow
+
+[discord invite]: https://discord.gg/xFTh8Np2ga
+[twitter follow]: https://twitter.com/intent/user?screen_name=vocdoni
+[npm link]: https://www.npmjs.com/package/@vocdoni/react-providers

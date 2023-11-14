@@ -1,5 +1,18 @@
-Vocdoni UI components and other helpers
-=======================================
+<div align="center">
+
+![vocdoni logo]
+
+
+![GitHub commit activity (develop)][commit activity badge]
+[![GitHub issues][github issues badge]][github issues]
+[![lint and test][lint and test badge]][lint and test]
+[![Join Discord][discord badge]][discord invite]
+[![Twitter Follow][twitter badge]][twitter follow]
+
+</div>
+
+Vocdoni's UI components
+=======================
 
 This project aims to ease the creation of voting user interfaces, allowing
 developers to easily style everything as desired, and to chose from a variety of
@@ -23,32 +36,27 @@ For now, two different package folders have been created:
 Included packages
 -----------------
 
-For now, there's only a single package published, but we may split it in the
-future, or create new ones for other frameworks:
 
-- [`@vocdoni/chakra-components`] React components built with chakra for easily
-  integrating Vocdoni services.
-- [`@vocdoni/rainbowkit-wallets`] A set of wallets for rainbowkit, reducing the
-  technical gap for users, not requiring them to have a Web3 wallet.
-- [`@vocdoni/react-providers`] React providers and hooks, where most of the magic
-  of react apps happens (and for other packages like [`@vocdoni/chakra-components`])
+| Component | Description |
+| --- | --- |
+| [![chakra-components badge]][`@vocdoni/chakra-components`] | Voting related react components built with chakra for easily integrating Vocdoni. |
+| [![rainbowkit-wallets badge]][`@vocdoni/rainbowkit-wallets`] | A set of custom wallets for rainbowkit. |
+| [![react-providers badge]][`@vocdoni/react-providers`] | React providers and hooks, where most of the magic of react apps happens (required by `@vocdoni/chakra-components`) |
 
 Development
 -----------
 
-There's a `dev` script on every project, allowing you to watch for your changes,
-and automatically refreshing the contents thanks to the hot module reload.
+Every package has typescript files configured as entrypoints, so you should be
+able to just run `yarn dev` on the included chakra template to start developing
+any of the included packages.
 
-The main repo has turborepo configured, meaning you could just run `yarn dev` on
-the root folder, but to be honest it does not work very well and can be a bit
-frustrating, specially when you start having weird errors related to react
-internals.
+Note that, due to the above mentioned reason, if you link (via npm/yarn link)
+any of the included packages to your project, your project MUST be able to run
+typescript code, otherwise it will fail.
 
-For that reason it's a bit better to just run `yarn dev` on two different
-terminals when you need to work on the components (and see a preview).
-
-Turbo is still very usefull if you only want to build (`yarn build` from the
-root), that's why it has been maintained (at least for now).
+Turbo was initially configured for the development process, but it's not used
+anymore; still, you can use it if you want to make a build of all the included
+packages. To do su, simply run `yarn build` from the root of the project.
 
 LICENSE
 -------
@@ -81,3 +89,18 @@ with them.
 [`@vocdoni/chakra-components`]: ./packages/chakra-components/README.md
 [`@vocdoni/rainbowkit-wallets`]: ./packages/rainbowkit-wallets/README.md
 [`@vocdoni/react-providers`]: ./packages/react-providers/README.md
+
+[vocdoni logo]: https://docs.vocdoni.io/Logotype.svg
+[chakra-components badge]: https://img.shields.io/npm/v/%40vocdoni%2Fchakra-components?label=%40vocdoni%2Fchakra-components
+[commit activity badge]: https://img.shields.io/github/commit-activity/m/vocdoni/ui-components
+[discord badge]: https://img.shields.io/badge/discord-join%20chat-blue.svg
+[github issues badge]: https://img.shields.io/github/issues/vocdoni/ui-components
+[lint and test badge]: https://github.com/vocdoni/ui-components/actions/workflows/test.yml/badge.svg?branch=main
+[rainbowkit-wallets badge]: https://img.shields.io/npm/v/%40vocdoni%2Frainbowkit-wallets?label=%40vocdoni%2Frainbowkit-wallets
+[react-providers badge]: https://img.shields.io/npm/v/%40vocdoni%2Freact-providers?label=%40vocdoni%2Freact-providers
+[twitter badge]: https://img.shields.io/twitter/follow/vocdoni?style=social&label=Follow
+
+[discord invite]: https://discord.gg/xFTh8Np2ga
+[twitter follow]: https://twitter.com/intent/user?screen_name=vocdoni
+[lint and test]: https://github.com/vocdoni/ui-components/actions/workflows/test.yml
+[github issues]: https://github.com/vocdoni/ui-components/issues

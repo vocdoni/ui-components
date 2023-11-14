@@ -1,3 +1,13 @@
+<div align="center">
+
+![vocdoni logo]
+
+[![chakra-components badge]][npm link]
+[![Join Discord][discord badge]][discord invite]
+[![Twitter Follow][twitter badge]][twitter follow]
+
+</div>
+
 UI Components with Chakra UI
 ============================
 
@@ -334,3 +344,12 @@ v3.0][license].
 [css props]: #styling-via-props
 [sdk environments]: https://github.com/vocdoni/vocdoni-sdk#environment
 [locales file]: ./src/i18n/locales.ts
+
+[vocdoni logo]: https://docs.vocdoni.io/Logotype.svg
+[chakra-components badge]: https://img.shields.io/npm/v/%40vocdoni%2Fchakra-components?label=%40vocdoni%2Fchakra-components
+[discord badge]: https://img.shields.io/badge/discord-join%20chat-blue.svg
+[twitter badge]: https://img.shields.io/twitter/follow/vocdoni?style=social&label=Follow
+
+[discord invite]: https://discord.gg/xFTh8Np2ga
+[twitter follow]: https://twitter.com/intent/user?screen_name=vocdoni
+[npm link]: https://www.npmjs.com/package/@vocdoni/chakra-components
