@@ -1,6 +1,6 @@
 {
   "name": "@vocdoni/react-providers",
-  "version": "0.1.14",
+  "version": "0.2.0",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/react-providers#readme",
   "bugs": "https://github.com/vocdoni/ui-components/issues",
@@ -23,11 +23,8 @@
     "clean": "rm -rf dist .turbo node_modules"
   },
   "main": "src/index.ts",
-  "dependencies": {
-    "@vocdoni/sdk": "^0.4.2"
-  },
   "peerDependencies": {
-    "@vocdoni/sdk": ">= 0.4.1",
+    "@vocdoni/sdk": "~0.5.1",
     "react": ">= 16.8.0"
   },
   "devDependencies": {
@@ -35,6 +32,7 @@
     "@ethersproject/wallet": "^5.7.0",
     "@types/latinize": "^0.2.15",
     "@types/react": "^18.0.30",
+    "@vocdoni/sdk": "~0.5.1",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-react-app": "^7.0.1",
