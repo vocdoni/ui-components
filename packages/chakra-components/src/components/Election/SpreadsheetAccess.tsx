@@ -14,7 +14,7 @@ import { useDisclosure } from '@chakra-ui/react-use-disclosure'
 import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useToast } from '@chakra-ui/toast'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
-import { VocdoniSDKClient, dotobject } from '@vocdoni/sdk'
+import { ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -72,7 +72,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     message: localize('required'),
   }
 
-  if (election?.get('census.type') !== 'spreadsheet') return null
+  if (election?.get('census.type') !== 'spreadsheet' || election instanceof ArchivedElection) return null
 
   if (connected) {
     return (
