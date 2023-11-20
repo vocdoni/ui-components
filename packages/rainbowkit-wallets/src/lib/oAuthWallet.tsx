@@ -1,6 +1,5 @@
-import { WalletClient } from 'viem'
 import localStorageWallet from './localStorageWallet'
-import { PublicClient } from 'wagmi'
+import { PublicClient, WalletClient } from 'wagmi'
 
 /**
  * This class is used to create a wallet from an external service (OAuth)

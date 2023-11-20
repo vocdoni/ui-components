@@ -1,15 +1,6 @@
-import {
-  type Address,
-  UserRejectedRequestError,
-  getAddress,
-  Account,
-  Chain,
-  createPublicClient,
-  http,
-  WalletClient,
-} from 'viem'
+import { type Address, UserRejectedRequestError, getAddress, Account, Chain, createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
-import { ConnectorData, ConnectorNotFoundError, PublicClient } from 'wagmi'
+import { ConnectorData, ConnectorNotFoundError, PublicClient, WalletClient } from 'wagmi'
 import { Connector, normalizeChainId } from '@wagmi/connectors'
 import localStorageWallet from '../lib/localStorageWallet'
 
@@ -107,6 +98,8 @@ export class localStorageConnector extends Connector {
   async getWalletClient({ chainId }: { chainId: number }) {
     const provider = await this.getProvider()
     if (!provider) throw new ConnectorNotFoundError()
+    const account = await this.getAccount()
+    if (!account) throw new ConnectorNotFoundError()
 
     let wallet = await localStorageWallet.getWallet(provider)
     if (!wallet) throw new ConnectorNotFoundError()

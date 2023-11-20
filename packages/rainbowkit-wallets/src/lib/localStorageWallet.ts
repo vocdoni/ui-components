@@ -1,22 +1,22 @@
 import { Buffer } from 'buffer'
-import { createWalletClient, custom, keccak256, WalletClient, publicActions } from 'viem'
+import { createWalletClient, custom, keccak256, publicActions } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
-import { PublicClient, mainnet } from 'wagmi'
+import { PublicClient, mainnet, WalletClient } from 'wagmi'
 
 export default class localStorageWallet {
   static storageItemName = 'localstorage-wallet-seed'
 
-  public static async getWallet(provider: PublicClient): Promise<WalletClient | undefined> {
+  public static async getWallet(provider: PublicClient): Promise<WalletClient> {
     try {
       const value: string = localStorage.getItem(this.storageItemName) as string
-      if (!value) return undefined
+      if (!value) throw new Error('no wallet found')
 
       return this.createWallet(value, provider)
     } catch (err) {
       console.error('failed to generate wallet:', err)
     }
 
-    return undefined
+    throw new Error('could not find or create wallet')
   }
 
   public static async createWallet(data: string | string[], provider: PublicClient): Promise<WalletClient> {
