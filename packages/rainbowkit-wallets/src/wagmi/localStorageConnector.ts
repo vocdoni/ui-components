@@ -9,7 +9,7 @@ import {
   WalletClient,
 } from 'viem'
 import { mainnet } from 'viem/chains'
-import { ConnectorData, ConnectorNotFoundError, WindowProvider } from 'wagmi'
+import { ConnectorData, ConnectorNotFoundError, PublicClient } from 'wagmi'
 import { Connector, normalizeChainId } from '@wagmi/connectors'
 import localStorageWallet from '../lib/localStorageWallet'
 
@@ -24,7 +24,7 @@ export class localStorageConnector extends Connector {
   readonly name: string = 'localStorage'
 
   protected chainId: number | undefined
-  protected provider: WindowProvider | undefined
+  protected provider: PublicClient | undefined
   protected wallet: WalletClient | undefined
 
   constructor(config: { chains: Chain[]; options: any }) {
