@@ -1,6 +1,6 @@
 import { WindowProvider } from '@wagmi/connectors'
 import { Buffer } from 'buffer'
-import { createWalletClient, custom, keccak256, WalletClient } from 'viem'
+import { createWalletClient, custom, keccak256, WalletClient, publicActions } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { mainnet } from 'wagmi'
 
@@ -31,7 +31,7 @@ export default class localStorageWallet {
       account,
       chain: mainnet,
       transport: custom(provider),
-    })
+    }).extend(publicActions)
 
     return client
   }

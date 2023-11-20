@@ -17,6 +17,6 @@ export class inputsConnector extends localStorageConnector {
       wallet = await w.create(provider)
     }
 
-    this.wallet = wallet?.account
+    this.wallet = wallet
   }
 }
