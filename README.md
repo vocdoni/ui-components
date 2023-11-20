@@ -50,13 +50,21 @@ Every package has typescript files configured as entrypoints, so you should be
 able to just run `yarn dev` on the included chakra template to start developing
 any of the included packages.
 
-Note that, due to the above mentioned reason, if you link (via npm/yarn link)
-any of the included packages to your project, your project MUST be able to run
-typescript code, otherwise it will fail.
+Due to the above mentioned reason, if you link (via npm/yarn link) any of the
+included packages to your project, your project MUST be able to run typescript
+code, otherwise it will fail.
 
-Turbo was initially configured for the development process, but it's not used
-anymore; still, you can use it if you want to make a build of all the included
-packages. To do su, simply run `yarn build` from the root of the project.
+Turbo was initially configured for the development process, but its usage is
+minimum; still, you can use it for some global commands:
+
+- `yarn build`: will build every package in the monorepo (including templates)
+- `yarn clean`: removes `dist`, `.turbo` and `node_modules` folders in the
+  entire monorepo.
+- `yarn lint`: runs the linter of each package (may vary per package, but
+  usually prettier & tsc).
+- `yarn test`: runs all the tests in the monorepo. Note these are configured
+  globally in the monorepo (testing dependencies are in the base `package.json`
+  file)
 
 LICENSE
 -------
