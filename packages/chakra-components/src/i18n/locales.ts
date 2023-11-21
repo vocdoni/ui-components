@@ -35,7 +35,6 @@ export const locales = {
     wrong_data_title: 'Wrong data',
     wrong_data_description: 'The specified data is not correct',
   },
-  required: 'This field is required',
   schedule: 'Voting from {{ begin }} to {{ end }}',
   // results component
   results: {
@@ -62,6 +61,10 @@ export const locales = {
     close: 'Close',
     logout: 'Logout',
     modal_title: 'You must identify first',
+  },
+  validation: {
+    required: 'This field is required',
+    min_length: 'This field must be at least {{ min }} characters long',
   },
 }
 

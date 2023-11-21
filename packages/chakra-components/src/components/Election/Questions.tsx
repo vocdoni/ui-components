@@ -169,7 +169,7 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
             </chakra.div>
           )}
           <Controller
-            rules={{ required: localize('required') }}
+            rules={{ required: localize('validation.required') }}
             name={index}
             render={({ field }) => (
               <RadioGroup
