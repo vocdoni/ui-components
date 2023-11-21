@@ -1,8 +1,7 @@
 import { createRoot } from 'react-dom/client'
-import { WalletClient } from 'viem'
-import { WindowProvider } from 'wagmi'
 import { CreateWalletModal } from '../components/CreateWalletModal'
 import localStorageWallet from './localStorageWallet'
+import { PublicClient, WalletClient } from 'wagmi'
 
 /**
  * This class is used to create a wallet from a form
@@ -11,7 +10,7 @@ export class inputsWallet extends localStorageWallet {
   private data: any
   private cancel: boolean = false
 
-  async create(provider: WindowProvider): Promise<WalletClient> {
+  async create(provider: PublicClient): Promise<WalletClient> {
     // Create a div to render the modal
     const myDiv = document.createElement('div')
     myDiv.setAttribute('id', 'myDiv' + Math.random())

@@ -1,5 +1,4 @@
-import { WindowProvider } from '@wagmi/connectors'
-import { Chain } from 'wagmi'
+import { Chain, PublicClient } from 'wagmi'
 import { oAuthWallet } from '../lib/oAuthWallet'
 import { localStorageConnector } from './localStorageConnector'
 
@@ -28,13 +27,14 @@ export class oAuthConnector extends localStorageConnector {
   }
 
   protected async createWallet() {
-    const provider = (await this.getProvider()) as WindowProvider
+    const provider = (await this.getProvider()) as PublicClient
     let wallet = await oAuthWallet.getWallet(provider)
+
     if (!wallet) {
       const w = new oAuthWallet(this.oAuthServiceUrl, this.oAuthServiceProvider)
       wallet = await w.create(provider)
     }
 
-    this.wallet = wallet?.account
+    this.wallet = wallet
   }
 }

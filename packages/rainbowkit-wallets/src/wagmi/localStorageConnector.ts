@@ -1,7 +1,7 @@
-import { normalizeChainId, WindowProvider } from '@wagmi/connectors'
-import { InjectedConnector } from '@wagmi/connectors/injected'
-import { Account, Chain, getAddress, UserRejectedRequestError, type Address } from 'viem'
-import { ConnectorData, ConnectorNotFoundError } from 'wagmi'
+import { type Address, UserRejectedRequestError, getAddress, Account, Chain, createPublicClient, http } from 'viem'
+import { mainnet } from 'viem/chains'
+import { ConnectorData, ConnectorNotFoundError, PublicClient, WalletClient } from 'wagmi'
+import { Connector, normalizeChainId } from '@wagmi/connectors'
 import localStorageWallet from '../lib/localStorageWallet'
 
 const IS_SERVER = typeof window === 'undefined'
@@ -9,14 +9,14 @@ const IS_SERVER = typeof window === 'undefined'
 /**
  * A connector that uses the local storage to store seed for a deterministic wallet generation
  */
-export class localStorageConnector extends InjectedConnector {
+export class localStorageConnector extends Connector {
   ready = !IS_SERVER
   readonly id: string = 'localStorageConnector'
   readonly name: string = 'localStorage'
 
   protected chainId: number | undefined
-  protected provider: WindowProvider | undefined
-  protected wallet: Account | undefined
+  protected provider: PublicClient | undefined
+  protected wallet: WalletClient | undefined
 
   constructor(config: { chains: Chain[]; options: any }) {
     super(config)
@@ -58,7 +58,19 @@ export class localStorageConnector extends InjectedConnector {
   }
 
   async getSigner(): Promise<Account | undefined> {
-    return this.wallet
+    if (!this.wallet) return undefined
+    return this.wallet.account
+  }
+
+  async getProvider() {
+    if (!this.provider) {
+      this.provider = createPublicClient({
+        chain: mainnet,
+        transport: http(),
+      })
+    }
+
+    return this.provider
   }
 
   async getChainId() {
@@ -77,10 +89,23 @@ export class localStorageConnector extends InjectedConnector {
     let wallet = await localStorageWallet.getWallet(provider)
     if (!wallet) return false
 
-    this.wallet = wallet.account
+    this.wallet = wallet
 
     const account = await this.getAccount()
     return !!account
+  }
+
+  async getWalletClient({ chainId }: { chainId: number }) {
+    const provider = await this.getProvider()
+    if (!provider) throw new ConnectorNotFoundError()
+    const account = await this.getAccount()
+    if (!account) throw new ConnectorNotFoundError()
+
+    let wallet = await localStorageWallet.getWallet(provider)
+    if (!wallet) throw new ConnectorNotFoundError()
+
+    this.wallet = wallet
+    return this.wallet
   }
 
   onDisconnect = async (error: Error): Promise<void> => {
