@@ -81,7 +81,11 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
 
   const required = {
     value: true,
-    message: localize('required'),
+    message: localize('validation.required'),
+  }
+  const minLength = {
+    value: 8,
+    message: localize('validation.min_length', { min: 8 }),
   }
 
   if (election?.get('census.type') !== 'spreadsheet' || election instanceof ArchivedElection) return null
@@ -116,7 +120,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
               {election.electionType.anonymous && (
                 <FormControl isInvalid={!!errors.sik_password} sx={styles.sik_control}>
                   <FormLabel sx={styles.label}>{localize('spreadsheet.anon_sik_label')}</FormLabel>
-                  <Input {...register('sik_password', { required })} type='password' sx={styles.input} />
+                  <Input {...register('sik_password', { required, minLength })} type='password' sx={styles.input} />
                   {!!errors.sik_password ? (
                     <FormErrorMessage sx={styles.error}>{errors.sik_password?.message?.toString()}</FormErrorMessage>
                   ) : (
