@@ -91,7 +91,7 @@ describe('<ClientProvider />', () => {
     expect(result.current.client.url).toEqual(ApiUrl.dev)
   })
 
-  it('"creates" an account', async () => {
+  it('fetches an account', async () => {
     const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
     const signer = Wallet.createRandom()
     const { result } = renderHook(() => useClient(), {
@@ -99,18 +99,44 @@ describe('<ClientProvider />', () => {
       initialProps: { env: 'dev', signer },
     })
 
+    expect(result.current.loaded.fetch).toBeFalsy()
+
+    // fetch account request is mocked, so we're actually not creating accounts, just fetching them
+    await act(async () => {
+      await result.current.fetchAccount()
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.fetch).toBeTruthy()
+    })
+
+    expect(result.current.loading.fetch).toBeFalsy()
+    expect(result.current.account).not.toBeUndefined()
+    expect(result.current.errors.fetch).toBeNull()
+  })
+
+  it('creates an account', async () => {
+    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const signer = Wallet.createRandom()
+    const { result } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { env: 'dev', signer },
+    })
+
+    expect(result.current.loaded.create).toBeFalsy()
+
     // fetch account request is mocked, so we're actually not creating accounts, just fetching them
     await act(async () => {
       await result.current.createAccount()
     })
 
     await waitFor(() => {
-      expect(result.current.loaded.account).toBeTruthy()
+      expect(result.current.loaded.create).toBeTruthy()
     })
 
-    expect(result.current.loading.account).toBeFalsy()
+    expect(result.current.loading.create).toBeFalsy()
     expect(result.current.account).not.toBeUndefined()
-    expect(result.current.errors.account).toBeNull()
+    expect(result.current.errors.create).toBeNull()
   })
 
   it('properly clears session data', async () => {
@@ -127,7 +153,7 @@ describe('<ClientProvider />', () => {
     })
 
     await waitFor(() => {
-      expect(result.current.loaded.account).toBeTruthy()
+      expect(result.current.loaded.create).toBeTruthy()
     })
 
     expect(result.current.connected).toBeTruthy()
@@ -140,7 +166,7 @@ describe('<ClientProvider />', () => {
 
     expect(result.current.connected).toBeFalsy()
     expect(result.current.client.wallet).toBeUndefined()
-    expect(result.current.signer).toStrictEqual({})
+    expect(result.current.signer).toStrictEqual(null)
     expect(result.current.balance).toEqual(-1)
   })
 })

@@ -13,9 +13,13 @@ export type ClientReducerProps = {
   signer?: Wallet | Signer
 }
 
-export const ClientAccountError = 'client:account:error'
+export const ClientAccountCreate = 'client:account:create'
+export const ClientAccountCreateError = 'client:account:create::error'
+export const ClientAccountError = 'client:account::error'
 export const ClientAccountFetch = 'client:account:fetch'
+export const ClientAccountFetchError = 'client:account:fetch::error'
 export const ClientAccountSet = 'client:account:set'
+export const ClientAccountSetCreate = 'client:account:setcreate'
 export const ClientClear = 'client:clear'
 export const ClientEnvSet = 'client:env:set'
 export const ClientSet = 'client:set'
@@ -35,9 +39,13 @@ export type ClientActionPayload =
   | ClientSignerSetPayload
 
 export type ClientActionType =
+  | typeof ClientAccountCreate
+  | typeof ClientAccountCreateError
   | typeof ClientAccountError
   | typeof ClientAccountFetch
+  | typeof ClientAccountFetchError
   | typeof ClientAccountSet
+  | typeof ClientAccountSetCreate
   | typeof ClientClear
   | typeof ClientEnvSet
   | typeof ClientSet
@@ -59,18 +67,34 @@ export interface ClientState {
   connected: boolean
   // loaded status
   loaded: {
+    // todo: remove in a future major release
+    // has both create and fetch status, maintained for backwards compatibility
     account: boolean
+    create: boolean
+    fetch: boolean
   }
   // loading status
   loading: {
+    // todo: remove in a future major release
+    // has both create and fetch status, maintained for backwards compatibility
     account: boolean
+    create: boolean
+    fetch: boolean
   }
   errors: {
+    // todo: remove in a future major release
+    // has both create and fetch status, maintained for backwards compatibility
     account: string | null
+    create: string | null
+    fetch: string | null
   }
 }
 
-export const clientStateEmpty = (env: EnvOptions, client: VocdoniSDKClient, signer: Wallet | Signer): ClientState => ({
+export const clientStateEmpty = (
+  env: EnvOptions,
+  client: VocdoniSDKClient | null,
+  signer: Wallet | Signer
+): ClientState => ({
   env: env || EnvOptions.PROD,
   signer,
   client:
@@ -84,46 +108,66 @@ export const clientStateEmpty = (env: EnvOptions, client: VocdoniSDKClient, sign
   connected: false,
   loading: {
     account: false,
+    create: false,
+    fetch: false,
   },
   loaded: {
     account: false,
+    create: false,
+    fetch: false,
   },
   errors: {
     account: null,
+    create: null,
+    fetch: null,
   },
 })
 
 const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, action: ClientAction) => {
   switch (action.type) {
-    case ClientAccountFetch: {
+    case ClientAccountFetch:
+    case ClientAccountCreate: {
+      const isCreate = action.type === ClientAccountCreate
       return {
         ...state,
         loading: {
           ...state.loading,
           account: true,
+          create: isCreate ? true : state.loading.create,
+          fetch: !isCreate ? true : state.loading.fetch,
         },
       }
     }
-    case ClientAccountError: {
+    case ClientAccountError:
+    case ClientAccountCreateError: {
       const error = action.payload as ClientAccountErrorPayload
+      const isCreate = action.type === ClientAccountCreateError
       return {
         ...state,
         loading: {
           ...state.loading,
           account: false,
+          create: isCreate ? false : state.loading.create,
+          fetch: !isCreate ? false : state.loading.fetch,
         },
         loaded: {
           ...state.loaded,
           account: true,
+          create: isCreate ? true : state.loaded.create,
+          fetch: !isCreate ? true : state.loaded.fetch,
         },
         errors: {
           ...state.errors,
           account: errorToString(error),
+          create: isCreate ? errorToString(error) : state.errors.create,
+          fetch: !isCreate ? errorToString(error) : state.errors.fetch,
         },
       }
     }
+    case ClientAccountSetCreate:
     case ClientAccountSet: {
       const account = action.payload as ClientAccountSetPayload
+      const isCreate = action.type === ClientAccountSetCreate
       return {
         ...state,
         account,
@@ -131,14 +175,20 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         loading: {
           ...state.loading,
           account: false,
+          create: isCreate ? false : state.loading.create,
+          fetch: !isCreate ? false : state.loading.fetch,
         },
         loaded: {
           ...state.loaded,
           account: true,
+          create: isCreate ? true : state.loaded.create,
+          fetch: !isCreate ? true : state.loaded.fetch,
         },
         errors: {
           ...state.errors,
           account: null,
+          create: null,
+          fetch: null,
         },
       }
     }
@@ -197,9 +247,13 @@ export const useClientReducer = ({ env, client, signer }: ClientReducerProps) =>
 
   // dispatch helper methods
   const clear = () => dispatch({ type: ClientClear })
+  const createAccount = () => dispatch({ type: ClientAccountCreate })
   const errorAccount = (error: ErrorPayload) => dispatch({ type: ClientAccountError, payload: error })
+  const errorAccountCreate = (error: ErrorPayload) => dispatch({ type: ClientAccountCreateError, payload: error })
   const fetchAccount = () => dispatch({ type: ClientAccountFetch })
   const setAccount = (account: AccountData | undefined) => dispatch({ type: ClientAccountSet, payload: account })
+  const setAccountCreate = (account: AccountData | undefined) =>
+    dispatch({ type: ClientAccountSetCreate, payload: account })
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ClientSet, payload: client })
   const setEnv = (env: ClientEnvSetPayload) => dispatch({ type: ClientEnvSet, payload: env })
   const setSigner = (signer: Wallet | Signer) => dispatch({ type: ClientSignerSet, payload: signer })
@@ -209,9 +263,12 @@ export const useClientReducer = ({ env, client, signer }: ClientReducerProps) =>
     dispatch,
     actions: {
       clear,
+      createAccount,
       errorAccount,
+      errorAccountCreate,
       fetchAccount,
       setAccount,
+      setAccountCreate,
       setClient,
       setEnv,
       setSigner,

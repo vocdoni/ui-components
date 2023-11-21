@@ -65,7 +65,7 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
    * @returns {Promise<AccountData>}
    */
   const fetchAccount = () => {
-    if (state.loading.account) return
+    if (state.loading.fetch) return
 
     actions.fetchAccount()
     return state.client.fetchAccountInfo().then(actions.setAccount).catch(actions.errorAccount)
@@ -77,10 +77,13 @@ export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProvid
    * @returns {Promise<AccountData>}
    */
   const createAccount = (account?: Account, faucetPackage?: string) => {
-    if (state.loading.account) return
+    if (state.loading.create) return
 
-    actions.fetchAccount()
-    return state.client.createAccount({ account, faucetPackage }).then(actions.setAccount).catch(actions.errorAccount)
+    actions.createAccount()
+    return state.client
+      .createAccount({ account, faucetPackage })
+      .then(actions.setAccountCreate)
+      .catch(actions.errorAccountCreate)
   }
 
   /**
