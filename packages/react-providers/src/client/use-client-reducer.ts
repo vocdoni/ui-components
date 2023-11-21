@@ -142,29 +142,8 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         },
       }
     }
-
     case ClientClear: {
-      const client = new VocdoniSDKClient({
-        env: state.env,
-      })
-      const census3 = new VocdoniCensus3Client({
-        env: state.env,
-      })
-      return {
-        ...state,
-        client,
-        census3,
-        signer: {} as Signer,
-        account: undefined,
-        balance: -1,
-        connected: false,
-        loaded: {
-          account: false,
-        },
-        errors: {
-          account: null,
-        },
-      }
+      return clientStateEmpty(state.env, null, null as unknown as Signer)
     }
     case ClientSet: {
       const client = action.payload as ClientSetPayload
