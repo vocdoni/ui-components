@@ -30,14 +30,15 @@ export const ClientClear = 'client:clear'
 export const ClientEnvSet = 'client:env:set'
 export const ClientSet = 'client:set'
 export const ClientSignerSet = 'client:signer:set'
-export const ClientSikPasswordSet = 'client:sikp:set'
+export const ClientSikPasswordSet = 'client:sikpassword:set'
+export const ClientSikSignatureSet = 'client:siksignature:set'
 
 export type ClientAccountErrorPayload = ErrorPayload
 export type ClientAccountSetPayload = AccountData
 export type ClientEnvSetPayload = ClientEnv
 export type ClientSetPayload = VocdoniSDKClient
 export type ClientSignerSetPayload = Signer | Wallet
-export type ClientSikPasswordSetPayload = string
+export type ClientSikPayload = string
 
 export type ClientActionPayload =
   | ClientAccountErrorPayload
@@ -45,7 +46,7 @@ export type ClientActionPayload =
   | ClientEnvSetPayload
   | ClientSetPayload
   | ClientSignerSetPayload
-  | ClientSikPasswordSetPayload
+  | ClientSikPayload
 
 export type ClientActionType =
   | typeof ClientAccountCreate
@@ -60,6 +61,7 @@ export type ClientActionType =
   | typeof ClientSet
   | typeof ClientSignerSet
   | typeof ClientSikPasswordSet
+  | typeof ClientSikSignatureSet
 
 export interface ClientAction {
   type: ClientActionType
@@ -102,6 +104,10 @@ export interface ClientState {
     api_url?: string
     faucet_url?: string
   }
+  // SIK password
+  sikp: string | null
+  // SIK signature
+  siks: string | null
 }
 
 export const clientStateEmpty = (
@@ -133,6 +139,8 @@ export const clientStateEmpty = (
     fetch: null,
   },
   options,
+  sikp: null,
+  siks: null,
 })
 
 const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, action: ClientAction) => {
@@ -202,6 +210,8 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
           create: null,
           fetch: null,
         },
+        sikp: null,
+        siks: null,
       }
     }
     case ClientClear: {
@@ -241,10 +251,17 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       }
     }
     case ClientSikPasswordSet: {
-      const sikp = action.payload as ClientSikPasswordSetPayload
+      const sikp = action.payload as ClientSikPayload
       return {
         ...state,
         sikp,
+      }
+    }
+    case ClientSikSignatureSet: {
+      const siks = action.payload as ClientSikPayload
+      return {
+        ...state,
+        siks,
       }
     }
     default:
@@ -283,7 +300,8 @@ export const useClientReducer = ({ env, client, signer, options }: ClientReducer
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ClientSet, payload: client })
   const setEnv = (env: ClientEnvSetPayload) => dispatch({ type: ClientEnvSet, payload: env })
   const setSigner = (signer: Wallet | Signer) => dispatch({ type: ClientSignerSet, payload: signer })
-  const setSik = (sikp: string) => dispatch({ type: ClientSikPasswordSet, payload: sikp })
+  const setSikPassword = (sikp: string) => dispatch({ type: ClientSikPasswordSet, payload: sikp })
+  const setSikSignature = (siks: string) => dispatch({ type: ClientSikSignatureSet, payload: siks })
 
   return {
     state,
@@ -299,7 +317,8 @@ export const useClientReducer = ({ env, client, signer, options }: ClientReducer
       setClient,
       setEnv,
       setSigner,
-      setSik,
+      setSikPassword,
+      setSikSignature,
     },
   }
 }

@@ -91,6 +91,7 @@ export interface ElectionReducerState {
   loaded: {
     census: boolean
     election: boolean
+    voted: boolean
   }
   errors: {
     census: string | null
@@ -129,6 +130,7 @@ export const ElectionStateEmpty = ({
   loaded: {
     census: false,
     election: false,
+    voted: false,
   },
   errors: {
     census: null,
@@ -165,10 +167,12 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
         loading: {
           ...state.loading,
           census: false,
+          voted: false,
         },
         loaded: {
           ...state.loaded,
           census: false,
+          voted: false,
         },
         votesLeft: 0,
         isAbleToVote: false,
@@ -310,6 +314,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
         loaded: {
           ...state.loaded,
           census: true,
+          voted: true,
         },
         loading: {
           ...state.loading,
