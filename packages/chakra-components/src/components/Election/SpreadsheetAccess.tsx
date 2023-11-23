@@ -24,7 +24,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const { connected, clearClient } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
-  const { env, setSik } = useClient()
+  const { env, setSikPassword } = useClient()
   const { election, setClient, localize, fetchCensus } = useElection()
   const fields: string[] = dotobject(election, 'meta.census.fields')
   const {
@@ -63,7 +63,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       fetchCensus()
       // store sik password to client on anon elections
       if (election?.electionType.anonymous && sikp) {
-        setSik(sikp)
+        setSikPassword(sikp)
       }
       // in case of success, set current client
       setClient(client)
