@@ -30,7 +30,11 @@ export const useElectionProvider = ({
   autoUpdate,
   ...rest
 }: ElectionProviderProps) => {
-  const { client: c, localize, sikp, siks } = useClient()
+  const {
+    client: c,
+    localize,
+    sik: { password, signature },
+  } = useClient()
   const { state, actions } = useElectionReducer(c, data)
   const { client, csp, election, loading, loaded } = state
 
@@ -50,19 +54,13 @@ export const useElectionProvider = ({
     const address = await client.wallet?.getAddress()
     if (!election) return
 
-    console.log('fetches census...', siks)
-
     try {
-      console.log('loadcensus', address)
       actions.loadCensus(address as string)
       const isIn = await client.isInCensus({ electionId: election.id })
-      console.log('isIn', isIn)
       actions.inCensus(isIn)
       const censusType = election.census.type as CensusType
 
-      console.log('censusType', censusType)
       if (isIn && censusType === CensusType.WEIGHTED && !election.electionType.anonymous) {
-        console.log('non anon voted check')
         actions.voted(await client.hasAlreadyVoted({ electionId: election.id }))
 
         // no need to check votes left if member ain't in census
@@ -70,13 +68,13 @@ export const useElectionProvider = ({
       }
 
       // check differs a bit for anonymous votings
-      if (isIn && election.electionType.anonymous && siks) {
-        console.log('fetching voteid for anonymous voting')
-        const voteId = await AnonymousService.calcVoteId(siks, sikp ?? '0', election.id)
-        console.log('fetched:', voteId)
-        actions.voted(await client.hasAlreadyVoted({ voteId, electionId: election.id }))
+      if (isIn && election.electionType.anonymous && signature) {
+        const voteId = await AnonymousService.calcVoteId(signature, password ?? '0', election.id)
+        const hasAlreadyVoted = await client.hasAlreadyVoted({ voteId, electionId: election.id })
+        actions.voted(hasAlreadyVoted)
+        const votesLeft = await client.votesLeftCount({ voteId, electionId: election.id })
 
-        actions.votesLeft(await client.votesLeftCount({ voteId, electionId: election.id }))
+        actions.votesLeft(votesLeft)
       }
 
       actions.isAbleToVote()
@@ -84,7 +82,7 @@ export const useElectionProvider = ({
       console.error('error in census fetch:', e)
       actions.censusError(e)
     }
-  }, [actions, client, election, sikp, siks])
+  }, [actions, client, election, password, signature])
 
   const fetchAnonCircuits = useCallback(() => {
     const hasOverwriteEnabled =
@@ -130,14 +128,13 @@ export const useElectionProvider = ({
       // The condition is just negated so we can return the code execution.
       // A less mental option is to not negate the entire condition and add
       // the try/catch code inside the if
-      console.log('refreshes useeffect', siks, state)
       if (
         !(
           !loaded.census ||
           !areEqualHexStrings(state.voter, address) ||
           (data && !areEqualHexStrings(data.id, election.id)) ||
           // fetch census if there's sik signature and no vote id
-          (siks && !state.loaded.voted)
+          (signature && !state.loaded.voted)
         )
       ) {
         return
@@ -146,7 +143,7 @@ export const useElectionProvider = ({
       await censusFetch()
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote, siks])
+  }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote, signature])
 
   // auto update metadata (if enabled)
   useEffect(() => {
@@ -218,8 +215,8 @@ export const useElectionProvider = ({
 
     try {
       let vote: Vote | AnonymousVote = new Vote(values)
-      if (election.electionType.anonymous && sikp) {
-        vote = new AnonymousVote(values, sikp)
+      if (election.electionType.anonymous && password) {
+        vote = new AnonymousVote(values, password)
       }
 
       actions.setVote(vote)

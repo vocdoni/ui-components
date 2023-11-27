@@ -105,7 +105,7 @@ export interface ElectionReducerState {
   }
 }
 
-export const ElectionStateEmpty = ({
+export const electionStateEmpty = ({
   client,
   election,
 }: {
@@ -129,7 +129,7 @@ export const ElectionStateEmpty = ({
   },
   loaded: {
     census: false,
-    election: false,
+    election: !!election,
     voted: false,
   },
   errors: {
@@ -160,23 +160,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 ) => {
   switch (action.type) {
     case CensusClear: {
-      return {
-        ...state,
-        connected: false,
-        voted: null,
-        loading: {
-          ...state.loading,
-          census: false,
-          voted: false,
-        },
-        loaded: {
-          ...state.loaded,
-          census: false,
-          voted: false,
-        },
-        votesLeft: 0,
-        isAbleToVote: false,
-      }
+      return electionStateEmpty({ client: state.client, election: state.election })
     }
     case CensusError: {
       const payload = action.payload as CensusErrorPayload
@@ -394,15 +378,11 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 }
 
 export const useElectionReducer = (client: VocdoniSDKClient, election?: PublishedElection) => {
-  const initial = ElectionStateEmpty({ client, election })
-  const { connected } = useClient()
+  const initial = electionStateEmpty({ client, election })
+  const { connected, setSikPassword, setSikSignature } = useClient()
   const [state, dispatch] = useReducer(electionReducer, {
     ...initial,
     election,
-    loaded: {
-      ...initial.loaded,
-      election: !!election,
-    },
   })
 
   const clear = () => dispatch({ type: CensusClear })
@@ -442,9 +422,9 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
 
     if (
       // we don't want to disconnect the local client for Wallet sessions when the main client gets disconnected
-      (!connected && state.election?.meta?.census && state.election?.get('census.type') === 'spreadsheet') ||
+      (!connected && state.election?.get('census.type') === 'spreadsheet') ||
       // we don't want to clear the local client on Signer sessions (non wallet ones)
-      (!state.connected && state.election?.meta?.census && state.election?.get('census.type') !== 'spreadsheet')
+      (!state.connected && state.election?.get('census.type') !== 'spreadsheet')
     ) {
       return
     }
@@ -461,6 +441,8 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
       setClient,
       clearClient: () => {
         setClient(client)
+        setSikPassword(null)
+        setSikSignature(null)
         clear()
       },
       load: (id?: string) => dispatch({ type: ElectionLoad, payload: id }),

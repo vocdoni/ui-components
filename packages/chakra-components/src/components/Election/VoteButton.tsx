@@ -5,7 +5,11 @@ import { ArchivedElection, ElectionStatus, InvalidElection } from '@vocdoni/sdk'
 import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 export const VoteButton = (props: ButtonProps) => {
-  const { connected, siks, setSikSignature } = useClient()
+  const {
+    connected,
+    sik: { signature },
+    setSikSignature,
+  } = useClient()
   const {
     client,
     loading: { voting },
@@ -37,7 +41,7 @@ export const VoteButton = (props: ButtonProps) => {
     children: voted && isAbleToVote ? localize('vote.button_update') : localize('vote.button'),
   }
 
-  if (connected && election?.electionType.anonymous && !siks) {
+  if (connected && election?.electionType.anonymous && !signature) {
     button.type = 'button'
     button.children = localize('vote.identify')
     button.onClick = async () => {
