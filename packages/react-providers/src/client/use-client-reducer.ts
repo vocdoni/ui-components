@@ -11,6 +11,10 @@ export type ClientReducerProps = {
   client?: VocdoniSDKClient
   env?: ClientEnv
   signer?: Wallet | Signer
+  options?: {
+    api_url?: string
+    faucet_url?: string
+  }
 }
 
 export const ClientAccountCreate = 'client:account:create'
@@ -88,12 +92,17 @@ export interface ClientState {
     create: string | null
     fetch: string | null
   }
+  options?: {
+    api_url?: string
+    faucet_url?: string
+  }
 }
 
 export const clientStateEmpty = (
   env: EnvOptions,
   client: VocdoniSDKClient | null,
-  signer: Wallet | Signer
+  signer: Wallet | Signer,
+  options: { api_url?: string; faucet_url?: string } | undefined
 ): ClientState => ({
   env: env || EnvOptions.PROD,
   signer,
@@ -101,6 +110,8 @@ export const clientStateEmpty = (
     client ||
     new VocdoniSDKClient({
       env: env || EnvOptions.PROD,
+      faucet: options?.faucet_url ? { url: options.faucet_url, token_limit: 99999999 } : undefined, //TODO: Why token_limit is mandatory?
+      api_url: options?.api_url || undefined,
     }),
   census3: new VocdoniCensus3Client({ env: env || EnvOptions.PROD }),
   account: undefined,
@@ -121,6 +132,7 @@ export const clientStateEmpty = (
     create: null,
     fetch: null,
   },
+  options,
 })
 
 const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, action: ClientAction) => {
@@ -193,7 +205,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       }
     }
     case ClientClear: {
-      return clientStateEmpty(state.env, null, null as unknown as Signer)
+      return clientStateEmpty(state.env, null, null as unknown as Signer, state.options)
     }
     case ClientSet: {
       const client = action.payload as ClientSetPayload
@@ -209,6 +221,8 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       const client = new VocdoniSDKClient({
         env,
         wallet: state.signer,
+        faucet: state.options?.faucet_url ? { url: state.options.faucet_url, token_limit: 99999999 } : undefined,
+        api_url: state.options?.api_url || undefined,
       })
       const census3 = new VocdoniCensus3Client({ env })
       return {
@@ -226,6 +240,8 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       const client = new VocdoniSDKClient({
         env: state.env,
         wallet: signer,
+        faucet: state.options?.faucet_url ? { url: state.options.faucet_url, token_limit: 99999999 } : undefined,
+        api_url: state.options?.api_url || undefined,
       })
       return {
         ...state,
@@ -239,10 +255,10 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
   }
 }
 
-export const useClientReducer = ({ env, client, signer }: ClientReducerProps) => {
+export const useClientReducer = ({ env, client, signer, options }: ClientReducerProps) => {
   const [state, dispatch] = useReducer(
     clientReducer,
-    clientStateEmpty(env as EnvOptions, client as VocdoniSDKClient, signer as Wallet | Signer)
+    clientStateEmpty(env as EnvOptions, client as VocdoniSDKClient, signer as Wallet | Signer, options)
   )
 
   // dispatch helper methods

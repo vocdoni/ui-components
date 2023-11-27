@@ -6,12 +6,13 @@ import { ClientReducerProps, useClientReducer } from './use-client-reducer'
 
 export type ClientProviderProps = ClientReducerProps
 
-export const useClientProvider = ({ client: c, env: e, signer: s }: ClientProviderProps) => {
+export const useClientProvider = ({ client: c, env: e, signer: s, options: o }: ClientProviderProps) => {
   const localize = useLocalize()
   const { actions, state } = useClientReducer({
     client: c,
     env: e,
     signer: s,
+    options: o,
   })
 
   // update env on updates
