@@ -249,7 +249,7 @@ export const newVocdoniSDKClient = (
   return new VocdoniSDKClient({
     env,
     wallet: signer,
-    faucet: options?.faucet_url ? { url: options.faucet_url, token_limit: 99999999 } : undefined,
+    faucet: options?.faucet_url ? { url: options.faucet_url } : undefined,
     api_url: options?.api_url || undefined,
   })
 }
