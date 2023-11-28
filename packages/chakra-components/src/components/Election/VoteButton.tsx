@@ -2,14 +2,11 @@ import { Button, ButtonProps } from '@chakra-ui/button'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ArchivedElection, ElectionStatus, InvalidElection } from '@vocdoni/sdk'
+import { useState } from 'react'
 import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 export const VoteButton = (props: ButtonProps) => {
-  const {
-    connected,
-    sik: { signature },
-    setSikSignature,
-  } = useClient()
+  const { connected } = useClient()
   const {
     client,
     loading: { voting },
@@ -19,7 +16,10 @@ export const VoteButton = (props: ButtonProps) => {
     election,
     voted,
     localize,
+    sik: { signature },
+    sikSignature,
   } = useElection()
+  const [loading, setLoading] = useState<boolean>(false)
   const isDisabled = !client.wallet || !isAbleToVote || election?.status !== ElectionStatus.ONGOING
 
   if (election instanceof InvalidElection || election instanceof ArchivedElection) return null
@@ -42,10 +42,15 @@ export const VoteButton = (props: ButtonProps) => {
   }
 
   if (connected && election?.electionType.anonymous && !signature) {
+    button.isLoading = loading
     button.type = 'button'
-    button.children = localize('vote.identify')
+    button.children = localize('vote.sign')
     button.onClick = async () => {
-      setSikSignature(await client.anonymousService.signSIKPayload(client.wallet as Signer))
+      setLoading(true)
+      try {
+        sikSignature(await client.anonymousService.signSIKPayload(client.wallet as Signer))
+      } catch (e) {}
+      setLoading(false)
     }
   }
 

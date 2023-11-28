@@ -1,5 +1,5 @@
 import { Wallet } from '@ethersproject/wallet'
-import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect } from 'react'
 import { useLocalize } from '../i18n/localize'
 import { ClientReducerProps, newVocdoniSDKClient, useClientReducer } from './use-client-reducer'
@@ -105,8 +105,6 @@ export const useClientProvider = ({ client: c, env: e, signer: s, options: o }: 
     clear: actions.clear,
     setClient: actions.setClient,
     setSigner: actions.setSigner,
-    setSikPassword: actions.setSikPassword,
-    setSikSignature: actions.setSikSignature,
     createAccount,
     fetchAccount,
     generateSigner,

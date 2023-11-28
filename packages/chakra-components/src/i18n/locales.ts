@@ -22,14 +22,6 @@ export const locales = {
     cancel: 'Cancel',
     confirm: 'Confirm',
   },
-  // questions and vote button
-  vote: {
-    button_update: 'Re-submit vote',
-    button: 'Vote',
-    confirm: 'Please confirm your choices:',
-    voted_description: 'Your vote id is {{ id }}. You can use it to verify your vote.',
-    voted_title: 'Your vote was successfully cast!',
-  },
   empty: 'Apparently this process has no questions 🤔',
   errors: {
     wrong_data_title: 'Wrong data',
@@ -65,6 +57,15 @@ export const locales = {
   validation: {
     required: 'This field is required',
     min_length: 'This field must be at least {{ min }} characters long',
+  },
+  // questions and vote button
+  vote: {
+    button_update: 'Re-submit vote',
+    button: 'Vote',
+    confirm: 'Please confirm your choices:',
+    sign: 'Sign first',
+    voted_description: 'Your vote id is {{ id }}. You can use it to verify your vote.',
+    voted_title: 'Your vote was successfully cast!',
   },
 }
 

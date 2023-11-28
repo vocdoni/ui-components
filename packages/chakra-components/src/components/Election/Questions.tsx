@@ -1,6 +1,8 @@
 import { Alert, AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/alert'
+import { Button } from '@chakra-ui/button'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Box, Link, Stack, Text } from '@chakra-ui/layout'
+import { ModalBody, ModalCloseButton, ModalFooter, ModalHeader } from '@chakra-ui/modal'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { chakra, ChakraProps, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { Wallet } from '@ethersproject/wallet'
@@ -91,23 +93,39 @@ export type QuestionsConfirmationProps = {
 }
 
 export const QuestionsConfirmation = ({ answers, questions, ...rest }: QuestionsConfirmationProps) => {
+  const mstyles = useMultiStyleConfig('ConfirmModal')
   const styles = useMultiStyleConfig('QuestionsConfirmation', rest)
+  const { cancel, proceed } = useConfirm()
   const props = omitThemingProps(rest)
   const { localize } = useClient()
 
   return (
-    <Box {...props} sx={styles.box}>
-      <Text sx={styles.description}>{localize('vote.confirm')}</Text>
-      {questions.map((q, k) => {
-        const choice = q.choices.find((v) => v.value === parseInt(answers[k.toString()], 10))
-        return (
-          <chakra.div key={k} __css={styles.question}>
-            <chakra.div __css={styles.title}>{q.title.default}</chakra.div>
-            <chakra.div __css={styles.answer}>{choice?.title.default}</chakra.div>
-          </chakra.div>
-        )
-      })}
-    </Box>
+    <>
+      <ModalHeader sx={mstyles.header}>{localize('confirm.title')}</ModalHeader>
+      <ModalCloseButton sx={mstyles.close} />
+      <ModalBody sx={mstyles.body}>
+        <Box {...props} sx={styles.box}>
+          <Text sx={styles.description}>{localize('vote.confirm')}</Text>
+          {questions.map((q, k) => {
+            const choice = q.choices.find((v) => v.value === parseInt(answers[k.toString()], 10))
+            return (
+              <chakra.div key={k} __css={styles.question}>
+                <chakra.div __css={styles.title}>{q.title.default}</chakra.div>
+                <chakra.div __css={styles.answer}>{choice?.title.default}</chakra.div>
+              </chakra.div>
+            )
+          })}
+        </Box>
+      </ModalBody>
+      <ModalFooter sx={mstyles.footer}>
+        <Button onClick={cancel!} variant='ghost' sx={mstyles.cancel}>
+          {localize('confirm.cancel')}
+        </Button>
+        <Button onClick={proceed!} sx={mstyles.confirm}>
+          {localize('confirm.confirm')}
+        </Button>
+      </ModalFooter>
+    </>
   )
 }
 

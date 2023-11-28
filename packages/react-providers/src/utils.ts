@@ -1,4 +1,4 @@
-import { VocdoniSDKClient, ensure0x } from '@vocdoni/sdk'
+import { ensure0x, VocdoniSDKClient } from '@vocdoni/sdk'
 import latinize from 'latinize'
 
 /**
@@ -50,8 +50,15 @@ export const normalizeText = (text?: string): string => {
   return latinize(result)
 }
 
-export const walletFromRow = (organization: string, row: string[]) => {
+/**
+ * Generates a Wallet from a given row of data and a salt. The row of data should be an array of strings
+ *
+ * @param {string} salt A random string to be used as salt, the more random the better
+ * @param {string} row The row to be used to generate the wallet
+ * @returns {Wallet}
+ */
+export const walletFromRow = (salt: string, row: string[]) => {
   const normalized = row.map(normalizeText)
-  normalized.push(organization)
+  normalized.push(salt)
   return VocdoniSDKClient.generateWalletFromData(normalized)
 }

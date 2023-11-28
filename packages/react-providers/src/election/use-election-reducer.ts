@@ -21,6 +21,8 @@ export const ElectionVoteSet = 'election:vote:set'
 export const ElectionVotesLeft = 'election:votes_left'
 export const ElectionVoting = 'election:voting'
 export const ElectionVotingError = 'election:voting:error'
+export const SikPasswordSet = 'sik:password:set'
+export const SikSignatureSet = 'sik:signature:set'
 
 export type ElectionActionType =
   | typeof CensusClear
@@ -39,6 +41,8 @@ export type ElectionActionType =
   | typeof ElectionVotesLeft
   | typeof ElectionVoting
   | typeof ElectionVotingError
+  | typeof SikPasswordSet
+  | typeof SikSignatureSet
 
 export type CensusErrorPayload = ErrorPayload
 export type CensusIsAbleToVotePayload = undefined | boolean
@@ -54,6 +58,7 @@ export type ElectionVotedPayload = string | null
 export type ElectionVoteSetPayload = Vote
 export type ElectionVotesLeftPayload = number
 export type ElectionVotingErrorPayload = ErrorPayload
+export type SikPayload = string | undefined
 
 export type ElectionActionPayload =
   | CensusErrorPayload
@@ -66,6 +71,7 @@ export type ElectionActionPayload =
   | ElectionVoteSetPayload
   | ElectionVotesLeftPayload
   | ElectionVotingErrorPayload
+  | SikPayload
 
 export interface ElectionAction {
   type: ElectionActionType
@@ -102,6 +108,10 @@ export interface ElectionReducerState {
     handler: 'github'
     token: string | undefined
     authToken: string | undefined
+  }
+  sik: {
+    password: string | undefined
+    signature: string | undefined
   }
 }
 
@@ -141,6 +151,10 @@ export const electionStateEmpty = ({
     handler: 'github',
     token: undefined,
     authToken: undefined,
+  },
+  sik: {
+    password: undefined,
+    signature: undefined,
   },
 })
 
@@ -372,14 +386,34 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
         },
       }
     }
+    case SikPasswordSet: {
+      const password = action.payload as SikPayload
+      return {
+        ...state,
+        sik: {
+          ...state.sik,
+          password,
+        },
+      }
+    }
+    case SikSignatureSet: {
+      const signature = action.payload as SikPayload
+      return {
+        ...state,
+        sik: {
+          ...state.sik,
+          signature,
+        },
+      }
+    }
+    default:
+      return state
   }
-
-  return state
 }
 
 export const useElectionReducer = (client: VocdoniSDKClient, election?: PublishedElection) => {
   const initial = electionStateEmpty({ client, election })
-  const { connected, setSikPassword, setSikSignature } = useClient()
+  const { connected } = useClient()
   const [state, dispatch] = useReducer(electionReducer, {
     ...initial,
     election,
@@ -388,6 +422,8 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   const clear = () => dispatch({ type: CensusClear })
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ElectionClientSet, payload: client })
   const set = (election: PublishedElection) => dispatch({ type: ElectionSet, payload: election })
+  const sikPassword = (password: SikPayload) => dispatch({ type: SikPasswordSet, payload: password })
+  const sikSignature = (signature: SikPayload) => dispatch({ type: SikSignatureSet, payload: signature })
 
   // update local client in case it's updated
   useEffect(() => {
@@ -439,10 +475,12 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
       clear,
       set,
       setClient,
+      sikPassword,
+      sikSignature,
       clearClient: () => {
         setClient(client)
-        setSikPassword(null)
-        setSikSignature(null)
+        sikPassword(undefined)
+        sikSignature(undefined)
         clear()
       },
       load: (id?: string) => dispatch({ type: ElectionLoad, payload: id }),
