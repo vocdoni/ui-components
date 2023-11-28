@@ -1,4 +1,4 @@
-import { Chain, PublicClient } from 'wagmi'
+import { Chain, PublicClient, WalletClient } from 'wagmi'
 import { oAuthWallet } from '../lib/oAuthWallet'
 import { localStorageConnector } from './localStorageConnector'
 
@@ -35,6 +35,6 @@ export class oAuthConnector extends localStorageConnector {
       wallet = await w.create(provider)
     }
 
-    this.wallet = wallet
+    this.wallet = wallet as WalletClient
   }
 }

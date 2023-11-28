@@ -1,6 +1,6 @@
 import { inputsWallet } from '../lib/inputsWallet'
 import { localStorageConnector } from './localStorageConnector'
-import { PublicClient } from 'wagmi'
+import { PublicClient, WalletClient } from 'wagmi'
 
 const IS_SERVER = typeof window === 'undefined'
 
@@ -17,6 +17,6 @@ export class inputsConnector extends localStorageConnector {
       wallet = await w.create(provider)
     }
 
-    this.wallet = wallet
+    this.wallet = wallet as WalletClient
   }
 }
