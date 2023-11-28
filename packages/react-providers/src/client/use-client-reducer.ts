@@ -7,10 +7,16 @@ import { errorToString } from '../utils'
 
 export type ClientEnv = `${EnvOptions}` | EnvOptions
 
+export type ClientReducerPropsOptions = {
+  api_url?: string
+  faucet_url?: string
+}
+
 export type ClientReducerProps = {
   client?: VocdoniSDKClient
   env?: ClientEnv
   signer?: Wallet | Signer
+  options?: ClientReducerPropsOptions
 }
 
 export const ClientAccountCreate = 'client:account:create'
@@ -88,20 +94,21 @@ export interface ClientState {
     create: string | null
     fetch: string | null
   }
+  options?: {
+    api_url?: string
+    faucet_url?: string
+  }
 }
 
 export const clientStateEmpty = (
   env: EnvOptions,
   client: VocdoniSDKClient | null,
-  signer: Wallet | Signer
+  signer: Wallet | Signer,
+  options: ClientReducerPropsOptions | undefined
 ): ClientState => ({
   env: env || EnvOptions.PROD,
   signer,
-  client:
-    client ||
-    new VocdoniSDKClient({
-      env: env || EnvOptions.PROD,
-    }),
+  client: client || newVocdoniSDKClient(env || EnvOptions.PROD, undefined, options),
   census3: new VocdoniCensus3Client({ env: env || EnvOptions.PROD }),
   account: undefined,
   balance: -1,
@@ -121,6 +128,7 @@ export const clientStateEmpty = (
     create: null,
     fetch: null,
   },
+  options,
 })
 
 const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, action: ClientAction) => {
@@ -193,7 +201,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       }
     }
     case ClientClear: {
-      return clientStateEmpty(state.env, null, null as unknown as Signer)
+      return clientStateEmpty(state.env, null, null as unknown as Signer, state.options)
     }
     case ClientSet: {
       const client = action.payload as ClientSetPayload
@@ -206,10 +214,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
     case ClientEnvSet: {
       const env = action.payload as ClientEnvSetPayload as EnvOptions
       // redefine client to use new environment
-      const client = new VocdoniSDKClient({
-        env,
-        wallet: state.signer,
-      })
+      const client = newVocdoniSDKClient(env, state.signer, state.options)
       const census3 = new VocdoniCensus3Client({ env })
       return {
         ...state,
@@ -223,10 +228,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
     }
     case ClientSignerSet: {
       const signer = action.payload as ClientSignerSetPayload
-      const client = new VocdoniSDKClient({
-        env: state.env,
-        wallet: signer,
-      })
+      const client = newVocdoniSDKClient(state.env, signer, state.options)
       return {
         ...state,
         client,
@@ -239,10 +241,23 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
   }
 }
 
-export const useClientReducer = ({ env, client, signer }: ClientReducerProps) => {
+export const newVocdoniSDKClient = (
+  env: EnvOptions,
+  signer: Wallet | Signer | undefined,
+  options: ClientReducerPropsOptions | undefined
+): VocdoniSDKClient => {
+  return new VocdoniSDKClient({
+    env,
+    wallet: signer,
+    faucet: options?.faucet_url ? { url: options.faucet_url } : undefined,
+    api_url: options?.api_url || undefined,
+  })
+}
+
+export const useClientReducer = ({ env, client, signer, options }: ClientReducerProps) => {
   const [state, dispatch] = useReducer(
     clientReducer,
-    clientStateEmpty(env as EnvOptions, client as VocdoniSDKClient, signer as Wallet | Signer)
+    clientStateEmpty(env as EnvOptions, client as VocdoniSDKClient, signer as Wallet | Signer, options)
   )
 
   // dispatch helper methods

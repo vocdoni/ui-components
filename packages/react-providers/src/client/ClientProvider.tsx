@@ -30,7 +30,7 @@ export type ClientProviderComponentProps = InternalClientProviderComponentProps 
  * Required internal client provider so we can use useLocalize in useClientProvider.
  */
 const InternalClientProvider = ({ env, client, signer, ...rest }: InternalClientProviderComponentProps) => {
-  const value = useClientProvider({ env, client, signer })
+  const value = useClientProvider({ env, client, signer, ...rest })
 
   return <ClientContext.Provider value={value} {...rest} />
 }
