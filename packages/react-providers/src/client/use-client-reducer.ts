@@ -7,14 +7,16 @@ import { errorToString } from '../utils'
 
 export type ClientEnv = `${EnvOptions}` | EnvOptions
 
+export type ClientReducerPropsOptions = {
+  api_url?: string
+  faucet_url?: string
+}
+
 export type ClientReducerProps = {
   client?: VocdoniSDKClient
   env?: ClientEnv
   signer?: Wallet | Signer
-  options?: {
-    api_url?: string
-    faucet_url?: string
-  }
+  options?: ClientReducerPropsOptions
 }
 
 export const ClientAccountCreate = 'client:account:create'
@@ -102,17 +104,11 @@ export const clientStateEmpty = (
   env: EnvOptions,
   client: VocdoniSDKClient | null,
   signer: Wallet | Signer,
-  options: { api_url?: string; faucet_url?: string } | undefined
+  options: ClientReducerPropsOptions | undefined
 ): ClientState => ({
   env: env || EnvOptions.PROD,
   signer,
-  client:
-    client ||
-    new VocdoniSDKClient({
-      env: env || EnvOptions.PROD,
-      faucet: options?.faucet_url ? { url: options.faucet_url, token_limit: 99999999 } : undefined, //TODO: Why token_limit is mandatory?
-      api_url: options?.api_url || undefined,
-    }),
+  client: client || newVocdoniSDKClient(env || EnvOptions.PROD, undefined, options),
   census3: new VocdoniCensus3Client({ env: env || EnvOptions.PROD }),
   account: undefined,
   balance: -1,
@@ -218,12 +214,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
     case ClientEnvSet: {
       const env = action.payload as ClientEnvSetPayload as EnvOptions
       // redefine client to use new environment
-      const client = new VocdoniSDKClient({
-        env,
-        wallet: state.signer,
-        faucet: state.options?.faucet_url ? { url: state.options.faucet_url, token_limit: 99999999 } : undefined,
-        api_url: state.options?.api_url || undefined,
-      })
+      const client = newVocdoniSDKClient(env, state.signer, state.options)
       const census3 = new VocdoniCensus3Client({ env })
       return {
         ...state,
@@ -237,12 +228,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
     }
     case ClientSignerSet: {
       const signer = action.payload as ClientSignerSetPayload
-      const client = new VocdoniSDKClient({
-        env: state.env,
-        wallet: signer,
-        faucet: state.options?.faucet_url ? { url: state.options.faucet_url, token_limit: 99999999 } : undefined,
-        api_url: state.options?.api_url || undefined,
-      })
+      const client = newVocdoniSDKClient(state.env, signer, state.options)
       return {
         ...state,
         client,
@@ -253,6 +239,19 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
     default:
       return state
   }
+}
+
+export const newVocdoniSDKClient = (
+  env: EnvOptions,
+  signer: Wallet | Signer | undefined,
+  options: ClientReducerPropsOptions | undefined
+): VocdoniSDKClient => {
+  return new VocdoniSDKClient({
+    env,
+    wallet: signer,
+    faucet: options?.faucet_url ? { url: options.faucet_url, token_limit: 99999999 } : undefined,
+    api_url: options?.api_url || undefined,
+  })
 }
 
 export const useClientReducer = ({ env, client, signer, options }: ClientReducerProps) => {

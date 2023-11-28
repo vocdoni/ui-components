@@ -2,7 +2,7 @@ import { Wallet } from '@ethersproject/wallet'
 import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect } from 'react'
 import { useLocalize } from '../i18n/localize'
-import { ClientReducerProps, useClientReducer } from './use-client-reducer'
+import { ClientReducerProps, newVocdoniSDKClient, useClientReducer } from './use-client-reducer'
 
 export type ClientProviderProps = ClientReducerProps
 
@@ -42,12 +42,7 @@ export const useClientProvider = ({ client: c, env: e, signer: s, options: o }: 
     if (!('ethereum' in window)) return
 
     const accChanged = async () => {
-      actions.setClient(
-        new VocdoniSDKClient({
-          env: state.env as EnvOptions,
-          wallet: state.signer,
-        })
-      )
+      actions.setClient(newVocdoniSDKClient(state.env as EnvOptions, state.signer, state.options))
       // undefine so other effects do their job
       actions.setAccount(undefined)
     }
