@@ -89,7 +89,7 @@ export class localStorageConnector extends Connector {
     let wallet = await localStorageWallet.getWallet(provider)
     if (!wallet) return false
 
-    this.wallet = wallet
+    this.wallet = wallet as WalletClient
 
     const account = await this.getAccount()
     return !!account
@@ -104,7 +104,7 @@ export class localStorageConnector extends Connector {
     let wallet = await localStorageWallet.getWallet(provider)
     if (!wallet) throw new ConnectorNotFoundError()
 
-    this.wallet = wallet
+    this.wallet = wallet as WalletClient
     return this.wallet
   }
 

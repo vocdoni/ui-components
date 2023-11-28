@@ -6,10 +6,10 @@ import { PublicClient, mainnet, WalletClient } from 'wagmi'
 export default class localStorageWallet {
   static storageItemName = 'localstorage-wallet-seed'
 
-  public static async getWallet(provider: PublicClient): Promise<WalletClient> {
+  public static async getWallet(provider: PublicClient): Promise<WalletClient | false> {
     try {
       const value: string = localStorage.getItem(this.storageItemName) as string
-      if (!value) throw new Error('no wallet found')
+      if (!value) return false
 
       return this.createWallet(value, provider)
     } catch (err) {
