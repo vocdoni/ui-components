@@ -24,7 +24,7 @@
   },
   "main": "src/index.ts",
   "peerDependencies": {
-    "@vocdoni/sdk": "~0.5.3",
+    "@vocdoni/sdk": "~0.6.0",
     "react": ">= 16.8.0"
   },
   "devDependencies": {
@@ -32,7 +32,7 @@
     "@ethersproject/wallet": "^5.7.0",
     "@types/latinize": "^0.2.15",
     "@types/react": "^18.0.30",
-    "@vocdoni/sdk": "^0.5.3",
+    "@vocdoni/sdk": "~0.6.0",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-react-app": "^7.0.1",

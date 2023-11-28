@@ -30,13 +30,16 @@ export const useElectionProvider = ({
   autoUpdate,
   ...rest
 }: ElectionProviderProps) => {
-  const {
-    client: c,
-    localize,
-    sik: { password, signature },
-  } = useClient()
+  const { client: c, localize } = useClient()
   const { state, actions } = useElectionReducer(c, data)
-  const { client, csp, election, loading, loaded } = state
+  const {
+    client,
+    csp,
+    election,
+    loading,
+    loaded,
+    sik: { password, signature },
+  } = state
 
   const fetchElection = useCallback(
     async (id: string) => {
@@ -127,7 +130,7 @@ export const useElectionProvider = ({
       const address = await client.wallet?.getAddress()
       // The condition is just negated so we can return the code execution.
       // A less mental option is to not negate the entire condition and add
-      // the try/catch code inside the if
+      // the `await censusFetch()` execution in there
       if (
         !(
           !loaded.census ||
@@ -215,8 +218,8 @@ export const useElectionProvider = ({
 
     try {
       let vote: Vote | AnonymousVote = new Vote(values)
-      if (election.electionType.anonymous && password) {
-        vote = new AnonymousVote(values, password)
+      if (election.electionType.anonymous && signature) {
+        vote = new AnonymousVote(values, signature, password)
       }
 
       actions.setVote(vote)
@@ -380,5 +383,7 @@ export const useElectionProvider = ({
     fetchCensus: censusFetch,
     clearClient: actions.clearClient,
     setClient: actions.setClient,
+    sikPassword: actions.sikPassword,
+    sikSignature: actions.sikSignature,
   }
 }

@@ -24,8 +24,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const { connected, clearClient } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
-  const { env, setSikPassword, setSikSignature } = useClient()
-  const { election, setClient, localize, fetchCensus } = useElection()
+  const { env, client: cl } = useClient()
+  const { election, setClient, localize, fetchCensus, sikPassword, sikSignature } = useElection()
   const fields: string[] = dotobject(election, 'meta.census.fields')
   const {
     register,
@@ -45,7 +45,9 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       }
 
       // create wallet and client
-      const wallet = walletFromRow(election!.organizationId, Object.values(vals))
+      const hid = await cl.electionService.getNumericElectionId(election!.id)
+      const salt = await cl.electionService.getElectionSalt(election!.organizationId, hid)
+      const wallet = walletFromRow(salt, Object.values(vals))
       const client = new VocdoniSDKClient({
         env,
         wallet,
@@ -63,8 +65,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       fetchCensus()
       // store SIK requirements to client on anon elections
       if (election?.electionType.anonymous && sikp) {
-        setSikPassword(sikp)
-        setSikSignature(await client.anonymousService.signSIKPayload(wallet))
+        sikPassword(sikp)
+        sikSignature(await client.anonymousService.signSIKPayload(wallet))
       }
       // in case of success, set current client
       setClient(client)

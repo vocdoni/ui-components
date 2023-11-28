@@ -13,6 +13,8 @@ export const confirmAnatomy = [
   'close',
 ]
 
+export const signModalAnatomy = ['body', 'description', 'footer', 'button']
+
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(confirmAnatomy)
 
 const baseStyle = definePartsStyle({
