@@ -1,8 +1,8 @@
 import { Box, Flex, Text } from '@chakra-ui/layout'
 import { Progress } from '@chakra-ui/progress'
-import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useClient, useDatesLocale, useElection } from '@vocdoni/react-providers'
-import { ElectionStatus, InvalidElection, formatUnits } from '@vocdoni/sdk'
+import { ElectionStatus, formatUnits, InvalidElection } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 
 const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(0) + '%'
