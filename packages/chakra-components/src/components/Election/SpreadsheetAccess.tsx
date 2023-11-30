@@ -14,7 +14,7 @@ import { useDisclosure } from '@chakra-ui/react-use-disclosure'
 import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useToast } from '@chakra-ui/toast'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
-import { ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
+import { AnonymousService, ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -65,8 +65,24 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       fetchCensus()
       // store SIK requirements to client on anon elections
       if (election?.electionType.anonymous && sikp) {
+        const signature = await client.anonymousService.signSIKPayload(wallet)
+        const sik = await client.anonymousService.fetchAccountSIK(wallet.address).catch(() => false)
+        if (sik) {
+          const voteId = await AnonymousService.calcVoteId(signature, sikp, election.id)
+          const hasAlreadyVoted = await client.hasAlreadyVoted({ wallet, electionId: election.id, voteId })
+          if (
+            !hasAlreadyVoted ||
+            (hasAlreadyVoted && !(await client.anonymousService.hasRegisteredSIK(wallet.address, signature, sikp)))
+          ) {
+            return toast({
+              status: 'error',
+              title: localize('errors.wrong_data_title'),
+              description: localize('errors.wrong_data_description'),
+            })
+          }
+        }
         sikPassword(sikp)
-        sikSignature(await client.anonymousService.signSIKPayload(wallet))
+        sikSignature(signature)
       }
       // in case of success, set current client
       setClient(client)
