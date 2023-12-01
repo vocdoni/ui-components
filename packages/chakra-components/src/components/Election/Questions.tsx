@@ -169,10 +169,16 @@ type QuestionFieldProps = ChakraProps & {
 
 const QuestionField = ({ question, index }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const { election, isAbleToVote, localize } = useElection()
+  const {
+    election,
+    isAbleToVote,
+    localize,
+    loading: { voting },
+  } = useElection()
   const {
     formState: { errors },
   } = useFormContext()
+  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
 
   return (
     <chakra.div __css={styles.question}>
@@ -190,11 +196,7 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
             rules={{ required: localize('validation.required') }}
             name={index}
             render={({ field }) => (
-              <RadioGroup
-                sx={styles.radioGroup}
-                {...field}
-                isDisabled={election?.status !== ElectionStatus.ONGOING || !isAbleToVote}
-              >
+              <RadioGroup sx={styles.radioGroup} {...field} isDisabled={disabled}>
                 <Stack direction='column' sx={styles.stack}>
                   {question.choices.map((choice, ck) => (
                     <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>

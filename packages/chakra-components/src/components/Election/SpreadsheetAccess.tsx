@@ -25,7 +25,15 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
   const { env, client: cl } = useClient()
-  const { election, setClient, localize, fetchCensus, sikPassword, sikSignature } = useElection()
+  const {
+    election,
+    setClient,
+    localize,
+    fetchCensus,
+    sikPassword,
+    sikSignature,
+    loading: { voting },
+  } = useElection()
   const fields: string[] = dotobject(election, 'meta.census.fields')
   const {
     register,
@@ -111,7 +119,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
 
   if (connected) {
     return (
-      <Button onClick={clearClient} sx={styles.disconnect}>
+      <Button onClick={clearClient} sx={styles.disconnect} isDisabled={voting}>
         {localize('spreadsheet.logout')}
       </Button>
     )
