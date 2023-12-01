@@ -30,7 +30,6 @@ export interface IWorkerResponse extends IBaseWorkerResponse<ICircuit> {}
 
 export default () => {
   self.addEventListener('message', async (e: MessageEvent<ICircuitWorkerRequest>) => {
-    console.time('Worker run')
     try {
       const { circuits } = e.data
 
@@ -51,7 +50,6 @@ export default () => {
         wasmURI: circuits.wasmURI,
         wasmHash: circuits.wasmHash,
       }
-      console.timeEnd('Worker run')
       return postMessage({ result: circuitsData } as IWorkerResponse)
     } catch (error) {
       return postMessage({ error } as IWorkerResponse)

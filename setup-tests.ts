@@ -25,10 +25,18 @@ class Worker {
   postMessage(msg) {
     this.onmessage(msg)
   }
+  addEventListener() {}
+  removeEventListener() {}
 }
 
 // required due to SDK dependency
-Object.defineProperty(window, 'Worker', Worker)
+Object.defineProperty(window, 'Worker', { value: Worker })
+Object.defineProperty(window, 'MockedWindowURL', {
+  value: {
+    createObjectURL: () => 'blob:mocked',
+    revokeObjectURL: () => {},
+  },
+})
 
 // required by any react component (almost all of them)
 global.React = React
