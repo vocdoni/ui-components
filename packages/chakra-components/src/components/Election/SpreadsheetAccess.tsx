@@ -30,7 +30,6 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     election,
     setClient,
     localize,
-    fetchCensus,
     sikPassword,
     sikSignature,
     loading: { voting },
@@ -95,8 +94,6 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
           description: localize('errors.wrong_data_description'),
         })
       }
-      // use provider method to set related census state info
-      fetchCensus()
       // store SIK requirements to client on anon elections
       if (election?.electionType.anonymous && sikp) {
         const signature = await client.anonymousService.signSIKPayload(wallet)
@@ -104,10 +101,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
         if (sik) {
           const voteId = await AnonymousService.calcVoteId(signature, sikp, election.id)
           const hasAlreadyVoted = await client.hasAlreadyVoted({ wallet, electionId: election.id, voteId })
-          if (
-            !hasAlreadyVoted ||
-            (hasAlreadyVoted && !(await client.anonymousService.hasRegisteredSIK(wallet.address, signature, sikp)))
-          ) {
+          if (!hasAlreadyVoted) {
             return toast({
               status: 'error',
               title: localize('errors.wrong_data_title'),
