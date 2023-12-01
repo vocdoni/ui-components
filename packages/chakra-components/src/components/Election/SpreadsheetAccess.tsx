@@ -15,13 +15,14 @@ import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useToast } from '@chakra-ui/toast'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
 import { AnonymousService, ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Wallet } from '@ethersproject/wallet'
 
 export const SpreadsheetAccess = (rest: ChakraProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const styles = useMultiStyleConfig('SpreadsheetAccess', rest)
-  const { connected, clearClient } = useElection()
+  const { connected, clearClient, client: electionClient } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
   const { env, client: cl } = useClient()
@@ -40,6 +41,32 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<any>()
+  const shouldRender = election?.get('census.type') === 'spreadsheet' && !(election instanceof ArchivedElection)
+
+  const privkey = window.location.hash ? window.location.hash.split('#')[1] : ''
+
+  // In case of spreadsheet census and a private provided through the URI, do intent to login automatically
+  // Example url with private key:
+  // https://app.vocdoni.io/processes/0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef#0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+  useEffect(() => {
+    ;(async () => {
+      try {
+        if (!shouldRender) return
+        if (privkey) {
+          const privKeyWallet = new Wallet(privkey)
+          let client = new VocdoniSDKClient({
+            env,
+            wallet: privKeyWallet,
+            electionId: election?.id,
+          })
+          setClient(client)
+        }
+      } catch (error) {
+        console.warn('Error trying to login with private key ', error)
+        setClient(electionClient)
+      }
+    })()
+  }, [election, env, shouldRender, privkey])
 
   const onSubmit = async (vals: any) => {
     try {
@@ -115,7 +142,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     message: localize('validation.min_length', { min: 8 }),
   }
 
-  if (election?.get('census.type') !== 'spreadsheet' || election instanceof ArchivedElection) return null
+  if (!shouldRender) return null
 
   if (connected) {
     return (
@@ -144,7 +171,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
                   <FormErrorMessage sx={styles.error}>{errors[key]?.message?.toString()}</FormErrorMessage>
                 </FormControl>
               ))}
-              {election.electionType.anonymous && (
+              {election?.electionType.anonymous && (
                 <FormControl isInvalid={!!errors.sik_password} sx={styles.sik_control}>
                   <FormLabel sx={styles.label}>{localize('spreadsheet.anon_sik_label')}</FormLabel>
                   <Input {...register('sik_password', { required, minLength })} type='password' sx={styles.input} />
