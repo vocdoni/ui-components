@@ -13,16 +13,16 @@ import {
 import { useDisclosure } from '@chakra-ui/react-use-disclosure'
 import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useToast } from '@chakra-ui/toast'
+import { Wallet } from '@ethersproject/wallet'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
 import { AnonymousService, ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Wallet } from '@ethersproject/wallet'
 
 export const SpreadsheetAccess = (rest: ChakraProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const styles = useMultiStyleConfig('SpreadsheetAccess', rest)
-  const { connected, clearClient, client: electionClient } = useElection()
+  const { connected, clearClient } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
   const { env, client: cl } = useClient()
@@ -41,8 +41,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     handleSubmit,
     formState: { errors },
   } = useForm<any>()
-  const shouldRender = election?.get('census.type') === 'spreadsheet' && !(election instanceof ArchivedElection)
 
+  const shouldRender = election?.get('census.type') === 'spreadsheet' && !(election instanceof ArchivedElection)
   const privkey = window.location.hash ? window.location.hash.split('#')[1] : ''
 
   // In case of spreadsheet census and a private provided through the URI, do intent to login automatically
@@ -51,21 +51,20 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   useEffect(() => {
     ;(async () => {
       try {
-        if (!shouldRender) return
-        if (privkey) {
-          const privKeyWallet = new Wallet(privkey)
-          let client = new VocdoniSDKClient({
-            env,
-            wallet: privKeyWallet,
-            electionId: election?.id,
-          })
-          setClient(client)
-        }
+        if (!shouldRender || !privkey) return
+        const privKeyWallet = new Wallet(privkey)
+        let client = new VocdoniSDKClient({
+          env,
+          wallet: privKeyWallet,
+          electionId: election?.id,
+        })
+        setClient(client)
       } catch (error) {
         console.warn('Error trying to login with private key ', error)
-        setClient(electionClient)
+        setClient(cl)
       }
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [election, env, shouldRender, privkey])
 
   const onSubmit = async (vals: any) => {
