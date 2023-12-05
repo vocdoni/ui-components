@@ -7,7 +7,7 @@ import {
   PublishedElection,
   Vote,
 } from '@vocdoni/sdk'
-import { ComponentType, useCallback, useEffect, useMemo, useState } from 'react'
+import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '../client'
 import { useElectionReducer } from './use-election-reducer'
 import { ChainAPI } from '@vocdoni/sdk'
@@ -45,6 +45,8 @@ export const useElectionProvider = ({
     sik: { password, signature },
   } = state
   const [anonCircuitsFetched, setAnonCircuitsFetched] = useState(false)
+
+  const isAnonCircuitsFetching = useRef(false)
 
   const fetchElection = useCallback(
     async (id: string) => {
@@ -119,7 +121,16 @@ export const useElectionProvider = ({
 
   // pre-fetches circuits needed for voting in anonymous elections
   useEffect(() => {
-    if (!fetchCensus || !election || loading.census || !client.wallet || anonCircuitsFetched) return
+    if (
+      !fetchCensus ||
+      !election ||
+      loading.census ||
+      !client.wallet ||
+      anonCircuitsFetched ||
+      isAnonCircuitsFetching.current
+    )
+      return
+    isAnonCircuitsFetching.current = true
     fetchAnonCircuits()
   }, [fetchAnonCircuits, client.wallet, election, loading.census, fetchCensus])
 
