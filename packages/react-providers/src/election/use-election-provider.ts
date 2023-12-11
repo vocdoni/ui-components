@@ -136,9 +136,11 @@ export const useElectionProvider = ({
 
   // sets circuits in the anonymous service
   useEffect(() => {
-    if (!circuits) return
-    setAnonCircuitsFetched(true)
-    client.anonymousService.setCircuits(circuits)
+    ;(async () => {
+      if (!circuits) return
+      setAnonCircuitsFetched(true)
+      client.anonymousService.setCircuits(circuits)
+    })()
   }, [circuits])
 
   // CSP OAuth flow

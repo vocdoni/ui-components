@@ -28,25 +28,62 @@ export interface ICircuitWorkerRequest {
 
 export interface IWorkerResponse extends IBaseWorkerResponse<ICircuit> {}
 
+export const fetchDataInChunks = async (url: string) => {
+  return fetch(url)
+    .then((res) => res.arrayBuffer())
+    .then((res) => new Uint8Array(res))
+}
+
 export default () => {
   self.addEventListener('message', async (e: MessageEvent<ICircuitWorkerRequest>) => {
     try {
       const { circuits } = e.data
 
+      async function fetchDataInChunks(uri: string) {
+        const response = await fetch(uri)
+        const reader = response.body?.getReader() as ReadableStreamDefaultReader
+        const contentLength = +response.headers.get('Content-Length')
+
+        const chunks = []
+        let receivedLength = 0
+
+        while (true) {
+          const { done, value } = await reader.read()
+
+          if (done) break
+
+          chunks.push(value)
+          receivedLength += value.length
+
+          // Check for content length, break if all content received
+          if (contentLength && receivedLength >= contentLength) break
+        }
+
+        const concatenatedArray = new Uint8Array(receivedLength)
+        let offset = 0
+
+        for (const chunk of chunks) {
+          concatenatedArray.set(chunk, offset)
+          offset += chunk.length
+        }
+
+        return concatenatedArray
+      }
+
+      const [zKeyData, vKeyData, wasmData] = await Promise.all([
+        fetchDataInChunks(circuits.zKeyURI),
+        fetchDataInChunks(circuits.vKeyURI),
+        fetchDataInChunks(circuits.wasmURI),
+      ])
+
       const circuitsData: ICircuit = {
-        zKeyData: await fetch(circuits.zKeyURI)
-          .then((res) => res.arrayBuffer())
-          .then((res) => new Uint8Array(res)),
+        zKeyData,
         zKeyURI: circuits.zKeyURI,
         zKeyHash: circuits.zKeyHash,
-        vKeyData: await fetch(circuits.vKeyURI)
-          .then((res) => res.arrayBuffer())
-          .then((res) => new Uint8Array(res)),
+        vKeyData,
         vKeyURI: circuits.vKeyURI,
         vKeyHash: circuits.vKeyHash,
-        wasmData: await fetch(circuits.wasmURI)
-          .then((res) => res.arrayBuffer())
-          .then((res) => new Uint8Array(res)),
+        wasmData,
         wasmURI: circuits.wasmURI,
         wasmHash: circuits.wasmHash,
       }
