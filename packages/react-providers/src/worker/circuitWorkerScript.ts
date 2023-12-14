@@ -42,7 +42,7 @@ export default () => {
       async function fetchDataInChunks(uri: string) {
         const response = await fetch(uri)
         const reader = response.body?.getReader() as ReadableStreamDefaultReader
-        const contentLength = +response.headers.get('Content-Length')
+        const contentLength = +(response.headers?.get('Content-Length') ?? 0)
 
         const chunks = []
         let receivedLength = 0
