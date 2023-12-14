@@ -7,9 +7,13 @@ import {
   PublishedElection,
   Vote,
 } from '@vocdoni/sdk'
-import { ComponentType, useCallback, useEffect } from 'react'
+import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '../client'
 import { useElectionReducer } from './use-election-reducer'
+import { ChainAPI } from '@vocdoni/sdk'
+import { createWebWorker } from '../worker/webWorker'
+import { useWebWorker } from '../worker/useWebWorker'
+import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
 
 export type ElectionProviderProps = {
   id?: string
@@ -40,6 +44,9 @@ export const useElectionProvider = ({
     loaded,
     sik: { password, signature },
   } = state
+  const [anonCircuitsFetched, setAnonCircuitsFetched] = useState(false)
+
+  const isAnonCircuitsFetching = useRef(false)
 
   const fetchElection = useCallback(
     async (id: string) => {
@@ -87,7 +94,10 @@ export const useElectionProvider = ({
     }
   }, [actions, client, election, password, signature])
 
-  const fetchAnonCircuits = useCallback(() => {
+  const workerInstance = useMemo(() => createWebWorker(worker), [])
+  const { result: circuits, startProcessing } = useWebWorker<ICircuit, ICircuitWorkerRequest>(workerInstance)
+
+  const fetchAnonCircuits = useCallback(async () => {
     const hasOverwriteEnabled =
       typeof election !== 'undefined' &&
       typeof election.voteType.maxVoteOverwrites !== 'undefined' &&
@@ -96,15 +106,42 @@ export const useElectionProvider = ({
     const votable = state.isAbleToVote || (hasOverwriteEnabled && state.isInCensus && state.voted)
 
     if (votable && election?.census.type === CensusType.ANONYMOUS) {
-      client.anonymousService.fetchCircuits()
+      const chainCircuits = await ChainAPI.circuits(client.url)
+      const circuits = {
+        zKeyURI: chainCircuits.uri + '/' + chainCircuits.circuitPath + '/' + chainCircuits.zKeyFilename,
+        zKeyHash: chainCircuits.zKeyHash,
+        vKeyURI: chainCircuits.uri + '/' + chainCircuits.circuitPath + '/' + chainCircuits.vKeyFilename,
+        vKeyHash: chainCircuits.vKeyHash,
+        wasmURI: chainCircuits.uri + '/' + chainCircuits.circuitPath + '/' + chainCircuits.wasmFilename,
+        wasmHash: chainCircuits.wasmHash,
+      }
+      startProcessing({ circuits })
     }
   }, [election, state.isAbleToVote, state.isInCensus, state.voted, client.anonymousService])
 
   // pre-fetches circuits needed for voting in anonymous elections
   useEffect(() => {
-    if (!fetchCensus || !election || loading.census || !client.wallet) return
+    if (
+      !fetchCensus ||
+      !election ||
+      loading.census ||
+      !client.wallet ||
+      anonCircuitsFetched ||
+      isAnonCircuitsFetching.current
+    )
+      return
+    isAnonCircuitsFetching.current = true
     fetchAnonCircuits()
   }, [fetchAnonCircuits, client.wallet, election, loading.census, fetchCensus])
+
+  // sets circuits in the anonymous service
+  useEffect(() => {
+    ;(async () => {
+      if (!circuits) return
+      setAnonCircuitsFetched(true)
+      client.anonymousService.setCircuits(circuits)
+    })()
+  }, [circuits])
 
   // CSP OAuth flow
   // As vote setting and voting token are async, we need to wait for both to be set
