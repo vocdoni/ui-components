@@ -1,6 +1,6 @@
 {
   "name": "@vocdoni/react-providers",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/react-providers#readme",
   "bugs": "https://github.com/vocdoni/ui-components/issues",
@@ -26,7 +26,7 @@
   "peerDependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
-    "@vocdoni/sdk": "~0.6.1",
+    "@vocdoni/sdk": "~0.7.0",
     "react": ">= 16.8.0"
   },
   "devDependencies": {
@@ -34,7 +34,7 @@
     "@ethersproject/wallet": "^5.7.0",
     "@types/latinize": "^0.2.15",
     "@types/react": "^18.0.30",
-    "@vocdoni/sdk": "~0.6.1",
+    "@vocdoni/sdk": "~0.7.0",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-react-app": "^7.0.1",
