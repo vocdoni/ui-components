@@ -15,7 +15,7 @@ import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useToast } from '@chakra-ui/toast'
 import { Wallet } from '@ethersproject/wallet'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
-import { AnonymousService, ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
+import { ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -98,16 +98,14 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       if (election?.electionType.anonymous && sikp) {
         const signature = await client.anonymousService.signSIKPayload(wallet)
         const sik = await client.anonymousService.fetchAccountSIK(wallet.address).catch(() => false)
-        if (sik) {
-          const voteId = await AnonymousService.calcVoteId(signature, sikp, election.id)
-          const hasAlreadyVoted = await client.hasAlreadyVoted({ wallet, electionId: election.id, voteId })
-          if (!hasAlreadyVoted) {
-            return toast({
-              status: 'error',
-              title: localize('errors.wrong_data_title'),
-              description: localize('errors.wrong_data_description'),
-            })
-          }
+        const valid = await client.anonymousService.hasRegisteredSIK(wallet.address, signature, sikp)
+
+        if (sik && !valid) {
+          return toast({
+            status: 'error',
+            title: localize('errors.wrong_data_title'),
+            description: localize('errors.wrong_data_description'),
+          })
         }
         sikPassword(sikp)
         sikSignature(signature)
