@@ -45,6 +45,7 @@ export const useElectionProvider = ({
     sik: { password, signature },
   } = state
   const [anonCircuitsFetched, setAnonCircuitsFetched] = useState(false)
+  const [oAuthMessage, setOAuthMessage] = useState<{ code: string; handler: string } | undefined>()
 
   const isAnonCircuitsFetching = useRef(false)
 
@@ -196,27 +197,25 @@ export const useElectionProvider = ({
   }, [autoUpdate, autoUpdateInterval, election])
 
   // CSP OAuth flow
-  // Listening for the popup window meessage
+  // Listening for the popup window message
   useEffect(() => {
-    ;(async () => {
-      const handleMessage = (event: any) => {
-        if (event.data.code && event.data.handler) {
-          getOAuthToken(event.data.code, event.data.handler)
-        }
+    const handleMessage = (event: any) => {
+      if (event.data.code && event.data.handler) {
+        setOAuthMessage(event.data)
       }
+    }
 
-      if (window.opener || !client || election?.census?.type !== CensusType.CSP) {
-        return
-      }
+    if (window.opener) {
+      return
+    }
 
-      window.addEventListener('message', handleMessage)
+    window.addEventListener('message', handleMessage)
 
-      return () => {
-        window.removeEventListener('message', handleMessage)
-      }
-    })()
+    return () => {
+      window.removeEventListener('message', handleMessage)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, election?.census?.type])
+  }, [])
 
   // CSP OAuth flow
   // Posting the message to the main window
@@ -237,6 +236,14 @@ export const useElectionProvider = ({
       }
     })()
   }, [])
+
+  // CSP OAuth flow
+  // Handling message callback preventing multiple calls
+  useEffect(() => {
+    if (!oAuthMessage?.code || !oAuthMessage?.handler) return
+    getOAuthToken(oAuthMessage.code, oAuthMessage.handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [oAuthMessage])
 
   // context vote function (the one to be used with the given components)
   const vote = async (values: number[]) => {
@@ -356,10 +363,7 @@ export const useElectionProvider = ({
   // CSP OAuth flow
   const getOAuthToken = useCallback(
     async (code: string, handler: string) => {
-      if (csp.token) {
-        return
-      }
-
+      if (!client || csp.token) return
       if (!code) {
         throw new Error('no code provided')
       }
