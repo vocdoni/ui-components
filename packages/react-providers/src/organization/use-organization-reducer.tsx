@@ -1,4 +1,4 @@
-import { AccountData, areEqualHexStrings } from '@vocdoni/sdk'
+import { AccountData, ArchivedAccountData, areEqualHexStrings } from '@vocdoni/sdk'
 import { Reducer, useEffect, useReducer } from 'react'
 import { ErrorPayload } from '../types'
 import { errorToString } from '../utils'
@@ -42,7 +42,7 @@ export interface OrganizationReducerState {
     load: string | null
     update: string | null
   }
-  organization: AccountData | undefined
+  organization: AccountData | ArchivedAccountData | undefined
 }
 
 export const OrganizationStateEmpty: OrganizationReducerState = {
@@ -127,14 +127,15 @@ const organizationReducer: Reducer<OrganizationReducerState, OrganizationAction>
   return state
 }
 
-export const useOrganizationReducer = (organization?: AccountData) => {
+export const useOrganizationReducer = (organization?: AccountData | ArchivedAccountData) => {
   const [state, dispatch] = useReducer(organizationReducer, {
     ...OrganizationStateEmpty,
     organization,
     loaded: !!organization,
   })
 
-  const setOrganization = (organization: AccountData) => dispatch({ type: OrganizationSet, payload: organization })
+  const setOrganization = (organization: AccountData | ArchivedAccountData) =>
+    dispatch({ type: OrganizationSet, payload: organization })
 
   // update org if updated via props
   useEffect(() => {
@@ -149,7 +150,7 @@ export const useOrganizationReducer = (organization?: AccountData) => {
     dispatch,
     setOrganization,
     loading: (id?: string) => dispatch({ type: OrganizationLoading, payload: id }),
-    updateOrganization: (organization: Partial<AccountData>) =>
+    updateOrganization: (organization: Partial<AccountData | ArchivedAccountData>) =>
       dispatch({ type: OrganizationUpdate, payload: organization }),
     loadError: (error: string) => dispatch({ type: OrganizationLoadError, payload: error }),
     updateError: (error: string) => dispatch({ type: OrganizationUpdateError, payload: error }),

@@ -1,11 +1,11 @@
-import { Account, AccountData, areEqualHexStrings } from '@vocdoni/sdk'
+import { Account, AccountData, ArchivedAccountData, areEqualHexStrings } from '@vocdoni/sdk'
 import { useEffect } from 'react'
 import { useClient } from '../client'
 import { useOrganizationReducer } from './use-organization-reducer'
 
 export type OrganizationProviderProps = {
   id?: string
-  organization?: AccountData
+  organization?: AccountData | ArchivedAccountData
 }
 
 export const useOrganizationProvider = ({ id, organization }: OrganizationProviderProps) => {
