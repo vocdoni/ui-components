@@ -1,11 +1,11 @@
-import { Account, AccountData, ArchivedAccountData, areEqualHexStrings } from '@vocdoni/sdk'
+import { Account, AccountData, areEqualHexStrings } from '@vocdoni/sdk'
 import { useEffect } from 'react'
 import { useClient } from '../client'
 import { useOrganizationReducer } from './use-organization-reducer'
 
 export type OrganizationProviderProps = {
   id?: string
-  organization?: AccountData | ArchivedAccountData
+  organization?: AccountData
 }
 
 export const useOrganizationProvider = ({ id, organization }: OrganizationProviderProps) => {
@@ -16,7 +16,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
   const fetch = (id?: string) => {
     const identifier = id || state.id
     loading(identifier)
-    return client.fetchAccountInfo(identifier).then(setOrganization).catch(loadError)
+    return client.fetchAccount(identifier).then(setOrganization).catch(loadError)
   }
 
   // updates organization info, and sets the new result to state

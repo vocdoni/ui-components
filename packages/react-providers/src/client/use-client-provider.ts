@@ -71,7 +71,7 @@ export const useClientProvider = ({
     if (state.loading.fetch) return
 
     actions.fetchAccount()
-    return state.client.fetchAccountInfo().then(actions.setAccount).catch(actions.errorAccount)
+    return state.client.fetchAccount().then(actions.setAccount).catch(actions.errorAccount)
   }
 
   /**

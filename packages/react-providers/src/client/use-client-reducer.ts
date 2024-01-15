@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
-import { AccountData, ArchivedAccountData, EnvOptions, VocdoniCensus3Client, VocdoniSDKClient } from '@vocdoni/sdk'
+import { AccountData, EnvOptions, VocdoniCensus3Client, VocdoniSDKClient } from '@vocdoni/sdk'
 import { Reducer, useReducer } from 'react'
 import type { ErrorPayload } from '../types'
 import { errorToString } from '../utils'
@@ -71,7 +71,7 @@ export interface ClientState {
   client: VocdoniSDKClient
   census3: VocdoniCensus3Client
   env: EnvOptions
-  account: AccountData | ArchivedAccountData | undefined
+  account: AccountData | undefined
   signer: Wallet | Signer
   balance: number
   // determines if a wallet is connected to the client
@@ -278,9 +278,8 @@ export const useClientReducer = ({ env, client, signer, options, census3Options 
   const errorAccount = (error: ErrorPayload) => dispatch({ type: ClientAccountError, payload: error })
   const errorAccountCreate = (error: ErrorPayload) => dispatch({ type: ClientAccountCreateError, payload: error })
   const fetchAccount = () => dispatch({ type: ClientAccountFetch })
-  const setAccount = (account: AccountData | ArchivedAccountData | undefined) =>
-    dispatch({ type: ClientAccountSet, payload: account })
-  const setAccountCreate = (account: AccountData | ArchivedAccountData | undefined) =>
+  const setAccount = (account: AccountData | undefined) => dispatch({ type: ClientAccountSet, payload: account })
+  const setAccountCreate = (account: AccountData | undefined) =>
     dispatch({ type: ClientAccountSetCreate, payload: account })
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ClientSet, payload: client })
   const setEnv = (env: ClientEnvSetPayload) => dispatch({ type: ClientEnvSet, payload: env })
