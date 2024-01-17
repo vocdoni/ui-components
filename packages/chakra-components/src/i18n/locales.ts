@@ -57,9 +57,11 @@ export const locales = {
   validation: {
     required: 'This field is required',
     min_length: 'This field must be at least {{ min }} characters long',
+    choices_count: 'Select {{ count }} choices',
   },
   // questions and vote button
   vote: {
+    abstain: 'Abstain',
     button_update: 'Re-submit vote',
     button: 'Vote',
     confirm: 'Please confirm your choices:',

@@ -19,6 +19,7 @@
     "@testing-library/react": "14.0.0",
     "@types/jest": "^29.5.3",
     "@types/testing-library__jest-dom": "5.14.8",
+    "@vocdoni/sdk": "./vocdoni-sdk-v0.7.2-beta1.tgz",
     "axios": "^0.27.0",
     "eslint-plugin-testing-library": "5.5.1",
     "ethers": "^5.7.0",
@@ -39,8 +40,8 @@
     "clean": "turbo clean --filter=@vocdoni* && rm -fr node_modules",
     "test": "jest"
   },
-  "dependencies": {
-    "tsup": "^7.2.0"
+  "resolutions": {
+    "@vocdoni/sdk": "./vocdoni-sdk-v0.7.2-beta1.tgz"
   },
   "packageManager": "yarn@1.22.19"
 }

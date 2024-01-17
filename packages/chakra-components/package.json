@@ -29,7 +29,7 @@
   "peerDependencies": {
     "@chakra-ui/alert": "^2.0.18",
     "@chakra-ui/button": "^2.0.18",
-    "@chakra-ui/card": "^2.1.6",
+    "@chakra-ui/checkbox": "^2.3.2",
     "@chakra-ui/form-control": "^2.0.18",
     "@chakra-ui/image": "^2.0.13",
     "@chakra-ui/input": "^2.1.0",
@@ -55,6 +55,7 @@
   "devDependencies": {
     "@chakra-ui/alert": "^2.0.18",
     "@chakra-ui/button": "^2.0.17",
+    "@chakra-ui/checkbox": "^2.3.2",
     "@chakra-ui/form-control": "^2.0.18",
     "@chakra-ui/image": "^2.0.13",
     "@chakra-ui/input": "^2.1.0",
@@ -82,7 +83,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-hook-form": "^7.43.8",
+    "react-hook-form": "^7.49.3",
     "react-icons": "^4.8.0",
     "react-markdown": "^8.0.6",
     "react-string-replace": "^1.1.0",

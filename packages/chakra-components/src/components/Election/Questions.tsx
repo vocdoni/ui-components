@@ -1,13 +1,14 @@
 import { Alert, AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/alert'
 import { Button } from '@chakra-ui/button'
+import { Checkbox } from '@chakra-ui/checkbox'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Box, Link, Stack, Text } from '@chakra-ui/layout'
 import { ModalBody, ModalCloseButton, ModalFooter, ModalHeader } from '@chakra-ui/modal'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
-import { chakra, ChakraProps, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
+import { ChakraProps, chakra, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { Wallet } from '@ethersproject/wallet'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { ElectionStatus, InvalidElection, IQuestion } from '@vocdoni/sdk'
+import { ElectionResultsTypeNames, ElectionStatus, IQuestion, InvalidElection } from '@vocdoni/sdk'
 import { ReactNode } from 'react'
 import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
@@ -64,7 +65,24 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
       return false
     }
 
-    return bvote(election.questions.map((q, k) => parseInt(values[k.toString()], 10)))
+    let results = []
+    switch (election.resultsType.name) {
+      case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
+        results = election.questions.map((q, k) => parseInt(values[k.toString()], 10))
+        break
+      case ElectionResultsTypeNames.MULTIPLE_CHOICE:
+        results = Object.values(values)
+          .pop()
+          .map((v: string) => parseInt(v, 10))
+        break
+      default:
+        throw new Error('Unknown or invalid election type')
+    }
+
+    // console.log(results)
+    // return
+
+    return bvote(results)
   }
 
   return (
@@ -162,23 +180,18 @@ const Voted = () => {
   )
 }
 
-type QuestionFieldProps = ChakraProps & {
+type QuestionProps = {
   index: string
   question: IQuestion
 }
 
+type QuestionFieldProps = ChakraProps & QuestionProps
+
 const QuestionField = ({ question, index }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
   const {
-    election,
-    isAbleToVote,
-    localize,
-    loading: { voting },
-  } = useElection()
-  const {
     formState: { errors },
   } = useFormContext()
-  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
 
   return (
     <chakra.div __css={styles.question}>
@@ -192,26 +205,132 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
               <Markdown>{question.description.default}</Markdown>
             </chakra.div>
           )}
-          <Controller
-            rules={{ required: localize('validation.required') }}
-            name={index}
-            render={({ field }) => (
-              <RadioGroup sx={styles.radioGroup} {...field} isDisabled={disabled}>
-                <Stack direction='column' sx={styles.stack}>
-                  {question.choices.map((choice, ck) => (
-                    <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
-                      {choice.title.default}
-                    </Radio>
-                  ))}
-                </Stack>
-                <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
-              </RadioGroup>
-            )}
-          />
+          <FieldSwitcher index={index} question={question} />
         </chakra.div>
       </FormControl>
     </chakra.div>
   )
 }
 
-QuestionField.displayName = 'QuestionField'
+const FieldSwitcher = (props: QuestionProps) => {
+  const { election } = useElection()
+
+  switch (election?.resultsType.name) {
+    case ElectionResultsTypeNames.MULTIPLE_CHOICE:
+      return <MultiChoice {...props} />
+    case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
+    default:
+      return <SingleChoice {...props} />
+  }
+}
+
+const MultiChoice = ({ index, question }: QuestionProps) => {
+  const styles = useMultiStyleConfig('ElectionQuestions')
+  const {
+    election,
+    isAbleToVote,
+    loading: { voting },
+    localize,
+  } = useElection()
+  const {
+    formState: { errors },
+    control,
+    setValue,
+    watch,
+  } = useFormContext()
+  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
+  const values = watch(index) || []
+
+  if (!(election && election.resultsType.name === ElectionResultsTypeNames.MULTIPLE_CHOICE)) {
+    return null
+  }
+
+  const choices = [...question.choices]
+  for (const abstain of election.resultsType.properties.abstainValues) {
+    choices.push({
+      title: {
+        default: localize('vote.abstain'),
+      },
+      value: abstain,
+    })
+  }
+
+  return (
+    <Stack sx={styles.stack}>
+      <Controller
+        control={control}
+        disabled={disabled}
+        rules={{
+          validate: (v) => {
+            return (
+              (v && v.length === election.voteType.maxCount) ||
+              localize('validation.choices_count', { count: election.voteType.maxCount })
+            )
+          },
+        }}
+        name={index}
+        render={({ field }) =>
+          choices.map((choice, ck) => (
+            <Checkbox
+              {...field}
+              key={ck}
+              sx={styles.checkbox}
+              value={choice.value.toString()}
+              isDisabled={disabled}
+              onChange={(e) => {
+                if (values.includes(e.target.value)) {
+                  setValue(
+                    index,
+                    values.filter((v: string) => v !== e.target.value)
+                  )
+                } else {
+                  setValue(index, [...values, e.target.value])
+                }
+              }}
+            >
+              {choice.title.default}
+            </Checkbox>
+          ))
+        }
+      />
+      <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
+    </Stack>
+  )
+}
+
+const SingleChoice = ({ index, question }: QuestionProps) => {
+  const styles = useMultiStyleConfig('ElectionQuestions')
+  const {
+    election,
+    isAbleToVote,
+    loading: { voting },
+    localize,
+  } = useElection()
+  const {
+    formState: { errors },
+    control,
+  } = useFormContext()
+  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
+  return (
+    <Controller
+      control={control}
+      disabled={disabled}
+      rules={{
+        required: localize('validation.required'),
+      }}
+      name={index}
+      render={({ field }) => (
+        <RadioGroup sx={styles.radioGroup} {...field} isDisabled={disabled}>
+          <Stack direction='column' sx={styles.stack}>
+            {question.choices.map((choice, ck) => (
+              <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
+                {choice.title.default}
+              </Radio>
+            ))}
+          </Stack>
+          <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
+        </RadioGroup>
+      )}
+    />
+  )
+}
