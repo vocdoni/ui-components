@@ -8,7 +8,7 @@ import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { ChakraProps, chakra, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { Wallet } from '@ethersproject/wallet'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { ElectionResultsTypeNames, ElectionStatus, IQuestion, InvalidElection } from '@vocdoni/sdk'
+import { ElectionResultsTypeNames, ElectionStatus, IQuestion, InvalidElection, PublishedElection } from '@vocdoni/sdk'
 import { ReactNode } from 'react'
 import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
@@ -16,7 +16,7 @@ import { environment } from '../../environment'
 import { Markdown, useConfirm } from '../layout'
 
 type ElectionQuestionsProps = ChakraProps & {
-  confirmContents?: (questions: IQuestion[], answers: FieldValues) => ReactNode
+  confirmContents?: (election: PublishedElection, answers: FieldValues) => ReactNode
   onInvalid?: SubmitErrorHandler<FieldValues>
 }
 
@@ -56,9 +56,9 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
       client.wallet instanceof Wallet &&
       !(await confirm(
         typeof confirmContents === 'function' ? (
-          confirmContents(questions, values)
+          confirmContents(election, values)
         ) : (
-          <QuestionsConfirmation questions={questions} answers={values} />
+          <QuestionsConfirmation election={election} answers={values} />
         )
       ))
     ) {
@@ -107,10 +107,10 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
 
 export type QuestionsConfirmationProps = {
   answers: FieldValues
-  questions: IQuestion[]
+  election: PublishedElection
 }
 
-export const QuestionsConfirmation = ({ answers, questions, ...rest }: QuestionsConfirmationProps) => {
+export const QuestionsConfirmation = ({ answers, election, ...rest }: QuestionsConfirmationProps) => {
   const mstyles = useMultiStyleConfig('ConfirmModal')
   const styles = useMultiStyleConfig('QuestionsConfirmation', rest)
   const { cancel, proceed } = useConfirm()
@@ -124,12 +124,29 @@ export const QuestionsConfirmation = ({ answers, questions, ...rest }: Questions
       <ModalBody sx={mstyles.body}>
         <Box {...props} sx={styles.box}>
           <Text sx={styles.description}>{localize('vote.confirm')}</Text>
-          {questions.map((q, k) => {
-            const choice = q.choices.find((v) => v.value === parseInt(answers[k.toString()], 10))
+          {election.questions.map((q, k) => {
+            if (election.resultsType.name === ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION) {
+              const choice = q.choices.find((v) => v.value === parseInt(answers[k.toString()], 10))
+              return (
+                <chakra.div key={k} __css={styles.question}>
+                  <chakra.div __css={styles.title}>{q.title.default}</chakra.div>
+                  <chakra.div __css={styles.answer}>{choice?.title.default}</chakra.div>
+                </chakra.div>
+              )
+            }
+            const choices = answers[0]
+              .map((a) => (q.choices[Number(a)] ? q.choices[Number(a)].title.default : localize('vote.abstain')))
+              .map((a) => (
+                <span>
+                  - {a}
+                  <br />
+                </span>
+              ))
+
             return (
               <chakra.div key={k} __css={styles.question}>
                 <chakra.div __css={styles.title}>{q.title.default}</chakra.div>
-                <chakra.div __css={styles.answer}>{choice?.title.default}</chakra.div>
+                <chakra.div __css={styles.answer}>{choices}</chakra.div>
               </chakra.div>
             )
           })}
