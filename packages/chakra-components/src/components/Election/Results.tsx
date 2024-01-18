@@ -6,6 +6,7 @@ import {
   ElectionResultsTypeNames,
   ElectionStatus,
   IChoice,
+  IQuestion,
   InvalidElection,
   PublishedElection,
   formatUnits,
@@ -34,17 +35,15 @@ export const ElectionResults = (props: ChakraProps) => {
     )
   }
 
-  console.log('election:', election)
   const decimals = (election.meta as any)?.token?.decimals || 0
   const totals = election?.questions
     .map((el) => el.choices.reduce((acc, curr) => acc + Number(curr.results), 0))
     .map((votes: number) => results(votes, decimals))
-  console.log('totals:', totals)
+
   return (
     <Flex sx={styles.wrapper} {...props}>
-      {election?.questions.map((q: any, idx: number) => {
-        const choices = electionChoices(election, q.choices, localize('vote.abstain'))
-        console.log('choices:', choices)
+      {election?.questions.map((q: IQuestion, idx: number) => {
+        const choices = electionChoices(election, q, localize('vote.abstain'))
         return (
           <chakra.div key={idx} sx={styles.question}>
             <chakra.div sx={styles.header}>
@@ -78,22 +77,19 @@ export const ElectionResults = (props: ChakraProps) => {
   )
 }
 
-const electionChoices = (election: PublishedElection, choices: IChoice[], abstainLabel: string) => {
-  const nchoices = [...choices]
-  if (election.resultsType.name === ElectionResultsTypeNames.MULTIPLE_CHOICE) {
-    console.log('received results:', election.results)
-    const results = election.results[0].map((val, key) => parseInt(val, 10) + parseInt(election.results[1][key], 10))
-    for (const k in nchoices) {
-      nchoices[k].results = results[parseInt(nchoices[k].value, 10)]
-    }
-    const abstain = {
+const electionChoices = (election: PublishedElection, q: IQuestion, abstainLabel: string) => {
+  const nchoices = [...q.choices]
+
+  if (
+    election.resultsType.name === ElectionResultsTypeNames.MULTIPLE_CHOICE &&
+    election.resultsType.properties.canAbstain
+  ) {
+    const abstain: IChoice = {
       title: {
         default: abstainLabel,
       },
-      results: 0,
-    }
-    for (const id of election.resultsType.properties.abstainValues) {
-      abstain.results += parseInt(results[id], 10)
+      results: q.numAbstains as string,
+      value: -1,
     }
     nchoices.push(abstain)
   }

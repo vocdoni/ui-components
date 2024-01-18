@@ -87,7 +87,10 @@ export const handlers = [
               title: { default: 'das ist eine andere frage' },
             },
           ],
-          results: { aggregation: 'discrete-counting', display: 'multiple-question' },
+          type: {
+            name: 'single-choice-multiquestion',
+            properties: {},
+          },
         },
       })
     )

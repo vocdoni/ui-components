@@ -79,9 +79,6 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
         throw new Error('Unknown or invalid election type')
     }
 
-    // console.log(results)
-    // return
-
     return bvote(results)
   }
 
@@ -135,8 +132,10 @@ export const QuestionsConfirmation = ({ answers, election, ...rest }: QuestionsC
               )
             }
             const choices = answers[0]
-              .map((a) => (q.choices[Number(a)] ? q.choices[Number(a)].title.default : localize('vote.abstain')))
-              .map((a) => (
+              .map((a: string) =>
+                q.choices[Number(a)] ? q.choices[Number(a)].title.default : localize('vote.abstain')
+              )
+              .map((a: string) => (
                 <span>
                   - {a}
                   <br />
@@ -263,13 +262,15 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
   }
 
   const choices = [...question.choices]
-  for (const abstain of election.resultsType.properties.abstainValues) {
-    choices.push({
-      title: {
-        default: localize('vote.abstain'),
-      },
-      value: abstain,
-    })
+  if (election.resultsType.properties.canAbstain) {
+    for (const abstain of election.resultsType.properties.abstainValues) {
+      choices.push({
+        title: {
+          default: localize('vote.abstain'),
+        },
+        value: parseInt(abstain, 10),
+      })
+    }
   }
 
   return (
@@ -286,29 +287,31 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
           },
         }}
         name={index}
-        render={({ field }) =>
-          choices.map((choice, ck) => (
-            <Checkbox
-              {...field}
-              key={ck}
-              sx={styles.checkbox}
-              value={choice.value.toString()}
-              isDisabled={disabled}
-              onChange={(e) => {
-                if (values.includes(e.target.value)) {
-                  setValue(
-                    index,
-                    values.filter((v: string) => v !== e.target.value)
-                  )
-                } else {
-                  setValue(index, [...values, e.target.value])
-                }
-              }}
-            >
-              {choice.title.default}
-            </Checkbox>
-          ))
-        }
+        render={({ field }) => (
+          <>
+            {choices.map((choice, ck) => (
+              <Checkbox
+                {...field}
+                key={ck}
+                sx={styles.checkbox}
+                value={choice.value.toString()}
+                isDisabled={disabled}
+                onChange={(e) => {
+                  if (values.includes(e.target.value)) {
+                    setValue(
+                      index,
+                      values.filter((v: string) => v !== e.target.value)
+                    )
+                  } else {
+                    setValue(index, [...values, e.target.value])
+                  }
+                }}
+              >
+                {choice.title.default}
+              </Checkbox>
+            ))}
+          </>
+        )}
       />
       <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
     </Stack>
