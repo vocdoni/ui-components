@@ -15,7 +15,7 @@ import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useToast } from '@chakra-ui/toast'
 import { Wallet } from '@ethersproject/wallet'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
-import { ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
+import { ArchivedElection, VocdoniSDKClient, dotobject } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -125,7 +125,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   }
 
   // genarate validation array if any validation provided from the user
-  const toValidate: { [name: string]: RegExp } = election?.get('census.fields.specs')
+  const toValidate: { [name: string]: RegExp } = election?.get('census.specs')
 
   const required = {
     value: true,
@@ -164,7 +164,10 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
                   <Input
                     {...register(key.toString(), {
                       required,
-                      pattern: field in toValidate ? new RegExp(toValidate[field]) : new RegExp('.*'),
+                      pattern:
+                        toValidate && typeof toValidate[field] !== 'undefined'
+                          ? new RegExp(toValidate[field])
+                          : new RegExp('.*'),
                     })}
                     sx={styles.input}
                   />
