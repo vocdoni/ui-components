@@ -124,6 +124,9 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     }
   }
 
+  // genarate validation array if any validation provided from the user
+  const toValidate: { [name: string]: RegExp } = election?.get('census.fields.specs')
+
   const required = {
     value: true,
     message: localize('validation.required'),
@@ -158,7 +161,13 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
               {fields.map((field, key) => (
                 <FormControl key={key} isInvalid={!!errors[key]} sx={styles.control}>
                   <FormLabel sx={styles.label}>{field}</FormLabel>
-                  <Input {...register(key.toString(), { required })} sx={styles.input} />
+                  <Input
+                    {...register(key.toString(), {
+                      required,
+                      pattern: field in toValidate ? new RegExp(toValidate[field]) : new RegExp('.*'),
+                    })}
+                    sx={styles.input}
+                  />
                   <FormErrorMessage sx={styles.error}>{errors[key]?.message?.toString()}</FormErrorMessage>
                 </FormControl>
               ))}
