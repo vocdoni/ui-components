@@ -125,7 +125,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   }
 
   // genarate validation array if any validation provided from the user
-  const toValidate: { [name: string]: RegExp } = election?.get('census.specs')
+  // const toValidate: { [name: string]: RegExp } = election?.get('census.specs')
+  const toValidate: { [name: string]: { value: string; message: string } } = election?.get('census.fields.specs')
 
   const required = {
     value: true,
@@ -166,8 +167,16 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
                       required,
                       pattern:
                         toValidate && typeof toValidate[field] !== 'undefined'
-                          ? new RegExp(toValidate[field])
-                          : new RegExp('.*'),
+                          ? {
+                              // Accepts only the provided regex
+                              value: new RegExp(toValidate[field]['value']),
+                              message: toValidate[field]['message'],
+                            }
+                          : {
+                              // Accepts all
+                              value: new RegExp('.*'),
+                              message: '',
+                            },
                     })}
                     sx={styles.input}
                   />
