@@ -15,7 +15,7 @@ import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useToast } from '@chakra-ui/toast'
 import { Wallet } from '@ethersproject/wallet'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
-import { ArchivedElection, VocdoniSDKClient, dotobject } from '@vocdoni/sdk'
+import { ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -124,10 +124,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     }
   }
 
-  // genarate validation array if any validation provided from the user
-  // const toValidate: { [name: string]: RegExp } = election?.get('census.specs')
-  const toValidate: { [name: string]: { value: string; message: string } } = election?.get('census.fields.specs')
-
+  // Validation rules
   const required = {
     value: true,
     message: localize('validation.required'),
@@ -135,6 +132,15 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const minLength = {
     value: 8,
     message: localize('validation.min_length', { min: 8 }),
+  }
+  // Validations provided by the election metadata
+  const validations: { [name: string]: { value: string; message: string } } = election?.get('census.specs')
+  const pattern = (field: string) => {
+    if (!validations || typeof validations[field] === 'undefined') return undefined
+    return {
+      value: new RegExp(validations[field].value),
+      message: validations[field].message,
+    }
   }
 
   if (!shouldRender) return null
@@ -165,18 +171,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
                   <Input
                     {...register(key.toString(), {
                       required,
-                      pattern:
-                        toValidate && typeof toValidate[field] !== 'undefined'
-                          ? {
-                              // Accepts only the provided regex
-                              value: new RegExp(toValidate[field]['value']),
-                              message: toValidate[field]['message'],
-                            }
-                          : {
-                              // Accepts all
-                              value: new RegExp('.*'),
-                              message: '',
-                            },
+                      pattern: pattern(field),
                     })}
                     sx={styles.input}
                   />
