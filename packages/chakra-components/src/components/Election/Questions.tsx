@@ -5,10 +5,10 @@ import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Box, Link, Stack, Text } from '@chakra-ui/layout'
 import { ModalBody, ModalCloseButton, ModalFooter, ModalHeader } from '@chakra-ui/modal'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
-import { ChakraProps, chakra, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { Wallet } from '@ethersproject/wallet'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { ElectionResultsTypeNames, ElectionStatus, IQuestion, InvalidElection, PublishedElection } from '@vocdoni/sdk'
+import { ElectionResultsTypeNames, ElectionStatus, InvalidElection, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { ReactNode } from 'react'
 import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
@@ -65,7 +65,7 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
       return false
     }
 
-    let results = []
+    let results: number[] = []
     switch (election.resultsType.name) {
       case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
         results = election.questions.map((q, k) => parseInt(values[k.toString()], 10))
@@ -74,6 +74,14 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
         results = Object.values(values)
           .pop()
           .map((v: string) => parseInt(v, 10))
+        // map proper abstain ids
+        if (results.includes(-1)) {
+          results.splice(results.indexOf(-1), 1)
+          let abs = 0
+          while (results.length < (election.voteType.maxCount || 1)) {
+            results.push(parseInt(election.resultsType.properties.abstainValues[abs++], 10))
+          }
+        }
         break
       default:
         throw new Error('Unknown or invalid election type')
@@ -263,14 +271,12 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
 
   const choices = [...question.choices]
   if (election.resultsType.properties.canAbstain) {
-    for (const abstain of election.resultsType.properties.abstainValues) {
-      choices.push({
-        title: {
-          default: localize('vote.abstain'),
-        },
-        value: parseInt(abstain, 10),
-      })
-    }
+    choices.push({
+      title: {
+        default: localize('vote.abstain'),
+      },
+      value: -1,
+    })
   }
 
   return (
@@ -280,6 +286,9 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
         disabled={disabled}
         rules={{
           validate: (v) => {
+            // allow a single selection if is an abstain
+            if (v.length === 1 && v.includes('-1')) return true
+
             return (
               (v && v.length === election.voteType.maxCount) ||
               localize('validation.choices_count', { count: election.voteType.maxCount })
