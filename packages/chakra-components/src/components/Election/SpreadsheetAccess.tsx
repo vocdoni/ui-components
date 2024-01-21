@@ -124,6 +124,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     }
   }
 
+  // Validation rules
   const required = {
     value: true,
     message: localize('validation.required'),
@@ -131,6 +132,15 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const minLength = {
     value: 8,
     message: localize('validation.min_length', { min: 8 }),
+  }
+  // Validations provided by the election metadata
+  const validations: { [name: string]: { value: string; message: string } } = election?.get('census.specs')
+  const pattern = (field: string) => {
+    if (!validations || typeof validations[field] === 'undefined') return undefined
+    return {
+      value: new RegExp(validations[field].value),
+      message: validations[field].message,
+    }
   }
 
   if (!shouldRender) return null
@@ -158,7 +168,13 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
               {fields.map((field, key) => (
                 <FormControl key={key} isInvalid={!!errors[key]} sx={styles.control}>
                   <FormLabel sx={styles.label}>{field}</FormLabel>
-                  <Input {...register(key.toString(), { required })} sx={styles.input} />
+                  <Input
+                    {...register(key.toString(), {
+                      required,
+                      pattern: pattern(field),
+                    })}
+                    sx={styles.input}
+                  />
                   <FormErrorMessage sx={styles.error}>{errors[key]?.message?.toString()}</FormErrorMessage>
                 </FormControl>
               ))}
