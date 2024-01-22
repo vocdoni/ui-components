@@ -22,8 +22,9 @@ export const questionsAnatomy = [
   'radioGroup',
   // questions stack
   'stack',
-  // form radio
+  // form radio and checkboxes
   'radio',
+  'checkbox',
   // form error message
   'error',
 ]
