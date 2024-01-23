@@ -13,7 +13,7 @@ import {
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 
-const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(0) + '%'
+const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(1) + '%'
 const results = (result: number, decimals?: number) =>
   decimals ? parseInt(formatUnits(BigInt(result), decimals), 10) : result
 
@@ -36,8 +36,10 @@ export const ElectionResults = (props: ChakraProps) => {
   }
 
   const decimals = (election.meta as any)?.token?.decimals || 0
+  const totalsAbstain = election?.questions.map((q) => ('numAbstains' in q ? Number(q.numAbstains) : 0))
+
   const totals = election?.questions
-    .map((el) => el.choices.reduce((acc, curr) => acc + Number(curr.results), 0))
+    .map((el, idx) => el.choices.reduce((acc, curr) => acc + Number(curr.results), totalsAbstain[idx]))
     .map((votes: number) => results(votes, decimals))
 
   return (
