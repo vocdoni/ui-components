@@ -27,6 +27,7 @@ export const locales = {
     wrong_data_title: 'Wrong data',
     wrong_data_description: 'The specified data is not correct',
   },
+  loading: 'Loading...',
   schedule: 'Voting from {{ begin }} to {{ end }}',
   // results component
   results: {
