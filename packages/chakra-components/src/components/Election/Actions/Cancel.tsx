@@ -1,7 +1,8 @@
 import { IconButtonProps } from '@chakra-ui/button'
-import { chakra, forwardRef } from '@chakra-ui/system'
+import { forwardRef } from '@chakra-ui/system'
 import { useActions, useClient, useElection } from '@vocdoni/react-providers'
 import { areEqualHexStrings, ElectionStatus } from '@vocdoni/sdk'
+import { Button } from '../../layout'
 
 export const ActionCancel = forwardRef<IconButtonProps, 'button'>((props, ref) => {
   const { account, localize } = useClient()
@@ -15,7 +16,7 @@ export const ActionCancel = forwardRef<IconButtonProps, 'button'>((props, ref) =
   if (!election || (election && !areEqualHexStrings(election.organizationId, account?.address))) return null
 
   return (
-    <chakra.button
+    <Button
       ref={ref}
       isLoading={loading}
       onClick={cancel}

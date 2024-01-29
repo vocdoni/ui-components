@@ -1,8 +1,9 @@
-import { Button, ButtonProps } from '@chakra-ui/button'
+import { ButtonProps } from '@chakra-ui/button'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ArchivedElection, ElectionStatus, InvalidElection } from '@vocdoni/sdk'
 import { useState } from 'react'
+import { Button } from '../layout/Button'
 import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 export const VoteButton = (props: ButtonProps) => {
