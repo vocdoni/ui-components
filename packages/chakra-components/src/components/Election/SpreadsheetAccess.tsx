@@ -1,4 +1,3 @@
-import { Button } from '@chakra-ui/button'
 import { FormControl, FormErrorMessage, FormHelperText, FormLabel } from '@chakra-ui/form-control'
 import { Input } from '@chakra-ui/input'
 import {
@@ -18,6 +17,7 @@ import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/r
 import { ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Button } from '../layout/Button'
 
 export const SpreadsheetAccess = (rest: ChakraProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
