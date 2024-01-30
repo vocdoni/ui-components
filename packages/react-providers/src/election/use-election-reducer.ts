@@ -48,7 +48,7 @@ export type CensusErrorPayload = ErrorPayload
 export type CensusIsAbleToVotePayload = undefined | boolean
 export type CensusLoadPayload = string
 export type ElectionClientSetPayload = VocdoniSDKClient
-export type ElectionCspStep0Payload = string
+export type ElectionCspStep0Payload = { handler: string; token: string }
 export type ElectionCspStep1Payload = string
 export type ElectionErrorPayload = ErrorPayload
 export type ElectionInCensusPayload = boolean
@@ -105,7 +105,6 @@ export interface ElectionReducerState {
     voting: string | null
   }
   csp: {
-    handler: 'github'
     token: string | undefined
     authToken: string | undefined
   }
@@ -148,7 +147,6 @@ export const electionStateEmpty = ({
     voting: null,
   },
   csp: {
-    handler: 'github',
     token: undefined,
     authToken: undefined,
   },
@@ -222,12 +220,13 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
     }
 
     case ElectionCspStep0: {
-      const authToken = action.payload as ElectionCspStep0Payload
+      const data = action.payload as ElectionCspStep0Payload
       return {
         ...state,
         csp: {
           ...state.csp,
-          authToken,
+          authToken: data.token,
+          handler: data.handler,
         },
       }
     }
@@ -484,7 +483,7 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
         clear()
       },
       load: (id?: string) => dispatch({ type: ElectionLoad, payload: id }),
-      csp0: (token: string) => dispatch({ type: ElectionCspStep0, payload: token }),
+      csp0: (data: ElectionCspStep0Payload) => dispatch({ type: ElectionCspStep0, payload: data }),
       csp1: (token: string) => dispatch({ type: ElectionCspStep1, payload: token }),
       error: (error: ElectionErrorPayload) => dispatch({ type: ElectionError, payload: error }),
       loadCensus: (voter: string) => dispatch({ type: CensusLoad, payload: voter }),
