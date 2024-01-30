@@ -305,9 +305,7 @@ export const useElectionProvider = ({
 
   // CSP OAuth flow
   const cspAuthAndVote = async () => {
-    const {
-      csp: { handler },
-    } = state
+    const handler = election?.meta.csp?.service
     if (!client) {
       throw new Error('no client initialized')
     }
@@ -333,7 +331,7 @@ export const useElectionProvider = ({
     try {
       // TODO: properly type when ICspIntermediateStepResponse is exposed from SDK
       const step0: any = await client.cspStep(0, [handler, redirectURL])
-      actions.csp0(step0.authToken)
+      actions.csp0({ handler, token: step0.authToken })
       openLoginPopup(handler, step0['response'][0])
     } catch (e) {
       actions.votingError(e)
