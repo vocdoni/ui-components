@@ -1,6 +1,6 @@
 import { Wallet } from '@ethersproject/wallet'
 import { act, render, renderHook, waitFor } from '@testing-library/react'
-import { VocdoniCensus3Client } from '@vocdoni/sdk'
+import { Account, VocdoniCensus3Client } from '@vocdoni/sdk'
 import { ApiUrl, CensusUrls, properProps } from '../test-utils'
 import { ClientProvider, useClient } from './ClientProvider'
 
@@ -137,6 +137,39 @@ describe('<ClientProvider />', () => {
     expect(result.current.loading.create).toBeFalsy()
     expect(result.current.account).not.toBeUndefined()
     expect(result.current.errors.create).toBeNull()
+  })
+
+  it('updates an account', async () => {
+    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const signer = Wallet.createRandom()
+    const { result } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { env: 'dev', signer },
+    })
+
+    expect(result.current.loaded.create).toBeFalsy()
+
+    // fetch account request is mocked, so we're actually not creating accounts, just fetching them
+    await act(async () => {
+      await result.current.createAccount()
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.create).toBeTruthy()
+    })
+
+    // now we update it
+    await act(async () => {
+      await result.current.updateAccount(new Account({ name: 'tests' }))
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.update).toBeTruthy()
+    })
+
+    expect(result.current.loading.update).toBeFalsy()
+    expect(result.current.account).not.toBeUndefined()
+    expect(result.current.errors.update).toBeNull()
   })
 
   it('properly clears session data', async () => {
