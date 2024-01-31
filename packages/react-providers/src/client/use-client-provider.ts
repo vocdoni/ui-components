@@ -1,5 +1,5 @@
 import { Wallet } from '@ethersproject/wallet'
-import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect } from 'react'
 import { useLocalize } from '../i18n/localize'
 import { ClientReducerProps, newVocdoniSDKClient, useClientReducer } from './use-client-reducer'
@@ -87,6 +87,19 @@ export const useClientProvider = ({
   }
 
   /**
+   * Updates an account.
+   *
+   * @returns {Promise<AccountData}
+   */
+  const updateAccount = (account: Account) => {
+    if (state.loading.update) return
+
+    actions.updateAccount()
+
+    return state.client.updateAccountInfo(account).then(actions.setAccountUpdate).catch(actions.errorAccountUpdate)
+  }
+
+  /**
    * Generates a signer so the implementer can use it to sign transactions.
    * @param seed
    * @returns
@@ -116,5 +129,6 @@ export const useClientProvider = ({
     fetchAccount,
     generateSigner,
     localize,
+    updateAccount,
   }
 }

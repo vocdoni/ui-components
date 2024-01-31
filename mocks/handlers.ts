@@ -1,6 +1,30 @@
 import { rest } from 'msw'
 
 export const handlers = [
+  rest.get('https://api*.vocdoni.*/v2/chain/info', (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        chainId: 'vocdoni/DEV/31',
+        blockTime: [10252, 10355, 10394, 10437, 10409],
+        electionCount: 1223,
+        organizationCount: 725,
+        genesisTime: '2024-01-12T01:00:00Z',
+        height: 134359,
+        syncing: false,
+        blockTimestamp: 1706705296,
+        transactionCount: 72027,
+        validatorCount: 3,
+        voteCount: 68428,
+        circuitVersion: 'v1.0.0',
+        maxCensusSize: 100000,
+        networkCapacity: 20000,
+      })
+    )
+  }),
+  rest.post('https://api*.vocdoni.*/v2/files/cid', (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json(generateRandomCID()))
+  }),
   rest.get('https://api*.vocdoni.*/v2/accounts/*', (req, res, ctx) => {
     const id = req.params[1]
     return res(
@@ -21,6 +45,15 @@ export const handlers = [
         },
       })
     )
+  }),
+  rest.post('https://api*.vocdoni.*/v2/accounts', (req, res, ctx) => {
+    return res(ctx.status(200), ctx.body('0xmocked'))
+  }),
+  rest.get('https://api*.vocdoni.*/v2/chain/transactions/reference/*', (req, res, ctx) => {
+    return res(ctx.status(200), ctx.body('ok'))
+  }),
+  rest.post('https://api*.vocdoni.*/v2/accounts', (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json('0xinvented'))
   }),
   rest.get('https://api*.vocdoni.*/v2/elections/*', (req, res, ctx) => {
     const id = req.params[1]
@@ -120,3 +153,15 @@ export const handlers = [
     )
   }),
 ]
+
+const generateRandomCID = (): string => {
+  const characters = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+  const length = 46
+  let result = 'Qm'
+
+  for (let i = 2; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length))
+  }
+
+  return result
+}

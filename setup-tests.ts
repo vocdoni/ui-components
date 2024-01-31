@@ -1,6 +1,13 @@
 import '@testing-library/jest-dom/extend-expect'
+import { TextDecoder, TextEncoder } from 'node:util'
 import React from 'react'
 import { server } from './mocks/server'
+
+// polyfill text encoder/decoder
+Object.defineProperties(globalThis, {
+  TextDecoder: { value: TextDecoder },
+  TextEncoder: { value: TextEncoder },
+})
 
 // Establish API mocking before all tests.
 beforeAll(() =>
