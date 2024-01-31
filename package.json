@@ -40,5 +40,9 @@
     "clean": "turbo clean --filter=@vocdoni* && rm -fr node_modules",
     "test": "jest"
   },
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "yarn@1.22.19",
+  "engines": {
+    "npm": "please use yarn",
+    "yarn": ">= 1.19.1 && < 2"
+  }
 }
