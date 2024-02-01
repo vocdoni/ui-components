@@ -8,24 +8,39 @@ export default class localStorageWallet {
 
   public static async getWallet(provider: PublicClient): Promise<WalletClient | false> {
     try {
-      const value: string = localStorage.getItem(this.storageItemName) as string
+      const value = localStorage.getItem(this.storageItemName) as `0x${string}`
       if (!value) return false
 
-      return this.createWallet(value, provider)
+      return await this.createWallet(value, provider)
     } catch (err) {
+      this.deleteWallet()
       console.error('failed to generate wallet:', err)
     }
 
     throw new Error('could not find or create wallet')
   }
 
-  public static async createWallet(data: string | string[], provider: PublicClient): Promise<WalletClient> {
+  public static async createWalletFromPrivateKey(pk: string, provider: PublicClient): Promise<WalletClient> {
+    if (!pk.startsWith('0x')) {
+      pk = '0x' + pk
+    }
+
+    if (!this.isValidEthereumPrivateKey(pk)) throw new Error('invalid private key')
+
+    localStorage.setItem(this.storageItemName, pk)
+    return this.createWallet(pk as `0x${string}`, provider)
+  }
+
+  public static async createWalletFromData(data: string | string[], provider: PublicClient): Promise<WalletClient> {
     const inputs = Array.isArray(data) ? data : [data]
     const hash = inputs.reduce((acc, curr) => acc + curr, '')
+    const pk = keccak256(Buffer.from(hash))
+    localStorage.setItem(this.storageItemName, pk)
+    return this.createWallet(pk, provider)
+  }
 
-    localStorage.setItem(this.storageItemName, hash)
-
-    const account = privateKeyToAccount(keccak256(Buffer.from(hash)))
+  public static async createWallet(pk: `0x${string}`, provider: PublicClient): Promise<WalletClient> {
+    const account = privateKeyToAccount(pk)
     const client = createWalletClient({
       account,
       chain: mainnet,
@@ -65,5 +80,17 @@ export default class localStorageWallet {
 
   public static async deleteWallet(): Promise<void> {
     localStorage.removeItem(this.storageItemName)
+  }
+
+  public static isValidEthereumPrivateKey(privateKey: string): boolean {
+    const hexRegex = /^[0-9a-fA-F]+$/
+
+    // Remove the '0x' prefix if present
+    if (privateKey.startsWith('0x')) {
+      privateKey = privateKey.slice(2)
+    }
+
+    // Check if the private key is 64 characters long and only contains hexadecimal characters
+    return privateKey.length === 64 && hexRegex.test(privateKey)
   }
 }

@@ -1,12 +1,12 @@
 import { createRoot } from 'react-dom/client'
-import { CreateWalletModal } from '../components/CreateWalletModal'
+import { ImportPrivateKeyModal } from '../components/ImportPrivateKeyModal'
 import localStorageWallet from './localStorageWallet'
 import { PublicClient, WalletClient } from 'wagmi'
 
 /**
  * This class is used to create a wallet from a form
  */
-export class inputsWallet extends localStorageWallet {
+export class privateKeyWallet extends localStorageWallet {
   private data: any
   private cancel: boolean = false
 
@@ -16,7 +16,7 @@ export class inputsWallet extends localStorageWallet {
     myDiv.setAttribute('id', 'myDiv' + Math.random())
     document.getElementsByTagName('body')[0].appendChild(myDiv)
     const root = createRoot(myDiv)
-    root.render(<CreateWalletModal onExit={() => (this.cancel = true)} onSubmit={(data) => (this.data = data)} />)
+    root.render(<ImportPrivateKeyModal onExit={() => (this.cancel = true)} onSubmit={(data) => (this.data = data)} />)
 
     // Check every 100ms if the user has submitted the form
     const r = await new Promise((resolve) => {
@@ -37,6 +37,6 @@ export class inputsWallet extends localStorageWallet {
       throw new Error('User cancelled')
     }
 
-    return await localStorageWallet.createWalletFromData(JSON.stringify(this.data), provider)
+    return await localStorageWallet.createWalletFromPrivateKey(this.data.pk, provider)
   }
 }

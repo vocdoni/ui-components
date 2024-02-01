@@ -44,7 +44,7 @@ export class oAuthWallet extends localStorageWallet {
       throw new Error('User cancelled')
     }
 
-    return await localStorageWallet.createWallet(JSON.stringify(this.data), provider)
+    return await localStorageWallet.createWalletFromData(JSON.stringify(this.data), provider)
   }
 
   private async openLoginPopup(url: string) {
