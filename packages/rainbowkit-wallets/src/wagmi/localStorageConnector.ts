@@ -28,6 +28,7 @@ export class localStorageConnector extends Connector {
   async connect() {
     this.emit('message', { type: 'connecting' })
     try {
+      if (!this.wallet && this.creating) return
       if (!this.wallet && !this.creating) {
         this.creating = true
         await this.createWallet()
@@ -35,7 +36,6 @@ export class localStorageConnector extends Connector {
 
       const account = await this.getAccount()
       const chainId = await this.getChainId()
-
       const cdata: ConnectorData = {
         account,
         chain: {
@@ -43,7 +43,6 @@ export class localStorageConnector extends Connector {
           unsupported: false,
         },
       }
-
       this.creating = false
       return cdata
     } catch (error) {

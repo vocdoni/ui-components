@@ -2,16 +2,27 @@ import { Buffer } from 'buffer'
 import { createWalletClient, custom, keccak256, publicActions } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { PublicClient, mainnet, WalletClient } from 'wagmi'
+import CryptoJS from 'crypto-js'
 
 export default class localStorageWallet {
   static storageItemName = 'localstorage-wallet-seed'
+  static storageItemEncryptionItemName = 'session-wallet-encryption-key'
 
   public static async getWallet(provider: PublicClient): Promise<WalletClient | false> {
     try {
-      const value = localStorage.getItem(this.storageItemName) as `0x${string}`
+      const value: string = localStorage.getItem(this.storageItemName) as string
       if (!value) return false
 
-      return await this.createWallet(value, provider)
+      const valueObj = JSON.parse(value) as { type: string; pk: string }
+
+      let pk = valueObj.pk
+      if (valueObj.type === 'encrypted') {
+        const password = sessionStorage.getItem(this.storageItemEncryptionItemName)
+        if (!password) return false
+        pk = CryptoJS.AES.decrypt(pk, password).toString(CryptoJS.enc.Utf8)
+      }
+
+      return await this.createWallet(pk as `0x${string}`, provider)
     } catch (err) {
       this.deleteWallet()
       console.error('failed to generate wallet:', err)
@@ -20,14 +31,20 @@ export default class localStorageWallet {
     throw new Error('could not find or create wallet')
   }
 
-  public static async createWalletFromPrivateKey(pk: string, provider: PublicClient): Promise<WalletClient> {
+  public static async createWalletFromPrivateKey(
+    pkAndPassword: { pk: string; password: string },
+    provider: PublicClient
+  ): Promise<WalletClient> {
+    let pk = pkAndPassword.pk
     if (!pk.startsWith('0x')) {
       pk = '0x' + pk
     }
 
     if (!this.isValidEthereumPrivateKey(pk)) throw new Error('invalid private key')
 
-    localStorage.setItem(this.storageItemName, pk)
+    const encryptedPk = CryptoJS.AES.encrypt(pk, pkAndPassword.password).toString()
+    localStorage.setItem(this.storageItemName, JSON.stringify({ type: 'encrypted', pk: encryptedPk }))
+    sessionStorage.setItem(this.storageItemEncryptionItemName, pkAndPassword.password)
     return this.createWallet(pk as `0x${string}`, provider)
   }
 
@@ -35,7 +52,7 @@ export default class localStorageWallet {
     const inputs = Array.isArray(data) ? data : [data]
     const hash = inputs.reduce((acc, curr) => acc + curr, '')
     const pk = keccak256(Buffer.from(hash))
-    localStorage.setItem(this.storageItemName, pk)
+    localStorage.setItem(this.storageItemName, JSON.stringify({ type: 'plain', pk }))
     return this.createWallet(pk, provider)
   }
 

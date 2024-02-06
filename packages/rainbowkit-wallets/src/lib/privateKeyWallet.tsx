@@ -37,6 +37,6 @@ export class privateKeyWallet extends localStorageWallet {
       throw new Error('User cancelled')
     }
 
-    return await localStorageWallet.createWalletFromPrivateKey(this.data.pk, provider)
+    return await localStorageWallet.createWalletFromPrivateKey(this.data, provider)
   }
 }

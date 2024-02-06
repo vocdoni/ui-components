@@ -23,6 +23,7 @@ type ICreateWalletProps = {
 export function ImportPrivateKeyModal(props: ICreateWalletProps): React.JSX.Element {
   const [modalIsOpen, setModalIsOpen] = useState(true)
   const [pk, setPk] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
   function closeModal() {
@@ -39,7 +40,7 @@ export function ImportPrivateKeyModal(props: ICreateWalletProps): React.JSX.Elem
     }
 
     setModalIsOpen(false)
-    props.onSubmit({ pk })
+    props.onSubmit({ pk, password })
   }
 
   return (
@@ -68,6 +69,22 @@ export function ImportPrivateKeyModal(props: ICreateWalletProps): React.JSX.Elem
           onChange={(e) => setPk(e.target.value)}
         />
         {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        <label htmlFor='password'>Password</label>
+        <input
+          type='password'
+          style={{
+            display: 'block',
+            border: '1px solid #CCC',
+            borderRadius: '8px',
+            height: '35px',
+            width: '100%',
+            padding: '10px',
+          }}
+          id='password'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
         <input
           type='submit'
