@@ -45,6 +45,7 @@ export const VoteButton = (props: ButtonProps) => {
   if (connected && election?.electionType.anonymous && !signature) {
     button.isLoading = loading
     button.type = 'button'
+    button.isDisabled = !client.wallet || !isAbleToVote
     button.children = localize('vote.sign')
     button.onClick = async () => {
       setLoading(true)
