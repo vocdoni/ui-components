@@ -166,6 +166,13 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
           fetch: isFetch ? true : state.loading.fetch,
           update: isUpdate ? true : state.loading.update,
         },
+        errors: {
+          ...state.errors,
+          account: null,
+          create: isCreate ? null : state.errors.create,
+          fetch: isFetch ? null : state.errors.fetch,
+          update: isUpdate ? null : state.errors.update,
+        },
       }
     }
     case ClientAccountFetchError:
