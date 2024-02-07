@@ -3,17 +3,17 @@ import {
   AnonymousVote,
   areEqualHexStrings,
   CensusType,
+  ChainAPI,
   CspVote,
   PublishedElection,
   Vote,
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '../client'
-import { useElectionReducer } from './use-election-reducer'
-import { ChainAPI } from '@vocdoni/sdk'
-import { createWebWorker } from '../worker/webWorker'
-import { useWebWorker } from '../worker/useWebWorker'
 import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
+import { useWebWorker } from '../worker/useWebWorker'
+import { createWebWorker } from '../worker/webWorker'
+import { useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
@@ -118,6 +118,7 @@ export const useElectionProvider = ({
       }
       startProcessing({ circuits })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [election, state.isAbleToVote, state.isInCensus, state.voted, client.anonymousService])
 
   // pre-fetches circuits needed for voting in anonymous elections
@@ -133,6 +134,7 @@ export const useElectionProvider = ({
       return
     isAnonCircuitsFetching.current = true
     fetchAnonCircuits()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchAnonCircuits, client.wallet, election, loading.census, fetchCensus])
 
   // sets circuits in the anonymous service
@@ -142,6 +144,7 @@ export const useElectionProvider = ({
       setAnonCircuitsFetched(true)
       client.anonymousService.setCircuits(circuits)
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [circuits])
 
   // CSP OAuth flow

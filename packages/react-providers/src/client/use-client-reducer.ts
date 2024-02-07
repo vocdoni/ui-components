@@ -29,6 +29,7 @@ export const ClientAccountCreateError = 'client:account:create::error'
 export const ClientAccountFetch = 'client:account:fetch'
 export const ClientAccountFetchError = 'client:account:fetch::error'
 export const ClientAccountSet = 'client:account:set'
+export const ClientAccountReset = 'client:account:reset'
 export const ClientAccountSetCreate = 'client:account:setcreate'
 export const ClientAccountSetUpdate = 'client:account:setupdate'
 export const ClientAccountUpdate = 'client:account:update'
@@ -56,6 +57,7 @@ export type ClientActionType =
   | typeof ClientAccountCreateError
   | typeof ClientAccountFetch
   | typeof ClientAccountFetchError
+  | typeof ClientAccountReset
   | typeof ClientAccountSet
   | typeof ClientAccountSetCreate
   | typeof ClientAccountSetUpdate
@@ -214,6 +216,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       const isCreate = action.type === ClientAccountSetCreate
       const isFetch = action.type === ClientAccountSet
       const isUpdate = action.type === ClientAccountSetUpdate
+
       return {
         ...state,
         account,
@@ -237,6 +240,25 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
           account: null,
           create: null,
           fetch: null,
+          update: null,
+        },
+      }
+    }
+    case ClientAccountReset: {
+      return {
+        ...state,
+        account: undefined,
+        loaded: {
+          account: false,
+          create: false,
+          fetch: false,
+          update: false,
+        },
+        errors: {
+          account: null,
+          create: null,
+          fetch: null,
+          update: null,
         },
       }
     }
@@ -306,6 +328,7 @@ export const useClientReducer = ({ env, client, signer, options, census3Options 
 
   // dispatch helper methods
   const clear = () => dispatch({ type: ClientClear })
+  const clearAccount = () => dispatch({ type: ClientAccountReset })
   const createAccount = () => dispatch({ type: ClientAccountCreate })
   const errorAccount = (error: ErrorPayload) => dispatch({ type: ClientAccountFetchError, payload: error })
   const errorAccountCreate = (error: ErrorPayload) => dispatch({ type: ClientAccountCreateError, payload: error })
@@ -326,6 +349,7 @@ export const useClientReducer = ({ env, client, signer, options, census3Options 
     dispatch,
     actions: {
       clear,
+      clearAccount,
       createAccount,
       errorAccount,
       errorAccountCreate,

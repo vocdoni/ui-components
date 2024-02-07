@@ -51,7 +51,7 @@ export const useClientProvider = ({
     const accChanged = async () => {
       actions.setClient(newVocdoniSDKClient(state.env as EnvOptions, state.signer, state.options))
       // undefine so other effects do their job
-      actions.setAccount(undefined)
+      actions.clearAccount()
     }
 
     ;(window as any).ethereum.on('accountsChanged', accChanged)
