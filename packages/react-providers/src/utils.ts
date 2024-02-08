@@ -1,4 +1,4 @@
-import { AccountData, ArchivedAccountData, ensure0x, VocdoniSDKClient } from '@vocdoni/sdk'
+import { ensure0x, VocdoniSDKClient } from '@vocdoni/sdk'
 import latinize from 'latinize'
 
 /**
@@ -61,16 +61,4 @@ export const walletFromRow = (salt: string, row: string[]) => {
   const normalized = row.map(normalizeText)
   normalized.push(salt)
   return VocdoniSDKClient.generateWalletFromData(normalized)
-}
-
-/**
- * Determines if the specified account is a Signer account (otherwise is considered
- * a Wallet account). Required to properly distinguish between the two types, since
- * tools like wagmi/viem require to have a Signer.
- *
- * @param {AccountData|ArchivedAccountData} account Account to be checked
- * @returns {boolean}
- */
-export const isSignerAccount = (account: AccountData | ArchivedAccountData): account is AccountData => {
-  return (account as AccountData).nonce !== undefined
 }
