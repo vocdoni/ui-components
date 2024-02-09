@@ -1,5 +1,5 @@
 import { FormControl, FormErrorMessage, FormHelperText, FormLabel } from '@chakra-ui/form-control'
-import { Input } from '@chakra-ui/input'
+import { Input, InputProps } from '@chakra-ui/input'
 import {
   Modal,
   ModalBody,
@@ -16,8 +16,32 @@ import { Wallet } from '@ethersproject/wallet'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
 import { ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { RegisterOptions, useForm } from 'react-hook-form'
 import { Button } from '../layout/Button'
+
+type MetaSpecs = {
+  [name: string]: {
+    type?:
+      | 'checkbox'
+      | 'date'
+      | 'datetime-local'
+      | 'email'
+      | 'month'
+      | 'number'
+      | 'password'
+      | 'tel'
+      | 'text'
+      | 'time'
+      | 'url'
+      | 'week'
+    pattern?: {
+      value: string
+      message: string
+    }
+    description?: string
+    props?: any
+  }
+}
 
 export const SpreadsheetAccess = (rest: ChakraProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -134,13 +158,46 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     message: localize('validation.min_length', { min: 8 }),
   }
   // Validations provided by the election metadata
-  const validations: { [name: string]: { value: string; message: string } } = election?.get('census.specs')
-  const pattern = (field: string) => {
-    if (!validations || typeof validations[field] === 'undefined') return undefined
-    return {
-      value: new RegExp(validations[field].value),
-      message: validations[field].message,
+  const specs: MetaSpecs = election?.get('census.specs')
+  // form specs
+  const fspecs = (field: string) => {
+    if (!specs || typeof specs[field] === 'undefined') return
+    const f = specs[field]
+    const props: RegisterOptions<any, string> = {}
+
+    if (f.pattern) {
+      props.pattern = {
+        value: new RegExp(f.pattern.value),
+        message: f.pattern.message,
+      }
     }
+
+    if (f.props) {
+      if (f.props.max) {
+        props.max = f.props.max
+      }
+      if (f.props.min) {
+        props.min = f.props.min
+      }
+    }
+
+    return props
+  }
+  // input specs
+  const ispecs = (field: string) => {
+    if (!specs || typeof specs[field] === 'undefined') return
+    const f = specs[field]
+    const props: InputProps = f.props || {}
+    if (f.type) {
+      props.type = f.type
+    }
+
+    return props
+  }
+  // input helper text
+  const description = (field: string) => {
+    if (!specs || typeof specs[field] === 'undefined') return
+    return specs[field].description
   }
 
   if (!shouldRender) return null
@@ -171,11 +228,16 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
                   <Input
                     {...register(key.toString(), {
                       required,
-                      pattern: pattern(field),
+                      ...fspecs(field),
                     })}
                     sx={styles.input}
+                    {...ispecs(field)}
                   />
-                  <FormErrorMessage sx={styles.error}>{errors[key]?.message?.toString()}</FormErrorMessage>
+                  {!!errors[key]?.message ? (
+                    <FormErrorMessage sx={styles.error}>{errors[key]?.message?.toString()}</FormErrorMessage>
+                  ) : (
+                    description(field) && <FormHelperText>{description(field)}</FormHelperText>
+                  )}
                 </FormControl>
               ))}
               {election?.electionType.anonymous && (
