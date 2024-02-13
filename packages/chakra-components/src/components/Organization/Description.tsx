@@ -8,11 +8,11 @@ export const OrganizationDescription = (props: Omit<ReactMarkdownProps, 'childre
   const { organization } = useOrganization()
 
   if (!organization) return null
-  if (!organization.account.description) return null
+  if (!organization.data.description) return null
 
   return (
     <Markdown {...props} sx={styles}>
-      {organization.account.description.default}
+      {organization.data.description.default}
     </Markdown>
   )
 }

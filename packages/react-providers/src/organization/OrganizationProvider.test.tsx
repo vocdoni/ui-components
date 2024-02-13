@@ -26,34 +26,32 @@ describe('<OrganizationProvider />', () => {
       )
     }
 
-    const organization: AccountData = {
-      account: new Account({
-        name: 'testing',
-      }),
+    const organization: Account = new Account({
+      data: new AccountData({ name: 'testing' }),
       address: '0xB38492889D136054A29EC37B238Cc8bBF4f3DEe7',
       balance: 0,
       electionIndex: 0,
       nonce: 0,
-    }
+    })
 
     const { result, rerender } = renderHook(() => useOrganization(), { wrapper, initialProps: { organization } })
 
-    expect(result.current.organization?.account.name.default).toBe('testing')
+    expect(result.current.organization?.data.name.default).toBe('testing')
     expect(result.current.organization?.address).toEqual('0xB38492889D136054A29EC37B238Cc8bBF4f3DEe7')
 
-    const neworg: AccountData = {
-      account: new Account({
+    const neworg: Account = new Account({
+      data: new AccountData({
         name: 'testing2',
       }),
       address: '0xde0F66E999db9927cc31acABED5cEd80a926d4b7',
       balance: 0,
       electionIndex: 0,
       nonce: 0,
-    }
+    })
 
     rerender({ organization: neworg })
 
-    expect(result.current.organization?.account.name.default).toBe('testing2')
+    expect(result.current.organization?.data.name.default).toBe('testing2')
     expect(result.current.organization?.address).toEqual('0xde0F66E999db9927cc31acABED5cEd80a926d4b7')
   })
 
@@ -76,6 +74,6 @@ describe('<OrganizationProvider />', () => {
     })
 
     expect(result.current.errors.load).toBeNull()
-    expect(result.current.organization?.account.name.default).toEqual('testing account')
+    expect(result.current.organization?.data.name.default).toEqual('testing account')
   })
 })

@@ -8,7 +8,7 @@ export const OrganizationHeader = (props: IPFSImageProps) => {
   const { organization } = useOrganization()
 
   if (!organization) return null
-  const { header } = organization.account
+  const { header } = organization.data
 
   return <Image src={header} sx={styles} {...props} />
 }

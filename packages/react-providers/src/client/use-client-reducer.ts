@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
-import { AccountData, EnvOptions, VocdoniCensus3Client, VocdoniSDKClient } from '@vocdoni/sdk'
+import { Account, EnvOptions, VocdoniCensus3Client, VocdoniSDKClient } from '@vocdoni/sdk'
 import { Reducer, useReducer } from 'react'
 import type { ErrorPayload } from '../types'
 import { errorToString } from '../utils'
@@ -40,7 +40,7 @@ export const ClientSet = 'client:set'
 export const ClientSignerSet = 'client:signer:set'
 
 export type ClientAccountErrorPayload = ErrorPayload
-export type ClientAccountSetPayload = AccountData
+export type ClientAccountSetPayload = Account
 export type ClientEnvSetPayload = ClientEnv
 export type ClientSetPayload = VocdoniSDKClient
 export type ClientSignerSetPayload = Signer | Wallet
@@ -77,7 +77,7 @@ export interface ClientState {
   client: VocdoniSDKClient
   census3: VocdoniCensus3Client
   env: EnvOptions
-  account: AccountData | undefined
+  account: Account | undefined
   signer: Wallet | Signer
   balance: number
   // determines if a wallet is connected to the client
@@ -335,10 +335,10 @@ export const useClientReducer = ({ env, client, signer, options, census3Options 
   const fetchAccount = () => dispatch({ type: ClientAccountFetch })
   const updateAccount = () => dispatch({ type: ClientAccountUpdate })
   const errorAccountUpdate = (error: ErrorPayload) => dispatch({ type: ClientAccountUpdateError, payload: error })
-  const setAccount = (account: AccountData | undefined) => dispatch({ type: ClientAccountSet, payload: account })
-  const setAccountCreate = (account: AccountData | undefined) =>
+  const setAccount = (account: Account | undefined) => dispatch({ type: ClientAccountSet, payload: account })
+  const setAccountCreate = (account: Account | undefined) =>
     dispatch({ type: ClientAccountSetCreate, payload: account })
-  const setAccountUpdate = (account: AccountData | undefined) =>
+  const setAccountUpdate = (account: Account | undefined) =>
     dispatch({ type: ClientAccountSetUpdate, payload: account })
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ClientSet, payload: client })
   const setEnv = (env: ClientEnvSetPayload) => dispatch({ type: ClientEnvSet, payload: env })

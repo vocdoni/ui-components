@@ -11,7 +11,7 @@ export const OrganizationName = forwardRef<HeadingProps, 'h1'>((props, ref) => {
 
   return (
     <chakra.h1 ref={ref} {...rest} __css={styles}>
-      {organization.account.name.default || organization.address}
+      {organization.data.name.default || organization.address}
     </chakra.h1>
   )
 })
