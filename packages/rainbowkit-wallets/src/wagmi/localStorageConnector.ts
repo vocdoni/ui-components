@@ -17,6 +17,7 @@ export class localStorageConnector extends Connector {
   protected chainId: number | undefined
   protected provider: PublicClient | undefined
   protected wallet: WalletClient | undefined
+  protected creating: boolean = false
 
   constructor(config: { chains: Chain[]; options: any }) {
     super(config)
@@ -27,13 +28,14 @@ export class localStorageConnector extends Connector {
   async connect() {
     this.emit('message', { type: 'connecting' })
     try {
-      if (!this.wallet) {
+      if (!this.wallet && this.creating) return
+      if (!this.wallet && !this.creating) {
+        this.creating = true
         await this.createWallet()
       }
 
       const account = await this.getAccount()
       const chainId = await this.getChainId()
-
       const cdata: ConnectorData = {
         account,
         chain: {
@@ -41,7 +43,7 @@ export class localStorageConnector extends Connector {
           unsupported: false,
         },
       }
-
+      this.creating = false
       return cdata
     } catch (error) {
       throw new UserRejectedRequestError(error as Error)

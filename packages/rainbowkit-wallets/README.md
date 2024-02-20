@@ -28,7 +28,7 @@ yarn add @vocdoni/rainbowkit-wallets
 Usage
 -----
 
-Add the inputsWallet and/or the oAuthWallet connector to your wallet connectors list:
+Add the inputsWallet, oAuthWallet or privateKeyWallet connector to your wallet connectors list:
 
 ~~~tsx
 import { inputsWallet } from "@vocdoni/rainbowkit-wallets";
@@ -44,6 +44,11 @@ const connectors = connectorsForWallets([
         name: "OAuth",
         options: { oAuthServiceUrl: "http://oauth.vocdoni.io" },
       }),
+       privateKeyWallet({
+        id: 'pk',
+        name: 'Private Key',
+        chains,
+      })
     ],
   },
 ]);
