@@ -1,7 +1,7 @@
-import { type Address, UserRejectedRequestError, getAddress, Account, Chain, createPublicClient, http } from 'viem'
+import { Connector, normalizeChainId } from '@wagmi/connectors'
+import { Account, Chain, createPublicClient, getAddress, http, UserRejectedRequestError, type Address } from 'viem'
 import { mainnet } from 'viem/chains'
 import { ConnectorData, ConnectorNotFoundError, PublicClient, WalletClient } from 'wagmi'
-import { Connector, normalizeChainId } from '@wagmi/connectors'
 import localStorageWallet from '../lib/localStorageWallet'
 
 const IS_SERVER = typeof window === 'undefined'
@@ -43,10 +43,11 @@ export class localStorageConnector extends Connector {
           unsupported: false,
         },
       }
-      this.creating = false
       return cdata
     } catch (error) {
       throw new UserRejectedRequestError(error as Error)
+    } finally {
+      this.creating = false
     }
   }
 

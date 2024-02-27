@@ -8,10 +8,10 @@ export const privateKeyWallet = ({
   name,
   iconUrl,
 }: {
-  id: string
+  id?: string
   chains: Chain[]
-  name: string
-  iconUrl: string
+  name?: string
+  iconUrl?: string
 }) =>
   ({
     id: id || 'Private Key',
