@@ -32,10 +32,25 @@ export default class localStorageWallet {
   }
 
   public static async createWalletFromPrivateKey(
-    pkAndPassword: { pk: string; password: string },
+    pkAndPassword: { pk?: string; password: string },
     provider: PublicClient
   ): Promise<WalletClient> {
     let pk = pkAndPassword.pk
+    // not receiving a pk means it should be stored in local storage (and encrypted already)
+    if (!pk) {
+      const key = localStorage.getItem(this.storageItemName) as string
+      try {
+        const { pk: encrypted } = JSON.parse(key) as { type: string; pk: string }
+        pk = CryptoJS.AES.decrypt(encrypted, pkAndPassword.password).toString(CryptoJS.enc.Utf8)
+      } catch (e) {
+        throw e
+      }
+    }
+
+    if (!pk) {
+      throw new Error('got no private key (or the password was invalid)')
+    }
+
     if (!pk.startsWith('0x')) {
       pk = '0x' + pk
     }
@@ -70,16 +85,16 @@ export default class localStorageWallet {
             case 'eth_chainId':
               return `0x${mainnet.id}`
             case 'personal_sign': {
-              const [message, address] = params
+              const [message] = params
               return (await account.signMessage({ message })) || '0x'
             }
             case 'eth_sign': {
-              const [address, messageHash] = params
+              const [, messageHash] = params
               return (await account.signMessage({ message: messageHash })) || '0x'
             }
             case 'eth_signTypedData':
             case 'eth_signTypedData_v4': {
-              const [address, typedData] = params
+              const [, typedData] = params
               const parsedTypedData = typeof typedData === 'string' ? JSON.parse(typedData) : typedData
 
               const signature = await account.signTypedData(parsedTypedData)
@@ -109,5 +124,13 @@ export default class localStorageWallet {
 
     // Check if the private key is 64 characters long and only contains hexadecimal characters
     return privateKey.length === 64 && hexRegex.test(privateKey)
+  }
+
+  public static isAwaitingPassword() {
+    if (localStorage.getItem(this.storageItemName) && !sessionStorage.getItem(this.storageItemEncryptionItemName)) {
+      return true
+    }
+
+    return false
   }
 }
