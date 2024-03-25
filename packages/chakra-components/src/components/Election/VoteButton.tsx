@@ -1,4 +1,5 @@
 import { ButtonProps } from '@chakra-ui/button'
+import { Text } from '@chakra-ui/layout'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ArchivedElection, ElectionStatus, InvalidElection } from '@vocdoni/sdk'
@@ -21,28 +22,31 @@ export const VoteButton = (props: ButtonProps) => {
     sikSignature,
   } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
-  const isDisabled = !client.wallet || !isAbleToVote || election?.status !== ElectionStatus.ONGOING
+
+  if (!election) return null
+
+  const isDisabled = !client.wallet || !isAbleToVote || election.status !== ElectionStatus.ONGOING
 
   if (election instanceof InvalidElection || election instanceof ArchivedElection) return null
 
-  if (!connected && election?.get('census.type') !== 'spreadsheet' && ConnectButton) {
+  if (!connected && election.get('census.type') !== 'spreadsheet' && ConnectButton) {
     return <ConnectButton />
   }
 
-  if (!lconnected && election?.get('census.type') === 'spreadsheet') {
+  if (!lconnected && election.get('census.type') === 'spreadsheet') {
     return <SpreadsheetAccess />
   }
 
   const button: ButtonProps = {
     type: 'submit',
     ...props,
-    form: `election-questions-${election?.id}`,
+    form: `election-questions-${election.id}`,
     isDisabled,
     isLoading: voting,
     children: voted && isAbleToVote ? localize('vote.button_update') : localize('vote.button'),
   }
 
-  if (connected && election?.electionType.anonymous && !signature) {
+  if (connected && election.electionType.anonymous && !signature) {
     button.isLoading = loading
     button.type = 'button'
     button.isDisabled = !client.wallet || !isAbleToVote
@@ -54,6 +58,11 @@ export const VoteButton = (props: ButtonProps) => {
       } catch (e) {}
       setLoading(false)
     }
+  }
+
+  // when an election is ended and a user did not vote but already signed, show a message
+  if ([ElectionStatus.ENDED, ElectionStatus.RESULTS].includes(election.status) && !voted && signature) {
+    return <Text>{localize('errors.not_voted_in_ended_election')}</Text>
   }
 
   return <Button {...button} />
