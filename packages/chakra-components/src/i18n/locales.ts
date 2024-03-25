@@ -26,6 +26,7 @@ export const locales = {
   errors: {
     wrong_data_title: 'Wrong data',
     wrong_data_description: 'The specified data is not correct',
+    not_voted_in_ended_election: "You did not vote in this election and it's already finished",
   },
   loading: 'Loading...',
   schedule: 'Voting from {{ begin }} to {{ end }}',
