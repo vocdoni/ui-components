@@ -1,6 +1,6 @@
 import { Wallet } from '@ethersproject/wallet'
 import { act, render, renderHook, waitFor } from '@testing-library/react'
-import { Account, VocdoniCensus3Client } from '@vocdoni/sdk'
+import { AccountData, VocdoniCensus3Client } from '@vocdoni/sdk'
 import { ApiUrl, CensusUrls, properProps } from '../test-utils'
 import { ClientProvider, useClient } from './ClientProvider'
 
@@ -160,7 +160,7 @@ describe('<ClientProvider />', () => {
 
     // now we update it
     await act(async () => {
-      await result.current.updateAccount(new Account({ name: 'tests' }))
+      await result.current.updateAccount(new AccountData({ name: 'test' }))
     })
 
     await waitFor(() => {

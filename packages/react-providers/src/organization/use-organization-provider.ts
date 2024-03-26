@@ -5,7 +5,7 @@ import { useOrganizationReducer } from './use-organization-reducer'
 
 export type OrganizationProviderProps = {
   id?: string
-  organization?: AccountData
+  organization?: Account
 }
 
 export const useOrganizationProvider = ({ id, organization }: OrganizationProviderProps) => {
@@ -16,11 +16,11 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
   const fetch = (id?: string) => {
     const identifier = id || state.id
     loading(identifier)
-    return client.fetchAccount(identifier).then(setOrganization).catch(loadError)
+    return client.fetchAccount({ address: identifier }).then(setOrganization).catch(loadError)
   }
 
   // updates organization info, and sets the new result to state
-  const update = async (account: Account | Partial<Account>) => {
+  const update = async (account: AccountData | Partial<AccountData>) => {
     if (!vAccount) {
       await fetch()
     }
@@ -30,7 +30,7 @@ export const useOrganizationProvider = ({ id, organization }: OrganizationProvid
 
     loading(id)
     return client
-      .updateAccountInfo(account instanceof Account ? account : new Account(account))
+      .updateAccountInfo(account instanceof AccountData ? account : new AccountData(account))
       .then(setOrganization)
       .catch(updateError)
   }

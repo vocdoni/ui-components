@@ -39,7 +39,7 @@ export const RoutesProvider = () => {
             </SuspenseLoader>
           }
           path='/organization/:pid'
-          loader={async ({ params }) => await client.fetchAccount(params.pid)}
+          loader={async ({ params }) => await client.fetchAccount({ address: params.pid })}
         />
         <Route path='*' element={<Error404 />} />
       </Route>

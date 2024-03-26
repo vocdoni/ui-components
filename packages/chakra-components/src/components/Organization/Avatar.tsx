@@ -7,10 +7,10 @@ export const OrganizationAvatar = (props: IPFSImageProps) => {
 
   const { organization } = useOrganization()
 
-  let avatar = organization?.account.avatar
+  let avatar = organization?.data.avatar
   if (!avatar) {
     // fallback to deprecated logo field
-    avatar = organization?.account.logo
+    avatar = organization?.data.logo
   }
 
   return <Image src={avatar} sx={styles} {...props} />

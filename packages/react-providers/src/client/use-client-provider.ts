@@ -91,12 +91,12 @@ export const useClientProvider = ({
    *
    * @returns {Promise<AccountData}
    */
-  const updateAccount = (account: Account) => {
+  const updateAccount = (data: AccountData) => {
     if (state.loading.update) return
 
     actions.updateAccount()
 
-    return state.client.updateAccountInfo(account).then(actions.setAccountUpdate).catch(actions.errorAccountUpdate)
+    return state.client.updateAccountInfo(data).then(actions.setAccountUpdate).catch(actions.errorAccountUpdate)
   }
 
   /**
