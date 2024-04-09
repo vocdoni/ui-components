@@ -6,6 +6,7 @@ export const locales = {
     cancel_description: 'canceling the "{{ election.title.default }}" election process',
     cancel:
       'Cancel the process immediately, not allowing new votes and not counting any results (caution: it cannot be reverted)',
+    cancel_cta: 'Cancel',
     confirm: 'Confirm',
     confirm_cancel_cta: 'Cancel process',
     confirm_cancel_title: 'Confirm cancelation',
