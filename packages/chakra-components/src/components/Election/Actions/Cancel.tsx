@@ -23,6 +23,7 @@ export const ActionCancel = forwardRef<IconButtonProps, 'button'>((props, ref) =
           description={localize('actions.cancel_description', {
             election,
           })}
+          confirm={localize('actions.confirm_cancel_cta')}
         />
       )
     ) {

@@ -7,7 +7,9 @@ export const locales = {
     cancel:
       'Cancel the process immediately, not allowing new votes and not counting any results (caution: it cannot be reverted)',
     confirm: 'Confirm',
+    confirm_cancel_cta: 'Cancel process',
     confirm_cancel_title: 'Confirm cancelation',
+    confirm_end_cta: 'End process',
     confirm_end_title: 'Confirm ending',
     continue_description: 'resuming the "{{ election.title.default }}" election process',
     continue: 'Resume the process immediately, in case it has been paused',

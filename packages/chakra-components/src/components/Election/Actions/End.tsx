@@ -23,6 +23,7 @@ export const ActionEnd = forwardRef<IconButtonProps, 'button'>((props, ref) => {
           description={localize('actions.end_description', {
             election,
           })}
+          confirm={localize('actions.confirm_end_cta')}
         />
       )
     ) {
