@@ -256,12 +256,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
     loading: { voting },
     localize,
   } = useElection()
-  const {
-    formState: { errors },
-    control,
-    setValue,
-    watch,
-  } = useFormContext()
+  const { control, trigger, watch } = useFormContext()
   const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
   const values = watch(index) || []
 
@@ -296,33 +291,31 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
           },
         }}
         name={index}
-        render={({ field }) => (
+        render={({ field: { ref, onChange, ...restField }, fieldState: { error: fieldError } }) => (
           <>
             {choices.map((choice, ck) => (
               <Checkbox
-                {...field}
+                {...restField}
                 key={ck}
                 sx={styles.checkbox}
                 value={choice.value.toString()}
                 isDisabled={disabled}
                 onChange={(e) => {
                   if (values.includes(e.target.value)) {
-                    setValue(
-                      index,
-                      values.filter((v: string) => v !== e.target.value)
-                    )
+                    onChange(values.filter((v: string) => v !== e.target.value))
                   } else {
-                    setValue(index, [...values, e.target.value])
+                    onChange([...values, e.target.value])
                   }
+                  trigger(index) // Manually trigger validation
                 }}
               >
                 {choice.title.default}
               </Checkbox>
             ))}
+            <FormErrorMessage sx={styles.error}>{fieldError?.message as string}</FormErrorMessage>
           </>
         )}
       />
-      <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
     </Stack>
   )
 }
