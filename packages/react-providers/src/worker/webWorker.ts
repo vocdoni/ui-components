@@ -1,9 +1,7 @@
-import { Blob } from 'node:buffer'
-import { URL } from 'node:url'
-
 export const createWebWorker = (worker: any) => {
   const code = worker.toString()
   const blob = new Blob(['(' + code + ')()'])
-  const blobURL = URL.createObjectURL(blob)
+  const workerURL = (window as any).MockedWindowURL || window.URL || window.webkitURL
+  const blobURL = workerURL.createObjectURL(blob)
   return new Worker(blobURL)
 }
