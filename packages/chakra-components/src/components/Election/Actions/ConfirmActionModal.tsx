@@ -8,13 +8,18 @@ import { Button } from '@chakra-ui/button'
 export type ConfirmActionModalProps = {
   title: string
   description: string
+  confirm?: string
+  cancel?: string
 }
 
-export const ConfirmActionModal = ({ title, description, ...rest }: ConfirmActionModalProps) => {
+export const ConfirmActionModal = ({ title, description, confirm, cancel, ...rest }: ConfirmActionModalProps) => {
   const mstyles = useMultiStyleConfig('ConfirmModal')
   const styles = useMultiStyleConfig('QuestionsConfirmation', rest)
-  const { cancel, proceed } = useConfirm()
+  const { cancel: cancelFn, proceed } = useConfirm()
   const { localize } = useClient()
+
+  const _confirm = confirm || localize('actions.confirm')
+  const _cancel = cancel || localize('actions.cancel')
 
   return (
     <>
@@ -24,11 +29,11 @@ export const ConfirmActionModal = ({ title, description, ...rest }: ConfirmActio
         <Text sx={styles.description}>{description}</Text>
       </ModalBody>
       <ModalFooter sx={mstyles.footer}>
-        <Button onClick={cancel!} variant='ghost' sx={mstyles.cancel}>
-          {localize('actions.cancel')}
+        <Button onClick={cancelFn!} variant='ghost' sx={mstyles.cancel}>
+          {_cancel}
         </Button>
         <Button onClick={proceed!} sx={mstyles.confirm}>
-          {localize('actions.confirm')}
+          {_confirm}
         </Button>
       </ModalFooter>
     </>
