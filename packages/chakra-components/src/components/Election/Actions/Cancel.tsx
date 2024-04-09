@@ -19,12 +19,12 @@ export const ActionCancel = forwardRef<IconButtonProps, 'button'>((props, ref) =
     if (
       await confirm(
         <ConfirmActionModal
-          title={localize('actions.confirm_cancel_title')}
+          title={localize('confirm.cancel_process_title')}
           description={localize('actions.cancel_description', {
             election,
           })}
-          confirm={localize('actions.confirm_cancel_cta')}
-          cancel={localize('actions.cancel_cta')}
+          confirm={localize('confirm.cancel_process_button')}
+          cancel={localize('confirm.cancel_button')}
         />
       )
     ) {
