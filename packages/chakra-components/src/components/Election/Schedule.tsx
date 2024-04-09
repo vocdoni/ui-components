@@ -8,7 +8,7 @@ export type ElectionScheduleProps = HeadingProps & {
   format?: string
 }
 
-export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(({ format = 'PPpp', ...rest }, ref) => {
+export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(({ format = 'PPp', ...rest }, ref) => {
   const styles = useMultiStyleConfig('ElectionSchedule', rest)
   const { election } = useElection()
   const locale = useDatesLocale()
