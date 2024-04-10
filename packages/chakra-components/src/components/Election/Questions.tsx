@@ -370,6 +370,9 @@ const QuestionsTypeBadge = () => {
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
       title = localize('question_types.multichoice_title')
       desc = localize('question_types.multichoice_desc', { maxcount: election.voteType.maxCount })
+      if (election.resultsType.properties.canAbstain) {
+        desc += localize('question_types.multichoice_desc_abstain')
+      }
       break
     default:
       return
