@@ -222,6 +222,9 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
       <FormControl isInvalid={!!errors[index]}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
+          <chakra.div __css={styles.typeBadgeWrapper}>
+            <QuestionsTypeBadge />
+          </chakra.div>
         </chakra.div>
         <chakra.div __css={styles.body}>
           {question.description && (
@@ -274,12 +277,8 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
     })
   }
 
-  const badgeTitle = localize('question_types.multichoice_title')
-  const badgeDesc = localize('question_types.multichoice_desc', { maxcount: election.voteType.maxCount })
-
   return (
     <Stack sx={styles.stack}>
-      <QuestionsTypeBadge title={badgeTitle} description={badgeDesc} />
       <Controller
         control={control}
         disabled={disabled}
@@ -361,20 +360,27 @@ const SingleChoice = ({ index, question }: QuestionProps) => {
   )
 }
 
-type QuestionTypeBadgeProps = {
-  title: string
-  description?: string
-}
-
-const QuestionsTypeBadge = ({ title, description }: QuestionTypeBadgeProps) => {
+const QuestionsTypeBadge = () => {
   const styles = useMultiStyleConfig('QuestionsTypeBadge')
+  const { election, localize } = useElection()
+
+  let title: string = ''
+  let desc: string = ''
+  switch (election?.resultsType.name) {
+    case ElectionResultsTypeNames.MULTIPLE_CHOICE:
+      title = localize('question_types.multichoice_title')
+      desc = localize('question_types.multichoice_desc', { maxcount: election.voteType.maxCount })
+      break
+    default:
+      return
+  }
 
   return (
     <chakra.div __css={styles.wrapper}>
       <chakra.div __css={styles.box}>
         <chakra.label __css={styles.title}>{title}</chakra.label>
       </chakra.div>
-      {description && <chakra.div __css={styles.description}>{description}</chakra.div>}
+      {desc && <chakra.div __css={styles.description}>{desc}</chakra.div>}
     </chakra.div>
   )
 }

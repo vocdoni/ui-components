@@ -16,6 +16,8 @@ export const questionsAnatomy = [
   'body',
   // question title
   'title',
+  // Question type badge wrapper
+  'typeBadgeWrapper',
   // question description
   'description',
   // form radio group
@@ -45,6 +47,15 @@ const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpe
 const baseStyle = definePartsStyle({
   question: {
     marginBottom: 8,
+  },
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap-reverse',
+    justifyContent: 'space-between',
+    rowGap: '20px',
+    columnGap: '50px',
+    alignItems: 'end',
   },
   title: {
     fontWeight: 'bold',
