@@ -274,8 +274,12 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
     })
   }
 
+  const badgeTitle = localize('question_types.multichoice_title')
+  const badgeDesc = localize('question_types.multichoice_desc', { maxcount: election.voteType.maxCount })
+
   return (
     <Stack sx={styles.stack}>
+      <QuestionsTypeBadge title={badgeTitle} description={badgeDesc} />
       <Controller
         control={control}
         disabled={disabled}
@@ -354,5 +358,23 @@ const SingleChoice = ({ index, question }: QuestionProps) => {
         </RadioGroup>
       )}
     />
+  )
+}
+
+type QuestionTypeBadgeProps = {
+  title: string
+  description?: string
+}
+
+const QuestionsTypeBadge = ({ title, description }: QuestionTypeBadgeProps) => {
+  const styles = useMultiStyleConfig('QuestionsTypeBadge')
+
+  return (
+    <chakra.div __css={styles.wrapper}>
+      <chakra.div __css={styles.box}>
+        <chakra.label __css={styles.title}>{title}</chakra.label>
+      </chakra.div>
+      {description && <chakra.div __css={styles.description}>{description}</chakra.div>}
+    </chakra.div>
   )
 }

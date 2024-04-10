@@ -29,6 +29,10 @@ export const locales = {
     not_voted_in_ended_election: "You did not vote in this election and it's already finished",
   },
   loading: 'Loading...',
+  question_types: {
+    multichoice_title: 'Multichoice Voting',
+    multichoice_desc: 'select up to {{maxcount}} options (or abstain)',
+  },
   schedule: 'Voting from {{ begin }} to {{ end }}',
   // results component
   results: {

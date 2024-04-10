@@ -78,3 +78,29 @@ export const QuestionsConfirmationTheme = defineConfirmStyle({
     },
   }),
 })
+
+export const questionTypeBadgeAnatomy = [
+  // main content wrapper
+  'wrapper',
+  // confirmation wrapper box
+  'box',
+  // title text
+  'title',
+  // Description if required
+  'description',
+]
+
+const { defineMultiStyleConfig: defineQuestionTypeBadgeStyle, definePartsStyle: defineQuestionTypeBadgeParts } =
+  createMultiStyleConfigHelpers(questionTypeBadgeAnatomy)
+
+export const QuestionsTypeBadgeTheme = defineQuestionTypeBadgeStyle({
+  baseStyle: defineQuestionTypeBadgeParts({
+    wrapper: {
+      flexDirection: 'column',
+      gap: 2,
+    },
+    title: {
+      fontWeight: 'bold',
+    },
+  }),
+})
