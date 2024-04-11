@@ -9,7 +9,7 @@ import { chakra, ChakraProps, omitThemingProps, useMultiStyleConfig } from '@cha
 import { Wallet } from '@ethersproject/wallet'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, ElectionStatus, InvalidElection, IQuestion, PublishedElection } from '@vocdoni/sdk'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
 import { environment } from '../../environment'
@@ -30,11 +30,21 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
     isAbleToVote,
     client,
   } = useElection()
+  const { account } = useClient()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions = election?.questions
   const { confirm } = useConfirm()
   const { confirmContents, onInvalid, ...rest } = props
+
+  // reset form if account gets disconnected
+  useEffect(() => {
+    if (typeof client.wallet !== 'undefined' || !questions) return
+
+    fmethods.reset({
+      ...questions.reduce((acc, question, index) => ({ ...acc, [index]: '' }), {}),
+    })
+  }, [client])
 
   if (election instanceof InvalidElection) return null
 
