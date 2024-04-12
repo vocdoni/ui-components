@@ -31,7 +31,7 @@ export const locales = {
   loading: 'Loading...',
   question_types: {
     multichoice_title: 'Multichoice Voting',
-    multichoice_desc: 'select up to {{maxcount}} options',
+    multichoice_desc: 'Select up to {{maxcount}} options',
     multichoice_desc_abstain: ' (or abstain)',
   },
   schedule: 'Voting from {{ begin }} to {{ end }}',

@@ -219,12 +219,12 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
 
   return (
     <chakra.div __css={styles.question}>
+      <chakra.div __css={styles.typeBadgeWrapper}>
+        <QuestionsTypeBadge />
+      </chakra.div>
       <FormControl isInvalid={!!errors[index]}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
-          <chakra.div __css={styles.typeBadgeWrapper}>
-            <QuestionsTypeBadge />
-          </chakra.div>
         </chakra.div>
         <chakra.div __css={styles.body}>
           {question.description && (
@@ -233,6 +233,7 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
             </chakra.div>
           )}
           <FieldSwitcher index={index} question={question} />
+          <QuestionTip />
         </chakra.div>
       </FormControl>
     </chakra.div>
@@ -365,13 +366,31 @@ const QuestionsTypeBadge = () => {
   const { election, localize } = useElection()
 
   let title: string = ''
-  let desc: string = ''
   switch (election?.resultsType.name) {
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
       title = localize('question_types.multichoice_title')
-      desc = localize('question_types.multichoice_desc', { maxcount: election.voteType.maxCount })
+      break
+    default:
+      return
+  }
+
+  return (
+    <chakra.div __css={styles.box}>
+      <chakra.label __css={styles.title}>{title}</chakra.label>
+    </chakra.div>
+  )
+}
+
+const QuestionTip = () => {
+  const styles = useMultiStyleConfig('QuestionsTip')
+  const { election, localize } = useElection()
+
+  let txt: string = ''
+  switch (election?.resultsType.name) {
+    case ElectionResultsTypeNames.MULTIPLE_CHOICE:
+      txt = localize('question_types.multichoice_desc', { maxcount: election.voteType.maxCount })
       if (election.resultsType.properties.canAbstain) {
-        desc += localize('question_types.multichoice_desc_abstain')
+        txt += localize('question_types.multichoice_desc_abstain')
       }
       break
     default:
@@ -380,10 +399,7 @@ const QuestionsTypeBadge = () => {
 
   return (
     <chakra.div __css={styles.wrapper}>
-      <chakra.div __css={styles.box}>
-        <chakra.label __css={styles.title}>{title}</chakra.label>
-      </chakra.div>
-      {desc && <chakra.div __css={styles.description}>{desc}</chakra.div>}
+      <chakra.div __css={styles.text}>{txt}</chakra.div>
     </chakra.div>
   )
 }

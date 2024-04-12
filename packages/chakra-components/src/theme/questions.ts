@@ -1,4 +1,5 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
+import { theme } from '@chakra-ui/theme'
 
 export const questionsAnatomy = [
   // main content wrapper
@@ -47,14 +48,13 @@ const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpe
 const baseStyle = definePartsStyle({
   question: {
     marginBottom: 8,
-  },
-  header: {
     display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap-reverse',
-    justifyContent: 'space-between',
-    rowGap: '20px',
-    columnGap: '50px',
+    flexDirection: 'column',
+  },
+  typeBadgeWrapper: {
+    w: 'full',
+    display: 'flex',
+    justifyContent: 'end',
     alignItems: 'end',
   },
   title: {
@@ -91,14 +91,10 @@ export const QuestionsConfirmationTheme = defineConfirmStyle({
 })
 
 export const questionTypeBadgeAnatomy = [
-  // main content wrapper
-  'wrapper',
   // confirmation wrapper box
   'box',
   // title text
   'title',
-  // Description if required
-  'description',
 ]
 
 const { defineMultiStyleConfig: defineQuestionTypeBadgeStyle, definePartsStyle: defineQuestionTypeBadgeParts } =
@@ -112,6 +108,31 @@ export const QuestionsTypeBadgeTheme = defineQuestionTypeBadgeStyle({
     },
     title: {
       fontWeight: 'bold',
+    },
+  }),
+})
+
+export const questionTipAnatomy = [
+  // confirmation wrapper box
+  'wrapper',
+  // title text
+  'text',
+]
+
+const { defineMultiStyleConfig: defineQuestionTipStyle, definePartsStyle: defineQuestionTipParts } =
+  createMultiStyleConfigHelpers(questionTipAnatomy)
+
+export const QuestionsTipTheme = defineQuestionTipStyle({
+  baseStyle: defineQuestionTipParts({
+    wrapper: {
+      mt: 4,
+      w: 'full',
+      display: 'flex',
+      justifyContent: 'end',
+      alignItems: 'end',
+    },
+    text: {
+      ...theme.components.Heading.sizes?.sm,
     },
   }),
 })
