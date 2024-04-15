@@ -260,8 +260,8 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
     loading: { voting },
     localize,
   } = useElection()
-  const { control, trigger, watch } = useFormContext()
-  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
+  const { control, trigger, watch, getValues } = useFormContext()
+  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
   const values = watch(index) || []
 
   if (!(election && election.resultsType.name === ElectionResultsTypeNames.MULTIPLE_CHOICE)) {
@@ -282,7 +282,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
     <Stack sx={styles.stack}>
       <Controller
         control={control}
-        disabled={disabled}
+        disabled={isNotAbleToVote}
         rules={{
           validate: (v) => {
             // allow a single selection if is an abstain
@@ -295,30 +295,42 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
           },
         }}
         name={index}
-        render={({ field: { ref, onChange, ...restField }, fieldState: { error: fieldError } }) => (
-          <>
-            {choices.map((choice, ck) => (
-              <Checkbox
-                {...restField}
-                key={ck}
-                sx={styles.checkbox}
-                value={choice.value.toString()}
-                isDisabled={disabled}
-                onChange={(e) => {
-                  if (values.includes(e.target.value)) {
-                    onChange(values.filter((v: string) => v !== e.target.value))
-                  } else {
-                    onChange([...values, e.target.value])
-                  }
-                  trigger(index) // Manually trigger validation
-                }}
-              >
-                {choice.title.default}
-              </Checkbox>
-            ))}
-            <FormErrorMessage sx={styles.error}>{fieldError?.message as string}</FormErrorMessage>
-          </>
-        )}
+        render={({ field: { ref, onChange, ...restField }, fieldState: { error: fieldError } }) => {
+          // Determine if the checkbox should be disabled because maximum number of choices has been reached
+          const currentValues = getValues(index) || []
+
+          return (
+            <>
+              {choices.map((choice, ck) => {
+                const maxSelected =
+                  currentValues.length >= election.voteType.maxCount! &&
+                  !currentValues.includes(choice.value.toString())
+                return (
+                  <Checkbox
+                    {...restField}
+                    key={ck}
+                    sx={styles.checkbox}
+                    value={choice.value.toString()}
+                    isDisabled={isNotAbleToVote || maxSelected}
+                    isChecked={currentValues.includes(choice.value.toString())}
+                    onChange={(e) => {
+                      if (values.includes(e.target.value)) {
+                        onChange(values.filter((v: string) => v !== e.target.value))
+                      } else {
+                        if (maxSelected) return
+                        onChange([...values, e.target.value])
+                      }
+                      trigger(index) // Manually trigger validation
+                    }}
+                  >
+                    {choice.title.default}
+                  </Checkbox>
+                )
+              })}
+              <FormErrorMessage sx={styles.error}>{fieldError?.message as string}</FormErrorMessage>
+            </>
+          )
+        }}
       />
     </Stack>
   )
