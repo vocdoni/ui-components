@@ -28,6 +28,8 @@ export const questionsAnatomy = [
   // form radio and checkboxes
   'radio',
   'checkbox',
+  // Abstain badge to count number of remaining votes to abstain
+  'abstainBadge',
   // form error message
   'error',
 ]
@@ -64,6 +66,9 @@ const baseStyle = definePartsStyle({
   },
   description: {
     marginBottom: 4,
+  },
+  abstainBadge: {
+    ml: '5px',
   },
 })
 

@@ -299,6 +299,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
         render={({ field: { ref, onChange, ...restField }, fieldState: { error: fieldError } }) => {
           // Determine if the checkbox should be disabled because maximum number of choices has been reached
           const currentValues = getValues(index) || []
+          let remainingChoices = election.voteType.maxCount! - currentValues.length
 
           return (
             <>
@@ -306,6 +307,8 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
                 const maxSelected =
                   currentValues.length >= election.voteType.maxCount! &&
                   !currentValues.includes(choice.value.toString())
+                let isAbstain = false
+                if (choice.value === -1) isAbstain = true
                 return (
                   <Checkbox
                     {...restField}
@@ -325,6 +328,8 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
                     }}
                   >
                     {choice.title.default}
+                    {/*Abstain badge to count number of remaining votes to abstain*/}
+                    {isAbstain && <chakra.div __css={styles.abstainBadge}>{remainingChoices}</chakra.div>}
                   </Checkbox>
                 )
               })}
@@ -420,3 +425,15 @@ const QuestionTip = () => {
     </chakra.div>
   )
 }
+
+// const AbstainCounter = () => {
+//   const { election, localize } = useElection()
+//
+//   if (!election || !(election && election.resultsType.properties.canAbstain)) {
+//     return
+//   }
+//
+//   // const abstainCount =
+//   //
+//   return <chakra.div></chakra.div>
+// }

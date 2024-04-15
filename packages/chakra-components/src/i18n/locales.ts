@@ -35,6 +35,7 @@ export const locales = {
     multichoice_title: 'Multichoice Voting',
     multichoice_desc: 'Select up to {{maxcount}} options',
     multichoice_desc_abstain: ' (or abstain)',
+    multichoice_cannot_abstain: 'Too many options selected',
   },
   schedule: 'Voting from {{ begin }} to {{ end }}',
   // results component
