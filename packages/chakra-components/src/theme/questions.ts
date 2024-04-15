@@ -95,6 +95,8 @@ export const questionTypeBadgeAnatomy = [
   'box',
   // title text
   'title',
+  // badge tooltip
+  'tooltip',
 ]
 
 const { defineMultiStyleConfig: defineQuestionTypeBadgeStyle, definePartsStyle: defineQuestionTypeBadgeParts } =

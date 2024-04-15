@@ -30,6 +30,8 @@ export const locales = {
   },
   loading: 'Loading...',
   question_types: {
+    multichoice_tooltip:
+      'Multichoice voting lets you vote for up to {{maxcount}} options (defined by the voting organizer). The one with the most votes wins.',
     multichoice_title: 'Multichoice Voting',
     multichoice_desc: 'Select up to {{maxcount}} options',
     multichoice_desc_abstain: ' (or abstain)',

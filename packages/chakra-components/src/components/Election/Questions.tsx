@@ -14,6 +14,7 @@ import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, use
 import reactStringReplace from 'react-string-replace'
 import { environment } from '../../environment'
 import { Markdown, useConfirm } from '../layout'
+import { Tooltip } from '@chakra-ui/react'
 
 type ElectionQuestionsProps = ChakraProps & {
   confirmContents?: (election: PublishedElection, answers: FieldValues) => ReactNode
@@ -378,9 +379,11 @@ const QuestionsTypeBadge = () => {
   const { election, localize } = useElection()
 
   let title: string = ''
+  let tooltip: string = ''
   switch (election?.resultsType.name) {
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
       title = localize('question_types.multichoice_title')
+      tooltip = localize('question_types.multichoice_tooltip', { maxcount: election.voteType.maxCount })
       break
     default:
       return
@@ -388,7 +391,9 @@ const QuestionsTypeBadge = () => {
 
   return (
     <chakra.div __css={styles.box}>
-      <chakra.label __css={styles.title}>{title}</chakra.label>
+      <Tooltip label={tooltip} hasArrow sx={styles.tooltip} placement='auto'>
+        <chakra.label __css={styles.title}>{title}</chakra.label>
+      </Tooltip>
     </chakra.div>
   )
 }
