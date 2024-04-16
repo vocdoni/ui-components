@@ -287,7 +287,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
         rules={{
           validate: (v) => {
             // allow a single selection if is an abstain
-            if (v.length === 1 && v.includes('-1')) return true
+            if (v.includes('-1') && v.length < election.voteType.maxCount) return true
 
             return (
               (v && v.length === election.voteType.maxCount) ||
@@ -299,7 +299,6 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
         render={({ field: { ref, onChange, ...restField }, fieldState: { error: fieldError } }) => {
           // Determine if the checkbox should be disabled because maximum number of choices has been reached
           const currentValues = getValues(index) || []
-          let remainingChoices = election.voteType.maxCount! - currentValues.length
 
           return (
             <>
@@ -329,7 +328,11 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
                   >
                     {choice.title.default}
                     {/*Abstain badge to count number of remaining votes to abstain*/}
-                    {isAbstain && <chakra.div __css={styles.abstainBadge}>{remainingChoices}</chakra.div>}
+                    {isAbstain && (
+                      <chakra.div __css={styles.abstainBadge}>
+                        {election.voteType.maxCount! - currentValues.length}
+                      </chakra.div>
+                    )}
                   </Checkbox>
                 )
               })}
