@@ -397,7 +397,7 @@ const QuestionsTypeBadge = () => {
       tooltip = localize('question_types.multichoice_tooltip', { maxcount: election.voteType.maxCount })
       break
     default:
-      return
+      return null
   }
 
   return (
@@ -422,7 +422,7 @@ const QuestionTip = () => {
       }
       break
     default:
-      return
+      return null
   }
 
   return (
@@ -431,15 +431,3 @@ const QuestionTip = () => {
     </chakra.div>
   )
 }
-
-// const AbstainCounter = () => {
-//   const { election, localize } = useElection()
-//
-//   if (!election || !(election && election.resultsType.properties.canAbstain)) {
-//     return
-//   }
-//
-//   // const abstainCount =
-//   //
-//   return <chakra.div></chakra.div>
-// }
