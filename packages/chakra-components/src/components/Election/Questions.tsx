@@ -306,8 +306,15 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
                 const maxSelected =
                   currentValues.length >= election.voteType.maxCount! &&
                   !currentValues.includes(choice.value.toString())
-                let isAbstain = false
-                if (choice.value === -1) isAbstain = true
+                let abstainScore = null
+                // If is abstain option, show the number of votes that the abstain option will be worth
+                // The maximum number shown will be the maxCount of the election (in case any other option is selected)
+                if (choice.value === -1) {
+                  abstainScore =
+                    currentValues.length === 0
+                      ? election.voteType.maxCount!
+                      : election.voteType.maxCount! - currentValues.length + 1
+                }
                 return (
                   <Checkbox
                     {...restField}
@@ -328,11 +335,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
                   >
                     {choice.title.default}
                     {/*Abstain badge to count number of remaining votes to abstain*/}
-                    {isAbstain && (
-                      <chakra.div __css={styles.abstainBadge}>
-                        {election.voteType.maxCount! - currentValues.length}
-                      </chakra.div>
-                    )}
+                    {abstainScore && <chakra.div __css={styles.abstainBadge}>{abstainScore}</chakra.div>}
                   </Checkbox>
                 )
               })}
