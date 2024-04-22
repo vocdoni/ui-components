@@ -1,21 +1,65 @@
-<div align="center">
+<p align="center" width="100%">
+    <img src="https://developer.vocdoni.io/img/vocdoni_logotype_full_white.svg" />
+</p>
 
-![vocdoni logo]
+<p align="center" width="100%">
+    <a href="https://github.com/vocdoni/ui-components/commits/main/"><img src="https://img.shields.io/github/commit-activity/m/vocdoni/ui-components" /></a>
+    <a href="https://github.com/vocdoni/ui-components/issues"><img src="https://img.shields.io/github/issues/vocdoni/ui-components" /></a>
+    <a href="https://github.com/vocdoni/ui-components/actions/workflows/test.yml/"><img src="https://github.com/vocdoni/ui-components/actions/workflows/test.yml/badge.svg" /></a>
+    <a href="https://discord.gg/xFTh8Np2ga"><img src="https://img.shields.io/badge/discord-join%20chat-blue.svg" /></a>
+    <a href="https://twitter.com/vocdoni"><img src="https://img.shields.io/twitter/follow/vocdoni.svg?style=social&label=Follow" /></a>
+</p>
 
-[![react-providers badge]][npm link]
-[![Join Discord][discord badge]][discord invite]
-[![Twitter Follow][twitter badge]][twitter follow]
 
-</div>
+  <div align="center">
+    Vocdoni is the first universally verifiable, censorship-resistant, anonymous, and self-sovereign governance protocol. <br />
+    Our main aim is a trustless voting system where anyone can speak their voice and where everything is auditable. <br />
+    We are engineering building blocks for a permissionless, private and censorship resistant democracy.
+    <br />
+    <a href="https://developer.vocdoni.io/"><strong>Explore the developer portal »</strong></a>
+    <br />
+    <h3>More About Us</h3>
+    <a href="https://vocdoni.io">Vocdoni Website</a>
+    |
+    <a href="https://vocdoni.app">Web Application</a>
+    |
+    <a href="https://explorer.vote/">Blockchain Explorer</a>
+    |
+    <a href="https://law.mit.edu/pub/remotevotingintheageofcryptography/release/1">MIT Law Publication</a>
+    |
+    <a href="https://chat.vocdoni.io">Contact Us</a>
+    <br />
+    <h3>Key Repositories</h3>
+    <a href="https://github.com/vocdoni/vocdoni-node">Vocdoni Node</a>
+    |
+    <a href="https://github.com/vocdoni/vocdoni-sdk/">Vocdoni SDK</a>
+    |
+    <a href="https://github.com/vocdoni/ui-components">UI Components</a>
+    |
+    <a href="https://github.com/vocdoni/ui-scaffold">Application UI</a>
+    |
+    <a href="https://github.com/vocdoni/census3">Census3</a>
+  </div>
 
-@vocdoni/react-providers
-========================
+# @vocdoni/react-providers
 
-Package with react context & providers that help react developers create voting
-applications.
+This package includes react context & providers for integration with the Vocdoni protocol via the [Vocdoni SDK](https://developer.vocdoni.io/sdk).
 
-Installation
-------------
+
+The best place to learn about using this package is the [developer portal](https://developer.vocdoni.io/ui-components).
+
+### Table of Contents
+- [Getting Started](#getting-started)
+- [Reference](#reference)
+- [Examples](#examples)
+- [Preview](#preview)
+- [Disclaimer](#disclaimer)
+- [Contributing](#contributing)
+- [License](#license)
+
+
+## Getting Started
+
 
 Using your favorite package manager:
 
@@ -23,11 +67,7 @@ Using your favorite package manager:
 yarn add @vocdoni/react-providers
 ~~~
 
-Usage
------
-
-The very first step is to add the `<ClientProvider />` as a wrapper of your
-application or, at least, of your election:
+The very first step is to add the `<ClientProvider />` as a wrapper of your application or, at least, of your election:
 
 ~~~tsx
 import { ClientProvider } from '@vocdoni/react-providers'
@@ -42,106 +82,37 @@ const App = () => {
 }
 ~~~
 
-`ClientProvider` is a dependency of the other providers, so you'll have to
-ensure you initialize that one as the parent.
+`ClientProvider` is a dependency of the other providers, so you'll have to ensure you initialize it first as the parent.
 
-### ElectionProvider
+## Reference
 
-The `ElectionProvider` is the one that will allow you to interact with the
-election and easily execute actions like voting.
+The developer portal includes a [reference](https://developer.vocdoni.io/ui-components) for using the `@vocdoni/react-providers` package.
 
-You can use it as a wrapper of your elections:
+## Examples
 
-~~~tsx
-import { ElectionProvider } from '@vocdoni/react-providers'
+You can find mock-functional usage of the react providers in the ui-components [documentation](https://developer.vocdoni.io/ui-components/Election). There is also real-world usage of many of the providers from this package in the [code](https://github.com/vocdoni/ui-scaffold) for the Vocdoni application front-end.
 
-const MyElection = () => {
-  return (
-    <ElectionProvider id='election-uuid'>
-      {/* your actual election code */}
-    </ElectionProvider>
-  )
-}
-~~~
+## Preview
 
-You can either specify an id, and the provider will fetch the election for you,
-or you can directly pass an `election` object. This is usefull in case you want
-to render a list of elections and you already have the data:
+In addition to the live examples in the documentation, you can see this code in use at https://app.vocdoni.io/
 
-~~~tsx
-import { ElectionProvider } from '@vocdoni/react-providers'
+## Disclaimer
 
-const MyElectionList = () => {
-  const elections = /* your elections list */
-  return (
-    elections.map((election)=> (
-      <ElectionProvider election={election}>
-        <MyElectionListItem />
-      </ElectionProvider>
-    ))
-  )
-}
-~~~
+This project is a WIP and is subject to continuous changes during its
+development. We encourage you to review this repository and the developer portal for any changes.
 
-Once you initialized the provider, you can use the `useElection` hook to
-interact with the election:
+## Contributing 
 
+While we welcome contributions from the community, we do not track all of our issues on Github and we may not have the resources to onboard developers and review complex pull requests. That being said, there are multiple ways you can get involved with the project. 
 
-~~~tsx
-import { useElection } from '@vocdoni/react-providers'
+Please review our [development guidelines](https://developer.vocdoni.io/development-guidelines).
 
-const MyElectionListItem = () => {
-  const { election } = useElection()
+## License
 
-  return <h1>{election.title.default}</h1>
-}
-~~~
+This repository is licensed under the [GNU Affero General Public License v3.0.](./LICENSE)
 
-### OrganizationProvider
-
-Works more or less the same as the `ElectionProvider`, but for organizations:
-
-~~~tsx
-import { OrganizationProvider } from '@vocdoni/react-providers'
-
-const MyElection = () => {
-  return (
-    <OrganizationProvider id='organization-uuid'>
-      {/* your actual organization code */}
-    </OrganizationProvider>
-  )
-}
-~~~
-
-### hooks
-
-- `useClient` allows you to interact with the `ClientProvider` layer. All the
-  methods it exports allow you to use the client while interacting with the
-  context/state:
-    + `fetchAccount`: fetches connected account information (and balance)
-    + `createAccount`: creates a new account using the connected signer
-    + `setClient`: allows you to change the client during runtime
-    + `localize`: internal method used for localization
-    + `setSigner`: allows you to change the signer during runtime
-    + `generateSigner`: allows you to *generate* a signer
-- `useElection` allows you to interact with the `ElectionProvider` layer. As per
-  the `useClient` methods, anything exported here updates with the context:
-    + `fetchElection`
-    + `setClient`: allows you to change the client at election layer level
-    (used by flows like the spreadsheet/csv login one)
-    + `vote`: A helper method to vote, using the current context info.
-- `useOrganization`:
-  + `fetch`: fetches the organization data
-  + `update`: update the organization (only for organization owners)
-
-License
--------
-
-This components library is licensed under the [GNU Affero General Public License
-v3.0][license].
-
-    Vocdoni UI React Providers
-    Copyright (C) 2023 Vocdoni Roots MCU
+    Vocdoni UI React Components
+    Copyright (C) 2024 Vocdoni Association
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -156,13 +127,4 @@ v3.0][license].
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-[license]: ./LICENSE
-
-[vocdoni logo]: https://docs.vocdoni.io/Logotype.svg
-[react-providers badge]: https://img.shields.io/npm/v/%40vocdoni%2Freact-providers?label=%40vocdoni%2Freact-providers
-[discord badge]: https://img.shields.io/badge/discord-join%20chat-blue.svg
-[twitter badge]: https://img.shields.io/twitter/follow/vocdoni?style=social&label=Follow
-
-[discord invite]: https://discord.gg/xFTh8Np2ga
-[twitter follow]: https://twitter.com/intent/user?screen_name=vocdoni
-[npm link]: https://www.npmjs.com/package/@vocdoni/react-providers
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)

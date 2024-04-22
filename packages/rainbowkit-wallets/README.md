@@ -1,20 +1,56 @@
-<div align="center">
+<p align="center" width="100%">
+    <img src="https://developer.vocdoni.io/img/vocdoni_logotype_full_white.svg" />
+</p>
 
-![vocdoni logo]
+<p align="center" width="100%">
+    <a href="https://github.com/vocdoni/ui-components/commits/main/"><img src="https://img.shields.io/github/commit-activity/m/vocdoni/ui-components" /></a>
+    <a href="https://github.com/vocdoni/ui-components/issues"><img src="https://img.shields.io/github/issues/vocdoni/ui-components" /></a>
+    <a href="https://github.com/vocdoni/ui-components/actions/workflows/test.yml/"><img src="https://github.com/vocdoni/ui-components/actions/workflows/test.yml/badge.svg" /></a>
+    <a href="https://discord.gg/xFTh8Np2ga"><img src="https://img.shields.io/badge/discord-join%20chat-blue.svg" /></a>
+    <a href="https://twitter.com/vocdoni"><img src="https://img.shields.io/twitter/follow/vocdoni.svg?style=social&label=Follow" /></a>
+</p>
 
-[![rainbowkit-wallets badge]][npm link]
-[![Join Discord][discord badge]][discord invite]
-[![Twitter Follow][twitter badge]][twitter follow]
 
-</div>
+  <div align="center">
+    Vocdoni is the first universally verifiable, censorship-resistant, anonymous, and self-sovereign governance protocol. <br />
+    Our main aim is a trustless voting system where anyone can speak their voice and where everything is auditable. <br />
+    We are engineering building blocks for a permissionless, private and censorship resistant democracy.
+    <br />
+    <a href="https://developer.vocdoni.io/"><strong>Explore the developer portal »</strong></a>
+    <br />
+    <h3>More About Us</h3>
+    <a href="https://vocdoni.io">Vocdoni Website</a>
+    |
+    <a href="https://vocdoni.app">Web Application</a>
+    |
+    <a href="https://explorer.vote/">Blockchain Explorer</a>
+    |
+    <a href="https://law.mit.edu/pub/remotevotingintheageofcryptography/release/1">MIT Law Publication</a>
+    |
+    <a href="https://chat.vocdoni.io">Contact Us</a>
+    <br />
+    <h3>Key Repositories</h3>
+    <a href="https://github.com/vocdoni/vocdoni-node">Vocdoni Node</a>
+    |
+    <a href="https://github.com/vocdoni/vocdoni-sdk/">Vocdoni SDK</a>
+    |
+    <a href="https://github.com/vocdoni/ui-components">UI Components</a>
+    |
+    <a href="https://github.com/vocdoni/ui-scaffold">Application UI</a>
+    |
+    <a href="https://github.com/vocdoni/census3">Census3</a>
+  </div>
 
-@vocdoni/rainbowkit-wallets
-===========================
+# vocdoni/rainbowkit-wallets
 
-Rainbowkit wallets & wagmi connectors for easily extending web3 connectivity.
+This package includes rainbowkit wallets & wagmi connectors for easily extending web3 connectivity.
 
-Installing
-----------
+### Table of Contents
+- [Getting Started](#getting-started)
+- [Reference](#reference)
+- [License](#license)
+
+## Getting Started
 
 You'll first need to have a project with Rainbowkit <= 0.12 installed and configured. Follow
 their [official documentation](https://www.rainbowkit.com/docs/installation) in order to do so.
@@ -25,8 +61,8 @@ After that, you can add the required dependencies:
 yarn add @vocdoni/rainbowkit-wallets
 ~~~
 
-Usage
------
+
+## Reference
 
 Add the inputsWallet, oAuthWallet or privateKeyWallet connector to your wallet connectors list:
 
@@ -54,14 +90,12 @@ const connectors = connectorsForWallets([
 ]);
 ~~~
 
-LICENSE
--------
+## License
 
-This components library is licensed under the [GNU Affero General Public License
-v3.0][license].
+This repository is licensed under the [GNU Affero General Public License v3.0.](./LICENSE)
 
     Vocdoni UI React Components
-    Copyright (C) 2023 Vocdoni Roots MCU
+    Copyright (C) 2024 Vocdoni Association
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -76,21 +110,4 @@ v3.0][license].
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-[chakra getting started]: https://chakra-ui.com/getting-started
-[license]: ./LICENSE
-[theming]: #theming
-[theming components]: #theming-components
-[chakra theming]: https://chakra-ui.com/docs/styled-system/customize-theme#customizing-component-styles
-[advanced theming]: https://chakra-ui.com/docs/styled-system/advanced-theming
-[multipart components]: https://chakra-ui.com/docs/styled-system/component-style#styling-multipart-components
-[questions]: #questions
-[theme path]: ./src/theme
-
-[vocdoni logo]: https://docs.vocdoni.io/Logotype.svg
-[rainbowkit-wallets badge]: https://img.shields.io/npm/v/%40vocdoni%2Frainbowkit-wallets?label=%40vocdoni%2Frainbowkit-wallets
-[discord badge]: https://img.shields.io/badge/discord-join%20chat-blue.svg
-[twitter badge]: https://img.shields.io/twitter/follow/vocdoni?style=social&label=Follow
-
-[discord invite]: https://discord.gg/xFTh8Np2ga
-[twitter follow]: https://twitter.com/intent/user?screen_name=vocdoni
-[npm link]: https://www.npmjs.com/package/@vocdoni/rainbowkit-wallets
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
