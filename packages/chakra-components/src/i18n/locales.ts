@@ -35,6 +35,9 @@ export const locales = {
   },
   loading: 'Loading...',
   question_types: {
+    approval_tooltip:
+      "Approval voting lets you vote for as many options as you like. The one with the most votes wins. It's a simple way to show your support for all the choices you approve of.",
+    approval_title: 'Approval Voting',
     multichoice_tooltip:
       'Multichoice voting lets you vote for up to {{maxcount}} options (defined by the voting organizer). The one with the most votes wins.',
     multichoice_title: 'Multichoice Voting',
@@ -73,6 +76,7 @@ export const locales = {
     required: 'This field is required',
     min_length: 'This field must be at least {{ min }} characters long',
     choices_count: 'Select {{ count }} choices',
+    at_least_one: 'You must select at least one option',
   },
   // questions and vote button
   vote: {

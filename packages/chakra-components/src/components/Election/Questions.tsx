@@ -257,6 +257,8 @@ const FieldSwitcher = (props: QuestionProps) => {
   switch (election?.resultsType.name) {
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
       return <MultiChoice {...props} />
+    case ElectionResultsTypeNames.APPROVAL:
+      return <ApprovalChoice {...props} />
     case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
     default:
       return <SingleChoice {...props} />
@@ -358,6 +360,67 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
   )
 }
 
+const ApprovalChoice = ({ index, question }: QuestionProps) => {
+  const styles = useMultiStyleConfig('ElectionQuestions')
+  const {
+    election,
+    isAbleToVote,
+    loading: { voting },
+    localize,
+  } = useElection()
+  const { control, watch } = useFormContext()
+  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
+  const values = watch(index) || []
+
+  if (!(election && election.resultsType.name === ElectionResultsTypeNames.APPROVAL)) {
+    return null
+  }
+
+  const choices = [...question.choices]
+
+  return (
+    <Stack sx={styles.stack}>
+      <Controller
+        control={control}
+        disabled={isNotAbleToVote}
+        rules={{
+          validate: (v) => {
+            return (v && v.length > 0) || localize('validation.at_least_one')
+          },
+        }}
+        name={index}
+        render={({ field: { ref, onChange, ...restField }, fieldState: { error: fieldError } }) => {
+          return (
+            <>
+              {choices.map((choice, ck) => {
+                return (
+                  <Checkbox
+                    {...restField}
+                    key={ck}
+                    sx={styles.checkbox}
+                    value={choice.value.toString()}
+                    isDisabled={isNotAbleToVote}
+                    onChange={(e) => {
+                      if (values.includes(e.target.value)) {
+                        onChange(values.filter((v: string) => v !== e.target.value))
+                      } else {
+                        onChange([...values, e.target.value])
+                      }
+                    }}
+                  >
+                    {choice.title.default}
+                  </Checkbox>
+                )
+              })}
+              <FormErrorMessage sx={styles.error}>{fieldError?.message as string}</FormErrorMessage>
+            </>
+          )
+        }}
+      />
+    </Stack>
+  )
+}
+
 const SingleChoice = ({ index, question }: QuestionProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
   const {
@@ -405,6 +468,10 @@ const QuestionsTypeBadge = () => {
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
       title = localize('question_types.multichoice_title')
       tooltip = localize('question_types.multichoice_tooltip', { maxcount: election.voteType.maxCount })
+      break
+    case ElectionResultsTypeNames.APPROVAL:
+      title = localize('question_types.approval_title')
+      tooltip = localize('question_types.approval_tooltip', { maxcount: election.voteType.maxCount })
       break
     default:
       return null
