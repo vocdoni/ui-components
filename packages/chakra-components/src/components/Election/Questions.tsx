@@ -86,8 +86,7 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
           .pop()
           .map((v: string) => parseInt(v, 10))
         // map proper abstain ids
-        if (results.includes(-1)) {
-          results.splice(results.indexOf(-1), 1)
+        if (election.resultsType.properties.canAbstain && results.length < election.voteType.maxCount!) {
           let abs = 0
           while (results.length < (election.voteType.maxCount || 1)) {
             results.push(parseInt(election.resultsType.properties.abstainValues[abs++], 10))
@@ -280,14 +279,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
   }
 
   const choices = [...question.choices]
-  if (election.resultsType.properties.canAbstain) {
-    choices.push({
-      title: {
-        default: localize('vote.abstain'),
-      },
-      value: -1,
-    })
-  }
+  const canAbstain = election.resultsType.properties.canAbstain
 
   return (
     <Stack sx={styles.stack}>
@@ -297,7 +289,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
         rules={{
           validate: (v) => {
             // allow a single selection if is an abstain
-            if (v.includes('-1') && v.length < election.voteType.maxCount!) return true
+            if (canAbstain && v.length < election.voteType.maxCount!) return true
 
             return (
               (v && v.length === election.voteType.maxCount) ||
@@ -316,15 +308,6 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
                 const maxSelected =
                   currentValues.length >= election.voteType.maxCount! &&
                   !currentValues.includes(choice.value.toString())
-                let abstainScore = null
-                // If is abstain option, show the number of votes that the abstain option will be worth
-                // The maximum number shown will be the maxCount of the election (in case any other option is selected)
-                if (choice.value === -1) {
-                  abstainScore =
-                    currentValues.length === 0
-                      ? election.voteType.maxCount!
-                      : election.voteType.maxCount! - currentValues.length + 1
-                }
                 return (
                   <Checkbox
                     {...restField}
@@ -344,8 +327,6 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
                     }}
                   >
                     {choice.title.default}
-                    {/*Abstain badge to count number of remaining votes to abstain*/}
-                    {abstainScore && <chakra.div __css={styles.abstainBadge}>{abstainScore}</chakra.div>}
                   </Checkbox>
                 )
               })}
