@@ -1,6 +1,7 @@
 import { Wallet } from '@ethersproject/wallet'
-import { act, render, renderHook, waitFor } from '@testing-library/react'
+import { render, renderHook, waitFor } from '@testing-library/react'
 import { EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
+import { act } from 'react'
 import { ClientProvider, useClient } from '../client'
 import { onlyProps, properProps } from '../test-utils'
 import { ElectionProvider, useElection } from './ElectionProvider'

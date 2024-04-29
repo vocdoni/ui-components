@@ -8,7 +8,7 @@ const config = {
   },
   transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
   testPathIgnorePatterns: ['[/\\\\]dist[/\\\\].+\\.(js|jsx)$'],
-  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect', './setup-tests.ts'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom', './setup-tests.ts'],
   globals: {
     'ts-jest': {
       tsconfig: 'tsconfig/react-library.json',

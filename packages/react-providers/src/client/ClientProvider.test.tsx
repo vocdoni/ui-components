@@ -1,6 +1,7 @@
 import { Wallet } from '@ethersproject/wallet'
-import { act, render, renderHook, waitFor } from '@testing-library/react'
+import { render, renderHook, waitFor } from '@testing-library/react'
 import { Account, VocdoniCensus3Client } from '@vocdoni/sdk'
+import { act } from 'react'
 import { ApiUrl, CensusUrls, properProps } from '../test-utils'
 import { ClientProvider, useClient } from './ClientProvider'
 

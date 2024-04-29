@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import { TextDecoder, TextEncoder } from 'node:util'
 import React from 'react'
 import { server } from './mocks/server'
