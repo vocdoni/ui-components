@@ -289,7 +289,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
         rules={{
           validate: (v) => {
             // allow a single selection if is an abstain
-            if (canAbstain && v.length < election.voteType.maxCount!) return true
+            if (canAbstain && v && v.length < election.voteType.maxCount!) return true
 
             return (
               (v && v.length === election.voteType.maxCount) ||
