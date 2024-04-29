@@ -94,6 +94,15 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
           }
         }
         break
+      case ElectionResultsTypeNames.APPROVAL:
+        results = election.questions[0].choices.map((c, k) => {
+          if (values[0].includes(k.toString())) {
+            return 1
+          } else {
+            return 0
+          }
+        })
+        break
       default:
         throw new Error('Unknown or invalid election type')
     }
