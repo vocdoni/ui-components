@@ -34,6 +34,14 @@ export const locales = {
     not_voted_in_ended_election: "You did not vote in this election and it's already finished",
   },
   loading: 'Loading...',
+  question_types: {
+    multichoice_tooltip:
+      'Multichoice voting lets you vote for up to {{maxcount}} options (defined by the voting organizer). The one with the most votes wins.',
+    multichoice_title: 'Multichoice Voting',
+    multichoice_desc: 'Select up to {{maxcount}} options',
+    multichoice_desc_abstain: ' (or abstain)',
+    multichoice_cannot_abstain: 'Too many options selected',
+  },
   schedule: 'Voting from {{ begin }} to {{ end }}',
   // results component
   results: {

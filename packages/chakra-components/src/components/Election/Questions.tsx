@@ -14,6 +14,7 @@ import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, use
 import reactStringReplace from 'react-string-replace'
 import { environment } from '../../environment'
 import { Markdown, useConfirm } from '../layout'
+import { Tooltip } from '@chakra-ui/react'
 
 type ElectionQuestionsProps = ChakraProps & {
   confirmContents?: (election: PublishedElection, answers: FieldValues) => ReactNode
@@ -229,6 +230,9 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
 
   return (
     <chakra.div __css={styles.question}>
+      <chakra.div __css={styles.typeBadgeWrapper}>
+        <QuestionsTypeBadge />
+      </chakra.div>
       <FormControl isInvalid={!!errors[index]}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
@@ -240,6 +244,7 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
             </chakra.div>
           )}
           <FieldSwitcher index={index} question={question} />
+          <QuestionTip />
         </chakra.div>
       </FormControl>
     </chakra.div>
@@ -266,13 +271,8 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
     loading: { voting },
     localize,
   } = useElection()
-  const {
-    formState: { errors },
-    control,
-    setValue,
-    watch,
-  } = useFormContext()
-  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
+  const { control, trigger, watch, getValues } = useFormContext()
+  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
   const values = watch(index) || []
 
   if (!(election && election.resultsType.name === ElectionResultsTypeNames.MULTIPLE_CHOICE)) {
@@ -293,11 +293,11 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
     <Stack sx={styles.stack}>
       <Controller
         control={control}
-        disabled={disabled}
+        disabled={isNotAbleToVote}
         rules={{
           validate: (v) => {
             // allow a single selection if is an abstain
-            if (v.length === 1 && v.includes('-1')) return true
+            if (v.includes('-1') && v.length < election.voteType.maxCount!) return true
 
             return (
               (v && v.length === election.voteType.maxCount) ||
@@ -306,33 +306,54 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
           },
         }}
         name={index}
-        render={({ field }) => (
-          <>
-            {choices.map((choice, ck) => (
-              <Checkbox
-                {...field}
-                key={ck}
-                sx={styles.checkbox}
-                value={choice.value.toString()}
-                isDisabled={disabled}
-                onChange={(e) => {
-                  if (values.includes(e.target.value)) {
-                    setValue(
-                      index,
-                      values.filter((v: string) => v !== e.target.value)
-                    )
-                  } else {
-                    setValue(index, [...values, e.target.value])
-                  }
-                }}
-              >
-                {choice.title.default}
-              </Checkbox>
-            ))}
-          </>
-        )}
+        render={({ field: { ref, onChange, ...restField }, fieldState: { error: fieldError } }) => {
+          // Determine if the checkbox should be disabled because maximum number of choices has been reached
+          const currentValues = getValues(index) || []
+
+          return (
+            <>
+              {choices.map((choice, ck) => {
+                const maxSelected =
+                  currentValues.length >= election.voteType.maxCount! &&
+                  !currentValues.includes(choice.value.toString())
+                let abstainScore = null
+                // If is abstain option, show the number of votes that the abstain option will be worth
+                // The maximum number shown will be the maxCount of the election (in case any other option is selected)
+                if (choice.value === -1) {
+                  abstainScore =
+                    currentValues.length === 0
+                      ? election.voteType.maxCount!
+                      : election.voteType.maxCount! - currentValues.length + 1
+                }
+                return (
+                  <Checkbox
+                    {...restField}
+                    key={ck}
+                    sx={styles.checkbox}
+                    value={choice.value.toString()}
+                    isDisabled={isNotAbleToVote || maxSelected}
+                    isChecked={currentValues.includes(choice.value.toString())}
+                    onChange={(e) => {
+                      if (values.includes(e.target.value)) {
+                        onChange(values.filter((v: string) => v !== e.target.value))
+                      } else {
+                        if (maxSelected) return
+                        onChange([...values, e.target.value])
+                      }
+                      trigger(index) // Manually trigger validation
+                    }}
+                  >
+                    {choice.title.default}
+                    {/*Abstain badge to count number of remaining votes to abstain*/}
+                    {abstainScore && <chakra.div __css={styles.abstainBadge}>{abstainScore}</chakra.div>}
+                  </Checkbox>
+                )
+              })}
+              <FormErrorMessage sx={styles.error}>{fieldError?.message as string}</FormErrorMessage>
+            </>
+          )
+        }}
       />
-      <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
     </Stack>
   )
 }
@@ -371,5 +392,52 @@ const SingleChoice = ({ index, question }: QuestionProps) => {
         </RadioGroup>
       )}
     />
+  )
+}
+
+const QuestionsTypeBadge = () => {
+  const styles = useMultiStyleConfig('QuestionsTypeBadge')
+  const { election, localize } = useElection()
+
+  let title: string = ''
+  let tooltip: string = ''
+  switch (election?.resultsType.name) {
+    case ElectionResultsTypeNames.MULTIPLE_CHOICE:
+      title = localize('question_types.multichoice_title')
+      tooltip = localize('question_types.multichoice_tooltip', { maxcount: election.voteType.maxCount })
+      break
+    default:
+      return null
+  }
+
+  return (
+    <chakra.div __css={styles.box}>
+      <Tooltip label={tooltip} hasArrow sx={styles.tooltip} placement='auto'>
+        <chakra.label __css={styles.title}>{title}</chakra.label>
+      </Tooltip>
+    </chakra.div>
+  )
+}
+
+const QuestionTip = () => {
+  const styles = useMultiStyleConfig('QuestionsTip')
+  const { election, localize } = useElection()
+
+  let txt: string = ''
+  switch (election?.resultsType.name) {
+    case ElectionResultsTypeNames.MULTIPLE_CHOICE:
+      txt = localize('question_types.multichoice_desc', { maxcount: election.voteType.maxCount })
+      if (election.resultsType.properties.canAbstain) {
+        txt += localize('question_types.multichoice_desc_abstain')
+      }
+      break
+    default:
+      return null
+  }
+
+  return (
+    <chakra.div __css={styles.wrapper}>
+      <chakra.div __css={styles.text}>{txt}</chakra.div>
+    </chakra.div>
   )
 }

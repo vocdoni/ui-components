@@ -1,4 +1,5 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
+import { theme } from '@chakra-ui/theme'
 
 export const questionsAnatomy = [
   // main content wrapper
@@ -16,6 +17,8 @@ export const questionsAnatomy = [
   'body',
   // question title
   'title',
+  // Question type badge wrapper
+  'typeBadgeWrapper',
   // question description
   'description',
   // form radio group
@@ -25,6 +28,8 @@ export const questionsAnatomy = [
   // form radio and checkboxes
   'radio',
   'checkbox',
+  // Abstain badge to count number of remaining votes to abstain
+  'abstainBadge',
   // form error message
   'error',
 ]
@@ -45,6 +50,14 @@ const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpe
 const baseStyle = definePartsStyle({
   question: {
     marginBottom: 8,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  typeBadgeWrapper: {
+    w: 'full',
+    display: 'flex',
+    justifyContent: 'end',
+    alignItems: 'end',
   },
   title: {
     fontWeight: 'bold',
@@ -53,6 +66,9 @@ const baseStyle = definePartsStyle({
   },
   description: {
     marginBottom: 4,
+  },
+  abstainBadge: {
+    ml: '5px',
   },
 })
 
@@ -75,6 +91,55 @@ export const QuestionsConfirmationTheme = defineConfirmStyle({
     },
     title: {
       fontWeight: 'bold',
+    },
+  }),
+})
+
+export const questionTypeBadgeAnatomy = [
+  // confirmation wrapper box
+  'box',
+  // title text
+  'title',
+  // badge tooltip
+  'tooltip',
+]
+
+const { defineMultiStyleConfig: defineQuestionTypeBadgeStyle, definePartsStyle: defineQuestionTypeBadgeParts } =
+  createMultiStyleConfigHelpers(questionTypeBadgeAnatomy)
+
+export const QuestionsTypeBadgeTheme = defineQuestionTypeBadgeStyle({
+  baseStyle: defineQuestionTypeBadgeParts({
+    wrapper: {
+      flexDirection: 'column',
+      gap: 2,
+    },
+    title: {
+      fontWeight: 'bold',
+    },
+  }),
+})
+
+export const questionTipAnatomy = [
+  // confirmation wrapper box
+  'wrapper',
+  // title text
+  'text',
+]
+
+const { defineMultiStyleConfig: defineQuestionTipStyle, definePartsStyle: defineQuestionTipParts } =
+  createMultiStyleConfigHelpers(questionTipAnatomy)
+
+export const QuestionsTipTheme = defineQuestionTipStyle({
+  baseStyle: defineQuestionTipParts({
+    wrapper: {
+      mt: 4,
+      w: 'full',
+      display: 'flex',
+      justifyContent: 'end',
+      alignItems: 'end',
+    },
+    text: {
+      ...theme.components.Heading.sizes?.sm,
     },
   }),
 })
