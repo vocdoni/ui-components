@@ -471,9 +471,14 @@ const QuestionsTypeBadge = () => {
   const styles = useMultiStyleConfig('QuestionsTypeBadge')
   const { election, localize } = useElection()
 
+  if (!election) return null
+
   let title: string = ''
   let tooltip: string = ''
   switch (election?.resultsType.name) {
+    case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
+      title = localize('question_types.singlechoice_title')
+      break
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
       title = localize('question_types.multichoice_title')
       tooltip = localize('question_types.multichoice_tooltip', { maxcount: election.voteType.maxCount })
@@ -486,10 +491,14 @@ const QuestionsTypeBadge = () => {
       return null
   }
 
+  const weighted = Number(election.census.weight) !== election.census.size && localize('question_types.weighted_voting')
+
   return (
     <chakra.div __css={styles.box}>
       <Tooltip label={tooltip} hasArrow sx={styles.tooltip} placement='auto'>
-        <chakra.label __css={styles.title}>{title}</chakra.label>
+        <chakra.label __css={styles.title}>
+          {title} {weighted}
+        </chakra.label>
       </Tooltip>
     </chakra.div>
   )
