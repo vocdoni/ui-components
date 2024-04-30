@@ -89,6 +89,7 @@ export const locales = {
     sign: 'Sign first',
     voted_description: 'Your vote id is {{ id }}. You can use it to verify your vote.',
     voted_title: 'Your vote was successfully cast!',
+    weight: 'Your voting power is: ',
   },
 }
 

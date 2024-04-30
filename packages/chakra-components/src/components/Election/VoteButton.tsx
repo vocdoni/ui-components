@@ -3,9 +3,10 @@ import { Text } from '@chakra-ui/layout'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ArchivedElection, ElectionStatus, InvalidElection } from '@vocdoni/sdk'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { SpreadsheetAccess } from './SpreadsheetAccess'
+import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 
 export const VoteButton = (props: ButtonProps) => {
   const { connected } = useClient()
@@ -66,4 +67,27 @@ export const VoteButton = (props: ButtonProps) => {
   }
 
   return <Button {...button} />
+}
+
+export const VoteWeight = () => {
+  const { client, election, localize } = useElection()
+  const [weight, setWeight] = useState<string | null>(null)
+  const styles = useMultiStyleConfig('VoteWeight')
+
+  useEffect(() => {
+    ;(async () => {
+      if (!client || !election || !client.wallet || !election.census.censusId) return
+      const proof = await client.fetchProof(election.census.censusId, await client.wallet.getAddress())
+      setWeight(proof.weight)
+    })()
+  }, [client, election])
+
+  if (!weight) return null
+
+  return (
+    <chakra.div __css={styles.wrapper}>
+      {localize('vote.weight')}
+      <chakra.span __css={styles.weight}>{weight}</chakra.span>
+    </chakra.div>
+  )
 }
