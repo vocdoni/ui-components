@@ -13,11 +13,7 @@ const { defineMultiStyleConfig: defineVoteWeightTipStyle, definePartsStyle: defi
 export const VoteWeightTheme = defineVoteWeightTipStyle({
   baseStyle: defineVoteWeightParts({
     wrapper: {
-      mt: 4,
-      w: 'full',
       display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
       gap: 2,
     },
     weight: {
