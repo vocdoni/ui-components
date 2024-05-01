@@ -74,11 +74,18 @@ export const VoteWeight = () => {
   const [weight, setWeight] = useState<string | null>(null)
   const styles = useMultiStyleConfig('VoteWeight')
 
+  // Fetch the census proof for the current signer to extract the weight.
+  // It uses the election provider to get the signer of the election (not the logged-in app user)
   useEffect(() => {
     ;(async () => {
-      if (!client || !election || !client.wallet || !election.census.censusId) return
-      const proof = await client.fetchProof(election.census.censusId, await client.wallet.getAddress())
-      setWeight(proof.weight)
+      try {
+        if (!client || !election || !client.wallet || !election.census.censusId) return
+        const proof = await client.fetchProof(election.census.censusId, await client.wallet.getAddress())
+        setWeight(proof.weight)
+      } catch (e) {
+        console.warn('Error fetching voter weight', e)
+        setWeight(null)
+      }
     })()
   }, [client, election])
 
