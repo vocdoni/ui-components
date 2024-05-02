@@ -16,7 +16,7 @@
     "@emotion/styled": "^11.10.6",
     "@rainbow-me/rainbowkit": "^1.2.0",
     "@vocdoni/chakra-components": "*",
-    "@vocdoni/sdk": "~0.7.0",
+    "@vocdoni/sdk": "~0.8.0",
     "date-fns": "^2.29.3",
     "ethers": "^5.7.2",
     "formik": "^2.2.9",
