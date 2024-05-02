@@ -38,7 +38,6 @@ export const locales = {
     approval_tooltip:
       "Approval voting lets you vote for as many options as you like. The one with the most votes wins. It's a simple way to show your support for all the choices you approve of.",
     approval_title: 'Approval Voting',
-    singlechoice_title: 'Single Choice',
     singlechoice_title: 'Single Choice {{ weighted }}',
     multichoice_tooltip:
       'Multichoice voting lets you vote for up to {{maxcount}} options (defined by the voting organizer). The one with the most votes wins.',
