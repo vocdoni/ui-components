@@ -5,6 +5,7 @@ import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { Box, Link, Stack, Text } from '@chakra-ui/layout'
 import { ModalBody, ModalCloseButton, ModalFooter, ModalHeader } from '@chakra-ui/modal'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
+import { Tooltip } from '@chakra-ui/react'
 import { chakra, ChakraProps, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { Wallet } from '@ethersproject/wallet'
 import { useClient, useElection } from '@vocdoni/react-providers'
@@ -14,7 +15,6 @@ import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, use
 import reactStringReplace from 'react-string-replace'
 import { environment } from '../../environment'
 import { Markdown, useConfirm } from '../layout'
-import { Tooltip } from '@chakra-ui/react'
 
 type ElectionQuestionsProps = ChakraProps & {
   confirmContents?: (election: PublishedElection, answers: FieldValues) => ReactNode
@@ -453,7 +453,7 @@ const QuestionsTypeBadge = () => {
   const styles = useMultiStyleConfig('QuestionsTypeBadge')
   const { election, localize } = useElection()
 
-  if (!election) return null
+  if (!election || !election.census) return null
 
   const weighted =
     Number(election.census.weight) !== election.census.size ? localize('question_types.weighted_voting') : ''
