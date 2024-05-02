@@ -453,11 +453,18 @@ const QuestionsTypeBadge = () => {
   const styles = useMultiStyleConfig('QuestionsTypeBadge')
   const { election, localize } = useElection()
 
+  if (!election) return null
+
+  const weighted =
+    Number(election.census.weight) !== election.census.size ? localize('question_types.weighted_voting') : ''
   let title: string = ''
   let tooltip: string = ''
   switch (election?.resultsType.name) {
+    case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
+      title = localize('question_types.singlechoice_title', { weighted })
+      break
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
-      title = localize('question_types.multichoice_title')
+      title = localize('question_types.multichoice_title', { weighted })
       tooltip = localize('question_types.multichoice_tooltip', { maxcount: election.voteType.maxCount })
       break
     case ElectionResultsTypeNames.APPROVAL:

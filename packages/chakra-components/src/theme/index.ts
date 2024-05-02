@@ -8,6 +8,7 @@ import {
   QuestionsTypeBadgeTheme,
 } from './questions'
 import { ResultsTheme as ElectionResults } from './results'
+import { VoteWeightTheme } from './vote'
 
 export const theme = {
   components: {
@@ -20,6 +21,7 @@ export const theme = {
     QuestionsConfirmation: QuestionsConfirmationTheme,
     QuestionsTip: QuestionsTipTheme,
     QuestionsTypeBadge: QuestionsTypeBadgeTheme,
+    VoteWeight: VoteWeightTheme,
   } as any,
 }
 
