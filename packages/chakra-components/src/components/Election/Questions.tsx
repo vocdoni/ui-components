@@ -279,6 +279,7 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
   }
 
   const choices = [...question.choices]
+  // Put can abstain on a separated variable to avoid typing errors on validation function
   const canAbstain = election.resultsType.properties.canAbstain
 
   return (
