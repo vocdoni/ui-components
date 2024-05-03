@@ -6,6 +6,7 @@ import { useClient, useElection } from '@vocdoni/react-providers'
 import { ArchivedElection, ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
+import { results } from './Results'
 import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 export const VoteButton = (props: ButtonProps) => {
@@ -71,7 +72,7 @@ export const VoteButton = (props: ButtonProps) => {
 
 export const VoteWeight = () => {
   const { client, election, localize } = useElection()
-  const [weight, setWeight] = useState<string | null>(null)
+  const [weight, setWeight] = useState<number | null>(null)
   const styles = useMultiStyleConfig('VoteWeight')
 
   // Fetch the census proof for the current signer to extract the weight.
@@ -90,7 +91,11 @@ export const VoteWeight = () => {
         }
 
         const proof = await client.fetchProof(election.census.censusId, await client.wallet.getAddress())
-        setWeight(proof.weight)
+
+        // If is token voting reduce decimals
+        const decimals = (election.meta as any)?.token?.decimals || 0
+
+        setWeight(results(Number(proof.weight), decimals))
       } catch (e) {
         console.warn('Error fetching voter weight', e)
         setWeight(null)
