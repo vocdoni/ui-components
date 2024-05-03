@@ -13,7 +13,7 @@ import {
 import { format } from 'date-fns'
 
 const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(1) + '%'
-const results = (result: number, decimals?: number) =>
+export const results = (result: number, decimals?: number) =>
   decimals ? parseInt(formatUnits(BigInt(result), decimals), 10) : result
 
 export const ElectionResults = (props: ChakraProps) => {
