@@ -203,9 +203,14 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     return specs[field].description
   }
 
+  const logout = () => {
+    window.history.pushState({}, '', document.location.pathname) // Remove the PK after the hash
+    clearClient()
+  }
+
   if (connected) {
     return (
-      <Button onClick={clearClient} sx={styles.disconnect} isDisabled={voting}>
+      <Button onClick={logout} sx={styles.disconnect} isDisabled={voting}>
         {localize('spreadsheet.logout')}
       </Button>
     )
