@@ -1,7 +1,7 @@
 import { ButtonGroup, IconButton } from '@chakra-ui/button'
 import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { areEqualHexStrings, ElectionStatus } from '@vocdoni/sdk'
+import { areEqualHexStrings, ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { FaPause, FaPlay, FaStop } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { ActionsProvider } from './ActionsProvider'
@@ -20,9 +20,14 @@ export const ElectionActions = (props: ChakraProps) => {
   const { election } = useElection()
   const styles = useMultiStyleConfig('ElectionActions')
 
-  if (!election || (election && !areEqualHexStrings(election.organizationId, account?.address))) return null
-  // canceled and ended elections cannot be acted upon
-  if ([ElectionStatus.CANCELED, ElectionStatus.ENDED, ElectionStatus.RESULTS].includes(election.status)) return null
+  if (
+    !election ||
+    !(election instanceof PublishedElection) ||
+    (election && !areEqualHexStrings(election.organizationId, account?.address)) ||
+    [ElectionStatus.CANCELED, ElectionStatus.ENDED, ElectionStatus.RESULTS].includes(election.status)
+  ) {
+    return null
+  }
 
   return (
     <ButtonGroup size='sm' isAttached variant='outline' position='relative' sx={styles.group} {...props}>

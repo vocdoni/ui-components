@@ -1,5 +1,6 @@
 import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/alert'
 import { ElectionProvider, ElectionProviderComponentProps, useElection } from '@vocdoni/react-providers'
+import { PublishedElection } from '@vocdoni/sdk'
 import { HR } from '../layout'
 import {
   ElectionActions,
@@ -50,7 +51,9 @@ const ElectionBody = () => {
       <HR />
       <ElectionQuestions />
       <VoteButton />
-      {election?.get('census.type') === 'spreadsheet' && connected && <SpreadsheetAccess />}
+      {election instanceof PublishedElection && election?.get('census.type') === 'spreadsheet' && connected && (
+        <SpreadsheetAccess />
+      )}
       <ElectionResults />
     </>
   )

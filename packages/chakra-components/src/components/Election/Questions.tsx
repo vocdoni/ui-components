@@ -9,7 +9,7 @@ import { Tooltip } from '@chakra-ui/react'
 import { chakra, ChakraProps, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { Wallet } from '@ethersproject/wallet'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { ElectionResultsTypeNames, ElectionStatus, InvalidElection, IQuestion, PublishedElection } from '@vocdoni/sdk'
+import { ElectionResultsTypeNames, ElectionStatus, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { ReactNode, useEffect } from 'react'
 import { Controller, FieldValues, FormProvider, SubmitErrorHandler, useForm, useFormContext } from 'react-hook-form'
 import reactStringReplace from 'react-string-replace'
@@ -31,23 +31,22 @@ export const ElectionQuestions = (props: ElectionQuestionsProps) => {
     isAbleToVote,
     client,
   } = useElection()
-  const { account } = useClient()
   const fmethods = useForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const questions = election?.questions
+  const questions: IQuestion[] | undefined = (election as PublishedElection)?.questions
   const { confirm } = useConfirm()
   const { confirmContents, onInvalid, ...rest } = props
 
   // reset form if account gets disconnected
   useEffect(() => {
-    if (typeof client.wallet !== 'undefined' || !questions) return
+    if (typeof client.wallet !== 'undefined' || !questions || !(election instanceof PublishedElection)) return
 
     fmethods.reset({
       ...questions.reduce((acc, question, index) => ({ ...acc, [index]: '' }), {}),
     })
-  }, [client])
+  }, [client, election, fmethods, questions])
 
-  if (election instanceof InvalidElection) return null
+  if (!(election instanceof PublishedElection)) return null
 
   if (voted && !isAbleToVote) {
     return <Voted />
@@ -262,6 +261,8 @@ const QuestionField = ({ question, index }: QuestionFieldProps) => {
 const FieldSwitcher = (props: QuestionProps) => {
   const { election } = useElection()
 
+  if (!(election instanceof PublishedElection)) return null
+
   switch (election?.resultsType.name) {
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
       return <MultiChoice {...props} />
@@ -282,8 +283,11 @@ const MultiChoice = ({ index, question }: QuestionProps) => {
     localize,
   } = useElection()
   const { control, trigger, watch, getValues } = useFormContext()
-  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
   const values = watch(index) || []
+
+  if (!(election instanceof PublishedElection)) return null
+
+  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
 
   if (!(election && election.resultsType.name === ElectionResultsTypeNames.MULTIPLE_CHOICE)) {
     return null
@@ -360,8 +364,11 @@ const ApprovalChoice = ({ index, question }: QuestionProps) => {
     localize,
   } = useElection()
   const { control, watch } = useFormContext()
-  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
   const values = watch(index) || []
+
+  if (!(election instanceof PublishedElection)) return null
+
+  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
 
   if (!(election && election.resultsType.name === ElectionResultsTypeNames.APPROVAL)) {
     return null
@@ -424,6 +431,9 @@ const SingleChoice = ({ index, question }: QuestionProps) => {
     formState: { errors },
     control,
   } = useFormContext()
+
+  if (!(election instanceof PublishedElection)) return null
+
   const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
   return (
     <Controller
@@ -453,7 +463,9 @@ const QuestionsTypeBadge = () => {
   const styles = useMultiStyleConfig('QuestionsTypeBadge')
   const { election, localize } = useElection()
 
-  if (!election || !election.census) return null
+  if (!election || !(election instanceof PublishedElection) || !election.census) {
+    return null
+  }
 
   const weighted =
     Number(election.census.weight) !== election.census.size ? localize('question_types.weighted_voting') : ''
@@ -487,6 +499,8 @@ const QuestionsTypeBadge = () => {
 const QuestionTip = () => {
   const styles = useMultiStyleConfig('QuestionsTip')
   const { election, localize } = useElection()
+
+  if (!election || !(election instanceof PublishedElection)) return null
 
   let txt: string = ''
   switch (election?.resultsType.name) {

@@ -1,7 +1,7 @@
 import { IconButtonProps } from '@chakra-ui/button'
 import { forwardRef } from '@chakra-ui/system'
 import { useActions, useClient, useElection } from '@vocdoni/react-providers'
-import { areEqualHexStrings, ElectionStatus } from '@vocdoni/sdk'
+import { areEqualHexStrings, ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { Button } from '../../layout'
 
 export const ActionPause = forwardRef<IconButtonProps, 'button'>((props, ref) => {
@@ -13,7 +13,12 @@ export const ActionPause = forwardRef<IconButtonProps, 'button'>((props, ref) =>
     loading: { pause: loading },
   } = useActions()
 
-  if (!election || (election && !areEqualHexStrings(election.organizationId, account?.address))) return null
+  if (
+    !election ||
+    !(election instanceof PublishedElection) ||
+    !areEqualHexStrings(election.organizationId, account?.address)
+  )
+    return null
 
   return (
     <Button

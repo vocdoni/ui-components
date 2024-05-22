@@ -14,7 +14,7 @@ import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useToast } from '@chakra-ui/toast'
 import { Wallet } from '@ethersproject/wallet'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
-import { ArchivedElection, dotobject, VocdoniSDKClient } from '@vocdoni/sdk'
+import { dotobject, PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { RegisterOptions, useForm } from 'react-hook-form'
 import { Button } from '../layout/Button'
@@ -65,7 +65,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     formState: { errors },
   } = useForm<any>()
 
-  const shouldRender = election?.get('census.type') === 'spreadsheet' && !(election instanceof ArchivedElection)
+  const shouldRender = election instanceof PublishedElection && election?.get('census.type') === 'spreadsheet'
   const privkey = window.location.hash ? window.location.hash.split('#')[1] : ''
 
   // In case of spreadsheet census and a private provided through the URI, do intent to login automatically
@@ -89,6 +89,9 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [election, env, shouldRender, privkey])
+
+  // we return as soon as possible to avoid type issues with the following methods
+  if (!shouldRender) return null
 
   const onSubmit = async (vals: any) => {
     try {
@@ -199,8 +202,6 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     if (!specs || typeof specs[field] === 'undefined') return
     return specs[field].description
   }
-
-  if (!shouldRender) return null
 
   if (connected) {
     return (

@@ -1,15 +1,14 @@
 import { Box, Flex, Text } from '@chakra-ui/layout'
 import { Progress } from '@chakra-ui/progress'
-import { ChakraProps, chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useClient, useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
   ElectionResultsTypeNames,
   ElectionStatus,
+  formatUnits,
   IChoice,
   IQuestion,
-  InvalidElection,
   PublishedElection,
-  formatUnits,
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 
@@ -23,7 +22,7 @@ export const ElectionResults = (props: ChakraProps) => {
   const { localize } = useClient()
   const locale = useDatesLocale()
 
-  if (!election || election instanceof InvalidElection || election?.status === ElectionStatus.CANCELED) return null
+  if (!election || !(election instanceof PublishedElection) || election?.status === ElectionStatus.CANCELED) return null
 
   if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS) {
     return (

@@ -1,12 +1,12 @@
 import { ButtonProps } from '@chakra-ui/button'
 import { Text } from '@chakra-ui/layout'
+import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { ArchivedElection, ElectionStatus, InvalidElection } from '@vocdoni/sdk'
+import { ArchivedElection, ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { SpreadsheetAccess } from './SpreadsheetAccess'
-import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 
 export const VoteButton = (props: ButtonProps) => {
   const { connected } = useClient()
@@ -24,11 +24,11 @@ export const VoteButton = (props: ButtonProps) => {
   } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
 
-  if (!election) return null
+  if (!election || election instanceof InvalidElection || election instanceof ArchivedElection) {
+    return null
+  }
 
   const isDisabled = !client.wallet || !isAbleToVote || election.status !== ElectionStatus.ONGOING
-
-  if (election instanceof InvalidElection || election instanceof ArchivedElection) return null
 
   if (!connected && election.get('census.type') !== 'spreadsheet' && ConnectButton) {
     return <ConnectButton />
@@ -79,7 +79,16 @@ export const VoteWeight = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        if (!client || !election || !client.wallet || !election.census.censusId) return
+        if (
+          !client ||
+          !election ||
+          !client.wallet ||
+          !(election instanceof PublishedElection) ||
+          !election.census.censusId
+        ) {
+          return
+        }
+
         const proof = await client.fetchProof(election.census.censusId, await client.wallet.getAddress())
         setWeight(proof.weight)
       } catch (e) {
@@ -89,7 +98,7 @@ export const VoteWeight = () => {
     })()
   }, [client, election])
 
-  if (!weight) return null
+  if (!weight || !election || !(election instanceof PublishedElection)) return
 
   return (
     <chakra.div __css={styles.wrapper}>
