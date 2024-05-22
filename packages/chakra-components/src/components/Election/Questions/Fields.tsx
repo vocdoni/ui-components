@@ -8,7 +8,6 @@ import { ElectionResultsTypeNames, ElectionStatus, IQuestion, PublishedElection 
 import { Controller, useFormContext } from 'react-hook-form'
 import { Markdown } from '../../layout'
 import { QuestionTip } from './Tip'
-import { QuestionsTypeBadge } from './TypeBadge'
 
 export type QuestionProps = {
   index: string
@@ -25,9 +24,6 @@ export const QuestionField = ({ question, index }: QuestionFieldProps) => {
 
   return (
     <chakra.div __css={styles.question}>
-      <chakra.div __css={styles.typeBadgeWrapper}>
-        <QuestionsTypeBadge />
-      </chakra.div>
       <FormControl isInvalid={!!errors[index]}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>

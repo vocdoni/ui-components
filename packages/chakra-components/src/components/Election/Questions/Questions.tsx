@@ -5,6 +5,7 @@ import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler } from 'react-hook-form'
 import { QuestionField } from './Fields'
 import { QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
+import { QuestionsTypeBadge } from './TypeBadge'
 import { Voted } from './Voted'
 
 export type ElectionQuestionsFormProps = ChakraProps & {
@@ -51,6 +52,9 @@ export const ElectionQuestionsForm = (props: ElectionQuestionsFormProps) => {
     <chakra.div __css={styles.wrapper} {...rest}>
       <Voted />
       <form onSubmit={fmethods.handleSubmit(vote, onInvalid)} id={`election-questions-${election.id}`}>
+        <chakra.div __css={styles.typeBadgeWrapper}>
+          <QuestionsTypeBadge />
+        </chakra.div>
         {questions.map((question, qk) => (
           <QuestionField key={qk} index={qk.toString()} question={question} />
         ))}
