@@ -1,10 +1,12 @@
 import {
   AnonymousService,
   AnonymousVote,
+  ArchivedElection,
   areEqualHexStrings,
   CensusType,
   ChainAPI,
   CspVote,
+  InvalidElection,
   PublishedElection,
   Vote,
 } from '@vocdoni/sdk'
@@ -17,7 +19,7 @@ import { useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
-  election?: PublishedElection
+  election?: PublishedElection | InvalidElection | ArchivedElection
   ConnectButton?: ComponentType
   fetchCensus?: boolean
   beforeSubmit?: (vote: Vote) => boolean
@@ -63,7 +65,7 @@ export const useElectionProvider = ({
 
   const censusFetch = useCallback(async () => {
     const address = await client.wallet?.getAddress()
-    if (!election) return
+    if (!election || !(election instanceof PublishedElection)) return
 
     try {
       actions.loadCensus(address as string)
@@ -99,6 +101,8 @@ export const useElectionProvider = ({
   const { result: circuits, startProcessing } = useWebWorker<ICircuit, ICircuitWorkerRequest>(workerInstance)
 
   const fetchAnonCircuits = useCallback(async () => {
+    if (!(election instanceof PublishedElection)) return
+
     const hasOverwriteEnabled =
       typeof election !== 'undefined' &&
       typeof election.voteType.maxVoteOverwrites !== 'undefined' &&
@@ -259,6 +263,9 @@ export const useElectionProvider = ({
     if (!election) {
       throw new Error('no election initialized')
     }
+    if (!(election instanceof PublishedElection)) {
+      throw new Error('only published elections can be voted')
+    }
 
     actions.voting()
     client.setElectionId(election.id)
@@ -299,7 +306,7 @@ export const useElectionProvider = ({
     if (!vote) {
       throw new Error('no vote instance')
     }
-    if (![CensusType.WEIGHTED, CensusType.ANONYMOUS].includes(election!.census?.type)) {
+    if (![CensusType.WEIGHTED, CensusType.ANONYMOUS].includes((election as PublishedElection)!.census?.type)) {
       throw new Error('not a Weighted election')
     }
 
@@ -308,14 +315,14 @@ export const useElectionProvider = ({
 
   // CSP OAuth flow
   const cspAuthAndVote = async () => {
-    const handler = election?.meta.csp?.service
+    const handler = (election as PublishedElection)?.meta.csp?.service
     if (!client) {
       throw new Error('no client initialized')
     }
     if (!election) {
       throw new Error('no election initialized')
     }
-    if (election?.census?.type !== CensusType.CSP) {
+    if ((election as PublishedElection)?.census?.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
 
@@ -400,8 +407,7 @@ export const useElectionProvider = ({
     if (!client) {
       throw new Error('no client initialized')
     }
-
-    if (election?.census?.type !== CensusType.CSP) {
+    if (!(election instanceof PublishedElection) || election?.census?.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
 

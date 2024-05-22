@@ -37,7 +37,7 @@ describe('<ElectionProvider />', () => {
       expect(result.current.loaded.election).toBeTruthy()
     })
 
-    expect(result.current.election?.title.default).toEqual('mocked process')
+    expect((result.current.election as PublishedElection)?.title.default).toEqual('mocked process')
   })
 
   it('sets proper client from ClientProvider by default', async () => {
@@ -71,7 +71,7 @@ describe('<ElectionProvider />', () => {
           <ElectionProvider
             children={props.children}
             // @ts-ignore
-            election={PublishedElection.from({
+            election={PublishedElection.build({
               title: 'test',
               description: 'test',
               endDate: new Date(),
@@ -125,7 +125,7 @@ describe('<ElectionProvider />', () => {
           <ElectionProvider
             children={props.children}
             // @ts-ignore
-            election={PublishedElection.from({
+            election={PublishedElection.build({
               title: 'test',
               description: 'test',
               endDate: new Date(),
@@ -180,34 +180,33 @@ describe('<ElectionProvider />', () => {
       )
     }
 
-    const election = PublishedElection.from({
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'test',
       title: 'test',
       description: 'test',
       endDate: new Date(),
       census: new WeightedCensus(),
     })
-    // @ts-ignore
-    election.id = 'test'
 
     const { result, rerender } = renderHook(() => useElection(), { wrapper, initialProps: { election } })
 
-    expect(result.current.election?.title.default).toBe('test')
-    expect(result.current.election?.description.default).toBe('test')
+    expect((result.current.election as PublishedElection)?.title.default).toBe('test')
+    expect((result.current.election as PublishedElection)?.description.default).toBe('test')
 
-    const newelection = PublishedElection.from({
+    // @ts-ignore
+    const newelection = PublishedElection.build({
+      id: 'test2',
       title: 'test2',
       description: 'test2',
       endDate: new Date(),
       census: new WeightedCensus(),
     })
-    // ids must change in order for the data to be actually updated
-    // @ts-ignore
-    election.id = 'test2'
 
     rerender({ election: newelection })
 
-    expect(result.current.election?.title.default).toBe('test2')
-    expect(result.current.election?.description.default).toBe('test2')
+    expect((result.current.election as PublishedElection)?.title.default).toBe('test2')
+    expect((result.current.election as PublishedElection)?.description.default).toBe('test2')
   })
 
   it('clears session data on logout', async () => {
@@ -223,15 +222,15 @@ describe('<ElectionProvider />', () => {
         </ClientProvider>
       )
     }
-    const election = PublishedElection.from({
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'test',
       title: 'test',
       description: 'test',
       endDate: new Date(),
       census: new WeightedCensus(),
       meta: { census: { type: 'spreadsheet' } },
     })
-    // @ts-ignore
-    election.id = 'test'
 
     // we need both hooks for this test
     const useBothHooks = () => {
@@ -269,15 +268,15 @@ describe('<ElectionProvider />', () => {
     // but not election, since it's a spreadsheet one
     expect(result.current.election.connected).toBeTruthy()
 
-    const nelection = PublishedElection.from({
+    // @ts-ignore
+    const nelection = PublishedElection.build({
+      id: 'test2',
       title: 'test2',
       description: 'test2',
       endDate: new Date(),
       census: new WeightedCensus(),
       meta: { census: { type: 'token' } },
     })
-    // @ts-ignore
-    election.id = 'test2'
 
     rerender({ election: nelection })
 

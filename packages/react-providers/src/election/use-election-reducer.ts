@@ -1,4 +1,12 @@
-import { areEqualHexStrings, CensusType, PublishedElection, VocdoniSDKClient, Vote } from '@vocdoni/sdk'
+import {
+  ArchivedElection,
+  areEqualHexStrings,
+  CensusType,
+  InvalidElection,
+  PublishedElection,
+  VocdoniSDKClient,
+  Vote,
+} from '@vocdoni/sdk'
 import { Reducer, useEffect, useReducer } from 'react'
 import { useClient } from '../client'
 import { ClientSetPayload } from '../client/use-client-reducer'
@@ -84,7 +92,7 @@ export interface ElectionReducerState {
   id: string | undefined
   isAbleToVote: boolean | undefined
   isInCensus: boolean
-  election: PublishedElection | undefined
+  election: PublishedElection | InvalidElection | ArchivedElection | undefined
   vote: Vote | undefined
   voter: string | undefined
   votesLeft: number
@@ -119,7 +127,7 @@ export const electionStateEmpty = ({
   election,
 }: {
   client: VocdoniSDKClient
-  election?: PublishedElection
+  election?: PublishedElection | InvalidElection | ArchivedElection
 }): ElectionReducerState => ({
   client,
   connected: false,
@@ -158,6 +166,7 @@ export const electionStateEmpty = ({
 
 const isAbleToVote = (state: ElectionReducerState, payload?: boolean) =>
   payload ||
+  !(state.election instanceof PublishedElection) ||
   (state.isInCensus && state.votesLeft > 0) ||
   // TODO: the following two cases should be reviewed/improved. The anonymous one is a trick
   // to allow users to vote, and should be properly done when the SIK flow is completelly implemented.
@@ -410,7 +419,10 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
   }
 }
 
-export const useElectionReducer = (client: VocdoniSDKClient, election?: PublishedElection) => {
+export const useElectionReducer = (
+  client: VocdoniSDKClient,
+  election?: PublishedElection | ArchivedElection | InvalidElection
+) => {
   const initial = electionStateEmpty({ client, election })
   const { connected } = useClient()
   const [state, dispatch] = useReducer(electionReducer, {
@@ -420,7 +432,8 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
 
   const clear = () => dispatch({ type: CensusClear })
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ElectionClientSet, payload: client })
-  const set = (election: PublishedElection) => dispatch({ type: ElectionSet, payload: election })
+  const set = (election: PublishedElection | ArchivedElection | InvalidElection) =>
+    dispatch({ type: ElectionSet, payload: election })
   const sikPassword = (password: SikPayload) => dispatch({ type: SikPasswordSet, payload: password })
   const sikSignature = (signature: SikPayload) => dispatch({ type: SikSignatureSet, payload: signature })
 
@@ -429,7 +442,11 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
     if (!client) return
 
     // only propagate the client when census type !== spreadsheet (since it uses a locally instanced client)
-    if (state.election?.meta && state.election?.get('census.type') === 'spreadsheet') {
+    if (
+      state.election instanceof PublishedElection &&
+      state.election?.meta &&
+      state.election?.get('census.type') === 'spreadsheet'
+    ) {
       return
     }
 
@@ -448,7 +465,7 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   // ensure user data is cleared on logout
   useEffect(() => {
     // we don't want to clear the session when we're connected everywhere
-    if (state.connected && connected) return
+    if ((state.connected && connected) || !(state.election instanceof PublishedElection)) return
 
     // if there's no meta census information, avoid clearing it from state (process does not follow our way to create them)
     if (!state.election?.meta?.census) {
