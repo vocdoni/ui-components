@@ -1,0 +1,12 @@
+env:
+  browser: true
+  es2021: true
+extends:
+  - react-app
+  - plugin:prettier/recommended
+parserOptions:
+  ecmaVersion: latest
+  sourceType: module
+plugins:
+  - testing-library
+rules: {}
