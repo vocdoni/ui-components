@@ -345,6 +345,34 @@ export const useElectionProvider = ({
     }
   }
 
+  // CSP generic steps
+  const cspStep0 = async (handler: string, data: any[], cb?: (step0: ICspIntermediateStepResponse) => void) => {
+    let step0: ICspIntermediateStepResponse
+    try {
+      step0 = (await client.cspStep(0, data)) as ICspIntermediateStepResponse
+      actions.csp0({ handler, token: step0.authToken })
+      if (cb) {
+        cb(step0)
+      }
+      return step0
+    } catch (e) {
+      actions.votingError(e)
+      console.warn('CSP step 0 error', e)
+    }
+  }
+
+  // CSP generic steps
+  const cspStep1 = async (data: any[], authToken?: string | undefined) => {
+    try {
+      const step1 = (await client.cspStep(1, data, authToken)) as ICspFinalStepResponse
+      actions.csp1(step1.token)
+    } catch (e) {
+      actions.votingError(localize('errors.unauthorized'))
+      console.warn('CSP step 1 error', e)
+    }
+  }
+
+  // blind CSP flow
   const blindCspVote = async () => {
     if (!client) {
       throw new Error('no client initialized')
@@ -352,27 +380,11 @@ export const useElectionProvider = ({
     if (!(election instanceof PublishedElection) || election?.census?.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
+    const handler = (election as PublishedElection).meta.csp?.service
 
-    let step0: ICspIntermediateStepResponse
-    try {
-      // TODO: properly type when ICspIntermediateStepResponse is exposed from SDK
-      step0 = (await client.cspStep(0, ['Name test'])) as ICspIntermediateStepResponse
-    } catch (e) {
-      actions.votingError(e)
-      console.warn('CSP step 0 error', e)
-      return
-    }
-    try {
-      const step1 = (await client.cspStep(
-        1,
-        [step0.response.reduce((acc, v) => +acc + +v, 0).toString()],
-        step0.authToken
-      )) as ICspFinalStepResponse
-      actions.csp1(step1.token)
-    } catch (e) {
-      actions.votingError(localize('errors.unauthorized'))
-      console.warn('CSP step 1 error', e)
-    }
+    const step0 = await cspStep0(handler, ['Name test'])
+    if (!step0) return
+    await cspStep1([step0.response.reduce((acc, v) => +acc + +v, 0).toString()], step0.authToken)
   }
 
   // CSP OAuth flow
@@ -392,15 +404,9 @@ export const useElectionProvider = ({
     const redirectURL: string = `${window.location.origin}${window.location.pathname}?${params.toString()}${
       window.location.hash
     }`
-
-    try {
-      // TODO: properly type when ICspIntermediateStepResponse is exposed from SDK
-      const step0: any = await client.cspStep(0, [handler, redirectURL])
-      actions.csp0({ handler, token: step0.authToken })
+    await cspStep0(handler, [handler, redirectURL], (step0) => {
       openLoginPopup(handler, step0['response'][0])
-    } catch (e) {
-      actions.votingError(e)
-    }
+    })
   }
 
   // CSP OAuth flow
@@ -444,14 +450,7 @@ export const useElectionProvider = ({
       const redirectURL = `${window.location.origin}${window.location.pathname}?${params.toString()}${
         window.location.hash
       }`
-
-      try {
-        const step1: any = await client.cspStep(1, [handler, code, redirectURL], csp.authToken)
-        actions.csp1(step1.token)
-      } catch (e) {
-        actions.votingError(localize('errors.unauthorized'))
-        console.warn('CSP step 1 error', e)
-      }
+      await cspStep1([handler, code, redirectURL], csp.authToken)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [csp.token, csp.authToken, client]
