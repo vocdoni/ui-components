@@ -6,6 +6,8 @@ import {
   CensusType,
   ChainAPI,
   CspVote,
+  ICspFinalStepResponse,
+  ICspIntermediateStepResponse,
   InvalidElection,
   PublishedElection,
   Vote,
@@ -295,7 +297,7 @@ export const useElectionProvider = ({
 
       switch (election.census.type) {
         case CensusType.CSP:
-          await cspAuthAndVote()
+          await cspVoteByService()
           break
         case CensusType.ANONYMOUS:
         case CensusType.WEIGHTED:
@@ -325,19 +327,60 @@ export const useElectionProvider = ({
     return await client.submitVote(vote)
   }
 
-  // CSP OAuth flow
-  const cspAuthAndVote = async () => {
-    const handler = (election as PublishedElection)?.meta.csp?.service
+  // CSP flow
+  const cspVoteByService = async () => {
+    const service = (election as PublishedElection)?.meta.csp?.service
     if (!client) {
       throw new Error('no client initialized')
-    }
-    if (!election) {
-      throw new Error('no election initialized')
     }
     if ((election as PublishedElection)?.census?.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
+    switch (service) {
+      case 'vocdoni-blind-csp':
+        blindCspVote()
+        break
+      default:
+        cspAuthAndVote()
+    }
+  }
 
+  const blindCspVote = async () => {
+    if (!client) {
+      throw new Error('no client initialized')
+    }
+    if (!(election instanceof PublishedElection) || election?.census?.type !== CensusType.CSP) {
+      throw new Error('not a CSP election')
+    }
+
+    let step0: ICspIntermediateStepResponse
+    try {
+      // TODO: properly type when ICspIntermediateStepResponse is exposed from SDK
+      step0 = (await client.cspStep(0, ['Name test'])) as ICspIntermediateStepResponse
+    } catch (e) {
+      actions.votingError(e)
+      console.warn('CSP step 0 error', e)
+      return
+    }
+    try {
+      const step1 = (await client.cspStep(
+        1,
+        [step0.response.reduce((acc, v) => +acc + +v, 0).toString()],
+        step0.authToken
+      )) as ICspFinalStepResponse
+      actions.csp1(step1.token)
+    } catch (e) {
+      actions.votingError(localize('errors.unauthorized'))
+      console.warn('CSP step 1 error', e)
+    }
+  }
+
+  // CSP OAuth flow
+  const cspAuthAndVote = async () => {
+    const handler = (election as PublishedElection).meta.csp?.service
+    if (!election) {
+      throw new Error('no election initialized')
+    }
     const params: URLSearchParams = new URLSearchParams(window.location.search)
     if (!params.has('electionId')) {
       params.append('electionId', election.id)
