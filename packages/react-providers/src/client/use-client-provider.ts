@@ -24,7 +24,7 @@ export const useClientProvider = ({
 
   // update env on updates
   useEffect(() => {
-    if (!e) return
+    if (!e || e === state.env) return
     actions.setEnv(e)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [e])
