@@ -8,7 +8,7 @@ import {
   VoteAPI,
 } from '@vocdoni/sdk'
 
-export default class ExtendedSDKClient extends VocdoniSDKClient {
+export class ExtendedSDKClient extends VocdoniSDKClient {
   constructor(opts: ClientOptions) {
     super(opts)
   }
