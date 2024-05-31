@@ -1,6 +1,11 @@
+import { AvatarProps, Avatar as CAvatar } from '@chakra-ui/avatar'
 import { Image as CImage, ImageProps } from '@chakra-ui/image'
 
 export type IPFSImageProps = ImageProps & {
+  gateway?: string
+}
+
+export type IPFSAvatarProps = AvatarProps & {
   gateway?: string
 }
 
@@ -31,4 +36,12 @@ export const Image = ({ src, ...props }: IPFSImageProps) => {
   const link = linkify(src, props.gateway || 'https://infura-ipfs.io/ipfs/')
 
   return <CImage src={link} {...props} />
+}
+
+export const Avatar = ({ src, ...props }: IPFSAvatarProps) => {
+  if (!src) return null
+
+  const link = linkify(src, props.gateway || 'https://infura-ipfs.io/ipfs/')
+
+  return <CAvatar src={link} {...props} />
 }

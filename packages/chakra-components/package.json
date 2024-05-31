@@ -29,6 +29,7 @@
   },
   "peerDependencies": {
     "@chakra-ui/alert": "^2.2.2",
+    "@chakra-ui/avatar": "^2.3.0",
     "@chakra-ui/button": "^2.1.0",
     "@chakra-ui/checkbox": "^2.3.2",
     "@chakra-ui/form-control": "^2.2.0",
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@chakra-ui/alert": "^2.2.2",
+    "@chakra-ui/avatar": "^2.3.0",
     "@chakra-ui/button": "^2.1.0",
     "@chakra-ui/checkbox": "^2.3.2",
     "@chakra-ui/form-control": "^2.2.0",
