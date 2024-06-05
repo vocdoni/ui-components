@@ -1,5 +1,9 @@
 <p align="center" width="100%">
-    <img src="https://developer.vocdoni.io/img/vocdoni_logotype_full_white.svg" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://developer.vocdoni.io/img/vocdoni_logotype_full_blank.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://developer.vocdoni.io/img/vocdoni_logotype_full_white.svg" />
+      <img alt="Star History Chart" src="https://developer.vocdoni.io/img/vocdoni_logotype_full_white.svg" />
+  </picture>
 </p>
 
 <p align="center" width="100%">
@@ -43,7 +47,7 @@
 
 # @vocdoni/chakra-components
 
-This package provides UI components that integrate the Vocdoni voting protocol. The components can be styled with Chakra UI-based custom theming. 
+This package provides UI components that integrate the Vocdoni voting protocol. The components can be styled with Chakra UI-based custom theming.
 
 The best place to learn about using this package is the [developer portal](https://developer.vocdoni.io/ui-components).
 
@@ -85,9 +89,9 @@ In addition to the live examples in the documentation, you can see many of the c
 This project is a WIP and is subject to continuous changes during its
 development. We encourage you to review this repository and the developer portal for any changes.
 
-## Contributing 
+## Contributing
 
-While we welcome contributions from the community, we do not track all of our issues on Github and we may not have the resources to onboard developers and review complex pull requests. That being said, there are multiple ways you can get involved with the project. 
+While we welcome contributions from the community, we do not track all of our issues on Github and we may not have the resources to onboard developers and review complex pull requests. That being said, there are multiple ways you can get involved with the project.
 
 Please review our [development guidelines](https://developer.vocdoni.io/development-guidelines).
 

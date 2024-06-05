@@ -1,5 +1,9 @@
 <p align="center" width="100%">
-    <img src="https://developer.vocdoni.io/img/vocdoni_logotype_full_white.svg" />
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://developer.vocdoni.io/img/vocdoni_logotype_full_blank.svg" />
+      <source media="(prefers-color-scheme: light)" srcset="https://developer.vocdoni.io/img/vocdoni_logotype_full_white.svg" />
+      <img alt="Star History Chart" src="https://developer.vocdoni.io/img/vocdoni_logotype_full_white.svg" />
+  </picture>
 </p>
 
 <p align="center" width="100%">
@@ -43,7 +47,7 @@
 
 # ui-components
 
-This repository aims to ease the creation of voting interfaces for user-facing applications. The purpose is to allow developers to easily integrate a variety of voting flow components and style these components as desired. 
+This repository aims to ease the creation of voting interfaces for user-facing applications. The purpose is to allow developers to easily integrate a variety of voting flow components and style these components as desired.
 
 ## Included Packages
 
@@ -67,7 +71,7 @@ The best place to learn about using ui-components packages is the [developer por
 
 ## Getting Started
 
-Each of these packages can be used in a typescript/javascript project by importing them, eg. `yarn add @vocdoni/chakra-components`. Follow the developer documentation, or go to each individual package's readme file, for further details. 
+Each of these packages can be used in a typescript/javascript project by importing them, eg. `yarn add @vocdoni/chakra-components`. Follow the developer documentation, or go to each individual package's readme file, for further details.
 
 Each of the packages has a typescript file configured as an entrypoint, so you should be able to just run `yarn dev` on the included chakra template to start developing any of the included packages.
 
@@ -84,7 +88,7 @@ Turbo was initially configured for the development process, but its usage is min
 
 ## Reference
 
-The developer portal includes a [reference](https://developer.vocdoni.io/ui-components) for the `@vocdoni/chakra-components` package that also incorporates the full functionality of `@vocdoni/react-providers`. 
+The developer portal includes a [reference](https://developer.vocdoni.io/ui-components) for the `@vocdoni/chakra-components` package that also incorporates the full functionality of `@vocdoni/react-providers`.
 
 ## Examples
 
@@ -99,9 +103,9 @@ In addition to the live examples in the documentation, you can see many of the c
 This project is a WIP and is subject to continuous changes during its
 development. We encourage you to review this repository and the developer portal for any changes.
 
-## Contributing 
+## Contributing
 
-While we welcome contributions from the community, we do not track all of our issues on Github and we may not have the resources to onboard developers and review complex pull requests. That being said, there are multiple ways you can get involved with the project. 
+While we welcome contributions from the community, we do not track all of our issues on Github and we may not have the resources to onboard developers and review complex pull requests. That being said, there are multiple ways you can get involved with the project.
 
 Please review our [development guidelines](https://developer.vocdoni.io/development-guidelines).
 
