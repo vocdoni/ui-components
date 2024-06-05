@@ -24,12 +24,12 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
         case ElectionStatus.ONGOING:
         case ElectionStatus.RESULTS: {
           if (endDate < new Date()) {
-            return t('statuses.process_ended')
+            return t('statuses.ended')
           }
           return formatDistance(endDate, new Date(), { addSuffix: true })
         }
         case ElectionStatus.ENDED:
-          return t('statuses.process_ended')
+          return t('statuses.ended')
         case ElectionStatus.PAUSED:
           return t('statuses.paused')
         case ElectionStatus.UPCOMING:
