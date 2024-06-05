@@ -1,4 +1,12 @@
-import { AccountAPI, ChainAPI, ElectionAPI, IChainBlockInfoResponse, VocdoniSDKClient, VoteAPI } from '@vocdoni/sdk'
+import {
+  AccountAPI,
+  ChainAPI,
+  ElectionAPI,
+  IChainBlockInfoResponse,
+  IElectionListFilter,
+  VocdoniSDKClient,
+  VoteAPI,
+} from '@vocdoni/sdk'
 
 // Sorry for this, but we need to publish and the type isn't yet exported from the SDK...
 // TODO: remove when it's properly exported
@@ -26,12 +34,9 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
   electionVotesCount = (electionId: string) =>
     ElectionAPI.votesCount(this.url, electionId) as Promise<IElectionVotesCountResponse>
   electionKeys = (electionId: string) => ElectionAPI.keys(this.url, electionId)
-  electionList = (page: number, electionId?: string, organizationId?: string, status?: any, withResults?: boolean) =>
+  electionList = (page: number, filters: IElectionListFilter) =>
     ElectionAPI.electionsList(this.url, page, {
-      electionId,
-      organizationId,
-      status,
-      withResults,
+      ...filters,
     })
   blockTransactions = (height: number, page?: number) => ChainAPI.blockTransactions(this.url, height, page)
   blockByHeight = (height: number) => ChainAPI.blockByHeight(this.url, height)
