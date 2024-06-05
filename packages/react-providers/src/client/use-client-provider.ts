@@ -1,5 +1,5 @@
 import { Wallet } from '@ethersproject/wallet'
-import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
+import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect } from 'react'
 import { useLocalize } from '../i18n/localize'
 import { ClientReducerProps, newVocdoniSDKClient, useClientReducer } from './use-client-reducer'
@@ -64,8 +64,6 @@ export const useClientProvider = ({
 
   /**
    * Fetches currently connected account information.
-   *
-   * @returns {Promise<AccountData>}
    */
   const fetchAccount = () => {
     if (state.loading.fetch) return
@@ -76,8 +74,6 @@ export const useClientProvider = ({
 
   /**
    * Creates an account.
-   *
-   * @returns {Promise<AccountData>}
    */
   const createAccount = (options?: { account?: Account; faucetPackage?: string; sik?: boolean; password?: string }) => {
     if (state.loading.create) return
@@ -88,8 +84,6 @@ export const useClientProvider = ({
 
   /**
    * Updates an account.
-   *
-   * @returns {Promise<AccountData}
    */
   const updateAccount = (account: Account) => {
     if (state.loading.update) return
