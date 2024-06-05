@@ -24,8 +24,11 @@
     "postpack": "mv -fv package.json.backup package.json"
   },
   "main": "src/index.ts",
+  "devDependencies": {
+    "@vocdoni/sdk": "~0.8.1"
+  },
   "peerDependencies": {
-    "@vocdoni/sdk": "~0.8.0"
+    "@vocdoni/sdk": "~0.8.1"
   },
   "clean-package": "../../clean-package.config.json"
 }
