@@ -26,7 +26,7 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
           if (endDate < new Date()) {
             return t('statuses.ended')
           }
-          return formatDistance(endDate, new Date(), { addSuffix: true })
+          return formatDistance(endDate, new Date(), { addSuffix: true, locale })
         }
         case ElectionStatus.ENDED:
           return t('statuses.ended')
@@ -34,7 +34,7 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
           return t('statuses.paused')
         case ElectionStatus.UPCOMING:
         default:
-          return formatDistance(election.startDate, new Date(), { addSuffix: true })
+          return formatDistance(election.startDate, new Date(), { addSuffix: true, locale })
       }
     }
 
