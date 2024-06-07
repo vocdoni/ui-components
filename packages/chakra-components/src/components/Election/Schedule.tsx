@@ -20,21 +20,45 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
 
     const getRemaining = (): string => {
       const endDate = election.endDate
+      const startDate = election.startDate
       switch (election.status) {
         case ElectionStatus.ONGOING:
         case ElectionStatus.RESULTS: {
           if (endDate < new Date()) {
-            return t('statuses.ended')
+            return t('schedule.ended', {
+              distance: formatDistance(endDate, new Date(), {
+                addSuffix: true,
+                locale,
+              }),
+            })
           }
           return formatDistance(endDate, new Date(), { addSuffix: true, locale })
         }
         case ElectionStatus.ENDED:
-          return t('statuses.ended')
+          return t('schedule.ended', {
+            distance: formatDistance(endDate, new Date(), {
+              addSuffix: true,
+              locale,
+            }),
+          })
         case ElectionStatus.PAUSED:
-          return t('statuses.paused')
+          if (new Date() < startDate) {
+            return t('schedule.paused_start', {
+              distance: formatDistance(startDate, new Date(), {
+                addSuffix: true,
+                locale,
+              }),
+            })
+          }
+          return t('schedule.paused_end', {
+            distance: formatDistance(endDate, new Date(), {
+              addSuffix: true,
+              locale,
+            }),
+          })
         case ElectionStatus.UPCOMING:
         default:
-          return formatDistance(election.startDate, new Date(), { addSuffix: true, locale })
+          return formatDistance(startDate, new Date(), { addSuffix: true, locale })
       }
     }
 
@@ -42,7 +66,7 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
       <chakra.h2 __css={styles} {...rest}>
         {showRemaining
           ? getRemaining()
-          : t('schedule', {
+          : t('schedule.from_begin_to_end', {
               begin: dformat(new Date(election.startDate), format, { locale }),
               end: dformat(new Date(election.endDate), format, { locale }),
             })}
