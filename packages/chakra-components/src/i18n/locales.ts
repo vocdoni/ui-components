@@ -47,7 +47,12 @@ export const locales = {
     multichoice_cannot_abstain: 'Too many options selected',
     weighted_voting: 'Weighted Voting',
   },
-  schedule: 'Voting from {{ begin }} to {{ end }}',
+  schedule: {
+    from_begin_to_end: 'Voting from {{ begin }} to {{ end }}',
+    ended: 'Ended {{ distance }}',
+    paused_start: '(Paused) Starts {{ distance }}',
+    paused_end: '(Paused) Ends {{ distance }}',
+  },
   // results component
   results: {
     date_format: 'd-L-y HH:mm',
