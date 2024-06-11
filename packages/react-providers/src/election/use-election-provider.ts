@@ -38,6 +38,10 @@ export const useElectionProvider = ({
 }: ElectionProviderProps) => {
   const { client: c, localize } = useClient()
   const { state, actions } = useElectionReducer(c, data)
+
+  // If id and election data are both provided, it will fetch election info with the updated election.
+  const [mergeElection, setMergeElection] = useState<boolean>(!!id && !!data)
+
   const {
     client,
     csp,
@@ -167,6 +171,14 @@ export const useElectionProvider = ({
 
     fetchElection(id)
   }, [state.id, id, client, loading.election, loaded.election, fetchElection])
+
+  // fetch election whenever the election id changes. This is useful if election data is provided,
+  // and you want to fetch the latest data anyway
+  useEffect(() => {
+    if (!id || !mergeElection || !client || loading.election) return
+
+    fetchElection(id).finally(() => setMergeElection(false))
+  }, [client, data, election, fetchElection, id, loading.election, mergeElection])
 
   // check census information
   useEffect(() => {
