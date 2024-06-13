@@ -7,10 +7,11 @@ import { format as dformat, formatDistance } from 'date-fns'
 export type ElectionScheduleProps = HeadingProps & {
   format?: string
   showRemaining?: boolean // If true, it return the remaining time to start, end, if ended or paused, instead of the full schedule
+  showCreatedAt?: boolean
 }
 
 export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
-  ({ format = 'PPp', showRemaining = false, ...rest }, ref) => {
+  ({ format = 'PPp', showRemaining = false, showCreatedAt = false, ...rest }) => {
     const styles = useMultiStyleConfig('ElectionSchedule', rest)
     const { election } = useElection()
     const locale = useDatesLocale()
@@ -62,14 +63,24 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
       }
     }
 
+    let text = t('schedule.from_begin_to_end', {
+      begin: dformat(new Date(election.startDate), format, { locale }),
+      end: dformat(new Date(election.endDate), format, { locale }),
+    })
+    if (showRemaining) {
+      text = getRemaining()
+    } else if (showCreatedAt) {
+      text = t('schedule.created', {
+        distance: formatDistance(election.creationTime, new Date(), {
+          addSuffix: true,
+          locale,
+        }),
+      })
+    }
+
     return (
       <chakra.h2 __css={styles} {...rest}>
-        {showRemaining
-          ? getRemaining()
-          : t('schedule.from_begin_to_end', {
-              begin: dformat(new Date(election.startDate), format, { locale }),
-              end: dformat(new Date(election.endDate), format, { locale }),
-            })}
+        {text}
       </chakra.h2>
     )
   }

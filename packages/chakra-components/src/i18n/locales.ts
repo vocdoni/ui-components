@@ -52,6 +52,7 @@ export const locales = {
     ended: 'Ended {{ distance }}',
     paused_start: '(Paused) Starts {{ distance }}',
     paused_end: '(Paused) Ends {{ distance }}',
+    created: 'Created {{ distance }}',
   },
   // results component
   results: {
