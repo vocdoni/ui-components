@@ -1,4 +1,4 @@
-import { PropsWithChildren, createContext, useContext } from 'react'
+import { createContext, PropsWithChildren, useContext } from 'react'
 import { OrganizationProviderProps, useOrganizationProvider } from './use-organization-provider'
 
 export type OrganizationState = ReturnType<typeof useOrganizationProvider>
@@ -9,7 +9,7 @@ export const useOrganization = () => {
   const ctxt = useContext(OrganizationContext)
   if (!ctxt) {
     throw new Error(
-      'useElection returned `undefined`, maybe you forgot to wrap the component within <ElectionProvider />?'
+      'useOrganization returned `undefined`, maybe you forgot to wrap the component within <OrganizationProvider />?'
     )
   }
 
