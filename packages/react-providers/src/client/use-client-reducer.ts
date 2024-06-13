@@ -270,7 +270,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
       return {
         ...state,
         client,
-        connected: !!client.wallet,
+        connected: client.wallet ? !!Object.keys(client.wallet as unknown as any).length : false,
       }
     }
     case ClientEnvSet: {
@@ -285,7 +285,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         client,
         census3,
         env,
-        connected: !!client.wallet,
+        connected: client.wallet ? !!Object.keys(client.wallet as unknown as any).length : false,
       }
     }
     case ClientSignerSet: {
@@ -295,7 +295,7 @@ const clientReducer: Reducer<ClientState, ClientAction> = (state: ClientState, a
         ...state,
         client,
         signer,
-        connected: !!client.wallet,
+        connected: client.wallet ? !!Object.keys(client.wallet as unknown as any).length : false,
       }
     }
     default:

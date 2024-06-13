@@ -49,9 +49,10 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
   const { connected, clearClient } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
   const toast = useToast()
-  const { env, client: cl } = useClient()
+  const { env } = useClient()
   const {
     election,
+    client: cl,
     setClient,
     localize,
     sikPassword,
@@ -84,6 +85,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
         setClient(client)
       } catch (error) {
         console.warn('Error trying to login with private key ', error)
+        // this should not be required... if it fails, the client should already be the one set
         setClient(cl)
       }
     })()

@@ -7,14 +7,12 @@ import { ArchivedElection, ElectionStatus, InvalidElection, PublishedElection } 
 import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { results } from './Results'
-import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 export const VoteButton = (props: ButtonProps) => {
   const { connected } = useClient()
   const {
     client,
     loading: { voting },
-    connected: lconnected,
     ConnectButton,
     isAbleToVote,
     election,
@@ -33,10 +31,6 @@ export const VoteButton = (props: ButtonProps) => {
 
   if (!connected && election.get('census.type') !== 'spreadsheet' && ConnectButton) {
     return <ConnectButton />
-  }
-
-  if (!lconnected && election.get('census.type') === 'spreadsheet') {
-    return <SpreadsheetAccess />
   }
 
   const button: ButtonProps = {
