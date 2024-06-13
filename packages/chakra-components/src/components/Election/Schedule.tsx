@@ -11,7 +11,7 @@ export type ElectionScheduleProps = HeadingProps & {
 }
 
 export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
-  ({ format = 'PPp', showRemaining = false, showCreatedAt = false, ...rest }) => {
+  ({ format = 'PPp', showRemaining = false, showCreatedAt = false, ...rest }, ref) => {
     const styles = useMultiStyleConfig('ElectionSchedule', rest)
     const { election } = useElection()
     const locale = useDatesLocale()
@@ -79,7 +79,7 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
     }
 
     return (
-      <chakra.h2 __css={styles} {...rest}>
+      <chakra.h2 __css={styles} {...rest} {...ref}>
         {text}
       </chakra.h2>
     )
