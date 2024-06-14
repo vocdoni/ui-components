@@ -2,8 +2,8 @@ import { ConfirmModalTheme } from './confirm'
 import { ElectionScheduleTheme as ElectionSchedule, ElectionTitleTheme as ElectionTitle } from './election'
 import { HorizontalRulerTheme } from './layout'
 import {
-  QuestionsConfirmationTheme,
   QuestionsTheme as ElectionQuestions,
+  QuestionsConfirmationTheme,
   QuestionsTipTheme,
   QuestionsTypeBadgeTheme,
 } from './questions'
@@ -32,3 +32,4 @@ export * from './layout'
 export * from './questions'
 export * from './results'
 export * from './spreadsheet'
+export * from './vote'

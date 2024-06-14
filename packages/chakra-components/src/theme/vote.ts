@@ -1,6 +1,6 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
 
-export const VotwWeightAnatomy = [
+export const VoteWeightAnatomy = [
   // confirmation wrapper box
   'wrapper',
   // title text
@@ -8,7 +8,7 @@ export const VotwWeightAnatomy = [
 ]
 
 const { defineMultiStyleConfig: defineVoteWeightTipStyle, definePartsStyle: defineVoteWeightParts } =
-  createMultiStyleConfigHelpers(VotwWeightAnatomy)
+  createMultiStyleConfigHelpers(VoteWeightAnatomy)
 
 export const VoteWeightTheme = defineVoteWeightTipStyle({
   baseStyle: defineVoteWeightParts({
