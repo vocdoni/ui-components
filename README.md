@@ -140,4 +140,4 @@ This repository is licensed under the [GNU Affero General Public License v3.0.](
 [chakra-components badge]: https://img.shields.io/npm/v/%40vocdoni%2Fchakra-components?label=%40vocdoni%2Fchakra-components
 [rainbowkit-wallets badge]: https://img.shields.io/npm/v/%40vocdoni%2Frainbowkit-wallets?label=%40vocdoni%2Frainbowkit-wallets
 [react-providers badge]: https://img.shields.io/npm/v/%40vocdoni%2Freact-providers?label=%40vocdoni%2Freact-providers
-[extended-sdk badge]: https://img.shields.io/npm/v/%40vocdoni%2Freact-providers?label=%40vocdoni%2Fextended-sdk
+[extended-sdk badge]: https://img.shields.io/npm/v/%40vocdoni%2Fextended-sdk?label=%40vocdoni%2Fextended-sdk
