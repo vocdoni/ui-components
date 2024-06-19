@@ -338,22 +338,18 @@ export const useElectionProvider = ({
     }
     switch (service) {
       case 'vocdoni-blind-csp':
-        blindCspVote()
-        break
+        return blindCspVote()
       default:
-        cspAuthAndVote()
+        return cspAuthAndVote()
     }
   }
 
   // CSP generic steps
-  const cspStep0 = async (handler: string, data: any[], cb?: (step0: ICspIntermediateStepResponse) => void) => {
+  const cspStep0 = async (handler: string, data: any[]) => {
     let step0: ICspIntermediateStepResponse
     try {
       step0 = (await client.cspStep(0, data)) as ICspIntermediateStepResponse
       actions.csp0({ handler, token: step0.authToken })
-      if (cb) {
-        cb(step0)
-      }
       return step0
     } catch (e) {
       actions.votingError(e)
@@ -404,9 +400,10 @@ export const useElectionProvider = ({
     const redirectURL: string = `${window.location.origin}${window.location.pathname}?${params.toString()}${
       window.location.hash
     }`
-    await cspStep0(handler, [handler, redirectURL], (step0) => {
+    const step0 = await cspStep0(handler, [handler, redirectURL])
+    if (step0) {
       openLoginPopup(handler, step0['response'][0])
-    })
+    }
   }
 
   // CSP OAuth flow
