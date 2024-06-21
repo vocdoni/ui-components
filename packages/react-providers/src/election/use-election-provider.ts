@@ -17,7 +17,7 @@ import { useClient } from '../client'
 import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
 import { useWebWorker } from '../worker/useWebWorker'
 import { createWebWorker } from '../worker/webWorker'
-import { useElectionReducer } from './use-election-reducer'
+import { BlindCspServiceKey, useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
@@ -337,7 +337,7 @@ export const useElectionProvider = ({
       throw new Error('not a CSP election')
     }
     switch (service) {
-      case 'vocdoni-blind-csp':
+      case BlindCspServiceKey:
         return blindCspVote()
       default:
         return cspAuthAndVote()
@@ -465,7 +465,7 @@ export const useElectionProvider = ({
     try {
       const walletAddress: string = (await client.wallet?.getAddress()) as string
       const signature: string = await client.cspSign(walletAddress, token)
-      const cspVote: CspVote = client.cspVote(vote as Vote, signature)
+      const cspVote: CspVote = client.cspVote(vote, signature)
       const vid: string = await client.submitVote(cspVote)
       actions.voted(vid)
     } catch (e) {

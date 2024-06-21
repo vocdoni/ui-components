@@ -13,6 +13,8 @@ import { ClientSetPayload } from '../client/use-client-reducer'
 import type { ErrorPayload } from '../types'
 import { errorToString } from '../utils'
 
+export const BlindCspServiceKey = 'vocdoni-blind-csp'
+
 export const CensusClear = 'election:census:clear'
 export const CensusError = 'election:census:error'
 export const CensusIsAbleToVote = 'election:census:is_able_to_vote'
@@ -436,22 +438,24 @@ export const useElectionReducer = (
     dispatch({ type: ElectionSet, payload: election })
   const sikPassword = (password: SikPayload) => dispatch({ type: SikPasswordSet, payload: password })
   const sikSignature = (signature: SikPayload) => dispatch({ type: SikSignatureSet, payload: signature })
+  // Some census types require to have a local client instance. This var stores if the current election is one of those
+  const isSignerSessionCensusType =
+    state.election instanceof PublishedElection &&
+    state.election?.meta &&
+    (state.election.get('census.type') === 'spreadsheet' ||
+      (state.election.get('census.type') === 'csp' && state.election.meta.csp?.service === BlindCspServiceKey))
 
   // update local client in case it's updated
   useEffect(() => {
     if (!client) return
 
-    // only propagate the client when census type !== spreadsheet (since it uses a locally instanced client)
-    if (
-      state.election instanceof PublishedElection &&
-      state.election?.meta &&
-      state.election?.get('census.type') === 'spreadsheet'
-    ) {
+    // only propagate the client when census type !== spreadsheet || type !== blindCsp (since it uses a locally instanced client)
+    if (isSignerSessionCensusType) {
       return
     }
 
     setClient(client)
-  }, [client, state.election])
+  }, [client, isSignerSessionCensusType, state.election])
 
   // properly set election data in case it comes from props (and/or updates)
   useEffect(() => {
@@ -474,9 +478,9 @@ export const useElectionReducer = (
 
     if (
       // we don't want to disconnect the local client for Wallet sessions when the main client gets disconnected
-      (!connected && state.election?.get('census.type') === 'spreadsheet') ||
+      (!connected && isSignerSessionCensusType) ||
       // we don't want to clear the local client on Signer sessions (non wallet ones)
-      (!state.connected && state.election?.get('census.type') !== 'spreadsheet')
+      (!state.connected && !isSignerSessionCensusType)
     ) {
       return
     }

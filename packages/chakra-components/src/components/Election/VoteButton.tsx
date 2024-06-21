@@ -12,6 +12,7 @@ export const VoteButton = (props: ButtonProps) => {
   const { connected } = useClient()
   const {
     client,
+    connected: elConnected,
     loading: { voting },
     ConnectButton,
     isAbleToVote,
@@ -29,7 +30,7 @@ export const VoteButton = (props: ButtonProps) => {
 
   const isDisabled = !client.wallet || !isAbleToVote || election.status !== ElectionStatus.ONGOING
 
-  if (!connected && election.get('census.type') !== 'spreadsheet' && ConnectButton) {
+  if (!connected && !elConnected && ConnectButton) {
     return <ConnectButton />
   }
 
