@@ -6,6 +6,8 @@ import {
   CensusType,
   ChainAPI,
   CspVote,
+  ICspFinalStepResponse,
+  ICspIntermediateStepResponse,
   InvalidElection,
   PublishedElection,
   Vote,
@@ -15,7 +17,7 @@ import { useClient } from '../client'
 import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
 import { useWebWorker } from '../worker/useWebWorker'
 import { createWebWorker } from '../worker/webWorker'
-import { useElectionReducer } from './use-election-reducer'
+import { BlindCspServiceKey, useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
@@ -295,7 +297,7 @@ export const useElectionProvider = ({
 
       switch (election.census.type) {
         case CensusType.CSP:
-          await cspAuthAndVote()
+          await cspVoteByService()
           break
         case CensusType.ANONYMOUS:
         case CensusType.WEIGHTED:
@@ -325,19 +327,68 @@ export const useElectionProvider = ({
     return await client.submitVote(vote)
   }
 
-  // CSP OAuth flow
-  const cspAuthAndVote = async () => {
-    const handler = (election as PublishedElection)?.meta.csp?.service
+  // CSP flow
+  const cspVoteByService = async () => {
+    const service = (election as PublishedElection)?.meta.csp?.service
     if (!client) {
       throw new Error('no client initialized')
-    }
-    if (!election) {
-      throw new Error('no election initialized')
     }
     if ((election as PublishedElection)?.census?.type !== CensusType.CSP) {
       throw new Error('not a CSP election')
     }
+    switch (service) {
+      case BlindCspServiceKey:
+        return blindCspVote()
+      default:
+        return cspAuthAndVote()
+    }
+  }
 
+  // CSP generic steps
+  const cspStep0 = async (handler: string, data: any[]) => {
+    let step0: ICspIntermediateStepResponse
+    try {
+      step0 = (await client.cspStep(0, data)) as ICspIntermediateStepResponse
+      actions.csp0({ handler, token: step0.authToken })
+      return step0
+    } catch (e) {
+      actions.votingError(e)
+      console.warn('CSP step 0 error', e)
+    }
+  }
+
+  // CSP generic steps
+  const cspStep1 = async (data: any[], authToken?: string | undefined) => {
+    try {
+      const step1 = (await client.cspStep(1, data, authToken)) as ICspFinalStepResponse
+      actions.csp1(step1.token)
+    } catch (e) {
+      actions.votingError(localize('errors.unauthorized'))
+      console.warn('CSP step 1 error', e)
+    }
+  }
+
+  // blind CSP flow
+  const blindCspVote = async () => {
+    if (!client) {
+      throw new Error('no client initialized')
+    }
+    if (!(election instanceof PublishedElection) || election?.census?.type !== CensusType.CSP) {
+      throw new Error('not a CSP election')
+    }
+    const handler = (election as PublishedElection).meta.csp?.service
+
+    const step0 = await cspStep0(handler, ['Name test'])
+    if (!step0) return
+    await cspStep1([step0.response.reduce((acc, v) => +acc + +v, 0).toString()], step0.authToken)
+  }
+
+  // CSP OAuth flow
+  const cspAuthAndVote = async () => {
+    const handler = (election as PublishedElection).meta.csp?.service
+    if (!election) {
+      throw new Error('no election initialized')
+    }
     const params: URLSearchParams = new URLSearchParams(window.location.search)
     if (!params.has('electionId')) {
       params.append('electionId', election.id)
@@ -349,14 +400,9 @@ export const useElectionProvider = ({
     const redirectURL: string = `${window.location.origin}${window.location.pathname}?${params.toString()}${
       window.location.hash
     }`
-
-    try {
-      // TODO: properly type when ICspIntermediateStepResponse is exposed from SDK
-      const step0: any = await client.cspStep(0, [handler, redirectURL])
-      actions.csp0({ handler, token: step0.authToken })
+    const step0 = await cspStep0(handler, [handler, redirectURL])
+    if (step0) {
       openLoginPopup(handler, step0['response'][0])
-    } catch (e) {
-      actions.votingError(e)
     }
   }
 
@@ -401,14 +447,7 @@ export const useElectionProvider = ({
       const redirectURL = `${window.location.origin}${window.location.pathname}?${params.toString()}${
         window.location.hash
       }`
-
-      try {
-        const step1: any = await client.cspStep(1, [handler, code, redirectURL], csp.authToken)
-        actions.csp1(step1.token)
-      } catch (e) {
-        actions.votingError(localize('errors.unauthorized'))
-        console.warn('CSP step 1 error', e)
-      }
+      await cspStep1([handler, code, redirectURL], csp.authToken)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [csp.token, csp.authToken, client]
@@ -426,7 +465,7 @@ export const useElectionProvider = ({
     try {
       const walletAddress: string = (await client.wallet?.getAddress()) as string
       const signature: string = await client.cspSign(walletAddress, token)
-      const cspVote: CspVote = client.cspVote(vote as Vote, signature)
+      const cspVote: CspVote = client.cspVote(vote, signature)
       const vid: string = await client.submitVote(cspVote)
       actions.voted(vid)
     } catch (e) {
