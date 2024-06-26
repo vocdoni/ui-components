@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "lint": "tsc",
-    "build": "tsup src --dts",
+    "build": "tsup --config ../tsup.config.ts",
     "prepack": "clean-package",
     "clean": "rm -rf dist .turbo node_modules",
     "postpack": "mv -fv package.json.backup package.json"
