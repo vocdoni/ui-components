@@ -51,4 +51,8 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
       return blockInfo.reduce((prev, cur) => prev.concat(cur), []).reverse()
     })
   }
+
+  blockToDate = (height: number): ReturnType<typeof ChainAPI.blockToDate> => {
+    return ChainAPI.blockToDate(this.url, height)
+  }
 }
