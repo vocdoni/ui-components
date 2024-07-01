@@ -131,7 +131,7 @@ const participation = (election?: PublishedElection | InvalidElection | Archived
     return 0
   }
 
-  return Math.round((election.voteCount / (election.census.size || election.maxCensusSize)) * 100) / 100
+  return Math.round((election.voteCount / (election.census.size || election.maxCensusSize)) * 10000) / 100
 }
 
 const turnout = (election?: PublishedElection | InvalidElection | ArchivedElection) => {
@@ -140,7 +140,7 @@ const turnout = (election?: PublishedElection | InvalidElection | ArchivedElecti
   }
   const total = election.results.reduce((acc, q) => acc + Number(q), 0)
 
-  return Math.round((total / (election.census.size || election.maxCensusSize)) * 100) / 100
+  return Math.round((total / (election.census.size || election.maxCensusSize)) * 10000) / 100
 }
 
 export const electionStateEmpty = ({
