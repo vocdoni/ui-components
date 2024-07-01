@@ -20,9 +20,7 @@
   "peerDependencies": {
     "@rainbow-me/rainbowkit": "^1.2.0",
     "@wagmi/core": "^1.4.6",
-    "wagmi": "^1.4.6",
-    "react": "^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18",
-    "react-dom": "^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18"
+    "wagmi": "^1.4.6"
   },
   "devDependencies": {
     "@rainbow-me/rainbowkit": "^1.2.0",
