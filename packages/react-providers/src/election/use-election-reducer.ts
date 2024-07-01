@@ -122,6 +122,25 @@ export interface ElectionReducerState {
     password: string | undefined
     signature: string | undefined
   }
+  participation: number
+  turnout: number
+}
+
+const participation = (election?: PublishedElection | InvalidElection | ArchivedElection) => {
+  if (!election || election instanceof InvalidElection) {
+    return 0
+  }
+
+  return Math.round((election.voteCount / (election.census.size || election.maxCensusSize)) * 100) / 100
+}
+
+const turnout = (election?: PublishedElection | InvalidElection | ArchivedElection) => {
+  if (!election || election instanceof InvalidElection || !election.results) {
+    return 0
+  }
+  const total = election.results.reduce((acc, q) => acc + Number(q), 0)
+
+  return Math.round((total / (election.census.size || election.maxCensusSize)) * 100) / 100
 }
 
 export const electionStateEmpty = ({
@@ -164,6 +183,8 @@ export const electionStateEmpty = ({
     password: undefined,
     signature: undefined,
   },
+  participation: participation(election),
+  turnout: turnout(election),
 })
 
 const isAbleToVote = (state: ElectionReducerState, payload?: boolean) =>
@@ -281,6 +302,8 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
           election: null,
         },
         election,
+        participation: participation(election),
+        turnout: turnout(election),
       }
     }
 
