@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "lint": "tsc",
-    "build": "tsup src --dts",
+    "build": "tsup --config ../tsup.config.ts",
     "prepack": "clean-package",
     "clean": "rm -rf dist .turbo node_modules",
     "postpack": "mv -fv package.json.backup package.json"
@@ -82,7 +82,6 @@
     "@types/react": "^18.0.30",
     "@types/react-dom": "^18.0.11",
     "@vocdoni/sdk": "~0.8.2",
-    "clean-package": "^2.2.0",
     "date-fns": "^2.29.3",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
