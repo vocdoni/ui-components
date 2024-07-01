@@ -127,20 +127,23 @@ export interface ElectionReducerState {
 }
 
 const participation = (election?: PublishedElection | InvalidElection | ArchivedElection) => {
-  if (!election || election instanceof InvalidElection) {
+  if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
 
-  return Math.round((election.voteCount / (election.census.size || election.maxCensusSize)) * 10000) / 100
+  const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
+
+  return Math.round((election.voteCount / size) * 10000) / 100
 }
 
 const turnout = (election?: PublishedElection | InvalidElection | ArchivedElection) => {
-  if (!election || election instanceof InvalidElection || !election.results) {
+  if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
-  const total = election.results.reduce((acc, q) => acc + Number(q), 0)
+  const total = election.results ? election.results.reduce((acc, q) => acc + Number(q), 0) : 0
+  const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
 
-  return Math.round((total / (election.census.size || election.maxCensusSize)) * 10000) / 100
+  return Math.round((total / size) * 10000) / 100
 }
 
 export const electionStateEmpty = ({
