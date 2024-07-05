@@ -1,0 +1,51 @@
+---
+title: Pagination components
+description: Vocdoni Chakra components pagination
+---
+
+## Pagination and RoutedPagination
+
+You can easily add pagination to any method by using the included PaginationProvider (or RoutedPaginationProvider in
+case you want to use it with react-router-dom)
+
+```jsx
+const MyRoutedPaginatedComponent = () => {
+  // retrieve your data
+  const query = useQuery()
+
+
+  return (
+    {/* specify the total pages and the expected path for the router provider */}
+    <RoutedPaginationProvider totalPages={query.data.totalPages} path='/my-paginated-route-path'>
+      {query.data.map((item) => (
+        <MyItem key={item.id} item={item} />
+      ))}
+      {/* load the pagination itself */}
+      <Pagination />
+    </RoutedPaginationProvider>
+  )
+}
+```
+
+The Pagination component will automatically handle the pagination state and will update the URL with the current page.
+
+The `PaginationProvider` (non routed) uses an internal state to handle the current page, rather than taking it from the URL.
+
+```jsx
+const MyPaginatedComponent = () => {
+  // retrieve your data
+  const query = useQuery()
+
+
+  return (
+    {/* specify the total pages for the router provider */}
+    <PaginationProvider totalPages={query.data.totalPages}>
+      {query.data.map((item) => (
+        <MyItem key={item.id} item={item} />
+      ))}
+      {/* load the pagination itself */}
+      <Pagination />
+    </PaginationProvider>
+  )
+}
+```
