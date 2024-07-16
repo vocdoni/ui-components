@@ -38,16 +38,6 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
     })
   blockTransactions = (height: number, page?: number) => ChainAPI.blockTransactions(this.url, height, page)
 
-  // blockByHeight = async (height: number): Promise<IChainBlockInfoResponse | BlockNotFoundError> => {
-  //   try {
-  //     return await ChainAPI.blockByHeight(this.url, height)
-  //   } catch (error) {
-  //     if (error instanceof ErrAPI && error.raw?.response?.status === 404) {
-  //       return { height } as BlockNotFoundError
-  //     }
-  //     throw error // re-throw other errors
-  //   }
-  // }
   blockByHeight = (height: number) => ChainAPI.blockByHeight(this.url, height)
 
   blockList = (from: number, listSize: number = 10): Promise<Array<IChainBlockInfoResponse | BlockNotFoundError>> => {
@@ -55,20 +45,21 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
     // If is not a number bigger than 0
     if (isNaN(from)) return Promise.all(promises)
     for (let i = 0; i < listSize; i++) {
-      if (from + i > 0)
-        promises.push(
-          (async () => {
-            try {
-              return await this.blockByHeight(from + i)
-            } catch (error) {
-              if (error instanceof ErrAPI && error.raw?.response?.status === 404) {
-                return { height: from + i } as BlockNotFoundError
-              }
-              throw error // re-throw other errors
+      if (from + i <= 0) continue
+      promises.push(
+        (async () => {
+          try {
+            return await this.blockByHeight(from + i)
+          } catch (error) {
+            if (error instanceof ErrAPI && error.raw?.response?.status === 404) {
+              return { height: from + i } as BlockNotFoundError
             }
-          })()
-        )
+            throw error // re-throw other errors
+          }
+        })()
+      )
     }
+
     return Promise.all(promises).then((blockInfo) => {
       // flatten the array[][] into array[]
       // @ts-ignore
