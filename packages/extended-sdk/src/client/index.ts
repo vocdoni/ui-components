@@ -40,8 +40,8 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
 
   blockByHeight = (height: number) => ChainAPI.blockByHeight(this.url, height)
 
-  blockList = (from: number, listSize: number = 10): Promise<Array<IChainBlockInfoResponse | BlockNotFoundError>> => {
-    const promises: Promise<IChainBlockInfoResponse | BlockNotFoundError>[] = []
+  blockList = (from: number, listSize: number = 10): Promise<Array<IChainBlockInfoResponse | BlockError>> => {
+    const promises: Promise<IChainBlockInfoResponse | BlockError>[] = []
     // If is not a number bigger than 0
     if (isNaN(from)) return Promise.all(promises)
     for (let i = 0; i < listSize; i++) {
@@ -51,8 +51,11 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
           try {
             return await this.blockByHeight(from + i)
           } catch (error) {
-            if (error instanceof ErrAPI && error.raw?.response?.status === 404) {
-              return { height: from + i } as BlockNotFoundError
+            if (error instanceof ErrAPI) {
+              if (error.raw?.response?.status === 404) {
+                return new BlockNotFoundError(from + i, error)
+              }
+              return new BlockError(from + i, error)
             }
             throw error // re-throw other errors
           }
@@ -72,6 +75,13 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
   }
 }
 
-export type BlockNotFoundError = {
-  height: number
+export class BlockError extends ErrAPI {
+  public height: number
+
+  constructor(height: number, error: ErrAPI) {
+    super(error.message, error.raw)
+    this.height = height
+  }
 }
+
+export class BlockNotFoundError extends BlockError {}
