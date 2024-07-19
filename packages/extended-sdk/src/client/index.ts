@@ -1,4 +1,5 @@
 import {
+  AccountAPI,
   ChainAPI,
   ElectionAPI,
   ErrAPI,
@@ -18,6 +19,9 @@ interface IElectionVotesCountResponse {
 }
 
 export class ExtendedSDKClient extends VocdoniSDKClient {
+  accountTransfers = (accountId: string, page?: number) => AccountAPI.transfersList(this.url, accountId, page)
+  accountTransfersCount = (accountId: string) => AccountAPI.transfersCount(this.url, accountId)
+  accountFees = (accountId: string, page?: number) => AccountAPI.fees(this.url, accountId, page)
   txInfo = (txHash: string) => ChainAPI.txInfo(this.url, txHash)
   txInfoByBlock = (blockHeight: number, txIndex: number) => ChainAPI.txInfoByBlock(this.url, blockHeight, txIndex)
   txList = (page?: number) => ChainAPI.txList(this.url, page)
