@@ -29,9 +29,7 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
 
   blockByHash = (hash: string) => ChainAPI.blockByHash(this.url, hash)
 
-  blockToDate = (height: number): ReturnType<typeof ChainAPI.blockToDate> => {
-    return ChainAPI.blockToDate(this.url, height)
-  }
+  blockToDate = (height: number): ReturnType<typeof ChainAPI.blockToDate> => ChainAPI.blockToDate(this.url, height)
 
   blockTransactions = (height: number, page?: number) => ChainAPI.blockTransactions(this.url, height, page)
 
