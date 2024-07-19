@@ -17,9 +17,24 @@ interface IElectionVotesCountResponse {
    */
   count: number
 }
+interface IAccountTransfer {
+  amount: number
+  from: string
+  height: number
+  txHash: string
+  timestamp: string
+  to: string
+}
+interface IAccountTransfersResponse {
+  transfers: {
+    received: Array<IAccountTransfer>
+    sent: Array<IAccountTransfer>
+  }
+}
 
 export class ExtendedSDKClient extends VocdoniSDKClient {
-  accountTransfers = (accountId: string, page?: number) => AccountAPI.transfersList(this.url, accountId, page)
+  accountTransfers = (accountId: string, page?: number) =>
+    AccountAPI.transfersList(this.url, accountId, page) as Promise<IAccountTransfersResponse>
 
   accountTransfersCount = (accountId: string) => AccountAPI.transfersCount(this.url, accountId)
 
