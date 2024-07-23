@@ -3,34 +3,13 @@ import {
   ChainAPI,
   ElectionAPI,
   ErrAPI,
+  IAccountTransfersResponse,
   IChainBlockInfoResponse,
   IElectionListFilter,
+  IElectionVotesCountResponse,
   VocdoniSDKClient,
   VoteAPI,
 } from '@vocdoni/sdk'
-
-// Sorry for this, but we need to publish and the type isn't yet exported from the SDK...
-// TODO: remove when it's properly exported
-interface IElectionVotesCountResponse {
-  /**
-   * The number of votes
-   */
-  count: number
-}
-interface IAccountTransfer {
-  amount: number
-  from: string
-  height: number
-  txHash: string
-  timestamp: string
-  to: string
-}
-interface IAccountTransfersResponse {
-  transfers: {
-    received: Array<IAccountTransfer>
-    sent: Array<IAccountTransfer>
-  }
-}
 
 export class ExtendedSDKClient extends VocdoniSDKClient {
   accountTransfers = (accountId: string, page?: number) =>
