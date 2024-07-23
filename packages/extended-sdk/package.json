@@ -1,6 +1,6 @@
 {
   "name": "@vocdoni/extended-sdk",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/extended-sdk#readme",
   "bugs": "https://github.com/vocdoni/ui-components/issues",
