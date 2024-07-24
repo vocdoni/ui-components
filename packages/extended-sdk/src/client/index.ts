@@ -84,6 +84,7 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
 
   txInfo = (txHash: string) => ChainAPI.txInfo(this.url, txHash)
   txInfoByBlock = (blockHeight: number, txIndex: number) => ChainAPI.txInfoByBlock(this.url, blockHeight, txIndex)
+  txByIndex = (index: number, txIndex: number) => ChainAPI.txByIndex(this.url, index)
   txList = (page?: number) => ChainAPI.txList(this.url, page)
 
   validatorsList = () => ChainAPI.validatorsList(this.url)
