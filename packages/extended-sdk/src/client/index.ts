@@ -33,7 +33,7 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
     const promises: Promise<IChainBlockInfoResponse | BlockError>[] = []
 
     // Calculate the first block index for the reuqested page
-    const firstPageBlock = totalItems - page * limit + 1
+    const firstPageBlock = totalItems - page * limit + 1 - limit
 
     for (let i = 0; i < limit; i++) {
       if (firstPageBlock + i <= 0) continue
