@@ -25,13 +25,13 @@
   },
   "main": "src/index.ts",
   "devDependencies": {
-    "@vocdoni/sdk": "https://github.com/vocdoni/vocdoni-sdk.git#main"
+    "@vocdoni/sdk": "https://github.com/vocdoni/vocdoni-sdk.git#f/new_pagination"
   },
   "peerDependencies": {
     "@vocdoni/sdk": "~0.8.1"
   },
   "resolutions": {
-    "@vocdoni/sdk": "https://github.com/vocdoni/vocdoni-sdk.git#main"
+    "@vocdoni/sdk": "https://github.com/vocdoni/vocdoni-sdk.git#f/new_pagination"
   },
   "clean-package": "../../clean-package.config.json"
 }
