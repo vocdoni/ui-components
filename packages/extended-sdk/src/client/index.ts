@@ -1,11 +1,11 @@
 import {
-  AccountAPI,
   ChainAPI,
   ElectionAPI,
   ErrAPI,
   FetchFeesParametersWithPagination,
   FetchOrganizationParametersWithPagination,
   FetchTransactionsParametersWithPagination,
+  FetchTransfersParametersWithPagination,
   FetchVotesParametersWithPagination,
   IChainBlockInfoResponse,
   PaginationRequest,
@@ -15,10 +15,6 @@ import {
 } from '@vocdoni/sdk'
 
 export class ExtendedSDKClient extends VocdoniSDKClient {
-  accountTransfers = (accountId: string, page?: number) => AccountAPI.transfersList(this.url, accountId, page)
-
-  // accountTransfersCount = (accountId: string) => AccountAPI.transfersCount(this.url, accountId)
-
   blockByHeight = (height: number) => ChainAPI.blockByHeight(this.url, height)
 
   blockByHash = (hash: string) => ChainAPI.blockByHash(this.url, hash)
@@ -76,10 +72,6 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
 
   electionVotesList = (params: Partial<FetchVotesParametersWithPagination>) => VoteAPI.list(this.url, params)
 
-  // Deprecated
-  // electionVotesCount = (electionId: string) =>
-  //   ElectionAPI.votesCount(this.url, electionId) as Promise<IElectionVotesCountResponse>
-
   electionKeys = (electionId: string) => ElectionAPI.keys(this.url, electionId)
 
   feesList = (params?: Partial<FetchFeesParametersWithPagination> | undefined) => ChainAPI.feesList(this.url, params)
@@ -87,8 +79,7 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
   organizationList = (params?: Partial<FetchOrganizationParametersWithPagination>) =>
     ChainAPI.organizationList(this.url, params)
 
-  // Deprecated
-  // organizationCount = () => ChainAPI.organizationCount(this.url)
+  transfers = (params: Partial<FetchTransfersParametersWithPagination>) => ChainAPI.transfers(this.url, params)
 
   txInfo = (txHash: string) => ChainAPI.txInfo(this.url, txHash)
   txInfoByBlock = (blockHeight: number, txIndex: number) => ChainAPI.txInfoByBlock(this.url, blockHeight, txIndex)
