@@ -2,16 +2,18 @@ import { ConfirmModalTheme } from './confirm'
 import { ElectionScheduleTheme as ElectionSchedule, ElectionTitleTheme as ElectionTitle } from './election'
 import { HorizontalRulerTheme } from './layout'
 import {
-  QuestionsTheme as ElectionQuestions,
   QuestionsConfirmationTheme,
+  QuestionsTheme as ElectionQuestions,
   QuestionsTipTheme,
   QuestionsTypeBadgeTheme,
 } from './questions'
 import { ResultsTheme as ElectionResults } from './results'
 import { VoteWeightTheme } from './vote'
+import { EnvelopeTheme } from './envelope'
 
 export const theme = {
   components: {
+    EnvelopeTheme,
     ElectionQuestions,
     ElectionResults,
     ElectionSchedule,
@@ -27,6 +29,7 @@ export const theme = {
 
 export * from './actions'
 export * from './confirm'
+export * from './envelope'
 export * from './election'
 export * from './layout'
 export * from './questions'
