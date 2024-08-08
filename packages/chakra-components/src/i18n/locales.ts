@@ -30,6 +30,7 @@ export const locales = {
   empty: 'Apparently this process has no questions 🤔',
   envelopes: {
     envelope_abstain_count: 'Abstained times {{ count }}',
+    question_title: 'For question "{{ title }}" selected:',
   },
   errors: {
     wrong_data_title: 'Wrong data',

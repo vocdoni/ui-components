@@ -46,7 +46,7 @@ export const Envelope = ({
       {election.questions.map((q, i) => {
         return (
           <chakra.div sx={styles.question}>
-            <Text sx={styles.title}>{localize('results.title', { title: q.title.default })}</Text>
+            <Text sx={styles.title}>{localize('envelopes.question_title', { title: q.title.default })}</Text>
             <ChoosedOptions question={q} questionIndex={i} votes={votePackage.votes} election={election} />
           </chakra.div>
         )
