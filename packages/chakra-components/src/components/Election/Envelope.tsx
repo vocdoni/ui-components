@@ -12,11 +12,13 @@ import { Text } from '@chakra-ui/react'
 import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { format } from 'date-fns'
 
+export type VotePackageType = IVotePackage | IVoteEncryptedPackage
+
 export const Envelope = ({
   votePackage,
   ...props
 }: {
-  votePackage: IVotePackage | IVoteEncryptedPackage
+  votePackage: VotePackageType
 } & ChakraProps) => {
   const styles = useMultiStyleConfig('Envelope')
   const { localize } = useClient()
