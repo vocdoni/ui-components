@@ -84,7 +84,7 @@ const ChoosedOptions = ({
       if (abstainCount > 0) {
         selectedOptions.push({
           title: {
-            default: localize('vote.envelope_abstain_count', { count: abstainCount }),
+            default: localize('envelopes.envelope_abstain_count', { count: abstainCount }),
           },
           results: abstainCount.toString(),
           value: -1,
