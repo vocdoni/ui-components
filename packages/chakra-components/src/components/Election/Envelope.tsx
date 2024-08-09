@@ -1,3 +1,5 @@
+import { Text } from '@chakra-ui/react'
+import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
   ElectionResultsTypeNames,
@@ -8,8 +10,6 @@ import {
   IVotePackage,
   PublishedElection,
 } from '@vocdoni/sdk'
-import { Text } from '@chakra-ui/react'
-import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { format } from 'date-fns'
 
 export type VotePackageType = IVotePackage | IVoteEncryptedPackage
