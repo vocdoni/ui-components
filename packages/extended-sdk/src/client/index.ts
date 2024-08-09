@@ -1,48 +1,48 @@
 import {
-  AccountAPI,
   ChainAPI,
   ElectionAPI,
   ErrAPI,
-  IAccountTransfersResponse,
+  FetchFeesParametersWithPagination,
+  FetchOrganizationParametersWithPagination,
+  FetchTransactionsParametersWithPagination,
+  FetchTransfersParametersWithPagination,
+  FetchVotesParametersWithPagination,
   IChainBlockInfoResponse,
-  IElectionListFilter,
-  IElectionVotesCountResponse,
+  PaginationRequest,
+  PaginationResponse,
   VocdoniSDKClient,
   VoteAPI,
 } from '@vocdoni/sdk'
 
 export class ExtendedSDKClient extends VocdoniSDKClient {
-  accountTransfers = (accountId: string, page?: number) =>
-    AccountAPI.transfersList(this.url, accountId, page) as Promise<IAccountTransfersResponse>
-
-  accountTransfersCount = (accountId: string) => AccountAPI.transfersCount(this.url, accountId)
-
-  accountFees = (accountId: string, page?: number) => AccountAPI.fees(this.url, accountId, page)
-
   blockByHeight = (height: number) => ChainAPI.blockByHeight(this.url, height)
 
   blockByHash = (hash: string) => ChainAPI.blockByHash(this.url, hash)
 
   blockToDate = (height: number): ReturnType<typeof ChainAPI.blockToDate> => ChainAPI.blockToDate(this.url, height)
 
-  blockTransactions = (height: number, page?: number) => ChainAPI.blockTransactions(this.url, height, page)
-
-  blockList = (from: number, listSize: number = 10): Promise<Array<IChainBlockInfoResponse | BlockError>> => {
+  blockList = ({
+    totalItems, // Needed to construct the pagination response and first block of the page
+    page,
+    limit = 10,
+  }: BlockListParametersWithPagination): Promise<BlockListResponseWithPagination> => {
     const promises: Promise<IChainBlockInfoResponse | BlockError>[] = []
-    // If is not a number bigger than 0
-    if (isNaN(from)) return Promise.all(promises)
-    for (let i = 0; i < listSize; i++) {
-      if (from + i <= 0) continue
+
+    // Calculate the first block index for the reuqested page
+    const firstPageBlock = totalItems - page * limit + 1 - limit
+
+    for (let i = 0; i < limit; i++) {
+      if (firstPageBlock + i <= 0) continue
       promises.push(
         (async () => {
           try {
-            return await this.blockByHeight(from + i)
+            return await this.blockByHeight(firstPageBlock + i)
           } catch (error) {
             if (error instanceof ErrAPI) {
               if (error.raw?.response?.status === 404) {
-                return new BlockNotFoundError(from + i, error)
+                return new BlockNotFoundError(firstPageBlock + i, error)
               }
-              return new BlockError(from + i, error)
+              return new BlockError(firstPageBlock + i, error)
             }
             throw error // re-throw other errors
           }
@@ -50,42 +50,41 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
       )
     }
 
+    const lastPage = Math.ceil(totalItems / limit)
+
     return Promise.all(promises).then((blockInfo) => {
       // flatten the array[][] into array[]
-      // @ts-ignore
-      return blockInfo.reduce((prev, cur) => prev.concat(cur), []).reverse()
+      return {
+        // @ts-ignore
+        blocks: blockInfo.reverse(),
+        pagination: {
+          totalItems,
+          previousPage: page > 0 ? page - 1 : 0,
+          currentPage: page,
+          nextPage: page < lastPage ? page + 1 : lastPage,
+          lastPage: lastPage,
+        },
+      }
     })
   }
 
   chainInfo = () => ChainAPI.info(this.url)
 
-  electionVotesList = (electionId: string, page?: number) => ElectionAPI.votesList(this.url, electionId, page)
-
-  electionVotesCount = (electionId: string) =>
-    ElectionAPI.votesCount(this.url, electionId) as Promise<IElectionVotesCountResponse>
+  electionVotesList = (params: Partial<FetchVotesParametersWithPagination>) => VoteAPI.list(this.url, params)
 
   electionKeys = (electionId: string) => ElectionAPI.keys(this.url, electionId)
 
-  electionList = (page: number, filters: IElectionListFilter) =>
-    ElectionAPI.electionsList(this.url, page, {
-      ...filters,
-    })
+  feesList = (params?: Partial<FetchFeesParametersWithPagination> | undefined) => ChainAPI.feesList(this.url, params)
 
-  // Lists all token fees ordered by date.
-  feesList = (page?: number) => ChainAPI.feesList(this.url, page)
-  //  Lists token fees filtered by a specific reference, ordered by date.
-  feesListByReference = (reference: string, page?: number) => ChainAPI.feesListByReference(this.url, reference, page)
-  // Lists token fees filtered by a specific transaction type, ordered by date.
-  feesListByType = (type: string, page?: number) => ChainAPI.feesListByType(this.url, type, page)
+  organizationList = (params?: Partial<FetchOrganizationParametersWithPagination>) =>
+    ChainAPI.organizationList(this.url, params)
 
-  organizationList = (page?: number, organizationId?: string) =>
-    ChainAPI.organizationList(this.url, page, organizationId)
-  organizationCount = () => ChainAPI.organizationCount(this.url)
+  transfers = (params: Partial<FetchTransfersParametersWithPagination>) => ChainAPI.transfers(this.url, params)
 
   txInfo = (txHash: string) => ChainAPI.txInfo(this.url, txHash)
   txInfoByBlock = (blockHeight: number, txIndex: number) => ChainAPI.txInfoByBlock(this.url, blockHeight, txIndex)
   txByIndex = (index: number) => ChainAPI.txByIndex(this.url, index)
-  txList = (page?: number) => ChainAPI.txList(this.url, page)
+  txList = (params?: Partial<FetchTransactionsParametersWithPagination>) => ChainAPI.txList(this.url, params)
 
   validatorsList = () => ChainAPI.validatorsList(this.url)
   voteInfo = (voteId: string) => VoteAPI.info(this.url, voteId)
@@ -101,3 +100,11 @@ export class BlockError extends ErrAPI {
 }
 
 export class BlockNotFoundError extends BlockError {}
+
+export type BlockListResponseWithPagination = {
+  blocks: Array<IChainBlockInfoResponse | BlockError>
+} & PaginationResponse
+
+export type BlockListParametersWithPagination = {
+  totalItems: number
+} & PaginationRequest
