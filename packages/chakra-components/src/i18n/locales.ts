@@ -28,6 +28,10 @@ export const locales = {
     end_process_button: 'End process',
   },
   empty: 'Apparently this process has no questions 🤔',
+  envelopes: {
+    envelope_abstain_count: 'Abstained {{ count }} times',
+    question_title: 'Option/s selected in "{{ title }}":',
+  },
   errors: {
     wrong_data_title: 'Wrong data',
     wrong_data_description: 'The specified data is not correct',

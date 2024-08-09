@@ -1,5 +1,6 @@
 export * from './Actions'
 export * from './Description'
+export * from './Envelope'
 export * from './Election'
 export * from './Header'
 export * from './Questions'
