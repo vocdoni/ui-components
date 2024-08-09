@@ -29,8 +29,8 @@ export const locales = {
   },
   empty: 'Apparently this process has no questions 🤔',
   envelopes: {
-    envelope_abstain_count: 'Abstained times {{ count }}',
-    question_title: 'For question "{{ title }}" selected:',
+    envelope_abstain_count: 'Abstained {{ count }} times',
+    question_title: 'Option/s selected in "{{ title }}":',
   },
   errors: {
     wrong_data_title: 'Wrong data',

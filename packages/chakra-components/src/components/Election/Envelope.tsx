@@ -1,4 +1,4 @@
-import { useClient, useDatesLocale, useElection } from '@vocdoni/react-providers'
+import { useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
   ElectionResultsTypeNames,
   ElectionStatus,
@@ -21,8 +21,7 @@ export const Envelope = ({
   votePackage: VotePackageType
 } & ChakraProps) => {
   const styles = useMultiStyleConfig('Envelope')
-  const { localize } = useClient()
-  const { election } = useElection()
+  const { election, localize } = useElection()
   const locale = useDatesLocale()
 
   if (
@@ -49,7 +48,7 @@ export const Envelope = ({
         return (
           <chakra.div sx={styles.question}>
             <Text sx={styles.title}>{localize('envelopes.question_title', { title: q.title.default })}</Text>
-            <ChoosedOptions question={q} questionIndex={i} votes={votePackage.votes} election={election} />
+            <ChoosedOptions question={q} questionIndex={i} votes={votePackage.votes} />
           </chakra.div>
         )
       })}
@@ -58,25 +57,25 @@ export const Envelope = ({
 }
 
 const ChoosedOptions = ({
-  election,
   question,
   questionIndex,
   votes,
 }: {
-  election: PublishedElection
   question: IQuestion
   questionIndex: number
   votes: number[]
 }) => {
+  const { election, localize } = useElection()
   const styles = useMultiStyleConfig('Envelope')
-  const { localize } = useClient()
+
+  if (!election || !(election instanceof PublishedElection)) return null
 
   const selectedOptions: IChoice[] = []
   switch (election.resultsType.name) {
     case ElectionResultsTypeNames.MULTIPLE_CHOICE:
       const abstainValues = election.resultsType?.properties?.abstainValues ?? []
       let abstainCount = 0
-      votes.map((v) => {
+      votes.forEach((v) => {
         if (abstainValues.includes(v.toString())) {
           abstainCount++
           return
@@ -94,7 +93,7 @@ const ChoosedOptions = ({
       }
       break
     case ElectionResultsTypeNames.APPROVAL:
-      votes.map((v, i) => {
+      votes.forEach((v, i) => {
         if (v > 0) selectedOptions.push(question.choices[i])
       })
       break

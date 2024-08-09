@@ -13,7 +13,7 @@ import { EnvelopeTheme } from './envelope'
 
 export const theme = {
   components: {
-    EnvelopeTheme,
+    Envelope: EnvelopeTheme,
     ElectionQuestions,
     ElectionResults,
     ElectionSchedule,
