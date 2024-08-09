@@ -81,6 +81,7 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
 
   transfers = (params: Partial<FetchTransfersParametersWithPagination>) => ChainAPI.transfers(this.url, params)
 
+  txCosts = () => ChainAPI.txCosts(this.url)
   txInfo = (txHash: string) => ChainAPI.txInfo(this.url, txHash)
   txInfoByBlock = (blockHeight: number, txIndex: number) => ChainAPI.txInfoByBlock(this.url, blockHeight, txIndex)
   txByIndex = (index: number) => ChainAPI.txByIndex(this.url, index)
