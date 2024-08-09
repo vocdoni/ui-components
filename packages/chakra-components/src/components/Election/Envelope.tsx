@@ -1,3 +1,4 @@
+import { List, ListItem } from '@chakra-ui/layout'
 import { Text } from '@chakra-ui/react'
 import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useDatesLocale, useElection } from '@vocdoni/react-providers'
@@ -107,9 +108,9 @@ const SelectedOptions = ({
   return (
     <>
       {selectedOptions.map((c, i) => (
-        <chakra.div key={i} sx={styles.choiceWrapper}>
-          <Text sx={styles.choiceTitle}>{c.title.default}</Text>
-        </chakra.div>
+        <List key={i} sx={styles.choiceWrapper}>
+          <ListItem sx={styles.choiceTitle}>{c.title.default}</ListItem>
+        </List>
       ))}
     </>
   )
