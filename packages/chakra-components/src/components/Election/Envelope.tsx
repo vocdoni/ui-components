@@ -48,7 +48,7 @@ export const Envelope = ({
         return (
           <chakra.div sx={styles.question}>
             <Text sx={styles.title}>{localize('envelopes.question_title', { title: q.title.default })}</Text>
-            <ChoosedOptions question={q} questionIndex={i} votes={votePackage.votes} />
+            <SelectedOptions question={q} questionIndex={i} votes={votePackage.votes} />
           </chakra.div>
         )
       })}
@@ -56,7 +56,7 @@ export const Envelope = ({
   )
 }
 
-const ChoosedOptions = ({
+const SelectedOptions = ({
   question,
   questionIndex,
   votes,
