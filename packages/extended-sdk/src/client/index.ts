@@ -51,7 +51,7 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
       )
     }
 
-    const lastPage = Math.ceil(totalItems / limit)
+    const lastPage = Math.ceil(totalItems / limit) - 1
 
     return Promise.all(promises).then((blockInfo) => {
       // flatten the array[][] into array[]
