@@ -39,6 +39,9 @@ export const locales = {
     not_voted_in_ended_election: "You did not vote in this election and it's already finished",
   },
   loading: 'Loading...',
+  pagination: {
+    total_results: 'Showing a total of {{ count }} results',
+  },
   question_types: {
     approval_tooltip:
       "Approval voting lets you vote for as many options as you like. The one with the most votes wins. It's a simple way to show your support for all the choices you approve of.",

@@ -1,9 +1,11 @@
-import { Button, ButtonGroup, ButtonGroupProps, ButtonProps, Input, InputProps, Text } from '@chakra-ui/react'
-import { ReactElement, useMemo, useState } from 'react'
+import { ButtonGroup, ButtonGroupProps, ButtonProps, InputProps, Text } from '@chakra-ui/react'
+import { ReactElement, useMemo } from 'react'
 import { generatePath, Link as RouterLink, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { usePagination, useRoutedPagination } from '@vocdoni/react-providers'
+import { useLocalize, usePagination, useRoutedPagination } from '@vocdoni/react-providers'
 import { PaginationResponse } from '@vocdoni/sdk'
-import { Trans } from 'react-i18next'
+import { useMultiStyleConfig, chakra } from '@chakra-ui/system'
+import { EllipsisButton } from './EllipsisButton'
+import { PaginatorButton } from './PaginatorButton'
 
 export type PaginationProps = ButtonGroupProps & {
   maxButtons?: number | false
@@ -16,57 +18,19 @@ type PaginatorButtonProps = {
   currentPage: number
 } & ButtonProps
 
-const PageButton = ({ page, currentPage, ...rest }: PaginatorButtonProps) => (
-  <Button isActive={currentPage === page} {...rest}>
-    {page + 1}
-  </Button>
-)
-
-const RoutedPageButton = ({ page, currentPage, to, ...rest }: PaginatorButtonProps & { to: string }) => (
-  <Button as={RouterLink} to={to} isActive={currentPage === page} {...rest}>
-    {page + 1}
-  </Button>
-)
-
-type EllipsisButtonProps = ButtonProps & {
-  gotoPage: (page: number) => void
-  inputProps?: InputProps
+const PageButton = ({ page, currentPage, ...rest }: PaginatorButtonProps) => {
+  return (
+    <PaginatorButton isActive={currentPage === page} {...rest}>
+      {page + 1}
+    </PaginatorButton>
+  )
 }
 
-const EllipsisButton = ({ gotoPage, inputProps, ...rest }: EllipsisButtonProps) => {
-  const [ellipsisInput, setEllipsisInput] = useState(false)
-
-  if (ellipsisInput) {
-    return (
-      <Input
-        placeholder='Page #'
-        width='50px'
-        {...inputProps}
-        onKeyDown={(e) => {
-          if (e.target instanceof HTMLInputElement && e.key === 'Enter') {
-            const pageNumber = Number(e.target.value)
-            gotoPage(pageNumber)
-            setEllipsisInput(false)
-          }
-        }}
-        onBlur={() => setEllipsisInput(false)}
-        autoFocus
-      />
-    )
-  }
-
+const RoutedPageButton = ({ page, currentPage, to, ...rest }: PaginatorButtonProps & { to: string }) => {
   return (
-    <Button
-      as='a'
-      href='#goto-page'
-      {...rest}
-      onClick={(e) => {
-        e.preventDefault()
-        setEllipsisInput(true)
-      }}
-    >
-      ...
-    </Button>
+    <PaginatorButton as={RouterLink} to={to} isActive={currentPage === page} {...rest}>
+      {page + 1}
+    </PaginatorButton>
   )
 }
 
@@ -139,6 +103,9 @@ const PaginationButtons = ({
   goToPage: GotoPageType
 } & ButtonGroupProps &
   Pick<PaginationProps, 'maxButtons' | 'buttonProps'>) => {
+  const styles = useMultiStyleConfig('Pagination')
+  const t = useLocalize()
+
   const pages = usePaginationPages(
     currentPage,
     totalPages,
@@ -152,34 +119,34 @@ const PaginationButtons = ({
   )
 
   return (
-    <>
-      <ButtonGroup flexWrap={'wrap'} rowGap={2} {...rest}>
+    <chakra.div __css={styles.wrapper}>
+      <ButtonGroup sx={styles.buttonGroup} {...rest}>
         {totalPages === undefined ? (
           <>
-            <Button
+            <PaginatorButton
               key='previous'
               onClick={() => goToPage(currentPage - 1)}
               isDisabled={currentPage === 0}
               {...buttonProps}
             >
               Previous
-            </Button>
-            <Button key='next' onClick={() => goToPage(currentPage + 1)} {...buttonProps}>
+            </PaginatorButton>
+            <PaginatorButton key='next' onClick={() => goToPage(currentPage + 1)} {...buttonProps}>
               Next
-            </Button>
+            </PaginatorButton>
           </>
         ) : (
           pages
         )}
       </ButtonGroup>
       {totalItems && (
-        <Text color={'lighterText'}>
-          <Trans i18nKey={'filters.total_results'} count={totalItems}>
-            Showing a total of {{ count: totalItems }} results
-          </Trans>
+        <Text sx={styles.totalResults}>
+          {t('pagination.total_results', {
+            count: totalItems,
+          })}
         </Text>
       )}
-    </>
+    </chakra.div>
   )
 }
 

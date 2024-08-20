@@ -6,3 +6,5 @@ export * from './Election'
 export * from './layout'
 // Organization components
 export * from './Organization'
+// Pagination components
+export * from './Pagination'
