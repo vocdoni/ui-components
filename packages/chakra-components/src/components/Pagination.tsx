@@ -1,16 +1,29 @@
-import { Button, ButtonGroup, ButtonGroupProps, ButtonProps, Input, InputProps } from '@chakra-ui/react'
-import { usePagination, useRoutedPagination } from '@vocdoni/react-providers'
+import { Button, ButtonGroup, ButtonGroupProps, ButtonProps, Input, InputProps, Text } from '@chakra-ui/react'
 import { ReactElement, useMemo, useState } from 'react'
 import { generatePath, Link as RouterLink, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { usePagination, useRoutedPagination } from '@vocdoni/react-providers'
+import { PaginationResponse } from '@vocdoni/sdk'
+import { Trans } from 'react-i18next'
 
 export type PaginationProps = ButtonGroupProps & {
   maxButtons?: number | false
   buttonProps?: ButtonProps
   inputProps?: InputProps
-}
+} & PaginationResponse
 
-const createButton = (page: number, currentPage: number, props: ButtonProps) => (
-  <Button key={page} isActive={currentPage === page} {...props}>
+type PaginatorButtonProps = {
+  page: number
+  currentPage: number
+} & ButtonProps
+
+const PageButton = ({ page, currentPage, ...rest }: PaginatorButtonProps) => (
+  <Button isActive={currentPage === page} {...rest}>
+    {page + 1}
+  </Button>
+)
+
+const RoutedPageButton = ({ page, currentPage, to, ...rest }: PaginatorButtonProps & { to: string }) => (
+  <Button as={RouterLink} to={to} isActive={currentPage === page} {...rest}>
     {page + 1}
   </Button>
 )
@@ -57,12 +70,15 @@ const EllipsisButton = ({ gotoPage, inputProps, ...rest }: EllipsisButtonProps) 
   )
 }
 
+type CreatePageButtonType = (i: number) => ReactElement
+type GotoPageType = (page: number) => void
+
 const usePaginationPages = (
   currentPage: number,
   totalPages: number | undefined,
   maxButtons: number | undefined | false,
-  gotoPage: (page: number) => void,
-  createPageButton: (i: number) => ReactElement,
+  gotoPage: GotoPageType,
+  createPageButton: CreatePageButtonType,
   inputProps?: InputProps,
   buttonProps?: ButtonProps
 ) => {
@@ -106,79 +122,110 @@ const usePaginationPages = (
   }, [currentPage, totalPages, maxButtons, gotoPage])
 }
 
-export const Pagination = ({ maxButtons = 10, buttonProps, inputProps, ...rest }: PaginationProps) => {
-  const { page, setPage, totalPages } = usePagination()
-
+const PaginationButtons = ({
+  totalPages,
+  totalItems,
+  currentPage,
+  goToPage,
+  createPageButton,
+  maxButtons = 10,
+  buttonProps,
+  ...rest
+}: {
+  totalPages: number | undefined
+  totalItems: number | undefined
+  currentPage: number
+  createPageButton: CreatePageButtonType
+  goToPage: GotoPageType
+} & ButtonGroupProps &
+  Pick<PaginationProps, 'maxButtons' | 'buttonProps'>) => {
   const pages = usePaginationPages(
-    page,
+    currentPage,
     totalPages,
     maxButtons ? Math.max(5, maxButtons) : false,
     (page) => {
       if (page >= 0 && totalPages && page < totalPages) {
-        setPage(page)
+        goToPage(page)
       }
     },
-    (i) => createButton(i, page, { onClick: () => setPage(i), ...buttonProps })
+    createPageButton
   )
 
   return (
-    <ButtonGroup {...rest}>
-      {totalPages === undefined ? (
-        <>
-          <Button key='previous' onClick={() => setPage(page - 1)} isDisabled={page === 0} {...buttonProps}>
-            Previous
-          </Button>
-          <Button key='next' onClick={() => setPage(page + 1)} {...buttonProps}>
-            Next
-          </Button>
-        </>
-      ) : (
-        pages
+    <>
+      <ButtonGroup flexWrap={'wrap'} rowGap={2} {...rest}>
+        {totalPages === undefined ? (
+          <>
+            <Button
+              key='previous'
+              onClick={() => goToPage(currentPage - 1)}
+              isDisabled={currentPage === 0}
+              {...buttonProps}
+            >
+              Previous
+            </Button>
+            <Button key='next' onClick={() => goToPage(currentPage + 1)} {...buttonProps}>
+              Next
+            </Button>
+          </>
+        ) : (
+          pages
+        )}
+      </ButtonGroup>
+      {totalItems && (
+        <Text color={'lighterText'}>
+          <Trans i18nKey={'filters.total_results'} count={totalItems}>
+            Showing a total of {{ count: totalItems }} results
+          </Trans>
+        </Text>
       )}
-    </ButtonGroup>
+    </>
   )
 }
 
-export const RoutedPagination = ({ maxButtons = 10, buttonProps, ...rest }: PaginationProps) => {
-  const { path, totalPages } = useRoutedPagination()
+export const Pagination = ({ maxButtons = 10, buttonProps, inputProps, pagination, ...rest }: PaginationProps) => {
+  const { setPage } = usePagination()
+  const totalPages = pagination.lastPage + 1
+  const page = pagination.currentPage
+
+  return (
+    <PaginationButtons
+      goToPage={(page) => setPage(page)}
+      createPageButton={(i) => (
+        <PageButton key={i} page={i} currentPage={page} onClick={() => setPage(i)} {...buttonProps} />
+      )}
+      currentPage={page}
+      totalPages={totalPages}
+      totalItems={pagination.totalItems}
+      maxButtons={maxButtons}
+      {...rest}
+    />
+  )
+}
+
+export const RoutedPagination = ({ maxButtons = 10, buttonProps, pagination, ...rest }: PaginationProps) => {
+  const { path } = useRoutedPagination()
   const { search } = useLocation()
   const { page, ...extraParams }: { page?: number } = useParams()
   const navigate = useNavigate()
 
-  const p = Number(page) || 1
+  const totalPages = pagination.lastPage + 1
+
+  const currentPage = pagination.currentPage
 
   const _generatePath = (page: number) => generatePath(path, { page, ...extraParams }) + search
 
-  const pages = usePaginationPages(
-    p,
-    totalPages,
-    maxButtons ? Math.max(5, maxButtons) : false,
-    (page) => {
-      if (page >= 0 && totalPages && page < totalPages) {
-        navigate(_generatePath(page))
-      }
-    },
-    (i) => (
-      <Button as={RouterLink} key={i} to={_generatePath(i + 1)} isActive={p - 1 === i} {...buttonProps}>
-        {i + 1}
-      </Button>
-    )
-  )
-
   return (
-    <ButtonGroup {...rest}>
-      {totalPages === undefined ? (
-        <>
-          <Button key='previous' onClick={() => navigate(_generatePath(p - 1))} isDisabled={p === 1} {...buttonProps}>
-            Previous
-          </Button>
-          <Button key='next' onClick={() => navigate(_generatePath(p + 1))} {...buttonProps}>
-            Next
-          </Button>
-        </>
-      ) : (
-        pages
+    <PaginationButtons
+      goToPage={(page) => navigate(_generatePath(page))}
+      createPageButton={(i) => (
+        <RoutedPageButton key={i} to={_generatePath(i + 1)} page={i} currentPage={currentPage} {...buttonProps} />
       )}
-    </ButtonGroup>
+      currentPage={currentPage}
+      totalPages={totalPages}
+      totalItems={pagination.totalItems}
+      maxButtons={maxButtons}
+      {...rest}
+    />
   )
 }

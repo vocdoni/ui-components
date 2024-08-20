@@ -1,12 +1,12 @@
 import { createContext, PropsWithChildren, useContext, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 export type PaginationContextProps = {
   page: number
   setPage: (page: number) => void
-  totalPages?: number
 }
 
-export type RoutedPaginationContextProps = Omit<PaginationContextProps, 'setPage' | 'page'> & {
+export type RoutedPaginationContextProps = Omit<PaginationContextProps, 'setPage'> & {
   path: string
 }
 
@@ -29,22 +29,21 @@ export const useRoutedPagination = (): RoutedPaginationContextProps => {
   return context
 }
 
-export type PaginationProviderProps = Pick<PaginationContextProps, 'totalPages'>
+export type PaginationProviderProps = {}
 
 export type RoutedPaginationProviderProps = PaginationProviderProps & {
   path: string
 }
 
-export const RoutedPaginationProvider = ({
-  totalPages,
-  path,
-  ...rest
-}: PropsWithChildren<RoutedPaginationProviderProps>) => {
-  return <RoutedPaginationContext.Provider value={{ totalPages, path }} {...rest} />
+export const RoutedPaginationProvider = ({ path, ...rest }: PropsWithChildren<RoutedPaginationProviderProps>) => {
+  const { page }: { page?: number } = useParams()
+  const p = page && page > 0 ? page - 1 : 0
+
+  return <RoutedPaginationContext.Provider value={{ page: p, path }} {...rest} />
 }
 
-export const PaginationProvider = ({ totalPages, ...rest }: PropsWithChildren<PaginationProviderProps>) => {
+export const PaginationProvider = ({ ...rest }: PropsWithChildren<PaginationProviderProps>) => {
   const [page, setPage] = useState<number>(0)
 
-  return <PaginationContext.Provider value={{ page, setPage, totalPages }} {...rest} />
+  return <PaginationContext.Provider value={{ page, setPage }} {...rest} />
 }
