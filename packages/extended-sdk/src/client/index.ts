@@ -2,6 +2,7 @@ import {
   ChainAPI,
   ElectionAPI,
   ErrAPI,
+  ErrBlockNotFound,
   FetchFeesParametersWithPagination,
   FetchOrganizationParametersWithPagination,
   FetchTransactionsParametersWithPagination,
@@ -38,10 +39,10 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
           try {
             return await this.blockByHeight(firstPageBlock + i)
           } catch (error) {
+            if (error instanceof ErrBlockNotFound) {
+              return new BlockNotFoundError(firstPageBlock + i, error)
+            }
             if (error instanceof ErrAPI) {
-              if (error.raw?.response?.status === 404) {
-                return new BlockNotFoundError(firstPageBlock + i, error)
-              }
               return new BlockError(firstPageBlock + i, error)
             }
             throw error // re-throw other errors
@@ -91,11 +92,11 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
   voteInfo = (voteId: string) => VoteAPI.info(this.url, voteId)
 }
 
-export class BlockError extends ErrAPI {
+export class BlockError extends Error {
   public height: number
 
-  constructor(height: number, error: ErrAPI) {
-    super(error.message, error.raw)
+  constructor(height: number, error: ErrAPI | ErrBlockNotFound) {
+    super(error.message, error)
     this.height = height
   }
 }
