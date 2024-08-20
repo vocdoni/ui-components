@@ -8,26 +8,6 @@ description: Vocdoni Chakra components pagination
 You can easily add pagination to any method by using the included PaginationProvider (or RoutedPaginationProvider in
 case you want to use it with react-router-dom).
 
-### PaginationResponse Interface
-
-The `<Pagination />` component consumes a `PaginationResponse` object provided by the VocdoniSDK.
-This object contains the necessary pagination data to manage the state effectively.
-
-```ts
-interface PaginationResponse {
-    pagination: {
-        totalItems: number;
-        previousPage: number | null;
-        currentPage: number;
-        nextPage: number | null;
-        lastPage: number;
-    };
-}
-```
-
-When using the VocdoniSDK to retrieve paginated data, this PaginationResponse object will be included in the response,
-allowing for easy integration with the `<Pagination />` component.
-
 ### RoutedPaginationProvider Example
 
 If you're using `react-router-dom`, you can integrate pagination with URL routing using the `RoutedPaginationProvider`.
@@ -101,6 +81,27 @@ const MyPaginatedComponent = () => {
 ```
 
 In this example, the `PaginationProvider` manages the pagination state internally without affecting the URL.
+
+### PaginationResponse Interface
+
+The `<Pagination />` component consumes a `PaginationResponse` object provided by the VocdoniSDK.
+This object contains the necessary pagination data to manage the state effectively.
+
+```ts
+interface PaginationResponse {
+    pagination: {
+        totalItems: number;
+        previousPage: number | null;
+        currentPage: number;
+        nextPage: number | null;
+        lastPage: number;
+    };
+}
+```
+
+When using the VocdoniSDK to retrieve paginated data, this PaginationResponse object will be included in the response,
+allowing for easy integration with the `<Pagination />` component.
+
 
 ### Summary
 
