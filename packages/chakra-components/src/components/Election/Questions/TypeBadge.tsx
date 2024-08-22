@@ -1,9 +1,12 @@
 import { Tooltip } from '@chakra-ui/react'
-import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useElection } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
+import type { HTMLAttributes } from 'react'
 
-export const QuestionsTypeBadge = () => {
+type QuestionsTypeBadgeProps = ChakraProps & HTMLAttributes<HTMLDivElement>
+
+export const QuestionsTypeBadge = (props: QuestionsTypeBadgeProps) => {
   const styles = useMultiStyleConfig('QuestionsTypeBadge')
   const { election, localize } = useElection()
 
@@ -32,8 +35,8 @@ export const QuestionsTypeBadge = () => {
   }
 
   return (
-    <chakra.div __css={styles.box}>
-      <Tooltip label={tooltip} hasArrow sx={styles.tooltip} placement='auto'>
+    <chakra.div __css={styles.box} {...props}>
+      <Tooltip label={tooltip} hasArrow placement='auto' sx={styles.tooltip}>
         <chakra.label __css={styles.title}>{title}</chakra.label>
       </Tooltip>
     </chakra.div>
