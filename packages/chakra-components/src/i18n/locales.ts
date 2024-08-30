@@ -31,6 +31,7 @@ export const locales = {
   envelopes: {
     envelope_abstain_count: 'Abstained {{ count }} times',
     question_title: 'Option/s selected in "{{ title }}":',
+    error_processing_envelope: 'Cannot process envelope data for question "{{ title }}"',
   },
   errors: {
     wrong_data_title: 'Wrong data',

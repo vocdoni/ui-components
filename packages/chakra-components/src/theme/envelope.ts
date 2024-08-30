@@ -13,6 +13,8 @@ export const envelopeAnatomy = [
   'choiceTitle',
   // secret envelope (no results until the end text)
   'secret',
+  // Error boundary message
+  'error',
 ]
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(envelopeAnatomy)
