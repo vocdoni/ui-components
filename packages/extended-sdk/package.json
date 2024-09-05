@@ -25,13 +25,10 @@
   },
   "main": "src/index.ts",
   "devDependencies": {
-    "@vocdoni/sdk": "https://github.com/vocdoni/vocdoni-sdk.git#main"
+    "@vocdoni/sdk": "~0.9.0"
   },
   "peerDependencies": {
-    "@vocdoni/sdk": "~0.8.1"
-  },
-  "resolutions": {
-    "@vocdoni/sdk": "https://github.com/vocdoni/vocdoni-sdk.git#main"
+    "@vocdoni/sdk": "~0.9.0"
   },
   "clean-package": "../../clean-package.config.json"
 }
