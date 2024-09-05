@@ -49,7 +49,7 @@ export const handlers = [
   rest.post('https://api*.vocdoni.*/v2/accounts', (req, res, ctx) => {
     return res(ctx.status(200), ctx.body('0xmocked'))
   }),
-  rest.get('https://api*.vocdoni.*/v2/chain/transactions/reference/*', (req, res, ctx) => {
+  rest.get('https://api*.vocdoni.*/v2/chain/transactions/*', (req, res, ctx) => {
     return res(ctx.status(200), ctx.body('ok'))
   }),
   rest.post('https://api*.vocdoni.*/v2/accounts', (req, res, ctx) => {

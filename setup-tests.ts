@@ -47,3 +47,5 @@ Object.defineProperty(window, 'MockedWindowURL', {
 
 // required by any react component (almost all of them)
 global.React = React
+
+global.URL.createObjectURL = jest.fn()

@@ -1,5 +1,4 @@
 import {
-  ArchivedElection,
   areEqualHexStrings,
   CensusType,
   InvalidElection,
@@ -94,7 +93,7 @@ export interface ElectionReducerState {
   id: string | undefined
   isAbleToVote: boolean | undefined
   isInCensus: boolean
-  election: PublishedElection | InvalidElection | ArchivedElection | undefined
+  election: PublishedElection | InvalidElection | undefined
   vote: Vote | undefined
   voter: string | undefined
   votesLeft: number
@@ -126,7 +125,7 @@ export interface ElectionReducerState {
   turnout: number
 }
 
-const participation = (election?: PublishedElection | InvalidElection | ArchivedElection) => {
+const participation = (election?: PublishedElection | InvalidElection) => {
   if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
@@ -136,7 +135,7 @@ const participation = (election?: PublishedElection | InvalidElection | Archived
   return Math.round((election.voteCount / size) * 10000) / 100
 }
 
-const turnout = (election?: PublishedElection | InvalidElection | ArchivedElection) => {
+const turnout = (election?: PublishedElection | InvalidElection) => {
   if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
@@ -151,7 +150,7 @@ export const electionStateEmpty = ({
   election,
 }: {
   client: VocdoniSDKClient
-  election?: PublishedElection | InvalidElection | ArchivedElection
+  election?: PublishedElection | InvalidElection
 }): ElectionReducerState => ({
   client,
   connected: false,
@@ -447,10 +446,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
   }
 }
 
-export const useElectionReducer = (
-  client: VocdoniSDKClient,
-  election?: PublishedElection | ArchivedElection | InvalidElection
-) => {
+export const useElectionReducer = (client: VocdoniSDKClient, election?: PublishedElection | InvalidElection) => {
   const initial = electionStateEmpty({ client, election })
   const { connected } = useClient()
   const [state, dispatch] = useReducer(electionReducer, {
@@ -460,8 +456,7 @@ export const useElectionReducer = (
 
   const clear = () => dispatch({ type: CensusClear })
   const setClient = (client: VocdoniSDKClient) => dispatch({ type: ElectionClientSet, payload: client })
-  const set = (election: PublishedElection | ArchivedElection | InvalidElection) =>
-    dispatch({ type: ElectionSet, payload: election })
+  const set = (election: PublishedElection | InvalidElection) => dispatch({ type: ElectionSet, payload: election })
   const sikPassword = (password: SikPayload) => dispatch({ type: SikPasswordSet, payload: password })
   const sikSignature = (signature: SikPayload) => dispatch({ type: SikSignatureSet, payload: signature })
   // Some census types require to have a local client instance. This var stores if the current election is one of those

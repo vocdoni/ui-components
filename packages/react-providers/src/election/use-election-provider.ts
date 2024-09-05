@@ -1,7 +1,6 @@
 import {
   AnonymousService,
   AnonymousVote,
-  ArchivedElection,
   areEqualHexStrings,
   CensusType,
   ChainAPI,
@@ -21,7 +20,7 @@ import { BlindCspServiceKey, useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
-  election?: PublishedElection | InvalidElection | ArchivedElection
+  election?: PublishedElection | InvalidElection
   ConnectButton?: ComponentType
   fetchCensus?: boolean
   beforeSubmit?: (vote: Vote) => boolean
