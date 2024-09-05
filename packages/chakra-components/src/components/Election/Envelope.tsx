@@ -12,6 +12,7 @@ import {
   PublishedElection,
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
+import { Component, ErrorInfo, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 export type VotePackageType = IVotePackage | IVoteEncryptedPackage
 
@@ -48,8 +49,10 @@ export const Envelope = ({
       {election.questions.map((q, i) => {
         return (
           <chakra.div sx={styles.question}>
-            <Text sx={styles.title}>{localize('envelopes.question_title', { title: q.title.default })}</Text>
-            <SelectedOptions question={q} questionIndex={i} votes={votePackage.votes} />
+            <EnvelopeErrorBoundary question={q}>
+              <Text sx={styles.title}>{localize('envelopes.question_title', { title: q.title.default })}</Text>
+              <SelectedOptions question={q} questionIndex={i} votes={votePackage.votes} />
+            </EnvelopeErrorBoundary>
           </chakra.div>
         )
       })}
@@ -114,4 +117,46 @@ const SelectedOptions = ({
       ))}
     </>
   )
+}
+
+type IErrorParams = {
+  question: IQuestion
+}
+
+const EnvelopeError = ({ question }: IErrorParams) => {
+  const styles = useMultiStyleConfig('Envelope')
+  const { localize } = useElection()
+
+  return (
+    <Text sx={styles.error}>
+      {localize('envelopes.error_processing_envelope', { title: question?.title?.default || '' })}
+    </Text>
+  )
+}
+
+class EnvelopeErrorBoundary extends Component<
+  IErrorParams & PropsWithChildren,
+  {
+    hasError: boolean
+  }
+> {
+  public state = {
+    hasError: false,
+  }
+
+  public static getDerivedStateFromError(_: Error) {
+    return { hasError: true }
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Uncaught error:', error, errorInfo)
+  }
+
+  public render() {
+    if (this.state.hasError) {
+      return <EnvelopeError question={this.props.question} />
+    }
+
+    return this.props.children
+  }
 }
