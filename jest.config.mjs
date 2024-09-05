@@ -6,7 +6,7 @@ const config = {
   transform: {
     '^.+\\.(ts|tsx|js|jsx)?$': '@swc-node/jest',
   },
-  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
+  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\](?!ffjavascript).+\\.(js|jsx)$'],
   testPathIgnorePatterns: ['[/\\\\]dist[/\\\\].+\\.(js|jsx)$'],
   setupFilesAfterEnv: ['@testing-library/jest-dom', './setup-tests.ts'],
   globals: {
