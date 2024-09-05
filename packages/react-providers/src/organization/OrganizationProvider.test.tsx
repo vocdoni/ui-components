@@ -34,6 +34,9 @@ describe('<OrganizationProvider />', () => {
       balance: 0,
       electionIndex: 0,
       nonce: 0,
+      feesCount: 0,
+      sik: '',
+      transfersCount: 0,
     }
 
     const { result, rerender } = renderHook(() => useOrganization(), { wrapper, initialProps: { organization } })
@@ -49,6 +52,9 @@ describe('<OrganizationProvider />', () => {
       balance: 0,
       electionIndex: 0,
       nonce: 0,
+      feesCount: 0,
+      sik: '',
+      transfersCount: 0,
     }
 
     rerender({ organization: neworg })

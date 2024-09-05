@@ -3,7 +3,7 @@ import { Text } from '@chakra-ui/layout'
 import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { ArchivedElection, ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
+import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { results } from './Results'
@@ -24,7 +24,7 @@ export const VoteButton = (props: ButtonProps) => {
   } = useElection()
   const [loading, setLoading] = useState<boolean>(false)
 
-  if (!election || election instanceof InvalidElection || election instanceof ArchivedElection) {
+  if (!election || election instanceof InvalidElection) {
     return null
   }
 
