@@ -47,4 +47,5 @@ export class ExtendedSDKClient extends VocdoniSDKClient {
 export type BlockListQueryParamsWithPagination = {
   hash?: string // Filter by partial hash
   chainId?: string // Filter by exact chainId
+  proposerAddress?: string // Filter by exact proposerAddress
 } & PaginationRequest
