@@ -1,0 +1,120 @@
+---
+title: Pagination components
+description: Vocdoni Chakra components pagination
+---
+
+## Pagination and RoutedPagination
+
+You can easily add pagination to any method by using the included PaginationProvider (or RoutedPaginationProvider in
+case you want to use it with react-router-dom).
+
+### RoutedPaginationProvider Example
+
+If you're using `react-router-dom`, you can integrate pagination with URL routing using the `RoutedPaginationProvider`.
+Here's how to set it up:
+
+```jsx
+const MyProvidedRoutedPaginatedComponent = () => {
+  return (
+    <RoutedPaginationProvider path='/my-paginated-route-path'>
+      <MyRoutedPaginatedComponent />
+    </RoutedPaginationProvider>
+  )
+}
+
+const MyRoutedPaginatedComponent = () => {
+  // Use the page from the pagination provider instead of the `useParams` hook.
+  // Note: The displayed page in the URL is 1-based, but the internal page indexing starts at 0.
+  const { page } = useRoutedPagination()
+
+  // retrieve your data, specifying the desired page.
+  const { data } = useVocdoniSDKPaginatedCall({
+    page,
+  })
+
+  return (
+    <>
+      {data.items.map((item) => (
+        <MyItem key={item.id} item={item} />
+      ))}
+      {/* Render the pagination component */}
+      <Pagination pagination={data.pagination} />
+    </>
+  )
+}
+```
+
+In this setup, the `Pagination` component will automatically manage the pagination state and update the URL to reflect
+the current page.
+
+If we want to programatically set the page, we can use the `usePagination` hook, which provide other util methods:
+
+```ts
+const {
+  getPathForPage, // Get the path for a specific page
+  setPage, // Navigate to page
+  page, // Current page
+} = useRoutedPagination()
+```
+
+### PaginationProvider Example (Non-Routed)
+
+The `PaginationProvider` (non routed) uses an internal state to handle the current page, rather than taking it from the URL.
+
+```jsx
+const MyProvidedPaginatedComponent = () => {
+  return (
+    <PaginationProvider>
+      <MyPaginatedComponent />
+    </PaginationProvider>
+  )
+}
+const MyPaginatedComponent = () => {
+  const { page } = usePagination()
+
+  // Retrieve your data, specifying the desired page.
+  const { data } = useVocdoniSDKPaginatedCall({
+    page,
+  })
+
+  return (
+    <>
+      {data.items.map((item) => (
+        <MyItem key={item.id} item={item} />
+      ))}
+      {/* load the pagination itself */}
+      <Pagination pagination={data.pagination} />
+    </>
+  )
+}
+```
+
+In this example, the `PaginationProvider` manages the pagination state internally without affecting the URL.
+
+### PaginationResponse Interface
+
+The `<Pagination />` component consumes a `PaginationResponse` object provided by the VocdoniSDK.
+This object contains the necessary pagination data to manage the state effectively.
+
+```ts
+interface PaginationResponse {
+  pagination: {
+    totalItems: number
+    previousPage: number | null
+    currentPage: number
+    nextPage: number | null
+    lastPage: number
+  }
+}
+```
+
+When using the VocdoniSDK to retrieve paginated data, this PaginationResponse object will be included in the response,
+allowing for easy integration with the `<Pagination />` component.
+
+### Summary
+
+- `RoutedPaginationProvider`: Use this when you want to synchronize pagination with the URL (e.g., when using `react-router-dom`).
+- `PaginationProvider`: Use this when URL synchronization is not needed, and you want to manage pagination state internally.
+
+Both providers work seamlessly with the `Pagination` component and the `PaginationResponse` object from the VocdoniSDK,
+making it simple to add pagination to any data-driven component.

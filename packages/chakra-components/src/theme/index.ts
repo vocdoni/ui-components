@@ -9,6 +9,7 @@ import {
   QuestionsTypeBadgeTheme,
 } from './questions'
 import { ResultsTheme as ElectionResults } from './results'
+import { PaginationTheme as Pagination } from './pagination'
 import { VoteWeightTheme } from './vote'
 
 export const theme = {
@@ -19,6 +20,7 @@ export const theme = {
     ElectionSchedule,
     ElectionTitle,
     HorizontalRuler: HorizontalRulerTheme,
+    Pagination,
     ConfirmModal: ConfirmModalTheme,
     QuestionsConfirmation: QuestionsConfirmationTheme,
     QuestionsTip: QuestionsTipTheme,
@@ -32,6 +34,7 @@ export * from './confirm'
 export * from './election'
 export * from './envelope'
 export * from './layout'
+export * from './pagination'
 export * from './questions'
 export * from './results'
 export * from './spreadsheet'
