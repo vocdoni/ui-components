@@ -15,7 +15,7 @@ Here's how to set it up:
 
 ```jsx
 const MyProvidedRoutedPaginatedComponent = () => {
-      return (
+  return (
     <RoutedPaginationProvider path='/my-paginated-route-path'>
       <MyRoutedPaginatedComponent />
     </RoutedPaginationProvider>
@@ -29,9 +29,8 @@ const MyRoutedPaginatedComponent = () => {
 
   // retrieve your data, specifying the desired page.
   const { data } = useVocdoniSDKPaginatedCall({
-    page
+    page,
   })
-
 
   return (
     <>
@@ -47,6 +46,16 @@ const MyRoutedPaginatedComponent = () => {
 
 In this setup, the `Pagination` component will automatically manage the pagination state and update the URL to reflect
 the current page.
+
+If we want to programaticallt set the page, wcan use the `usePagination` hook, which provide other util methods:
+
+```ts
+  const {
+    getPathForPage, // Get the path for a specific page
+    setPage, // Navigate to page
+    page // Current page
+  } = useRoutedPagination()
+```
 
 ### PaginationProvider Example (Non-Routed)
 
@@ -65,7 +74,7 @@ const MyPaginatedComponent = () => {
 
   // Retrieve your data, specifying the desired page.
   const { data } = useVocdoniSDKPaginatedCall({
-    page
+    page,
   })
 
   return (
@@ -89,19 +98,18 @@ This object contains the necessary pagination data to manage the state effective
 
 ```ts
 interface PaginationResponse {
-    pagination: {
-        totalItems: number;
-        previousPage: number | null;
-        currentPage: number;
-        nextPage: number | null;
-        lastPage: number;
-    };
+  pagination: {
+    totalItems: number
+    previousPage: number | null
+    currentPage: number
+    nextPage: number | null
+    lastPage: number
+  }
 }
 ```
 
 When using the VocdoniSDK to retrieve paginated data, this PaginationResponse object will be included in the response,
 allowing for easy integration with the `<Pagination />` component.
-
 
 ### Summary
 
