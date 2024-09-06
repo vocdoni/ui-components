@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useContext, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { generatePath, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 export type PaginationContextProps = {
   page: number
@@ -8,6 +8,10 @@ export type PaginationContextProps = {
 
 export type RoutedPaginationContextProps = Omit<PaginationContextProps, 'setPage'> & {
   path: string
+  // Util function that generates the path for a given page
+  // (it return the actual path with queryParams and other route params but changing the page)
+  getPathForPage: (page: number, queryParams?: string) => string
+  setPage: (page: number, queryParams?: string) => void
 }
 
 const PaginationContext = createContext<PaginationContextProps | undefined>(undefined)
@@ -36,10 +40,22 @@ export type RoutedPaginationProviderProps = PaginationProviderProps & {
 }
 
 export const RoutedPaginationProvider = ({ path, ...rest }: PropsWithChildren<RoutedPaginationProviderProps>) => {
-  const { page }: { page?: number } = useParams()
+  const { search } = useLocation()
+  const { page, ...extraParams }: { page?: number } = useParams()
   const p = page && page > 0 ? page - 1 : 0
 
-  return <RoutedPaginationContext.Provider value={{ page: p, path }} {...rest} />
+  const navigate = useNavigate()
+
+  const getPathForPage = (page: number, queryParams?: string) => {
+    const p = queryParams || search
+    return generatePath(path, { page, ...extraParams }) + p
+  }
+
+  const setPage = (page: number, queryParams?: string) => {
+    navigate(getPathForPage(page, queryParams))
+  }
+
+  return <RoutedPaginationContext.Provider value={{ page: p, path, getPathForPage, setPage }} {...rest} />
 }
 
 export const PaginationProvider = ({ ...rest }: PropsWithChildren<PaginationProviderProps>) => {

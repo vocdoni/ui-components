@@ -1,6 +1,6 @@
 import { ButtonGroup, ButtonGroupProps, ButtonProps, InputProps, Text } from '@chakra-ui/react'
 import { ReactElement, useMemo } from 'react'
-import { generatePath, Link as RouterLink, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import { useLocalize, usePagination, useRoutedPagination } from '@vocdoni/react-providers'
 import { PaginationResponse } from '@vocdoni/sdk'
 import { useMultiStyleConfig, chakra } from '@chakra-ui/system'
@@ -18,21 +18,17 @@ type PaginatorButtonProps = {
   currentPage: number
 } & ButtonProps
 
-const PageButton = ({ page, currentPage, ...rest }: PaginatorButtonProps) => {
-  return (
-    <PaginatorButton isActive={currentPage === page} {...rest}>
-      {page + 1}
-    </PaginatorButton>
-  )
-}
+const PageButton = ({ page, currentPage, ...rest }: PaginatorButtonProps) => (
+  <PaginatorButton isActive={currentPage === page} {...rest}>
+    {page + 1}
+  </PaginatorButton>
+)
 
-const RoutedPageButton = ({ page, currentPage, to, ...rest }: PaginatorButtonProps & { to: string }) => {
-  return (
-    <PaginatorButton as={RouterLink} to={to} isActive={currentPage === page} {...rest}>
-      {page + 1}
-    </PaginatorButton>
-  )
-}
+const RoutedPageButton = ({ page, currentPage, to, ...rest }: PaginatorButtonProps & { to: string }) => (
+  <PaginatorButton as={RouterLink} to={to} isActive={currentPage === page} {...rest}>
+    {page + 1}
+  </PaginatorButton>
+)
 
 type CreatePageButtonType = (i: number) => ReactElement
 type GotoPageType = (page: number) => void
@@ -171,27 +167,20 @@ export const Pagination = ({ maxButtons = 10, buttonProps, inputProps, paginatio
 }
 
 export const RoutedPagination = ({ maxButtons = 10, buttonProps, pagination, ...rest }: PaginationProps) => {
-  const { path } = useRoutedPagination()
-  const { search } = useLocation()
-  const { page, ...extraParams }: { page?: number } = useParams()
-  const navigate = useNavigate()
+  const { getPathForPage, setPage } = useRoutedPagination()
 
   const totalPages = pagination.lastPage + 1
-
   const currentPage = pagination.currentPage
-
-  const _generatePath = (page: number) => generatePath(path, { page, ...extraParams }) + search
 
   return (
     <PaginationButtons
-      goToPage={(page) => navigate(_generatePath(page))}
+      goToPage={(page) => setPage(page)}
       createPageButton={(i) => (
-        <RoutedPageButton key={i} to={_generatePath(i + 1)} page={i} currentPage={currentPage} {...buttonProps} />
+        <RoutedPageButton key={i} to={getPathForPage(i + 1)} page={i} currentPage={currentPage} {...buttonProps} />
       )}
       currentPage={currentPage}
       totalPages={totalPages}
       totalItems={pagination.totalItems}
-      maxButtons={maxButtons}
       {...rest}
     />
   )
