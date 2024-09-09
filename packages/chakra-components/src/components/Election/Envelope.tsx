@@ -1,5 +1,4 @@
-import { List, ListItem } from '@chakra-ui/layout'
-import { Text } from '@chakra-ui/react'
+import { List, ListItem, Text } from '@chakra-ui/layout'
 import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
@@ -12,7 +11,7 @@ import {
   PublishedElection,
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
-import { Component, ErrorInfo, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import { Component, ErrorInfo, PropsWithChildren } from 'react'
 
 export type VotePackageType = IVotePackage | IVoteEncryptedPackage
 

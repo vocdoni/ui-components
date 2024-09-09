@@ -1,4 +1,6 @@
-import { ButtonGroup, ButtonGroupProps, ButtonProps, InputProps, Text } from '@chakra-ui/react'
+import { ButtonGroup, ButtonGroupProps, ButtonProps } from '@chakra-ui/button'
+import { InputProps } from '@chakra-ui/input'
+import { Text } from '@chakra-ui/layout'
 import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { useLocalize, usePagination, useRoutedPagination } from '@vocdoni/react-providers'
 import { PaginationResponse } from '@vocdoni/sdk'

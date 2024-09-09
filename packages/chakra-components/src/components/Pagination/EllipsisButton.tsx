@@ -1,4 +1,5 @@
-import { Button, ButtonProps, Input, InputProps } from '@chakra-ui/react'
+import { Button, ButtonProps } from '@chakra-ui/button'
+import { Input, InputProps } from '@chakra-ui/input'
 import { useStyleConfig } from '@chakra-ui/system'
 import { useState } from 'react'
 
