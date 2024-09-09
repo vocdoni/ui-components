@@ -28,6 +28,7 @@
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
     "@vocdoni/sdk": "~0.9.0",
+    "react-router-dom": "^6.9.0",
     "react": ">= 16.8.0"
   },
   "devDependencies": {
@@ -42,6 +43,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "latinize": "^0.5.0",
     "react": "18.3.1",
+    "react-router-dom": "^6.9.0",
     "ts-deepmerge": "^6.2.0",
     "tsconfig": "*",
     "typescript": "^4.9.5"
