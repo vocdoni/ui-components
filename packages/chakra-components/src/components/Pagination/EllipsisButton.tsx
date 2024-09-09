@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { useStyleConfig } from '@chakra-ui/system'
 import { Button, ButtonProps, Input, InputProps } from '@chakra-ui/react'
+import { useStyleConfig } from '@chakra-ui/system'
+import { useState } from 'react'
 
 type EllipsisButtonProps = ButtonProps & {
   gotoPage: (page: number) => void

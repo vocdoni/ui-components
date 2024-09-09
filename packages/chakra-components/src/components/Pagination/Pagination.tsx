@@ -1,11 +1,11 @@
 import { ButtonGroup, ButtonGroupProps, ButtonProps, InputProps, Text } from '@chakra-ui/react'
-import { ReactElement, useMemo } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
+import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { useLocalize, usePagination, useRoutedPagination } from '@vocdoni/react-providers'
 import { PaginationResponse } from '@vocdoni/sdk'
-import { useMultiStyleConfig, chakra } from '@chakra-ui/system'
+import { ReactElement, useMemo } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 import { EllipsisButton } from './EllipsisButton'
-import { PaginatorButton } from './PaginatorButton'
+import { PageButton as PaginatorButton } from './PaginatorButton'
 
 export type PaginationProps = ButtonGroupProps & {
   maxButtons?: number | false
@@ -41,8 +41,8 @@ const usePaginationPages = (
   createPageButton: CreatePageButtonType,
   inputProps?: InputProps,
   buttonProps?: ButtonProps
-) => {
-  return useMemo(() => {
+) =>
+  useMemo(() => {
     if (totalPages === undefined) return []
 
     let pages: ReactElement[] = []
@@ -79,8 +79,7 @@ const usePaginationPages = (
       const endPage = currentPage + Math.floor(availableButtons / 2)
       return [pages[0], startEllipsis, ...pages.slice(startPage, endPage - 1), endEllipsis, pages[totalPages - 1]]
     }
-  }, [currentPage, totalPages, maxButtons, gotoPage])
-}
+  }, [totalPages, maxButtons, gotoPage, inputProps, buttonProps, currentPage, createPageButton])
 
 const PaginationButtons = ({
   totalPages,
