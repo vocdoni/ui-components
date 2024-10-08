@@ -6,6 +6,8 @@ import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-fo
 import { useConfirm } from '../../layout'
 import { QuestionsConfirmation } from './Confirmation'
 
+export const DefaultElectionFormId = 'election-questions'
+
 export type QuestionsFormContextState = {
   fmethods: UseFormReturn<any>
   vote: (values: FieldValues) => Promise<false | void>

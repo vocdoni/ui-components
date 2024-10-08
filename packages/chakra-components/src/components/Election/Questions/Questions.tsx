@@ -4,12 +4,19 @@ import { useElection } from '@vocdoni/react-providers'
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler } from 'react-hook-form'
 import { QuestionField } from './Fields'
-import { QuestionsFormContextState, QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
+import {
+  DefaultElectionFormId,
+  QuestionsFormContextState,
+  QuestionsFormProvider,
+  QuestionsFormProviderProps,
+  useQuestionsForm,
+} from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
 import { Voted } from './Voted'
 
 export type ElectionQuestionsFormProps = ChakraProps & {
   onInvalid?: SubmitErrorHandler<FieldValues>
+  formId?: string
 }
 
 export type ElectionQuestionsProps = ElectionQuestionsFormProps & QuestionsFormProviderProps
@@ -20,23 +27,17 @@ export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestio
   </QuestionsFormProvider>
 )
 
-export const ElectionQuestionsForm = (props: ElectionQuestionsFormProps) => {
+export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQuestionsFormProps) => {
   const methods = useQuestionsForm()
   const { fmethods, vote } = methods
-  const { election } = useElection()
-
   return (
-    <form onSubmit={fmethods.handleSubmit(vote)} id={`election-questions-${election.id}`}>
-      <ElectionQuestion {...methods} {...props} />
+    <form onSubmit={fmethods.handleSubmit(vote, onInvalid)} id={formId ?? DefaultElectionFormId}>
+      <ElectionQuestion {...methods} {...rest} />
     </form>
   )
 }
 
-export const ElectionQuestion = ({
-  fmethods,
-  vote,
-  ...props
-}: QuestionsFormContextState & ElectionQuestionsFormProps) => {
+export const ElectionQuestion = (props: ChakraProps) => {
   const {
     election,
     voted,
@@ -46,7 +47,6 @@ export const ElectionQuestion = ({
   } = useElection()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions: IQuestion[] | undefined = (election as PublishedElection)?.questions
-  const { onInvalid, ...rest } = props
 
   if (!(election instanceof PublishedElection)) return null
 
@@ -64,7 +64,7 @@ export const ElectionQuestion = ({
   }
 
   return (
-    <chakra.div __css={styles.wrapper} {...rest}>
+    <chakra.div __css={styles.wrapper} {...props}>
       <Voted />
       <chakra.div __css={styles.typeBadgeWrapper}>
         <QuestionsTypeBadge />
