@@ -4,9 +4,11 @@ import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { results } from './Results'
+import { MultiElectionsContext } from './Questions/MultiElectionContext'
+import { DefaultElectionFormId } from './Questions'
 
 export const VoteButton = (props: ButtonProps) => {
   const { connected } = useClient()
@@ -36,8 +38,8 @@ export const VoteButton = (props: ButtonProps) => {
 
   const button: ButtonProps = {
     type: 'submit',
+    form: DefaultElectionFormId,
     ...props,
-    form: `election-questions-${election.id}`,
     isDisabled,
     isLoading: voting,
     children: voted && isAbleToVote ? localize('vote.button_update') : localize('vote.button'),
@@ -98,7 +100,7 @@ export const VoteWeight = () => {
     })()
   }, [client, election])
 
-  if (!weight || !election || !(election instanceof PublishedElection)) return
+  if (!weight || !election || !(election instanceof PublishedElection)) return <></>
 
   return (
     <chakra.div __css={styles.wrapper}>
