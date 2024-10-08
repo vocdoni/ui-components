@@ -4,7 +4,7 @@ import { useElection } from '@vocdoni/react-providers'
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler } from 'react-hook-form'
 import { QuestionField } from './Fields'
-import { QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
+import { QuestionsFormContextState, QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
 import { Voted } from './Voted'
 
@@ -21,6 +21,22 @@ export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestio
 )
 
 export const ElectionQuestionsForm = (props: ElectionQuestionsFormProps) => {
+  const methods = useQuestionsForm()
+  const { fmethods, vote } = methods
+  const { election } = useElection()
+
+  return (
+    <form onSubmit={fmethods.handleSubmit(vote)} id={`election-questions-${election.id}`}>
+      <ElectionQuestion {...methods} {...props} />
+    </form>
+  )
+}
+
+export const ElectionQuestion = ({
+  fmethods,
+  vote,
+  ...props
+}: QuestionsFormContextState & ElectionQuestionsFormProps) => {
   const {
     election,
     voted,
@@ -28,7 +44,6 @@ export const ElectionQuestionsForm = (props: ElectionQuestionsFormProps) => {
     localize,
     isAbleToVote,
   } = useElection()
-  const { fmethods, vote } = useQuestionsForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions: IQuestion[] | undefined = (election as PublishedElection)?.questions
   const { onInvalid, ...rest } = props
@@ -51,20 +66,18 @@ export const ElectionQuestionsForm = (props: ElectionQuestionsFormProps) => {
   return (
     <chakra.div __css={styles.wrapper} {...rest}>
       <Voted />
-      <form onSubmit={fmethods.handleSubmit(vote, onInvalid)} id={`election-questions-${election.id}`}>
-        <chakra.div __css={styles.typeBadgeWrapper}>
-          <QuestionsTypeBadge />
-        </chakra.div>
-        {questions.map((question, qk) => (
-          <QuestionField key={qk} index={qk.toString()} question={question} />
-        ))}
-        {error && (
-          <Alert status='error' variant='solid' mb={3}>
-            <AlertIcon />
-            {error}
-          </Alert>
-        )}
-      </form>
+      <chakra.div __css={styles.typeBadgeWrapper}>
+        <QuestionsTypeBadge />
+      </chakra.div>
+      {questions.map((question, qk) => (
+        <QuestionField key={qk} index={`${election.id}.${qk.toString()}`} question={question} />
+      ))}
+      {error && (
+        <Alert status='error' variant='solid' mb={3}>
+          <AlertIcon />
+          {error}
+        </Alert>
+      )}
     </chakra.div>
   )
 }
