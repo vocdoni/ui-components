@@ -22,9 +22,15 @@ export const QuestionField = ({ question, index }: QuestionFieldProps) => {
     formState: { errors },
   } = useFormContext()
 
+  const [election, qi] = index.split('.')
+  const questionIndex = Number(qi)
+  let isInvalid = false
+  if (errors[election] && Array.isArray(errors[election]) && errors[election][questionIndex]) {
+    isInvalid = !!errors[election][questionIndex]
+  }
   return (
     <chakra.div __css={styles.question}>
-      <FormControl isInvalid={!!errors[index]}>
+      <FormControl isInvalid={isInvalid}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
         </chakra.div>
@@ -227,7 +233,7 @@ export const SingleChoice = ({ index, question }: QuestionProps) => {
         required: localize('validation.required'),
       }}
       name={index}
-      render={({ field }) => (
+      render={({ field, fieldState: { error: fieldError } }) => (
         <RadioGroup sx={styles.radioGroup} {...field} isDisabled={disabled}>
           <Stack direction='column' sx={styles.stack}>
             {question.choices.map((choice, ck) => (
@@ -236,7 +242,7 @@ export const SingleChoice = ({ index, question }: QuestionProps) => {
               </Radio>
             ))}
           </Stack>
-          <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
+          <FormErrorMessage sx={styles.error}>{fieldError?.message as string}</FormErrorMessage>
         </RadioGroup>
       )}
     />

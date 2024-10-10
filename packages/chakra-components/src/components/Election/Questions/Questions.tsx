@@ -4,12 +4,13 @@ import { useElection } from '@vocdoni/react-providers'
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler } from 'react-hook-form'
 import { QuestionField } from './Fields'
-import { QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
+import { DefaultElectionFormId, QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
 import { Voted } from './Voted'
 
 export type ElectionQuestionsFormProps = ChakraProps & {
   onInvalid?: SubmitErrorHandler<FieldValues>
+  formId?: string
 }
 
 export type ElectionQuestionsProps = ElectionQuestionsFormProps & QuestionsFormProviderProps
@@ -20,7 +21,17 @@ export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestio
   </QuestionsFormProvider>
 )
 
-export const ElectionQuestionsForm = (props: ElectionQuestionsFormProps) => {
+export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQuestionsFormProps) => {
+  const methods = useQuestionsForm()
+  const { fmethods, vote } = methods
+  return (
+    <form onSubmit={fmethods.handleSubmit(vote, onInvalid)} id={formId ?? DefaultElectionFormId}>
+      <ElectionQuestion {...methods} {...rest} />
+    </form>
+  )
+}
+
+export const ElectionQuestion = (props: ChakraProps) => {
   const {
     election,
     voted,
@@ -28,10 +39,8 @@ export const ElectionQuestionsForm = (props: ElectionQuestionsFormProps) => {
     localize,
     isAbleToVote,
   } = useElection()
-  const { fmethods, vote } = useQuestionsForm()
   const styles = useMultiStyleConfig('ElectionQuestions')
   const questions: IQuestion[] | undefined = (election as PublishedElection)?.questions
-  const { onInvalid, ...rest } = props
 
   if (!(election instanceof PublishedElection)) return null
 
@@ -49,22 +58,20 @@ export const ElectionQuestionsForm = (props: ElectionQuestionsFormProps) => {
   }
 
   return (
-    <chakra.div __css={styles.wrapper} {...rest}>
+    <chakra.div __css={styles.wrapper} {...props}>
       <Voted />
-      <form onSubmit={fmethods.handleSubmit(vote, onInvalid)} id={`election-questions-${election.id}`}>
-        <chakra.div __css={styles.typeBadgeWrapper}>
-          <QuestionsTypeBadge />
-        </chakra.div>
-        {questions.map((question, qk) => (
-          <QuestionField key={qk} index={qk.toString()} question={question} />
-        ))}
-        {error && (
-          <Alert status='error' variant='solid' mb={3}>
-            <AlertIcon />
-            {error}
-          </Alert>
-        )}
-      </form>
+      <chakra.div __css={styles.typeBadgeWrapper}>
+        <QuestionsTypeBadge />
+      </chakra.div>
+      {questions.map((question, qk) => (
+        <QuestionField key={qk} index={`${election.id}.${qk.toString()}`} question={question} />
+      ))}
+      {error && (
+        <Alert status='error' variant='solid' mb={3}>
+          <AlertIcon />
+          {error}
+        </Alert>
+      )}
     </chakra.div>
   )
 }

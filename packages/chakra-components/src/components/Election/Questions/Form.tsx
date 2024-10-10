@@ -6,6 +6,8 @@ import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-fo
 import { useConfirm } from '../../layout'
 import { QuestionsConfirmation } from './Confirmation'
 
+export const DefaultElectionFormId = 'election-questions'
+
 export type QuestionsFormContextState = {
   fmethods: UseFormReturn<any>
   vote: (values: FieldValues) => Promise<false | void>
@@ -33,56 +35,30 @@ export const QuestionsFormProvider: React.FC<PropsWithChildren<QuestionsFormProv
   const { confirm } = useConfirm()
   const { election, client, vote: bvote } = useElection()
 
-  const vote = async (values: FieldValues) => {
+  const vote = async (values: Record<string, FieldValues>) => {
     if (!election || !(election instanceof PublishedElection)) {
       console.warn('vote attempt with no valid election defined')
       return false
     }
 
+    const electionChoices = values[election.id]
+
     if (
       client.wallet instanceof Wallet &&
       !(await confirm(
         typeof confirmContents === 'function' ? (
-          confirmContents(election, values)
+          confirmContents(election, electionChoices)
         ) : (
-          <QuestionsConfirmation election={election} answers={values} />
+          <QuestionsConfirmation election={election} answers={electionChoices} />
         )
       ))
     ) {
       return false
     }
 
-    let results: number[] = []
-    switch (election.resultsType.name) {
-      case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
-        results = election.questions.map((q, k) => parseInt(values[k.toString()], 10))
-        break
-      case ElectionResultsTypeNames.MULTIPLE_CHOICE:
-        results = Object.values(values)
-          .pop()
-          .map((v: string) => parseInt(v, 10))
-        // map proper abstain ids
-        if (election.resultsType.properties.canAbstain && results.length < election.voteType.maxCount!) {
-          let abs = 0
-          while (results.length < (election.voteType.maxCount || 1)) {
-            results.push(parseInt(election.resultsType.properties.abstainValues[abs++], 10))
-          }
-        }
-        break
-      case ElectionResultsTypeNames.APPROVAL:
-        results = election.questions[0].choices.map((c, k) => {
-          if (values[0].includes(k.toString())) {
-            return 1
-          } else {
-            return 0
-          }
-        })
-        break
-      default:
-        throw new Error('Unknown or invalid election type')
-    }
+    const votePackage = getVoteBallot(election, electionChoices)
 
-    return bvote(results)
+    return bvote(votePackage)
   }
 
   // reset form if account gets disconnected
@@ -105,4 +81,37 @@ export const QuestionsFormProvider: React.FC<PropsWithChildren<QuestionsFormProv
       <QuestionsFormContext.Provider value={{ fmethods, vote }}>{children}</QuestionsFormContext.Provider>
     </FormProvider>
   )
+}
+
+export const getVoteBallot = (election: PublishedElection, choices: FieldValues) => {
+  let results: number[] = []
+  switch (election.resultsType.name) {
+    case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
+      results = election.questions.map((q, k) => parseInt(choices[k.toString()], 10))
+      break
+    case ElectionResultsTypeNames.MULTIPLE_CHOICE:
+      results = Object.values(choices)
+        .pop()
+        .map((v: string) => parseInt(v, 10))
+      // map proper abstain ids
+      if (election.resultsType.properties.canAbstain && results.length < election.voteType.maxCount!) {
+        let abs = 0
+        while (results.length < (election.voteType.maxCount || 1)) {
+          results.push(parseInt(election.resultsType.properties.abstainValues[abs++], 10))
+        }
+      }
+      break
+    case ElectionResultsTypeNames.APPROVAL:
+      results = election.questions[0].choices.map((c, k) => {
+        if (choices[0].includes(k.toString())) {
+          return 1
+        } else {
+          return 0
+        }
+      })
+      break
+    default:
+      throw new Error('Unknown or invalid election type')
+  }
+  return results
 }
