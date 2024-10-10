@@ -4,13 +4,7 @@ import { useElection } from '@vocdoni/react-providers'
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler } from 'react-hook-form'
 import { QuestionField } from './Fields'
-import {
-  DefaultElectionFormId,
-  QuestionsFormContextState,
-  QuestionsFormProvider,
-  QuestionsFormProviderProps,
-  useQuestionsForm,
-} from './Form'
+import { DefaultElectionFormId, QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
 import { Voted } from './Voted'
 

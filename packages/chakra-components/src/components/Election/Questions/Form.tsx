@@ -56,7 +56,7 @@ export const QuestionsFormProvider: React.FC<PropsWithChildren<QuestionsFormProv
       return false
     }
 
-    const votePackage = getVotePackage(election, electionChoices)
+    const votePackage = getVoteBallot(election, electionChoices)
 
     return bvote(votePackage)
   }
@@ -83,7 +83,7 @@ export const QuestionsFormProvider: React.FC<PropsWithChildren<QuestionsFormProv
   )
 }
 
-export const getVotePackage = (election: PublishedElection, choices: FieldValues) => {
+export const getVoteBallot = (election: PublishedElection, choices: FieldValues) => {
   let results: number[] = []
   switch (election.resultsType.name) {
     case ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION:
