@@ -2,15 +2,24 @@ import { ButtonProps } from '@chakra-ui/button'
 import { Text } from '@chakra-ui/layout'
 import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
-import { useClient, useElection } from '@vocdoni/react-providers'
+import { ElectionState, useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { results } from './Results'
-import { MultiElectionsContext } from './Questions/MultiElectionContext'
 import { DefaultElectionFormId } from './Questions'
 
 export const VoteButton = (props: ButtonProps) => {
+  const election = useElection()
+  return <VoteButtonLogic {...props} electionState={election} />
+}
+
+export const VoteButtonLogic = ({
+  electionState,
+  ...props
+}: {
+  electionState: ElectionState
+} & ButtonProps) => {
   const { connected } = useClient()
   const {
     client,
@@ -23,7 +32,7 @@ export const VoteButton = (props: ButtonProps) => {
     localize,
     sik: { signature },
     sikSignature,
-  } = useElection()
+  } = electionState
   const [loading, setLoading] = useState<boolean>(false)
 
   if (!election || election instanceof InvalidElection) {
