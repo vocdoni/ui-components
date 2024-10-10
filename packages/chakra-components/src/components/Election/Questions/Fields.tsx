@@ -22,11 +22,10 @@ export const QuestionField = ({ question, index }: QuestionFieldProps) => {
     formState: { errors },
   } = useFormContext()
 
-  const [key, i] = index.split('.')
-
+  const [election, questionI] = index.split('.')
   return (
     <chakra.div __css={styles.question}>
-      <FormControl isInvalid={!!errors[key]?.[Number(i)]}>
+      <FormControl isInvalid={!!errors[election]?.[Number(questionI)]}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
         </chakra.div>
