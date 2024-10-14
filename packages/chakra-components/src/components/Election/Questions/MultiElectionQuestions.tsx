@@ -45,21 +45,14 @@ export const MultiElectionQuestionsForm = ({
   const { handleSubmit, watch } = fmethods
   const formData = watch()
 
-  const _validate = () => {
+  const onSubmit = (values: Record<string, FieldValues>) => {
     if (validate) {
       const error = validate(formData)
       if (typeof error === 'string' || (typeof error === 'boolean' && !error)) {
         setGlobalError(error.toString())
-        return false
+        return
       }
-    }
-    setGlobalError('')
-    return true
-  }
-
-  const onSubmit = (values: Record<string, FieldValues>) => {
-    if (validate && !_validate()) {
-      return
+      setGlobalError('')
     }
     voteAll(values)
   }
