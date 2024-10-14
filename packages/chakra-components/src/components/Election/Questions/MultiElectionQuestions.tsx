@@ -3,14 +3,13 @@ import { ElectionProvider, useElection } from '@vocdoni/react-providers'
 import { ComponentType, useEffect, useMemo, useState } from 'react'
 import { PublishedElection } from '@vocdoni/sdk'
 import { ButtonProps } from '@chakra-ui/button'
-import {
-  DefaultElectionFormId,
-  ElectionQuestion,
-  ElectionQuestionsFormProps,
-  VoteButtonLogic,
-} from '@vocdoni/chakra-components'
-import { Flex, FormControl, FormErrorMessage, useMultiStyleConfig } from '@chakra-ui/react'
-import { FieldValues, useFormContext, ValidateResult } from 'react-hook-form'
+import { useMultiStyleConfig } from '@chakra-ui/system'
+import { Flex } from '@chakra-ui/layout'
+import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
+import { FieldValues, ValidateResult } from 'react-hook-form'
+import { ElectionQuestion, ElectionQuestionsFormProps } from './Questions'
+import { VoteButtonLogic } from '../VoteButton'
+import { DefaultElectionFormId } from './Form'
 
 export type SubmitFormValidation = (values: Record<string, FieldValues>) => ValidateResult | Promise<ValidateResult>
 

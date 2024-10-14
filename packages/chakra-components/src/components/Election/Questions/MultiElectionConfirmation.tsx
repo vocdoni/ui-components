@@ -5,8 +5,8 @@ import { chakra, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system
 import { useClient } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames } from '@vocdoni/sdk'
 import { FieldValues } from 'react-hook-form'
-import { useConfirm } from '@vocdoni/chakra-components'
 import { ElectionStateStorage } from './MultiElectionContext'
+import { useConfirm } from '../../layout'
 
 export type MultiElectionConfirmationProps = {
   answers: Record<string, FieldValues>

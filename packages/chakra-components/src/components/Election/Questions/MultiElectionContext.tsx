@@ -4,7 +4,8 @@ import { PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
 import { Wallet } from '@ethersproject/wallet'
 import { useElection, ElectionState } from '@vocdoni/react-providers'
 import { MultiElectionConfirmation } from './MultiElectionConfirmation'
-import { useConfirm, getVoteBallot } from '@vocdoni/chakra-components'
+import { useConfirm } from '../../layout'
+import { getVoteBallot } from './Form'
 
 export type MultiElectionFormContextState = {
   fmethods: UseFormReturn<any>
