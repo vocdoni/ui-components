@@ -109,7 +109,7 @@ export const VoteWeight = () => {
     })()
   }, [client, election])
 
-  if (!weight || !election || !(election instanceof PublishedElection)) return <></>
+  if (!weight || !election || !(election instanceof PublishedElection)) return null
 
   return (
     <chakra.div __css={styles.wrapper}>
