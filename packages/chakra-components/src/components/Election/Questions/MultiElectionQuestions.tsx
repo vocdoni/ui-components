@@ -111,15 +111,3 @@ const SubElectionQuestions = (props: Omit<MultiElectionQuestionsFormProps, 'Conn
 
   return <ElectionQuestion {...props} />
 }
-
-/**
- * Check all values responses have the same length
- * Won't work for multiquestions elections.
- */
-export const sameLengthValidator: SubmitFormValidation = (answers) => {
-  const [first, ...rest] = Object.values(answers)
-  if (!first) {
-    throw new Error('No fields found')
-  }
-  return rest.every((ballot) => ballot[0].length === first[0].length)
-}
