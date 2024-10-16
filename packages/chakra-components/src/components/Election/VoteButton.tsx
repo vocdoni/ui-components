@@ -7,11 +7,28 @@ import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk
 import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { results } from './Results'
-import { DefaultElectionFormId } from './Questions'
+import { DefaultElectionFormId, useQuestionsForm } from './Questions'
 
 export const VoteButton = (props: ButtonProps) => {
   const election = useElection()
-  return <VoteButtonLogic {...props} electionState={election} />
+  try {
+    const questionForm = useQuestionsForm()
+    return <MultiElectionVoteButton {...props} />
+  } catch (e) {
+    return <VoteButtonLogic {...props} electionState={election} />
+  }
+}
+
+export const MultiElectionVoteButton = (props: ButtonProps) => {
+  const { isAbleToVote, voting, voted } = useQuestionsForm()
+  const election = useElection() // use Root election information
+
+  return (
+    <VoteButtonLogic
+      electionState={{ ...election, voted, loading: { ...election.loading, voting }, isAbleToVote }}
+      {...props}
+    />
+  )
 }
 
 export const VoteButtonLogic = ({

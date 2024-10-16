@@ -5,14 +5,15 @@ import { chakra, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system
 import { useClient } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames } from '@vocdoni/sdk'
 import { FieldValues } from 'react-hook-form'
-import { ElectionStateStorage } from './MultiElectionContext'
 import { useConfirm } from '../../layout'
+import { ElectionStateStorage } from './Questions'
 
 export type MultiElectionConfirmationProps = {
   answers: Record<string, FieldValues>
   elections: ElectionStateStorage
 }
 
+// todo(kon): refactor this to merge it with the current Confirmation modal
 export const MultiElectionConfirmation = ({ answers, elections, ...rest }: MultiElectionConfirmationProps) => {
   const mstyles = useMultiStyleConfig('ConfirmModal')
   const styles = useMultiStyleConfig('QuestionsConfirmation', rest)
@@ -26,13 +27,13 @@ export const MultiElectionConfirmation = ({ answers, elections, ...rest }: Multi
       <ModalBody sx={mstyles.body}>
         <Text sx={styles.description}>{localize('vote.confirm')}</Text>
         {Object.values(elections).map(({ election, voted, isAbleToVote }) => {
-          if (voted)
-            return (
-              <chakra.div __css={styles.question} key={election.id}>
-                <chakra.div __css={styles.title}>{election.title.default}</chakra.div>
-                <chakra.div __css={styles.answer}>{localize('vote.already_voted')}</chakra.div>
-              </chakra.div>
-            )
+          // if (voted)
+          //   return (
+          //     <chakra.div __css={styles.question} key={election.id}>
+          //       <chakra.div __css={styles.title}>{election.title.default}</chakra.div>
+          //       <chakra.div __css={styles.answer}>{localize('vote.already_voted')}</chakra.div>
+          //     </chakra.div>
+          //   )
           if (!isAbleToVote)
             return (
               <chakra.div __css={styles.question} key={election.id}>
@@ -42,6 +43,7 @@ export const MultiElectionConfirmation = ({ answers, elections, ...rest }: Multi
             )
           return (
             <Box key={election.id} {...props} sx={styles.box}>
+              {/*todo(kon): refactor to add election title and if already voted but can overwrite*/}
               {election.questions.map((q, k) => {
                 if (election.resultsType.name === ElectionResultsTypeNames.SINGLE_CHOICE_MULTIQUESTION) {
                   const choice = q.choices.find((v) => v.value === parseInt(answers[election.id][k.toString()], 10))
