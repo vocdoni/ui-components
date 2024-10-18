@@ -26,7 +26,7 @@ export const QuestionsConfirmation = ({ answers, elections, ...rest }: Questions
       <ModalBody sx={mstyles.body}>
         <Text sx={styles.description}>{localize('vote.confirm')}</Text>
         <Box {...props} sx={styles.box}>
-          {Object.values(elections).map(({ election, voted, isAbleToVote }) => {
+          {Object.values(elections).map(({ election, isAbleToVote }) => {
             if (!isAbleToVote)
               return (
                 <chakra.div __css={styles.question} key={election.id}>
