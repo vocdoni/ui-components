@@ -4,7 +4,7 @@ import { ElectionProvider, ElectionState, useElection } from '@vocdoni/react-pro
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler, ValidateResult } from 'react-hook-form'
 import { QuestionField } from './Fields'
-import { DefaultElectionFormId, QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
+import { QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
 import { Voted } from './Voted'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
@@ -35,7 +35,7 @@ export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestio
 export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQuestionsFormProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
   const { fmethods, voteAll, validate, renderWith } = useQuestionsForm()
-  const { ConnectButton } = useElection() // use Root election information
+  const { ConnectButton, election } = useElection() // use Root election information
   const [globalError, setGlobalError] = useState('')
 
   const { handleSubmit, watch } = fmethods
@@ -53,8 +53,10 @@ export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQu
     voteAll(values)
   }
 
+  if (!(election instanceof PublishedElection)) return null
+
   return (
-    <form onSubmit={handleSubmit(onSubmit, onInvalid)} id={formId ?? DefaultElectionFormId}>
+    <form onSubmit={handleSubmit(onSubmit, onInvalid)} id={formId ?? `election-questions-${election.id}`}>
       <ElectionQuestion {...rest} />
       {renderWith?.length > 0 && (
         <Flex direction={'column'} gap={10}>

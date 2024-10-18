@@ -7,7 +7,7 @@ import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk
 import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { results } from './Results'
-import { DefaultElectionFormId, useQuestionsForm } from './Questions'
+import { useQuestionsForm } from './Questions'
 
 export const VoteButton = (props: ButtonProps) => {
   const election = useElection()
@@ -64,7 +64,7 @@ export const VoteButtonLogic = ({
 
   const button: ButtonProps = {
     type: 'submit',
-    form: DefaultElectionFormId,
+    form: `election-questions-${election.id}`,
     ...props,
     isDisabled,
     isLoading: voting,

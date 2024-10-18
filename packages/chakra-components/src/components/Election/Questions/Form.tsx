@@ -7,8 +7,6 @@ import { useConfirm } from '../../layout'
 import { QuestionsConfirmation } from './Confirmation'
 import { ElectionStateStorage, RenderWith, SubElectionState, SubmitFormValidation } from './Questions'
 
-export const DefaultElectionFormId = 'election-questions'
-
 export type QuestionsFormContextState = {
   fmethods: UseFormReturn<any>
 } & SpecificFormProviderProps &
