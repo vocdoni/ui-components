@@ -143,7 +143,7 @@ const useMultiElectionsProvider = ({
 
   const voteAll = async (values: Record<string, FieldValues>) => {
     if (!electionsStates || Object.keys(electionsStates).length === 0) {
-      console.warn('vote attempt with no valid elections not defined')
+      console.warn('vote attempt with no valid elections defined')
       return false
     }
 
