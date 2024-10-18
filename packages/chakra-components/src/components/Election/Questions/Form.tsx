@@ -4,7 +4,7 @@ import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
 import React, { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form'
 import { useConfirm } from '../../layout'
-import { MultiElectionConfirmation } from './MultiElectionConfirmation'
+import { QuestionsConfirmation } from './Confirmation'
 import { ElectionStateStorage, RenderWith, SubElectionState, SubmitFormValidation } from './Questions'
 
 export const DefaultElectionFormId = 'election-questions'
@@ -155,7 +155,7 @@ const useMultiElectionsProvider = ({
         typeof confirmContents === 'function' ? (
           confirmContents(electionsStates, values)
         ) : (
-          <MultiElectionConfirmation elections={electionsStates} answers={values} />
+          <QuestionsConfirmation elections={electionsStates} answers={values} />
         )
       ))
     ) {
