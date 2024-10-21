@@ -57,16 +57,15 @@ export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQu
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} id={formId ?? `election-questions-${election.id}`}>
-      <ElectionQuestion {...rest} />
-      {renderWith?.length > 0 && (
-        <Flex direction={'column'} gap={10}>
-          {renderWith.map(({ id }) => (
+      <chakra.div __css={styles.elections}>
+        <ElectionQuestion {...rest} />
+        {renderWith?.length > 0 &&
+          renderWith.map(({ id }) => (
             <ElectionProvider key={id} ConnectButton={ConnectButton} id={id} fetchCensus>
               <SubElectionQuestions {...rest} />
             </ElectionProvider>
           ))}
-        </Flex>
-      )}
+      </chakra.div>
       <FormControl isInvalid={!!globalError}>
         <FormErrorMessage sx={styles.error}>{globalError}</FormErrorMessage>
       </FormControl>
