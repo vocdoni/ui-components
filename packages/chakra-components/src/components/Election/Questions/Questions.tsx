@@ -122,7 +122,7 @@ export const ElectionQuestion = (props: ChakraProps) => {
 export type SubElectionState = { election: PublishedElection } & Pick<ElectionState, 'vote' | 'isAbleToVote' | 'voted'>
 export type ElectionStateStorage = Record<string, SubElectionState>
 
-const SubElectionQuestions = (props: ChakraProps) => {
+export const SubElectionQuestions = (props: ChakraProps) => {
   const { rootClient, addElection, elections } = useQuestionsForm()
   const { election, setClient, vote, connected, clearClient, isAbleToVote, voted } = useElection()
 
