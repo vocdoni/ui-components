@@ -12,7 +12,7 @@ export const MultiElectionVoted = () => {
     return null
   }
   const votes = Object.values(elections).map((e) => e.voted)
-  return <VotedLogic voteds={votes} />
+  return <VotedLogic votes={votes} />
 }
 
 export const Voted = () => {
@@ -20,18 +20,18 @@ export const Voted = () => {
   if (!voted) {
     return null
   }
-  return <VotedLogic voteds={[voted]} />
+  return <VotedLogic votes={[voted]} />
 }
 
 interface IVotedLogicProps {
-  voteds: string[]
+  votes: string[]
 }
 
-const VotedLogic = ({ voteds }: IVotedLogicProps) => {
+const VotedLogic = ({ votes }: IVotedLogicProps) => {
   const { localize } = useElection()
   const styles = useMultiStyleConfig('ElectionQuestions')
 
-  if (!(voteds?.length > 0)) {
+  if (!(votes?.length > 0)) {
     return null
   }
 
@@ -49,7 +49,7 @@ const VotedLogic = ({ voteds }: IVotedLogicProps) => {
       <AlertIcon />
       <AlertTitle sx={styles.alertTitle}>{localize('vote.voted_title')}</AlertTitle>
       <AlertDescription isTruncated maxW='100%' whiteSpace='initial' sx={styles.alertDescription}>
-        {voteds.length === 1 ? <SingleElectionVoted voted={voteds[0]} /> : <MultipleElectionVoted voteds={voteds} />}
+        {votes.length === 1 ? <SingleElectionVoted voted={votes[0]} /> : <MultipleElectionVoted votes={votes} />}
       </AlertDescription>
     </Alert>
   )
@@ -70,16 +70,16 @@ const SingleElectionVoted = ({ voted }: { voted: string }) => {
   )
 }
 
-const MultipleElectionVoted = ({ voteds }: IVotedLogicProps) => {
+const MultipleElectionVoted = ({ votes }: IVotedLogicProps) => {
   const { localize } = useElection()
   const { env } = useClient()
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const votedsString = voteds.join(',')
+  const votesString = votes.join(',')
   return (
     <chakra.div __css={styles.alertDescriptionWrapper}>
-      {reactStringReplace(localize('vote.voted_description_multielection', { ids: votedsString }), votedsString, () => (
+      {reactStringReplace(localize('vote.voted_description_multielection', { ids: votesString }), votesString, () => (
         <>
-          {voteds.map((voted) => (
+          {votes.map((voted) => (
             <Link
               key={voted}
               href={environment.verifyVote(env, voted)}
