@@ -7,8 +7,10 @@ import { useConfirm } from '../../layout'
 import { QuestionsConfirmation } from './Confirmation'
 import { ElectionStateStorage, RenderWith, SubElectionState, SubmitFormValidation } from './Questions'
 
+export type FormFieldValues = Record<string, FieldValues>
+
 export type QuestionsFormContextState = {
-  fmethods: UseFormReturn<any>
+  fmethods: UseFormReturn<FormFieldValues>
 } & SpecificFormProviderProps &
   ReturnType<typeof useMultiElectionsProvider>
 
@@ -23,7 +25,7 @@ export const useQuestionsForm = () => {
 }
 
 export type QuestionsFormProviderProps = {
-  confirmContents?: (elections: ElectionStateStorage, answers: Record<string, FieldValues>) => ReactNode
+  confirmContents?: (elections: ElectionStateStorage, answers: FormFieldValues) => ReactNode
 }
 
 // Props that must not be shared with ElectionQuestionsProps
@@ -35,7 +37,7 @@ export type SpecificFormProviderProps = {
 export const QuestionsFormProvider: React.FC<
   PropsWithChildren<QuestionsFormProviderProps & SpecificFormProviderProps>
 > = ({ children, ...props }) => {
-  const fmethods = useForm()
+  const fmethods = useForm<FormFieldValues>()
   const multiElections = useMultiElectionsProvider({ fmethods, ...props })
 
   return (
@@ -85,7 +87,7 @@ export const constructVoteBallot = (election: PublishedElection, choices: FieldV
 const useMultiElectionsProvider = ({
   fmethods,
   confirmContents,
-}: { fmethods: UseFormReturn } & QuestionsFormProviderProps) => {
+}: { fmethods: UseFormReturn<FormFieldValues> } & QuestionsFormProviderProps) => {
   const { confirm } = useConfirm()
   const { client, isAbleToVote: rootIsAbleToVote, voted: rootVoted, election, vote } = useElection() // Root Election
   // State to store on memory the loaded elections to pass it into confirm modal to show the info
@@ -144,7 +146,7 @@ const useMultiElectionsProvider = ({
     addElection(rootElectionState)
   }, [rootElectionState, electionsStates, election])
 
-  const voteAll = async (values: Record<string, FieldValues>) => {
+  const voteAll = async (values: FormFieldValues) => {
     if (!electionsStates || Object.keys(electionsStates).length === 0) {
       console.warn('vote attempt with no valid elections defined')
       return false

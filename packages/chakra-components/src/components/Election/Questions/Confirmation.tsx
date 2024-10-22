@@ -9,7 +9,7 @@ import { useConfirm } from '../../layout'
 import { ElectionStateStorage } from './Questions'
 
 export type QuestionsConfirmationProps = {
-  answers: Record<string, FieldValues>
+  answers: FormFieldValues
   elections: ElectionStateStorage
 }
 

@@ -4,7 +4,7 @@ import { ElectionProvider, ElectionState, useElection } from '@vocdoni/react-pro
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler, ValidateResult } from 'react-hook-form'
 import { QuestionField } from './Fields'
-import { QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
+import { FormFieldValues, QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
 import { MultiElectionVoted, Voted } from './Voted'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
@@ -14,7 +14,7 @@ export type RenderWith = {
   id: string
 }
 
-export type SubmitFormValidation = (values: Record<string, FieldValues>) => ValidateResult | Promise<ValidateResult>
+export type SubmitFormValidation = (values: FormFieldValues) => ValidateResult | Promise<ValidateResult>
 
 export type ElectionQuestionsFormProps = ChakraProps & {
   onInvalid?: SubmitErrorHandler<FieldValues>
@@ -40,7 +40,7 @@ export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQu
   const { handleSubmit, watch } = fmethods
   const formData = watch()
 
-  const onSubmit = (values: Record<string, FieldValues>) => {
+  const onSubmit = (values: FormFieldValues) => {
     if (validate) {
       const error = validate(formData)
       if (typeof error === 'string' || (typeof error === 'boolean' && !error)) {
