@@ -92,14 +92,17 @@ const useMultiElectionsProvider = ({
   const [electionsStates, setElectionsStates] = useState<ElectionStateStorage>({})
   const [voting, setVoting] = useState<boolean>(false)
 
+  const electionsEmpty = Object.values(electionsStates).length === 0
+
   const voted = useMemo(
-    () => (electionsStates && Object.values(electionsStates).every(({ voted }) => voted) ? 'true' : null),
-    [electionsStates]
+    () =>
+      electionsStates && !electionsEmpty && Object.values(electionsStates).every(({ voted }) => voted) ? 'true' : null,
+    [electionsStates, electionsEmpty]
   )
 
   const isAbleToVote = useMemo(
-    () => electionsStates && Object.values(electionsStates).some(({ isAbleToVote }) => isAbleToVote),
-    [electionsStates]
+    () => electionsStates && !electionsEmpty && Object.values(electionsStates).some(({ isAbleToVote }) => isAbleToVote),
+    [electionsStates, electionsEmpty]
   )
 
   // Add an election to the storage
@@ -162,7 +165,7 @@ const useMultiElectionsProvider = ({
 
     setVoting(true)
 
-    const votingList = Object.entries(electionsStates).map(([key, { election, vote, voted, isAbleToVote }]) => {
+    const votingList = Object.entries(electionsStates).map(([key, { election, vote, isAbleToVote }]) => {
       if (!(election instanceof PublishedElection) || !values[election.id] || !isAbleToVote) {
         return Promise.resolve()
       }

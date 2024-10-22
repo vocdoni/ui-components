@@ -102,6 +102,7 @@ export const locales = {
     confirm: 'Please confirm your choices:',
     sign: 'Sign first',
     voted_description: 'Your vote id is {{ id }}. You can use it to verify your vote.',
+    voted_description_multielection: 'Your vote ids are: {{ ids }} You can use its to verify your votes.',
     voted_title: 'Your vote was successfully cast!',
     weight: 'Your voting power is: ',
   },

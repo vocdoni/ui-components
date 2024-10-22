@@ -6,10 +6,9 @@ import { FieldValues, SubmitErrorHandler, ValidateResult } from 'react-hook-form
 import { QuestionField } from './Fields'
 import { QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
-import { Voted } from './Voted'
+import { MultiElectionVoted, Voted } from './Voted'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
 import { useEffect, useMemo, useState } from 'react'
-import { Flex } from '@chakra-ui/layout'
 
 export type RenderWith = {
   id: string
@@ -34,7 +33,7 @@ export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestio
 
 export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQuestionsFormProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const { fmethods, voteAll, validate, renderWith } = useQuestionsForm()
+  const { fmethods, voteAll, validate, renderWith, voted, isAbleToVote } = useQuestionsForm()
   const { ConnectButton, election } = useElection() // use Root election information
   const [globalError, setGlobalError] = useState('')
 
@@ -58,6 +57,7 @@ export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQu
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} id={formId ?? `election-questions-${election.id}`}>
       <chakra.div __css={styles.elections}>
+        <MultiElectionVoted />
         <ElectionQuestion {...rest} />
         {renderWith?.length > 0 &&
           renderWith.map(({ id }) => (
@@ -87,7 +87,7 @@ export const ElectionQuestion = (props: ChakraProps) => {
   if (!(election instanceof PublishedElection)) return null
 
   if (voted && !isAbleToVote) {
-    return <Voted />
+    return null
   }
 
   if (!questions || (questions && !questions?.length)) {
