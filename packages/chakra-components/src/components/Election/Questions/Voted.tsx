@@ -59,11 +59,15 @@ const SingleElectionVoted = ({ voted }: { voted: string }) => {
   const { localize } = useElection()
   const { env } = useClient()
   const styles = useMultiStyleConfig('ElectionQuestions')
-  return reactStringReplace(localize('vote.voted_description', { id: voted }), voted, (match, k) => (
-    <Link key={k} href={environment.verifyVote(env, voted)} target='_blank' isTruncated sx={styles.alertLink}>
-      {match}
-    </Link>
-  ))
+  return (
+    <>
+      {reactStringReplace(localize('vote.voted_description', { id: voted }), voted, (match, k) => (
+        <Link key={k} href={environment.verifyVote(env, voted)} target='_blank' isTruncated sx={styles.alertLink}>
+          {match}
+        </Link>
+      ))}
+    </>
+  )
 }
 
 const MultipleElectionVoted = ({ voteds }: IVotedLogicProps) => {
