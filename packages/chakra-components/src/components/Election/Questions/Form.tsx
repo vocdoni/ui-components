@@ -89,6 +89,8 @@ const useMultiElectionsProvider = ({
   confirmContents,
 }: { fmethods: UseFormReturn<FormFieldValues> } & QuestionsFormProviderProps) => {
   const { confirm } = useConfirm()
+  // State to manually disable the form
+  const [isDisabled, setIsDisabled] = useState(false)
   const { client, isAbleToVote: rootIsAbleToVote, voted: rootVoted, election, vote } = useElection() // Root Election
   // State to store on memory the loaded elections to pass it into confirm modal to show the info
   const [electionsStates, setElectionsStates] = useState<ElectionStateStorage>({})
@@ -185,5 +187,7 @@ const useMultiElectionsProvider = ({
     addElection,
     isAbleToVote,
     voted,
+    isDisabled,
+    setIsDisabled,
   }
 }

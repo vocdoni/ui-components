@@ -3,7 +3,7 @@ import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { ElectionProvider, ElectionState, useElection } from '@vocdoni/react-providers'
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler, ValidateResult } from 'react-hook-form'
-import { QuestionField } from './Fields'
+import { QuestionField, QuestionProps } from './Fields'
 import { FormFieldValues, QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
 import { MultiElectionVoted, Voted } from './Voted'
@@ -33,7 +33,7 @@ export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestio
 
 export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQuestionsFormProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const { fmethods, voteAll, validate, renderWith, voted, isAbleToVote } = useQuestionsForm()
+  const { fmethods, voteAll, validate, renderWith, isDisabled } = useQuestionsForm()
   const { ConnectButton, election } = useElection() // use Root election information
   const [globalError, setGlobalError] = useState('')
 
@@ -58,7 +58,7 @@ export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQu
     <form onSubmit={handleSubmit(onSubmit, onInvalid)} id={formId ?? `election-questions-${election.id}`}>
       <chakra.div __css={styles.elections}>
         <MultiElectionVoted />
-        <ElectionQuestion {...rest} />
+        <ElectionQuestion isDisabled={isDisabled} {...rest} />
         {renderWith?.length > 0 &&
           renderWith.map(({ id }) => (
             <ElectionProvider key={id} ConnectButton={ConnectButton} id={id} fetchCensus>
@@ -73,7 +73,7 @@ export const ElectionQuestionsForm = ({ formId, onInvalid, ...rest }: ElectionQu
   )
 }
 
-export const ElectionQuestion = (props: ChakraProps) => {
+export const ElectionQuestion = ({ isDisabled, ...props }: Pick<QuestionProps, 'isDisabled'> & ChakraProps) => {
   const {
     election,
     voted,
@@ -106,7 +106,7 @@ export const ElectionQuestion = (props: ChakraProps) => {
         <QuestionsTypeBadge />
       </chakra.div>
       {questions.map((question, qk) => (
-        <QuestionField key={qk} index={`${election.id}.${qk.toString()}`} question={question} />
+        <QuestionField key={qk} index={`${election.id}.${qk.toString()}`} question={question} isDisabled={isDisabled} />
       ))}
       {error && (
         <Alert status='error' variant='solid' mb={3}>
@@ -122,7 +122,7 @@ export type SubElectionState = { election: PublishedElection } & Pick<ElectionSt
 export type ElectionStateStorage = Record<string, SubElectionState>
 
 export const SubElectionQuestions = (props: ChakraProps) => {
-  const { rootClient, addElection, elections } = useQuestionsForm()
+  const { rootClient, addElection, elections, isDisabled } = useQuestionsForm()
   const { election, setClient, vote, connected, clearClient, isAbleToVote, voted } = useElection()
 
   const subElectionState: SubElectionState | null = useMemo(() => {
@@ -156,5 +156,5 @@ export const SubElectionQuestions = (props: ChakraProps) => {
     addElection(subElectionState)
   }, [subElectionState, elections, election])
 
-  return <ElectionQuestion {...props} />
+  return <ElectionQuestion isDisabled={isDisabled} {...props} />
 }
