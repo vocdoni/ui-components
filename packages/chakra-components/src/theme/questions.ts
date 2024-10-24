@@ -8,7 +8,10 @@ export const questionsAnatomy = [
   'alert',
   'alertTitle',
   'alertDescription',
+  'alertDescriptionWrapper', // Wrapper for multielection voted message
   'alertLink',
+  // elections wrapper for multielections
+  'elections',
   // question wrapper
   'question',
   // question header
