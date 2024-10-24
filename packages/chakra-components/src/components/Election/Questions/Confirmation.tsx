@@ -6,6 +6,7 @@ import { useClient } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames } from '@vocdoni/sdk'
 import { FieldValues } from 'react-hook-form'
 import { useConfirm } from '../../layout'
+import { FormFieldValues } from './Form'
 import { ElectionStateStorage } from './Questions'
 
 export type QuestionsConfirmationProps = {
