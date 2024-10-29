@@ -43,7 +43,7 @@ export const QuestionsFormProvider: React.FC<
   return (
     <FormProvider {...fmethods}>
       <QuestionsFormContext.Provider
-        value={{ fmethods, renderWith: props.renderWith, validate: props.validate, ...multiElections }}
+        value={{ fmethods, renderWith: props.renderWith ?? [], validate: props.validate, ...multiElections }}
       >
         {children}
       </QuestionsFormContext.Provider>

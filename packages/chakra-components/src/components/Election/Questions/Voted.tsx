@@ -11,7 +11,9 @@ export const MultiElectionVoted = () => {
   if (!voted) {
     return null
   }
-  const votes = Object.values(elections).map((e) => e.voted)
+  const votes = Object.values(elections)
+    .map((e) => e.voted)
+    .filter((voted) => voted !== null)
   return <VotedLogic votes={votes} />
 }
 
