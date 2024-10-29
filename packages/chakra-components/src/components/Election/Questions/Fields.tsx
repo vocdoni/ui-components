@@ -280,11 +280,12 @@ export const QuestionChoice = (choice: IChoice & ChakraProps) => {
   const thumbnail = image?.thumbnail
   const descriptionTxt = description?.default ?? ''
 
-  const renderModal = defaultImage || descriptionTxt || thumbnail
+  const renderImage = defaultImage || thumbnail
+  const renderModal = renderImage || descriptionTxt
 
   return (
     <Stack sx={styles.choiceWrapper}>
-      {(defaultImage || thumbnail) && (
+      {renderImage && (
         <Skeleton isLoaded={loaded} sx={styles.skeleton}>
           <Image
             onClick={(e) => {
@@ -306,9 +307,14 @@ export const QuestionChoice = (choice: IChoice & ChakraProps) => {
           <ModalContent sx={styles.modalContent}>
             <ModalCloseButton sx={styles.modalClose} />
             <ModalBody sx={styles.modalBody}>
-              {defaultImage && (
+              {renderImage && (
                 <Skeleton isLoaded={loadedModal} sx={styles.skeletonModal}>
-                  <Image src={defaultImage} alt={label} sx={styles.modalImage} onLoad={() => setLoadedModal(true)} />
+                  <Image
+                    src={defaultImage ?? thumbnail}
+                    alt={label}
+                    sx={styles.modalImage}
+                    onLoad={() => setLoadedModal(true)}
+                  />
                 </Skeleton>
               )}
               <Text sx={styles.modalLabel}>{label}</Text>
