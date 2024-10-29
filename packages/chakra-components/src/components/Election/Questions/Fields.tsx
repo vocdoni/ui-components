@@ -7,7 +7,7 @@ import { useDisclosure } from '@chakra-ui/react-use-disclosure'
 import { Skeleton } from '@chakra-ui/skeleton'
 import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useElection } from '@vocdoni/react-providers'
-import { ElectionResultsTypeNames, ElectionStatus, IQuestion, PublishedElection } from '@vocdoni/sdk'
+import { ElectionResultsTypeNames, ElectionStatus, IChoice, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'
 import { Image, Markdown } from '../../layout'
 import { QuestionTip } from './Tip'
@@ -137,7 +137,7 @@ export const MultiChoice = ({ index, question, isDisabled }: QuestionProps) => {
                       trigger(index) // Manually trigger validation
                     }}
                   >
-                    <QuestionChoice label={choice.title.default} {...(choice?.meta ?? {})} />
+                    <QuestionChoice {...choice} />
                   </Checkbox>
                 )
               })}
@@ -201,7 +201,7 @@ export const ApprovalChoice = ({ index, question, isDisabled }: QuestionProps) =
                       }
                     }}
                   >
-                    <QuestionChoice label={choice.title.default} {...(choice?.meta ?? {})} />
+                    <QuestionChoice {...choice} />
                   </Checkbox>
                 )
               })}
@@ -245,7 +245,7 @@ export const SingleChoice = ({ index, question, isDisabled }: QuestionProps) => 
             {question.choices.map((choice, ck) => {
               return (
                 <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
-                  <QuestionChoice label={choice.title.default} {...(choice?.meta ?? {})} />
+                  <QuestionChoice {...choice} />
                 </Radio>
               )
             })}
@@ -268,47 +268,55 @@ export type QuestionChoiceMeta = {
   }
 }
 
-export type QuestionChoiceProps = { label: string } & QuestionChoiceMeta & ChakraProps
-
-export const QuestionChoice = ({ image, description, label }: QuestionChoiceProps) => {
+export const QuestionChoice = (choice: IChoice & ChakraProps) => {
   const styles = useMultiStyleConfig('QuestionsChoice')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [loaded, setLoaded] = useState(false)
   const [loadedModal, setLoadedModal] = useState(false)
+
+  const label = choice.title.default
+  const { image, description } = (choice?.meta ?? {}) as QuestionChoiceMeta
   const defaultImage = image?.default ?? ''
+  const thumbnail = image?.thumbnail
   const descriptionTxt = description?.default ?? ''
+
+  const renderModal = defaultImage || descriptionTxt || thumbnail
 
   return (
     <Stack sx={styles.choiceWrapper}>
-      <Skeleton isLoaded={loaded} sx={styles.skeleton}>
-        <Image
-          onClick={(e) => {
-            if (!defaultImage && !descriptionTxt) return
-            e.preventDefault()
-            onOpen()
-          }}
-          sx={styles.choiceImage}
-          src={image?.thumbnail ?? defaultImage}
-          alt={label}
-          onLoad={() => setLoaded(true)}
-        />
-      </Skeleton>
+      {(defaultImage || thumbnail) && (
+        <Skeleton isLoaded={loaded} sx={styles.skeleton}>
+          <Image
+            onClick={(e) => {
+              if (!renderModal) return
+              e.preventDefault()
+              onOpen()
+            }}
+            sx={styles.choiceImage}
+            src={thumbnail ?? defaultImage}
+            alt={label}
+            onLoad={() => setLoaded(true)}
+          />
+        </Skeleton>
+      )}
       <Text sx={styles.choiceLabel}>{label}</Text>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay sx={styles.modalOverlay} />
-        <ModalContent sx={styles.modalContent}>
-          <ModalCloseButton sx={styles.modalClose} />
-          <ModalBody sx={styles.modalBody}>
-            {defaultImage && (
-              <Skeleton isLoaded={loadedModal} sx={styles.skeletonModal}>
-                <Image src={defaultImage} alt={label} sx={styles.modalImage} onLoad={() => setLoadedModal(true)} />
-              </Skeleton>
-            )}
-            <Text sx={styles.modalLabel}>{label}</Text>
-            {descriptionTxt && <Text sx={styles.modalDescription}>{descriptionTxt}</Text>}
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      {renderModal && (
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay sx={styles.modalOverlay} />
+          <ModalContent sx={styles.modalContent}>
+            <ModalCloseButton sx={styles.modalClose} />
+            <ModalBody sx={styles.modalBody}>
+              {defaultImage && (
+                <Skeleton isLoaded={loadedModal} sx={styles.skeletonModal}>
+                  <Image src={defaultImage} alt={label} sx={styles.modalImage} onLoad={() => setLoadedModal(true)} />
+                </Skeleton>
+              )}
+              <Text sx={styles.modalLabel}>{label}</Text>
+              {descriptionTxt && <Text sx={styles.modalDescription}>{descriptionTxt}</Text>}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
     </Stack>
   )
 }
