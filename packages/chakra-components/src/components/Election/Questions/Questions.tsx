@@ -61,7 +61,7 @@ export const ElectionQuestionsForm = ({ formId, onSubmit, onInvalid, ...rest }: 
   if (!(election instanceof PublishedElection)) return null
 
   return (
-    <form
+    <chakra.form
       onSubmit={handleSubmit((...params) => {
         if (onSubmit) {
           return onSubmit(_onSubmit, ...params)
@@ -69,9 +69,10 @@ export const ElectionQuestionsForm = ({ formId, onSubmit, onInvalid, ...rest }: 
         return _onSubmit(params[0])
       }, onInvalid)}
       id={formId ?? `election-questions-${election.id}`}
+      __css={styles.form}
     >
+      <MultiElectionVoted />
       <chakra.div __css={styles.elections}>
-        <MultiElectionVoted />
         <ElectionQuestion isDisabled={isDisabled} {...rest} />
         {renderWith?.length > 0 &&
           renderWith.map(({ id }) => (
@@ -83,7 +84,7 @@ export const ElectionQuestionsForm = ({ formId, onSubmit, onInvalid, ...rest }: 
       <FormControl isInvalid={!!globalError}>
         <FormErrorMessage sx={styles.error}>{globalError}</FormErrorMessage>
       </FormControl>
-    </form>
+    </chakra.form>
   )
 }
 
