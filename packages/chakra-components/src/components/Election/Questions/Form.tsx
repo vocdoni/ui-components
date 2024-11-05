@@ -130,12 +130,15 @@ const useMultiElectionsProvider = ({
 
   // reset form if account gets disconnected
   useEffect(() => {
-    if (typeof client.wallet !== 'undefined') return
-
-    setElectionsStates({})
-    fmethods.reset({
-      ...Object.values(electionsStates).reduce((acc, { election }) => ({ ...acc, [election.id]: '' }), {}),
-    })
+    if (
+      (typeof client.wallet === 'undefined' || Object.values(client.wallet).length === 0) &&
+      Object.keys(electionsStates).length > 0
+    ) {
+      setElectionsStates({})
+      fmethods.reset({
+        ...Object.values(electionsStates).reduce((acc, { election }) => ({ ...acc, [election.id]: '' }), {}),
+      })
+    }
   }, [client, electionsStates, fmethods])
 
   // Add the root election to the state to elections cache

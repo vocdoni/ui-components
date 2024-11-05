@@ -138,7 +138,7 @@ export type ElectionStateStorage = Record<string, SubElectionState>
 
 export const SubElectionQuestions = (props: ChakraProps) => {
   const { rootClient, addElection, elections, isDisabled } = useQuestionsForm()
-  const { election, setClient, vote, connected, clearClient, isAbleToVote, voted } = useElection()
+  const { election, setClient, vote, clearClient, isAbleToVote, voted } = useElection()
 
   const subElectionState: SubElectionState | null = useMemo(() => {
     if (!election || !(election instanceof PublishedElection)) return null
@@ -152,16 +152,17 @@ export const SubElectionQuestions = (props: ChakraProps) => {
 
   // clear session of local context when login out
   useEffect(() => {
-    if (connected) return
-    clearClient()
-  }, [connected])
+    if (rootClient.wallet === undefined || Object.keys(rootClient.wallet).length === 0) {
+      clearClient()
+    }
+  }, [rootClient])
 
   // ensure the client is set to the root one
   useEffect(() => {
     setClient(rootClient)
-  }, [rootClient, election])
+  }, [rootClient])
 
-  // Add the election to the state cache
+  // Add the sub election to the state cache
   useEffect(() => {
     if (!subElectionState || !subElectionState.election) return
     const actualState = elections[subElectionState.election.id]
