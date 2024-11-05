@@ -1,7 +1,16 @@
 import { Wallet } from '@ethersproject/wallet'
 import { useElection } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
-import React, { createContext, PropsWithChildren, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
+import React, {
+  createContext,
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form'
 import { useConfirm } from '../../layout'
 import { QuestionsConfirmation } from './Confirmation'
@@ -39,11 +48,12 @@ export const QuestionsFormProvider: React.FC<
 > = ({ children, ...props }) => {
   const fmethods = useForm<FormFieldValues>()
   const multiElections = useMultiElectionsProvider({ fmethods, ...props })
+  const value = { fmethods, renderWith: props.renderWith, validate: props.validate, ...multiElections }
 
   return (
     <FormProvider {...fmethods}>
       <QuestionsFormContext.Provider
-        value={{ fmethods, renderWith: props.renderWith ?? [], validate: props.validate, ...multiElections }}
+        value={{ fmethods, renderWith: props.renderWith, validate: props.validate, ...multiElections }}
       >
         {children}
       </QuestionsFormContext.Provider>
@@ -87,35 +97,51 @@ export const constructVoteBallot = (election: PublishedElection, choices: FieldV
 const useMultiElectionsProvider = ({
   fmethods,
   confirmContents,
-}: { fmethods: UseFormReturn<FormFieldValues> } & QuestionsFormProviderProps) => {
+  ...rest
+}: { fmethods: UseFormReturn<FormFieldValues> } & QuestionsFormProviderProps & SpecificFormProviderProps) => {
   const { confirm } = useConfirm()
   // State to manually disable the form
   const [isDisabled, setIsDisabled] = useState(false)
-  const { client, isAbleToVote: rootIsAbleToVote, voted: rootVoted, election, vote } = useElection() // Root Election
+  const { client, isAbleToVote: rootIsAbleToVote, voted: rootVoted, election, loaded: rootLoaded, vote } = useElection() // Root Election
   // State to store on memory the loaded elections to pass it into confirm modal to show the info
   const [electionsStates, setElectionsStates] = useState<ElectionStateStorage>({})
   const [voting, setVoting] = useState<boolean>(false)
 
-  const electionsEmpty = Object.values(electionsStates).length === 0
-
+  // Util to check if the electionsStates object contains elections and is not empty
+  const _electionsCount = Object.values(electionsStates).length
   const voted = useMemo(
     () =>
-      electionsStates && !electionsEmpty && Object.values(electionsStates).every(({ voted }) => voted) ? 'true' : null,
-    [electionsStates, electionsEmpty]
+      electionsStates && _electionsCount > 0 && Object.values(electionsStates).every(({ voted }) => voted)
+        ? 'true'
+        : null,
+    [electionsStates, _electionsCount]
   )
 
   const isAbleToVote = useMemo(
-    () => electionsStates && !electionsEmpty && Object.values(electionsStates).some(({ isAbleToVote }) => isAbleToVote),
-    [electionsStates, electionsEmpty]
+    () =>
+      electionsStates && _electionsCount > 0 && Object.values(electionsStates).some(({ isAbleToVote }) => isAbleToVote),
+    [electionsStates, _electionsCount]
+  )
+
+  const loaded = useMemo(
+    () =>
+      electionsStates &&
+      _electionsCount > 0 &&
+      _electionsCount === rest.renderWith?.length + 1 && // If the amount of elections is the same as the amount of subelections + root election
+      Object.values(electionsStates).every(({ loaded }) => loaded.election),
+    [electionsStates, _electionsCount]
   )
 
   // Add an election to the storage
-  const addElection = (electionState: SubElectionState) => {
-    setElectionsStates((prev) => ({
-      ...prev,
-      [(electionState.election as PublishedElection).id]: electionState,
-    }))
-  }
+  const addElection = useCallback(
+    (electionState: SubElectionState) => {
+      setElectionsStates((prev) => ({
+        ...prev,
+        [(electionState.election as PublishedElection).id]: electionState,
+      }))
+    },
+    [setElectionsStates]
+  )
 
   // Root election state to be added to the state storage
   const rootElectionState: SubElectionState | null = useMemo(() => {
@@ -125,8 +151,9 @@ const useMultiElectionsProvider = ({
       election,
       isAbleToVote: rootIsAbleToVote,
       voted: rootVoted,
+      loaded: rootLoaded,
     }
-  }, [vote, election, rootIsAbleToVote, rootVoted])
+  }, [vote, election, rootIsAbleToVote, rootVoted, rootLoaded])
 
   // reset form if account gets disconnected
   useEffect(() => {
@@ -134,7 +161,6 @@ const useMultiElectionsProvider = ({
       (typeof client.wallet === 'undefined' || Object.values(client.wallet).length === 0) &&
       Object.keys(electionsStates).length > 0
     ) {
-      setElectionsStates({})
       fmethods.reset({
         ...Object.values(electionsStates).reduce((acc, { election }) => ({ ...acc, [election.id]: '' }), {}),
       })
@@ -145,11 +171,13 @@ const useMultiElectionsProvider = ({
   useEffect(() => {
     if (!rootElectionState || !rootElectionState.election) return
     const actualState = electionsStates[rootElectionState.election.id]
-    if (rootElectionState.vote === actualState?.vote || rootElectionState.isAbleToVote === actualState?.isAbleToVote) {
-      return
+    if (
+      (!actualState && rootElectionState.loaded.election) ||
+      (actualState && rootElectionState.isAbleToVote !== actualState?.isAbleToVote)
+    ) {
+      addElection(rootElectionState)
     }
-    addElection(rootElectionState)
-  }, [rootElectionState, electionsStates, election])
+  }, [rootElectionState, electionsStates])
 
   const voteAll = async (values: FormFieldValues) => {
     if (!electionsStates || Object.keys(electionsStates).length === 0) {
@@ -192,5 +220,6 @@ const useMultiElectionsProvider = ({
     voted,
     isDisabled,
     setIsDisabled,
+    loaded,
   }
 }

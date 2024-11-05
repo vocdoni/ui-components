@@ -39,7 +39,7 @@ export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestio
 
 export const ElectionQuestionsForm = ({ formId, onSubmit, onInvalid, ...rest }: ElectionQuestionsFormProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const { fmethods, voteAll, validate, renderWith, isDisabled } = useQuestionsForm()
+  const { loaded, fmethods, voteAll, validate, renderWith, isDisabled } = useQuestionsForm()
   const { ConnectButton, election } = useElection() // use Root election information
   const [globalError, setGlobalError] = useState('')
 
@@ -73,7 +73,7 @@ export const ElectionQuestionsForm = ({ formId, onSubmit, onInvalid, ...rest }: 
     >
       <MultiElectionVoted />
       <chakra.div __css={styles.elections}>
-        <ElectionQuestion isDisabled={isDisabled} {...rest} />
+        {loaded && <ElectionQuestion isDisabled={isDisabled} {...rest} />}
         {renderWith?.length > 0 &&
           renderWith.map(({ id }) => (
             <ElectionProvider key={id} ConnectButton={ConnectButton} id={id} fetchCensus>
@@ -133,12 +133,15 @@ export const ElectionQuestion = ({ isDisabled, ...props }: Pick<QuestionProps, '
   )
 }
 
-export type SubElectionState = { election: PublishedElection } & Pick<ElectionState, 'vote' | 'isAbleToVote' | 'voted'>
+export type SubElectionState = { election: PublishedElection } & Pick<
+  ElectionState,
+  'vote' | 'isAbleToVote' | 'voted' | 'loaded'
+>
 export type ElectionStateStorage = Record<string, SubElectionState>
 
 export const SubElectionQuestions = (props: ChakraProps) => {
-  const { rootClient, addElection, elections, isDisabled } = useQuestionsForm()
-  const { election, setClient, vote, clearClient, isAbleToVote, voted } = useElection()
+  const { rootClient, addElection, elections, isDisabled, loaded: renderWithLoaded } = useQuestionsForm()
+  const { election, setClient, vote, clearClient, isAbleToVote, voted, loaded } = useElection()
 
   const subElectionState: SubElectionState | null = useMemo(() => {
     if (!election || !(election instanceof PublishedElection)) return null
@@ -147,8 +150,9 @@ export const SubElectionQuestions = (props: ChakraProps) => {
       election,
       isAbleToVote,
       voted,
+      loaded,
     }
-  }, [vote, election, isAbleToVote, voted])
+  }, [vote, election, isAbleToVote, voted, loaded])
 
   // clear session of local context when login out
   useEffect(() => {
@@ -166,11 +170,15 @@ export const SubElectionQuestions = (props: ChakraProps) => {
   useEffect(() => {
     if (!subElectionState || !subElectionState.election) return
     const actualState = elections[subElectionState.election.id]
-    if (subElectionState.vote === actualState?.vote || subElectionState.isAbleToVote === actualState?.isAbleToVote) {
-      return
+    if (
+      (!actualState && subElectionState.loaded.election) ||
+      (actualState && subElectionState.isAbleToVote !== actualState?.isAbleToVote)
+    ) {
+      addElection(subElectionState)
     }
-    addElection(subElectionState)
-  }, [subElectionState, elections, election])
+  }, [subElectionState, elections])
+
+  if (!renderWithLoaded) return null
 
   return <ElectionQuestion isDisabled={isDisabled} {...props} />
 }
