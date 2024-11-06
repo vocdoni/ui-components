@@ -123,14 +123,18 @@ const useMultiElectionsProvider = ({
     [electionsStates, _electionsCount]
   )
 
-  const loaded = useMemo(
-    () =>
+  const loaded = useMemo(() => {
+    let renderWithCached = true
+    if (rest.renderWith?.length) {
+      renderWithCached = _electionsCount === rest.renderWith?.length + 1
+    }
+    return (
       electionsStates &&
       _electionsCount > 0 &&
-      _electionsCount === rest.renderWith?.length + 1 && // If the amount of elections is the same as the amount of subelections + root election
-      Object.values(electionsStates).every(({ loaded }) => loaded.election),
-    [electionsStates, _electionsCount]
-  )
+      renderWithCached && // If the amount of elections is the same as the amount of subelections + root election
+      Object.values(electionsStates).every(({ loaded }) => loaded.election)
+    )
+  }, [rest.renderWith?.length, electionsStates, _electionsCount])
 
   // Add an election to the storage
   const addElection = useCallback(
