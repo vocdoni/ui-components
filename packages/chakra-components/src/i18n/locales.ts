@@ -92,6 +92,7 @@ export const locales = {
     required: 'This field is required',
     min_length: 'This field must be at least {{ min }} characters long',
     choices_count: 'Select {{ count }} choices',
+    min_choices_count: 'Select minimum of {{ count }} choices',
     at_least_one: 'You must select at least one option',
   },
   // questions and vote button
