@@ -2,19 +2,16 @@ import { Alert, AlertIcon } from '@chakra-ui/alert'
 import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { ElectionProvider, ElectionState, useElection } from '@vocdoni/react-providers'
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
-import { FieldValues, SubmitErrorHandler, SubmitHandler, ValidateResult } from 'react-hook-form'
+import { FieldValues, SubmitErrorHandler, SubmitHandler } from 'react-hook-form'
 import { QuestionField, QuestionProps } from './Fields'
 import { FormFieldValues, QuestionsFormProvider, QuestionsFormProviderProps, useQuestionsForm } from './Form'
 import { QuestionsTypeBadge } from './TypeBadge'
 import { MultiElectionVoted, Voted } from './Voted'
-import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 export type RenderWith = {
   id: string
 }
-
-export type SubmitFormValidation = (values: FormFieldValues) => ValidateResult | Promise<ValidateResult>
 
 export type ExtendedSubmitHandler<TFieldValues extends FieldValues> = (
   onSubmit: SubmitHandler<TFieldValues>,
@@ -39,24 +36,10 @@ export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestio
 
 export const ElectionQuestionsForm = ({ formId, onSubmit, onInvalid, ...rest }: ElectionQuestionsFormProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
-  const { loaded, fmethods, voteAll, validate, renderWith, isDisabled } = useQuestionsForm()
+  const { loaded, fmethods, voteAll, renderWith, isDisabled } = useQuestionsForm()
   const { ConnectButton, election } = useElection() // use Root election information
-  const [globalError, setGlobalError] = useState('')
 
-  const { handleSubmit, watch } = fmethods
-  const formData = watch()
-
-  const _onSubmit = (values: FormFieldValues) => {
-    if (validate) {
-      const error = validate(formData)
-      if (typeof error === 'string' || (typeof error === 'boolean' && !error)) {
-        setGlobalError(error.toString())
-        return
-      }
-      setGlobalError('')
-    }
-    voteAll(values)
-  }
+  const { handleSubmit } = fmethods
 
   if (!(election instanceof PublishedElection)) return null
 
@@ -64,9 +47,9 @@ export const ElectionQuestionsForm = ({ formId, onSubmit, onInvalid, ...rest }: 
     <chakra.form
       onSubmit={handleSubmit((...params) => {
         if (onSubmit) {
-          return onSubmit(_onSubmit, ...params)
+          return onSubmit(voteAll, ...params)
         }
-        return _onSubmit(params[0])
+        return voteAll(params[0])
       }, onInvalid)}
       id={formId ?? `election-questions-${election.id}`}
       __css={styles.form}
@@ -81,9 +64,6 @@ export const ElectionQuestionsForm = ({ formId, onSubmit, onInvalid, ...rest }: 
             </ElectionProvider>
           ))}
       </chakra.div>
-      <FormControl isInvalid={!!globalError}>
-        <FormErrorMessage sx={styles.error}>{globalError}</FormErrorMessage>
-      </FormControl>
     </chakra.form>
   )
 }

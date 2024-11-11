@@ -14,7 +14,7 @@ import React, {
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form'
 import { useConfirm } from '../../layout'
 import { QuestionsConfirmation } from './Confirmation'
-import { ElectionStateStorage, RenderWith, SubElectionState, SubmitFormValidation } from './Questions'
+import { ElectionStateStorage, RenderWith, SubElectionState } from './Questions'
 
 export type FormFieldValues = Record<string, FieldValues>
 
@@ -40,7 +40,6 @@ export type QuestionsFormProviderProps = {
 // Props that must not be shared with ElectionQuestionsProps
 export type SpecificFormProviderProps = {
   renderWith?: RenderWith[]
-  validate?: SubmitFormValidation
 }
 
 export const QuestionsFormProvider: React.FC<
@@ -48,15 +47,11 @@ export const QuestionsFormProvider: React.FC<
 > = ({ children, ...props }) => {
   const fmethods = useForm<FormFieldValues>()
   const multiElections = useMultiElectionsProvider({ fmethods, ...props })
-  const value = { fmethods, renderWith: props.renderWith, validate: props.validate, ...multiElections }
+  const value = { fmethods, renderWith: props.renderWith, ...multiElections }
 
   return (
     <FormProvider {...fmethods}>
-      <QuestionsFormContext.Provider
-        value={{ fmethods, renderWith: props.renderWith, validate: props.validate, ...multiElections }}
-      >
-        {children}
-      </QuestionsFormContext.Provider>
+      <QuestionsFormContext.Provider value={value}>{children}</QuestionsFormContext.Provider>
     </FormProvider>
   )
 }
