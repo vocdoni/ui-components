@@ -144,7 +144,7 @@ export const SubElectionQuestions = (props: ChakraProps) => {
   // ensure the client is set to the root one
   useEffect(() => {
     setClient(rootClient)
-  }, [rootClient])
+  }, [election, rootClient])
 
   // Add the sub election to the state cache
   useEffect(() => {
