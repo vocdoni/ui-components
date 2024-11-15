@@ -97,6 +97,7 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
               if (v && v.length >= minChoices && v.length <= election.voteType.maxCount) {
                 return true
               }
+              if (minChoices === 1) return localize('validation.at_least_one')
               return localize('validation.min_choices_count', { count: minChoices })
             }
 
