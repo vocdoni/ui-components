@@ -78,8 +78,9 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
   }
 
   const choices = [...question.choices]
-  // Put can abstain on a separated variable to avoid typing errors on validation function
+  // Put can abstain and minChoices on a separated variable to avoid typing errors on validation function
   const canAbstain = election.resultsType.properties.canAbstain
+  const minChoices = election.resultsType?.properties?.numChoices?.min
 
   return (
     <Stack sx={styles.stack}>
@@ -91,6 +92,16 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
             // allow a single selection if is an abstain
             if (canAbstain && v && v.length < election.voteType.maxCount!) return true
 
+            // If there are min choices, validate that the user has selected at least that amount
+            if (minChoices) {
+              if (v && v.length >= minChoices && v.length <= election.voteType.maxCount) {
+                return true
+              }
+              if (minChoices === 1) return localize('validation.at_least_one')
+              return localize('validation.min_choices_count', { count: minChoices })
+            }
+
+            // If no minChoices configured, selected choices must be the maxCount
             return (
               (v && v.length === election.voteType.maxCount) ||
               localize('validation.choices_count', { count: election.voteType.maxCount })
@@ -123,6 +134,7 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
                         if (maxSelected) return
                         onChange([...values, e.target.value])
                       }
+
                       trigger(index) // Manually trigger validation
                     }}
                   >
