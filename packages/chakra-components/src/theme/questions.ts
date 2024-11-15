@@ -2,13 +2,16 @@ import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
 import { theme } from '@chakra-ui/theme'
 
 export const questionsAnatomy = [
-  // main content wrapper
+  // Question wrapper
   'wrapper',
   // alert messages (voted or no questions available)
   'alert',
   'alertTitle',
   'alertDescription',
+  'alertDescriptionWrapper', // Wrapper for multielection voted message
   'alertLink',
+  // elections wrapper for multielections
+  'elections',
   // question wrapper
   'question',
   // question header
@@ -30,6 +33,8 @@ export const questionsAnatomy = [
   'checkbox',
   // form error message
   'error',
+  // form wrapper
+  'form',
 ]
 
 export const questionsConfirmationAnatomy = [

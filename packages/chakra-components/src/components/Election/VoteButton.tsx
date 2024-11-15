@@ -2,13 +2,41 @@ import { ButtonProps } from '@chakra-ui/button'
 import { Text } from '@chakra-ui/layout'
 import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
 import { Signer } from '@ethersproject/abstract-signer'
-import { useClient, useElection } from '@vocdoni/react-providers'
+import { ElectionState, useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { Button } from '../layout/Button'
 import { results } from './Results'
+import { useQuestionsForm } from './Questions'
 
 export const VoteButton = (props: ButtonProps) => {
+  const election = useElection()
+  try {
+    const questionForm = useQuestionsForm()
+    return <MultiElectionVoteButton {...props} />
+  } catch (e) {
+    return <VoteButtonLogic {...props} electionState={election} />
+  }
+}
+
+export const MultiElectionVoteButton = (props: ButtonProps) => {
+  const { isAbleToVote, voting, voted } = useQuestionsForm()
+  const election = useElection() // use Root election information
+
+  return (
+    <VoteButtonLogic
+      electionState={{ ...election, voted, loading: { ...election.loading, voting }, isAbleToVote }}
+      {...props}
+    />
+  )
+}
+
+export const VoteButtonLogic = ({
+  electionState,
+  ...props
+}: {
+  electionState: ElectionState
+} & ButtonProps) => {
   const { connected } = useClient()
   const {
     client,
@@ -21,7 +49,7 @@ export const VoteButton = (props: ButtonProps) => {
     localize,
     sik: { signature },
     sikSignature,
-  } = useElection()
+  } = electionState
   const [loading, setLoading] = useState<boolean>(false)
 
   if (!election || election instanceof InvalidElection) {
@@ -36,8 +64,8 @@ export const VoteButton = (props: ButtonProps) => {
 
   const button: ButtonProps = {
     type: 'submit',
-    ...props,
     form: `election-questions-${election.id}`,
+    ...props,
     isDisabled,
     isLoading: voting,
     children: voted && isAbleToVote ? localize('vote.button_update') : localize('vote.button'),
@@ -98,7 +126,7 @@ export const VoteWeight = () => {
     })()
   }, [client, election])
 
-  if (!weight || !election || !(election instanceof PublishedElection)) return
+  if (!weight || !election || !(election instanceof PublishedElection)) return null
 
   return (
     <chakra.div __css={styles.wrapper}>

@@ -12,19 +12,26 @@ import { QuestionTip } from './Tip'
 export type QuestionProps = {
   index: string
   question: IQuestion
+  isDisabled?: boolean
 }
 
 export type QuestionFieldProps = ChakraProps & QuestionProps
 
-export const QuestionField = ({ question, index }: QuestionFieldProps) => {
+export const QuestionField = ({ question, index, isDisabled }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
   const {
     formState: { errors },
   } = useFormContext()
 
+  const [election, qi] = index.split('.')
+  const questionIndex = Number(qi)
+  let isInvalid = false
+  if (errors[election] && Array.isArray(errors[election]) && errors[election][questionIndex]) {
+    isInvalid = !!errors[election][questionIndex]
+  }
   return (
     <chakra.div __css={styles.question}>
-      <FormControl isInvalid={!!errors[index]}>
+      <FormControl isInvalid={isInvalid}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
         </chakra.div>
@@ -34,7 +41,7 @@ export const QuestionField = ({ question, index }: QuestionFieldProps) => {
               <Markdown>{question.description.default}</Markdown>
             </chakra.div>
           )}
-          <FieldSwitcher index={index} question={question} />
+          <FieldSwitcher index={index} question={question} isDisabled={isDisabled} />
           <QuestionTip />
         </chakra.div>
       </FormControl>
@@ -58,7 +65,7 @@ export const FieldSwitcher = (props: QuestionProps) => {
   }
 }
 
-export const MultiChoice = ({ index, question }: QuestionProps) => {
+export const MultiChoice = ({ index, question, isDisabled }: QuestionProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
   const {
     election,
@@ -71,7 +78,7 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
 
   if (!(election instanceof PublishedElection)) return null
 
-  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
+  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting || isDisabled
 
   if (!(election && election.resultsType.name === ElectionResultsTypeNames.MULTIPLE_CHOICE)) {
     return null
@@ -85,7 +92,7 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
     <Stack sx={styles.stack}>
       <Controller
         control={control}
-        disabled={isNotAbleToVote}
+        disabled={disabled}
         rules={{
           validate: (v) => {
             // allow a single selection if is an abstain
@@ -114,7 +121,7 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
                     key={ck}
                     sx={styles.checkbox}
                     value={choice.value.toString()}
-                    isDisabled={isNotAbleToVote || maxSelected}
+                    isDisabled={disabled || maxSelected}
                     isChecked={currentValues.includes(choice.value.toString())}
                     onChange={(e) => {
                       if (values.includes(e.target.value)) {
@@ -139,7 +146,7 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
   )
 }
 
-export const ApprovalChoice = ({ index, question }: QuestionProps) => {
+export const ApprovalChoice = ({ index, question, isDisabled }: QuestionProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
   const {
     election,
@@ -152,7 +159,7 @@ export const ApprovalChoice = ({ index, question }: QuestionProps) => {
 
   if (!(election instanceof PublishedElection)) return null
 
-  const isNotAbleToVote = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
+  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting || isDisabled
 
   if (!(election && election.resultsType.name === ElectionResultsTypeNames.APPROVAL)) {
     return null
@@ -164,7 +171,7 @@ export const ApprovalChoice = ({ index, question }: QuestionProps) => {
     <Stack sx={styles.stack}>
       <Controller
         control={control}
-        disabled={isNotAbleToVote}
+        disabled={disabled}
         rules={{
           validate: (v) => {
             return (v && v.length > 0) || localize('validation.at_least_one')
@@ -181,7 +188,7 @@ export const ApprovalChoice = ({ index, question }: QuestionProps) => {
                     key={ck}
                     sx={styles.checkbox}
                     value={choice.value.toString()}
-                    isDisabled={isNotAbleToVote}
+                    isDisabled={disabled}
                     onChange={(e) => {
                       if (values.includes(e.target.value)) {
                         onChange(values.filter((v: string) => v !== e.target.value))
@@ -203,7 +210,7 @@ export const ApprovalChoice = ({ index, question }: QuestionProps) => {
   )
 }
 
-export const SingleChoice = ({ index, question }: QuestionProps) => {
+export const SingleChoice = ({ index, question, isDisabled }: QuestionProps) => {
   const styles = useMultiStyleConfig('ElectionQuestions')
   const {
     election,
@@ -218,7 +225,7 @@ export const SingleChoice = ({ index, question }: QuestionProps) => {
 
   if (!(election instanceof PublishedElection)) return null
 
-  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting
+  const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting || isDisabled
   return (
     <Controller
       control={control}
@@ -227,7 +234,7 @@ export const SingleChoice = ({ index, question }: QuestionProps) => {
         required: localize('validation.required'),
       }}
       name={index}
-      render={({ field }) => (
+      render={({ field, fieldState: { error: fieldError } }) => (
         <RadioGroup sx={styles.radioGroup} {...field} isDisabled={disabled}>
           <Stack direction='column' sx={styles.stack}>
             {question.choices.map((choice, ck) => (
@@ -236,7 +243,7 @@ export const SingleChoice = ({ index, question }: QuestionProps) => {
               </Radio>
             ))}
           </Stack>
-          <FormErrorMessage sx={styles.error}>{errors[index]?.message as string}</FormErrorMessage>
+          <FormErrorMessage sx={styles.error}>{fieldError?.message as string}</FormErrorMessage>
         </RadioGroup>
       )}
     />
