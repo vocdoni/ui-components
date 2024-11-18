@@ -7,6 +7,7 @@ import {
   QuestionsConfirmationTheme,
   QuestionsTipTheme,
   QuestionsTypeBadgeTheme,
+  QuestionsChoiceTheme,
 } from './questions'
 import { ResultsTheme as ElectionResults } from './results'
 import { PaginationTheme as Pagination } from './pagination'
@@ -23,6 +24,7 @@ export const theme = {
     Pagination,
     ConfirmModal: ConfirmModalTheme,
     QuestionsConfirmation: QuestionsConfirmationTheme,
+    QuestionsChoice: QuestionsChoiceTheme,
     QuestionsTip: QuestionsTipTheme,
     QuestionsTypeBadge: QuestionsTypeBadgeTheme,
     VoteWeight: VoteWeightTheme,

@@ -1,13 +1,17 @@
 import { Checkbox } from '@chakra-ui/checkbox'
 import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
-import { Stack } from '@chakra-ui/layout'
+import { Stack, Text } from '@chakra-ui/layout'
+import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay } from '@chakra-ui/modal'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
+import { useDisclosure } from '@chakra-ui/react-use-disclosure'
+import { Skeleton } from '@chakra-ui/skeleton'
 import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
 import { useElection } from '@vocdoni/react-providers'
-import { ElectionResultsTypeNames, ElectionStatus, IQuestion, PublishedElection } from '@vocdoni/sdk'
+import { ElectionResultsTypeNames, ElectionStatus, IChoice, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'
-import { Markdown } from '../../layout'
+import { Image, Markdown } from '../../layout'
 import { QuestionTip } from './Tip'
+import { useState } from 'react'
 
 export type QuestionProps = {
   index: string
@@ -133,7 +137,7 @@ export const MultiChoice = ({ index, question, isDisabled }: QuestionProps) => {
                       trigger(index) // Manually trigger validation
                     }}
                   >
-                    {choice.title.default}
+                    <QuestionChoice {...choice} />
                   </Checkbox>
                 )
               })}
@@ -197,7 +201,7 @@ export const ApprovalChoice = ({ index, question, isDisabled }: QuestionProps) =
                       }
                     }}
                   >
-                    {choice.title.default}
+                    <QuestionChoice {...choice} />
                   </Checkbox>
                 )
               })}
@@ -226,6 +230,7 @@ export const SingleChoice = ({ index, question, isDisabled }: QuestionProps) => 
   if (!(election instanceof PublishedElection)) return null
 
   const disabled = election?.status !== ElectionStatus.ONGOING || !isAbleToVote || voting || isDisabled
+
   return (
     <Controller
       control={control}
@@ -237,15 +242,87 @@ export const SingleChoice = ({ index, question, isDisabled }: QuestionProps) => 
       render={({ field, fieldState: { error: fieldError } }) => (
         <RadioGroup sx={styles.radioGroup} {...field} isDisabled={disabled}>
           <Stack direction='column' sx={styles.stack}>
-            {question.choices.map((choice, ck) => (
-              <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
-                {choice.title.default}
-              </Radio>
-            ))}
+            {question.choices.map((choice, ck) => {
+              return (
+                <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
+                  <QuestionChoice {...choice} />
+                </Radio>
+              )
+            })}
           </Stack>
           <FormErrorMessage sx={styles.error}>{fieldError?.message as string}</FormErrorMessage>
         </RadioGroup>
       )}
     />
+  )
+}
+
+export type QuestionChoiceMeta = {
+  image: {
+    default: string
+    thumbnail?: string
+  }
+  description?: {
+    default: string
+    [lang: string]: string
+  }
+}
+
+export const QuestionChoice = (choice: IChoice & ChakraProps) => {
+  const styles = useMultiStyleConfig('QuestionsChoice')
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [loaded, setLoaded] = useState(false)
+  const [loadedModal, setLoadedModal] = useState(false)
+
+  const label = choice.title.default
+  const { image, description } = (choice?.meta ?? {}) as QuestionChoiceMeta
+  const defaultImage = image?.default ?? ''
+  const thumbnail = image?.thumbnail
+  const descriptionTxt = description?.default ?? ''
+
+  const renderImage = defaultImage || thumbnail
+  const renderModal = renderImage || descriptionTxt
+
+  return (
+    <Stack sx={styles.choiceWrapper}>
+      {renderImage && (
+        <Skeleton isLoaded={loaded} sx={styles.skeleton}>
+          <Image
+            onClick={(e) => {
+              if (!renderModal) return
+              e.preventDefault()
+              onOpen()
+            }}
+            sx={styles.choiceImage}
+            src={thumbnail ?? defaultImage}
+            alt={label}
+            onLoad={() => setLoaded(true)}
+          />
+        </Skeleton>
+      )}
+      <Text sx={styles.choiceLabel}>{label}</Text>
+      {renderModal && (
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay sx={styles.modalOverlay} />
+          <ModalContent sx={styles.modalContent}>
+            <ModalCloseButton sx={styles.modalClose} />
+            <ModalBody sx={styles.modalBody}>
+              {renderImage && (
+                <Skeleton isLoaded={loadedModal} sx={styles.skeletonModal}>
+                  <Image
+                    src={defaultImage ?? thumbnail}
+                    alt={label}
+                    sx={styles.modalImage}
+                    onLoad={() => setLoadedModal(true)}
+                  />
+                </Skeleton>
+              )}
+              <Text sx={styles.modalLabel}>{label}</Text>
+              {descriptionTxt && <Text sx={styles.modalDescription}>{descriptionTxt}</Text>}
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
+    </Stack>
   )
 }

@@ -143,3 +143,52 @@ export const QuestionsTipTheme = defineQuestionTipStyle({
     },
   }),
 })
+
+export const questionChoiceAnatomy = [
+  // Choice Label
+  'choiceLabel',
+  // Image for the choice
+  'choiceImage',
+  // Wrapper for image and label
+  'choiceWrapper',
+  // Skeleton loader for the choice image
+  'skeleton',
+  // Skeleton loader for modal image
+  'skeletonModal',
+  // Modal
+  'modalBody',
+  'modalContent',
+  'modalClose',
+  // Modal description if exists on metadata
+  'modalDescription',
+  // Image on modal
+  'modalImage',
+  // Modal label (choice label)
+  'modalLabel',
+  'modalOverlay',
+]
+
+const { defineMultiStyleConfig: defineQuestionChoiceStyle, definePartsStyle: defineQuestionChoiceParts } =
+  createMultiStyleConfigHelpers(questionChoiceAnatomy)
+
+export const QuestionsChoiceTheme = defineQuestionChoiceStyle({
+  baseStyle: defineQuestionChoiceParts({
+    choiceWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    modalBody: {
+      p: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    skeleton: {
+      boxSize: '80px',
+    },
+    skeletonModal: {
+      boxSize: '400px',
+    },
+  }),
+})
