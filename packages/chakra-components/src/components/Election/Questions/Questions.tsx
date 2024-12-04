@@ -1,5 +1,4 @@
-import { Alert, AlertIcon } from '@chakra-ui/alert'
-import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
+import { Alert, AlertIcon, chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/react'
 import { useElection } from '@vocdoni/react-providers'
 import { IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues, SubmitErrorHandler } from 'react-hook-form'

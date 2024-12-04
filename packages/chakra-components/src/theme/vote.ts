@@ -1,4 +1,4 @@
-import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
+import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
 
 export const VoteWeightAnatomy = [
   // confirmation wrapper box

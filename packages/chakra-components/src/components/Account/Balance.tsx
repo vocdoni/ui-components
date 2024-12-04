@@ -1,4 +1,4 @@
-import { Tag, TagProps } from '@chakra-ui/tag'
+import { Tag, TagProps } from '@chakra-ui/react'
 import { useClient } from '@vocdoni/react-providers'
 
 export const Balance = (props: TagProps) => {

@@ -1,4 +1,4 @@
-import { ToastId, useToast } from '@chakra-ui/toast'
+import { ToastId, useToast } from '@chakra-ui/react'
 import { useActions } from '@vocdoni/react-providers'
 import { useEffect, useRef } from 'react'
 

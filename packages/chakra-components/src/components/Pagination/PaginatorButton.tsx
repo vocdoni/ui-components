@@ -1,5 +1,4 @@
-import { Button, ButtonProps } from '@chakra-ui/button'
-import { forwardRef, useStyleConfig } from '@chakra-ui/system'
+import { Button, ButtonProps, forwardRef, useStyleConfig } from '@chakra-ui/react'
 
 export const PageButton = forwardRef<ButtonProps, 'div'>((props, ref) => {
   const styles = useStyleConfig('PageButton', props)

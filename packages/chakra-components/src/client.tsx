@@ -1,4 +1,4 @@
-import { ToastProvider } from '@chakra-ui/toast'
+import { ToastProvider } from '@chakra-ui/react'
 import { ClientProviderComponentProps, ClientProvider as RPClientProvider } from '@vocdoni/react-providers'
 import merge from 'ts-deepmerge'
 import { ConfirmProvider } from './components'

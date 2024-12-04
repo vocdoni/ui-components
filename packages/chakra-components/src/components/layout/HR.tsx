@@ -1,4 +1,4 @@
-import { chakra, ChakraProps, useStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, useStyleConfig } from '@chakra-ui/react'
 
 type HRProps = ChakraProps & {
   variant?: string

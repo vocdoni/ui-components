@@ -1,4 +1,4 @@
-import { useStyleConfig } from '@chakra-ui/system'
+import { useStyleConfig } from '@chakra-ui/react'
 import { useOrganization } from '@vocdoni/react-providers'
 import { Image, IPFSImageProps } from '../layout'
 

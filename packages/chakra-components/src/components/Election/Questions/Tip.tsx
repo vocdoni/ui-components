@@ -1,4 +1,4 @@
-import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, useMultiStyleConfig } from '@chakra-ui/react'
 import { useElection } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
 

@@ -1,5 +1,4 @@
-import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
-import { Tooltip } from '@chakra-ui/tooltip'
+import { chakra, ChakraProps, Tooltip, useMultiStyleConfig } from '@chakra-ui/react'
 import { useElection } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
 import type { HTMLAttributes } from 'react'

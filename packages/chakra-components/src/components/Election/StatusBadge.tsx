@@ -1,4 +1,4 @@
-import { Tag, TagProps } from '@chakra-ui/tag'
+import { Tag, TagProps } from '@chakra-ui/react'
 import { useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
 

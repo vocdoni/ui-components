@@ -1,6 +1,12 @@
-import { FormControl, FormErrorMessage, FormHelperText, FormLabel } from '@chakra-ui/form-control'
-import { Input, InputProps } from '@chakra-ui/input'
 import {
+  Button,
+  ChakraProps,
+  FormControl,
+  FormErrorMessage,
+  FormHelperText,
+  FormLabel,
+  Input,
+  InputProps,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -8,16 +14,15 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-} from '@chakra-ui/modal'
-import { useDisclosure } from '@chakra-ui/react-use-disclosure'
-import { ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
-import { useToast } from '@chakra-ui/toast'
+  useDisclosure,
+  useMultiStyleConfig,
+  useToast,
+} from '@chakra-ui/react'
 import { Wallet } from '@ethersproject/wallet'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
 import { dotobject, PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { RegisterOptions, useForm } from 'react-hook-form'
-import { Button } from '../layout/Button'
 
 type MetaSpecs = {
   [name: string]: {

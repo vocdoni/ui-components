@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/alert'
+import { Alert, AlertDescription, AlertIcon } from '@chakra-ui/react'
 import { ElectionProvider, ElectionProviderComponentProps, useElection } from '@vocdoni/react-providers'
 import { PublishedElection } from '@vocdoni/sdk'
 import { HR } from '../layout'

@@ -1,6 +1,4 @@
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/alert'
-import { Link } from '@chakra-ui/layout'
-import { useMultiStyleConfig } from '@chakra-ui/system'
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Link, useMultiStyleConfig } from '@chakra-ui/react'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import reactStringReplace from 'react-string-replace'
 import { environment } from '../../../environment'

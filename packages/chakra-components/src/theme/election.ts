@@ -1,4 +1,4 @@
-import { ComponentSingleStyleConfig, theme } from '@chakra-ui/theme'
+import { ComponentSingleStyleConfig, theme } from '@chakra-ui/react'
 
 export const ElectionTitleTheme: ComponentSingleStyleConfig = {
   baseStyle: {

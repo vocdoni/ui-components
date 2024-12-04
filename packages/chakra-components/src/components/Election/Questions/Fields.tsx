@@ -1,8 +1,14 @@
-import { Checkbox } from '@chakra-ui/checkbox'
-import { FormControl, FormErrorMessage } from '@chakra-ui/form-control'
-import { Stack } from '@chakra-ui/layout'
-import { Radio, RadioGroup } from '@chakra-ui/radio'
-import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
+import {
+  chakra,
+  ChakraProps,
+  Checkbox,
+  FormControl,
+  FormErrorMessage,
+  Radio,
+  RadioGroup,
+  Stack,
+  useMultiStyleConfig,
+} from '@chakra-ui/react'
 import { useElection } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, ElectionStatus, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'

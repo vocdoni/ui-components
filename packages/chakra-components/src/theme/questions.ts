@@ -1,5 +1,4 @@
-import { createMultiStyleConfigHelpers } from '@chakra-ui/styled-system'
-import { theme } from '@chakra-ui/theme'
+import { createMultiStyleConfigHelpers, theme } from '@chakra-ui/react'
 
 export const questionsAnatomy = [
   // main content wrapper

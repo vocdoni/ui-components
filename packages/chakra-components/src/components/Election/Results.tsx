@@ -1,6 +1,4 @@
-import { Box, Flex, Text } from '@chakra-ui/layout'
-import { Progress } from '@chakra-ui/progress'
-import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
+import { Box, chakra, ChakraProps, Flex, Progress, Text, useMultiStyleConfig } from '@chakra-ui/react'
 import { useClient, useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
   ElectionResultsTypeNames,
