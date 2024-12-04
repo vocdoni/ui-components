@@ -3,6 +3,9 @@ const config = {
   collectCoverageFrom: ['packages/**/*.{ts,tsx}'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   modulePathIgnorePatterns: ['<rootDir>/templates'],
+  moduleNameMapper: {
+    '^ffjavascript$': '<rootDir>/node_modules/ffjavascript/build/main.cjs',
+  },
   transform: {
     '^.+\\.(ts|tsx|js|jsx)?$': '@swc-node/jest',
   },

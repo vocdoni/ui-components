@@ -1,5 +1,4 @@
-import { HeadingProps } from '@chakra-ui/layout'
-import { chakra, forwardRef, omitThemingProps, useStyleConfig } from '@chakra-ui/system'
+import { chakra, forwardRef, HeadingProps, omitThemingProps, useStyleConfig } from '@chakra-ui/react'
 import { useElection } from '@vocdoni/react-providers'
 import { PublishedElection } from '@vocdoni/sdk'
 

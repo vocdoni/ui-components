@@ -1,4 +1,4 @@
-import { useStyleConfig } from '@chakra-ui/system'
+import { useStyleConfig } from '@chakra-ui/react'
 import { useElection } from '@vocdoni/react-providers'
 import { PublishedElection } from '@vocdoni/sdk'
 import { Image, IPFSImageProps } from '../layout'

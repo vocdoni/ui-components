@@ -1,5 +1,4 @@
-import { AvatarProps, Avatar as CAvatar } from '@chakra-ui/avatar'
-import { Image as CImage, ImageProps } from '@chakra-ui/image'
+import { AvatarProps, Avatar as CAvatar, Image as CImage, ImageProps } from '@chakra-ui/react'
 
 export type IPFSImageProps = ImageProps & {
   gateway?: string

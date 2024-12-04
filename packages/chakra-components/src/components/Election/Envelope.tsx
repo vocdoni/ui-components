@@ -1,5 +1,4 @@
-import { List, ListItem, Text } from '@chakra-ui/layout'
-import { chakra, ChakraProps, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, ChakraProps, List, ListItem, Text, useMultiStyleConfig } from '@chakra-ui/react'
 import { useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
   ElectionResultsTypeNames,

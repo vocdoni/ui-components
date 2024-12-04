@@ -1,4 +1,4 @@
-import { ChakraProps, useStyleConfig } from '@chakra-ui/system'
+import { ChakraProps, useStyleConfig } from '@chakra-ui/react'
 import { useOrganization } from '@vocdoni/react-providers'
 import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
 import { Markdown } from '../layout'

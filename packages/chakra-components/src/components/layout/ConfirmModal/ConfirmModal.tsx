@@ -1,5 +1,4 @@
-import { Modal, ModalContent, ModalOverlay } from '@chakra-ui/modal'
-import { useMultiStyleConfig } from '@chakra-ui/system'
+import { Modal, ModalContent, ModalOverlay, useMultiStyleConfig } from '@chakra-ui/react'
 import { useConfirm } from './ConfirmProvider'
 
 export const ConfirmModal = () => {

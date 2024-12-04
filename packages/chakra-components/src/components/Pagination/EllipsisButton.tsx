@@ -1,6 +1,4 @@
-import { Button, ButtonProps } from '@chakra-ui/button'
-import { Input, InputProps } from '@chakra-ui/input'
-import { useStyleConfig } from '@chakra-ui/system'
+import { Button, ButtonProps, Input, InputProps, useStyleConfig } from '@chakra-ui/react'
 import { useState } from 'react'
 
 type EllipsisButtonProps = ButtonProps & {

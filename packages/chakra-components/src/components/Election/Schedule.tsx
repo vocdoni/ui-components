@@ -1,5 +1,4 @@
-import { HeadingProps } from '@chakra-ui/layout'
-import { chakra, forwardRef, useMultiStyleConfig } from '@chakra-ui/system'
+import { chakra, forwardRef, HeadingProps, useMultiStyleConfig } from '@chakra-ui/react'
 import { useDatesLocale, useElection, useLocalize } from '@vocdoni/react-providers'
 import { ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { format as dformat, formatDistance } from 'date-fns'

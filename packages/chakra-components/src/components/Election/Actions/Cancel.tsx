@@ -1,8 +1,7 @@
-import { IconButtonProps } from '@chakra-ui/button'
-import { forwardRef } from '@chakra-ui/system'
+import { Button, forwardRef, IconButtonProps } from '@chakra-ui/react'
 import { useActions, useClient, useElection } from '@vocdoni/react-providers'
 import { areEqualHexStrings, ElectionStatus, PublishedElection } from '@vocdoni/sdk'
-import { Button, useConfirm } from '../../layout'
+import { useConfirm } from '../../layout'
 import { ConfirmActionModal } from './ConfirmActionModal'
 
 export const ActionCancel = forwardRef<IconButtonProps, 'button'>((props, ref) => {

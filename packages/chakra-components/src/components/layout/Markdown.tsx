@@ -1,6 +1,16 @@
-import { Box, Code, Heading, Link, ListItem, OrderedList, Text, UnorderedList } from '@chakra-ui/layout'
-import { chakra } from '@chakra-ui/system'
-import { Table, Tr } from '@chakra-ui/table'
+import {
+  Box,
+  chakra,
+  Code,
+  Heading,
+  Link,
+  ListItem,
+  OrderedList,
+  Table,
+  Text,
+  Tr,
+  UnorderedList,
+} from '@chakra-ui/react'
 import ReactMarkdown, { Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 

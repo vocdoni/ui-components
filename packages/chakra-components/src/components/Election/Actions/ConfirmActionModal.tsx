@@ -1,9 +1,14 @@
-import { useMultiStyleConfig } from '@chakra-ui/system'
-import { useConfirm } from '../../layout'
+import {
+  Button,
+  ModalBody,
+  ModalCloseButton,
+  ModalFooter,
+  ModalHeader,
+  Text,
+  useMultiStyleConfig,
+} from '@chakra-ui/react'
 import { useClient } from '@vocdoni/react-providers'
-import { ModalBody, ModalCloseButton, ModalFooter, ModalHeader } from '@chakra-ui/modal'
-import { Text } from '@chakra-ui/layout'
-import { Button } from '@chakra-ui/button'
+import { useConfirm } from '../../layout'
 
 export type ConfirmActionModalProps = {
   title: string

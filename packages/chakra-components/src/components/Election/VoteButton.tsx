@@ -1,11 +1,8 @@
-import { ButtonProps } from '@chakra-ui/button'
-import { Text } from '@chakra-ui/layout'
-import { chakra, useMultiStyleConfig } from '@chakra-ui/system'
+import { Button, ButtonProps, chakra, Text, useMultiStyleConfig } from '@chakra-ui/react'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
-import { Button } from '../layout/Button'
 import { results } from './Results'
 
 export const VoteButton = (props: ButtonProps) => {

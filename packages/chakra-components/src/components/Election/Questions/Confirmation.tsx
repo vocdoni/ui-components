@@ -1,7 +1,15 @@
-import { Button } from '@chakra-ui/button'
-import { Box, Text } from '@chakra-ui/layout'
-import { ModalBody, ModalCloseButton, ModalFooter, ModalHeader } from '@chakra-ui/modal'
-import { chakra, omitThemingProps, useMultiStyleConfig } from '@chakra-ui/system'
+import {
+  Box,
+  Button,
+  chakra,
+  ModalBody,
+  ModalCloseButton,
+  ModalFooter,
+  ModalHeader,
+  omitThemingProps,
+  Text,
+  useMultiStyleConfig,
+} from '@chakra-ui/react'
 import { useClient } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues } from 'react-hook-form'
