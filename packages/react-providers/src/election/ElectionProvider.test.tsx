@@ -1,6 +1,6 @@
 import { Wallet } from '@ethersproject/wallet'
 import { render, renderHook, waitFor } from '@testing-library/react'
-import { EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
+import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
 import { act } from 'react'
 import { ClientProvider, useClient } from '../client'
 import { onlyProps, properProps } from '../test-utils'
@@ -309,67 +309,6 @@ describe('<ElectionProvider />', () => {
         )
       }
 
-      // Test with voteCount
-      const census = new WeightedCensus()
-      census.size = 100
-      // @ts-ignore
-      const electionWithVotes = PublishedElection.build({
-        id: 'test',
-        title: 'test',
-        description: 'test',
-        endDate: new Date(),
-        census,
-        voteCount: 50,
-      })
-
-      const { result, rerender } = renderHook(() => useElection(), {
-        wrapper,
-        initialProps: { election: electionWithVotes },
-      })
-
-      // Should return raw vote count (50)
-      expect(result.current.participation).toBe(50)
-
-      // Test with no votes
-      // @ts-ignore
-      const electionNoVotes = PublishedElection.build({
-        id: 'test2',
-        title: 'test2',
-        description: 'test2',
-        endDate: new Date(),
-        census,
-        voteCount: 0,
-      })
-
-      rerender({ election: electionNoVotes })
-
-      // Should return 0 when no votes
-      expect(result.current.participation).toBe(0)
-
-      // Test with invalid election
-      // @ts-ignore
-      const invalidElection = PublishedElection.build({
-        id: 'test3',
-        title: 'test3',
-        description: 'test3',
-        endDate: new Date(),
-      })
-
-      rerender({ election: invalidElection })
-
-      // Should return 0 for invalid election
-      expect(result.current.participation).toBe(0)
-    })
-
-    it('calculates turnout correctly', () => {
-      const wrapper = (props: any) => {
-        return (
-          <ClientProvider>
-            <ElectionProvider {...properProps(props)} />
-          </ClientProvider>
-        )
-      }
-
       // Test with census.size
       const census = new WeightedCensus()
       census.size = 100
@@ -388,8 +327,8 @@ describe('<ElectionProvider />', () => {
         initialProps: { election: electionWithCensus },
       })
 
-      // Should be 50%
-      expect(result.current.turnout).toBe(50)
+      // Should be 50% (50 voters out of 100 total)
+      expect(result.current.participation).toBe(50)
 
       // Test with maxCensusSize
       // @ts-ignore
@@ -404,8 +343,8 @@ describe('<ElectionProvider />', () => {
 
       rerender({ election: electionWithMaxSize })
 
-      // Should be 50%
-      expect(result.current.turnout).toBe(50)
+      // Should be 50% (25 voters out of 50 total)
+      expect(result.current.participation).toBe(50)
 
       // Test with no census info
       // @ts-ignore
@@ -420,7 +359,96 @@ describe('<ElectionProvider />', () => {
       rerender({ election: electionNoCensus })
 
       // Should be 0 when no census info
-      expect(result.current.turnout).toBe(0)
+      expect(result.current.participation).toBe(0)
+    })
+
+    describe('turnout calculations', () => {
+      it('calculates turnout correctly for weighted voting', () => {
+        const wrapper = (props: any) => {
+          return (
+            <ClientProvider>
+              <ElectionProvider {...properProps(props)} />
+            </ClientProvider>
+          )
+        }
+
+        const census = new WeightedCensus()
+        census.type = CensusType.WEIGHTED
+        // @ts-ignore
+        const weightedElection = PublishedElection.build({
+          id: 'test',
+          title: 'test',
+          description: 'test',
+          endDate: new Date(),
+          census,
+          results: [
+            ['30', '20'],
+            ['15', '10'],
+          ], // Total votes: 75
+        })
+
+        const { result } = renderHook(() => useElection(), {
+          wrapper,
+          initialProps: { election: weightedElection },
+        })
+
+        // Should sum all votes (30 + 20 + 15 + 10 = 75)
+        expect(result.current.turnout).toBe(75)
+      })
+
+      it('calculates turnout correctly for non-weighted voting', () => {
+        const wrapper = (props: any) => {
+          return (
+            <ClientProvider>
+              <ElectionProvider {...properProps(props)} />
+            </ClientProvider>
+          )
+        }
+
+        const census = new WeightedCensus()
+        // @ts-ignore
+        const nonWeightedElection = PublishedElection.build({
+          id: 'test',
+          title: 'test',
+          description: 'test',
+          endDate: new Date(),
+          census,
+          voteCount: 50,
+        })
+
+        const { result } = renderHook(() => useElection(), {
+          wrapper,
+          initialProps: { election: nonWeightedElection },
+        })
+
+        // Should return voteCount for non-weighted voting
+        expect(result.current.turnout).toBe(50)
+      })
+
+      it('returns 0 for invalid election', () => {
+        const wrapper = (props: any) => {
+          return (
+            <ClientProvider>
+              <ElectionProvider {...properProps(props)} />
+            </ClientProvider>
+          )
+        }
+
+        // @ts-ignore
+        const invalidElection = PublishedElection.build({
+          id: 'test',
+          title: 'test',
+          description: 'test',
+          endDate: new Date(),
+        })
+
+        const { result } = renderHook(() => useElection(), {
+          wrapper,
+          initialProps: { election: invalidElection },
+        })
+
+        expect(result.current.turnout).toBe(0)
+      })
     })
   })
 })

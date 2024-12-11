@@ -125,22 +125,29 @@ export interface ElectionReducerState {
   turnout: number
 }
 
-// Return the raw vote count - number of people who voted
 const participation = (election?: PublishedElection | InvalidElection) => {
-  if (!election || election instanceof InvalidElection) {
-    return 0
-  }
-
-  return election.voteCount || 0
-}
-
-// Calculate percentage of people who voted
-const turnout = (election?: PublishedElection | InvalidElection) => {
   if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
   const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
+  // Calculate percentage of people who voted
   return Math.round((election.voteCount / size) * 10000) / 100
+}
+
+const turnout = (election?: PublishedElection | InvalidElection) => {
+  if (!election || election instanceof InvalidElection) {
+    return 0
+  }
+
+  // For weighted voting, sum up all results
+  if (election.census?.type === CensusType.WEIGHTED && election.results) {
+    return election.results.reduce((acc, questionResults) => {
+      return acc + questionResults.reduce((sum, value) => sum + Number(value), 0)
+    }, 0)
+  }
+
+  // For non-weighted voting or when no results available yet, return vote count
+  return election.voteCount || 0
 }
 
 export const electionStateEmpty = ({
