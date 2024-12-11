@@ -2,5 +2,10 @@ import { Button, ButtonProps, forwardRef, useStyleConfig } from '@chakra-ui/reac
 
 export const PageButton = forwardRef<ButtonProps, 'div'>((props, ref) => {
   const styles = useStyleConfig('PageButton', props)
-  return <Button sx={styles} {...props} />
+  return <Button sx={styles} ref={ref} {...props} />
+})
+
+export const NextPage = forwardRef<ButtonProps, 'div'>((props, ref) => {
+  const styles = useStyleConfig('PageButton', { ...props, variant: 'navigation' })
+  return <Button sx={styles} ref={ref} {...props} />
 })

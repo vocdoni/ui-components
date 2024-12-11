@@ -125,24 +125,22 @@ export interface ElectionReducerState {
   turnout: number
 }
 
+// Return the raw vote count - number of people who voted
 const participation = (election?: PublishedElection | InvalidElection) => {
-  if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
+  if (!election || election instanceof InvalidElection) {
     return 0
   }
 
-  const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
-
-  return Math.round((election.voteCount / size) * 10000) / 100
+  return election.voteCount || 0
 }
 
+// Calculate percentage of people who voted
 const turnout = (election?: PublishedElection | InvalidElection) => {
   if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
-  const total = election.results ? election.results.reduce((acc, q) => acc + Number(q), 0) : 0
   const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
-
-  return Math.round((total / size) * 10000) / 100
+  return Math.round((election.voteCount / size) * 10000) / 100
 }
 
 export const electionStateEmpty = ({

@@ -298,4 +298,129 @@ describe('<ElectionProvider />', () => {
     expect(result.current.client.connected).toBeFalsy()
     expect(result.current.election.connected).toBeFalsy()
   })
+
+  describe('participation and turnout calculations', () => {
+    it('calculates participation correctly', () => {
+      const wrapper = (props: any) => {
+        return (
+          <ClientProvider>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        )
+      }
+
+      // Test with voteCount
+      const census = new WeightedCensus()
+      census.size = 100
+      // @ts-ignore
+      const electionWithVotes = PublishedElection.build({
+        id: 'test',
+        title: 'test',
+        description: 'test',
+        endDate: new Date(),
+        census,
+        voteCount: 50,
+      })
+
+      const { result, rerender } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election: electionWithVotes },
+      })
+
+      // Should return raw vote count (50)
+      expect(result.current.participation).toBe(50)
+
+      // Test with no votes
+      // @ts-ignore
+      const electionNoVotes = PublishedElection.build({
+        id: 'test2',
+        title: 'test2',
+        description: 'test2',
+        endDate: new Date(),
+        census,
+        voteCount: 0,
+      })
+
+      rerender({ election: electionNoVotes })
+
+      // Should return 0 when no votes
+      expect(result.current.participation).toBe(0)
+
+      // Test with invalid election
+      // @ts-ignore
+      const invalidElection = PublishedElection.build({
+        id: 'test3',
+        title: 'test3',
+        description: 'test3',
+        endDate: new Date(),
+      })
+
+      rerender({ election: invalidElection })
+
+      // Should return 0 for invalid election
+      expect(result.current.participation).toBe(0)
+    })
+
+    it('calculates turnout correctly', () => {
+      const wrapper = (props: any) => {
+        return (
+          <ClientProvider>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        )
+      }
+
+      // Test with census.size
+      const census = new WeightedCensus()
+      census.size = 100
+      // @ts-ignore
+      const electionWithCensus = PublishedElection.build({
+        id: 'test',
+        title: 'test',
+        description: 'test',
+        endDate: new Date(),
+        census,
+        voteCount: 50,
+      })
+
+      const { result, rerender } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election: electionWithCensus },
+      })
+
+      // Should be 50%
+      expect(result.current.turnout).toBe(50)
+
+      // Test with maxCensusSize
+      // @ts-ignore
+      const electionWithMaxSize = PublishedElection.build({
+        id: 'test2',
+        title: 'test2',
+        description: 'test2',
+        endDate: new Date(),
+        voteCount: 25,
+        maxCensusSize: 50,
+      })
+
+      rerender({ election: electionWithMaxSize })
+
+      // Should be 50%
+      expect(result.current.turnout).toBe(50)
+
+      // Test with no census info
+      // @ts-ignore
+      const electionNoCensus = PublishedElection.build({
+        id: 'test3',
+        title: 'test3',
+        description: 'test3',
+        endDate: new Date(),
+        voteCount: 50,
+      })
+
+      rerender({ election: electionNoCensus })
+
+      // Should be 0 when no census info
+      expect(result.current.turnout).toBe(0)
+    })
+  })
 })
