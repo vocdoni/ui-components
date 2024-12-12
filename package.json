@@ -44,5 +44,8 @@
   "engines": {
     "npm": "please use yarn",
     "yarn": ">= 1.19.1 && < 2"
+  },
+  "resolutions": {
+    "@types/react": "18.x"
   }
 }
