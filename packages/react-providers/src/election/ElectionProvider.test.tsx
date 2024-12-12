@@ -1,6 +1,6 @@
 import { Wallet } from '@ethersproject/wallet'
 import { render, renderHook, waitFor } from '@testing-library/react'
-import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
+import { EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
 import { act } from 'react'
 import { ClientProvider, useClient } from '../client'
 import { onlyProps, properProps } from '../test-utils'
@@ -373,7 +373,7 @@ describe('<ElectionProvider />', () => {
         }
 
         const census = new WeightedCensus()
-        census.type = CensusType.WEIGHTED
+        census.size = 100
         // @ts-ignore
         const weightedElection = PublishedElection.build({
           id: 'test',
@@ -392,7 +392,7 @@ describe('<ElectionProvider />', () => {
           initialProps: { election: weightedElection },
         })
 
-        // Should sum all votes (30 + 20 + 15 + 10 = 75)
+        // Should be 75% (75 total votes out of 100 census size)
         expect(result.current.turnout).toBe(75)
       })
 
@@ -406,6 +406,7 @@ describe('<ElectionProvider />', () => {
         }
 
         const census = new WeightedCensus()
+        census.size = 100
         // @ts-ignore
         const nonWeightedElection = PublishedElection.build({
           id: 'test',
@@ -421,7 +422,7 @@ describe('<ElectionProvider />', () => {
           initialProps: { election: nonWeightedElection },
         })
 
-        // Should return voteCount for non-weighted voting
+        // Should be 50% (50 votes out of 100 census size)
         expect(result.current.turnout).toBe(50)
       })
 

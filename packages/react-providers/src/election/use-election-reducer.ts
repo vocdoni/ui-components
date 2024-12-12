@@ -125,6 +125,7 @@ export interface ElectionReducerState {
   turnout: number
 }
 
+// Participation returns the % of voters
 const participation = (election?: PublishedElection | InvalidElection) => {
   if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
@@ -134,20 +135,23 @@ const participation = (election?: PublishedElection | InvalidElection) => {
   return Math.round((election.voteCount / size) * 10000) / 100
 }
 
+// Turnout returns the % of total votes
 const turnout = (election?: PublishedElection | InvalidElection) => {
-  if (!election || election instanceof InvalidElection) {
+  if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
 
-  // For weighted voting, sum up all results
-  if (election.census?.type === CensusType.WEIGHTED && election.results) {
-    return election.results.reduce((acc, questionResults) => {
-      return acc + questionResults.reduce((sum, value) => sum + Number(value), 0)
-    }, 0)
-  }
+  const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
 
-  // For non-weighted voting or when no results available yet, return vote count
-  return election.voteCount || 0
+  // Calculate total votes (sum of all results if available, otherwise use voteCount)
+  const totalVotes = election.results
+    ? election.results.reduce((acc, questionResults) => {
+        return acc + questionResults.reduce((sum, value) => sum + Number(value), 0)
+      }, 0)
+    : election.voteCount || 0
+
+  // Calculate percentage of total votes
+  return Math.round((totalVotes / size) * 10000) / 100
 }
 
 export const electionStateEmpty = ({
