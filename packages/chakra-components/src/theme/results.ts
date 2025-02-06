@@ -19,7 +19,7 @@ export const resultsAnatomy = [
   'choiceTitle',
   // choice number of votes
   'choiceVotes',
-]
+] as const
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(resultsAnatomy)
 

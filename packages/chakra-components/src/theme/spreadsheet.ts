@@ -22,4 +22,4 @@ export const spreadsheetAccessAnatomy = [
   'helper',
   // sik field wrapper
   'sik_control',
-]
+] as const

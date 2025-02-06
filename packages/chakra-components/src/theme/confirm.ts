@@ -11,7 +11,7 @@ export const confirmAnatomy = [
   'confirm',
   'cancel',
   'close',
-]
+] as const
 
 export const signModalAnatomy = ['body', 'description', 'footer', 'button']
 

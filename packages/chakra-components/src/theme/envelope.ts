@@ -15,7 +15,7 @@ export const envelopeAnatomy = [
   'secret',
   // Error boundary message
   'error',
-]
+] as const
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(envelopeAnatomy)
 

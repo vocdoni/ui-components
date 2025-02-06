@@ -7,7 +7,7 @@ export const PaginationAnatomy = [
   'buttonGroup',
   // total results text
   'totalResults',
-]
+] as const
 
 const { defineMultiStyleConfig: defineVoteWeightTipStyle, definePartsStyle: defineVoteWeightParts } =
   createMultiStyleConfigHelpers(PaginationAnatomy)

@@ -29,7 +29,7 @@ export const questionsAnatomy = [
   'checkbox',
   // form error message
   'error',
-]
+] as const
 
 export const questionsConfirmationAnatomy = [
   // confirmation wrapper box
@@ -40,7 +40,7 @@ export const questionsConfirmationAnatomy = [
   'question',
   'title',
   'answer',
-]
+] as const
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsAnatomy)
 
@@ -96,7 +96,7 @@ export const questionTypeBadgeAnatomy = [
   'title',
   // badge tooltip
   'tooltip',
-]
+] as const
 
 const { defineMultiStyleConfig: defineQuestionTypeBadgeStyle, definePartsStyle: defineQuestionTypeBadgeParts } =
   createMultiStyleConfigHelpers(questionTypeBadgeAnatomy)
@@ -118,7 +118,7 @@ export const questionTipAnatomy = [
   'wrapper',
   // title text
   'text',
-]
+] as const
 
 const { defineMultiStyleConfig: defineQuestionTipStyle, definePartsStyle: defineQuestionTipParts } =
   createMultiStyleConfigHelpers(questionTipAnatomy)

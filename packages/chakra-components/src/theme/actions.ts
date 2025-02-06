@@ -5,4 +5,4 @@ export const actionsAnatomy = [
   'buttons',
   // icon styles
   'icons',
-]
+] as const

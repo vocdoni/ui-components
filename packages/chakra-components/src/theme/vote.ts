@@ -5,7 +5,7 @@ export const VoteWeightAnatomy = [
   'wrapper',
   // title text
   'weight',
-]
+] as const
 
 const { defineMultiStyleConfig: defineVoteWeightTipStyle, definePartsStyle: defineVoteWeightParts } =
   createMultiStyleConfigHelpers(VoteWeightAnatomy)
