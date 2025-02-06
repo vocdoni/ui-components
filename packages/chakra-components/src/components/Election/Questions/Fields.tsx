@@ -86,6 +86,14 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
   const choices = [...question.choices]
   // Put can abstain on a separated variable to avoid typing errors on validation function
   const canAbstain = election.resultsType.properties.canAbstain
+  if (canAbstain) {
+    choices.push({
+      title: {
+        default: localize('vote.abstain'),
+      },
+      value: -1,
+    })
+  }
 
   return (
     <Stack sx={styles.stack}>
@@ -95,7 +103,7 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
         rules={{
           validate: (v) => {
             // allow a single selection if is an abstain
-            if (canAbstain && v && v.length < election.voteType.maxCount!) return true
+            if (v.includes('-1') && v.length < election.voteType.maxCount!) return true
 
             return (
               (v && v.length === election.voteType.maxCount) ||
