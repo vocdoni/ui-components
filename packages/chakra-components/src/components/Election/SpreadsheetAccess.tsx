@@ -113,7 +113,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
 
       // create wallet and client
       const hid = await cl.electionService.getNumericElectionId(election!.id)
-      const salt = await cl.electionService.getElectionSalt(election!.organizationId, hid)
+      const salt =
+        election.get('census.salt') || (await cl.electionService.getElectionSalt(election!.organizationId, hid))
       const wallet = walletFromRow(salt, Object.values(vals))
       const client = new VocdoniSDKClient({
         env,
