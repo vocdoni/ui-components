@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/react'
 import { Wallet } from '@ethersproject/wallet'
 import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
-import { dotobject, PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
+import { PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { RegisterOptions, useForm } from 'react-hook-form'
 
@@ -64,7 +64,6 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     sikSignature,
     loading: { voting },
   } = useElection()
-  const fields: string[] = dotobject(election, 'meta.census.fields')
   const {
     register,
     handleSubmit,
@@ -159,6 +158,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     }
   }
 
+  // Form fields
+  const fields: string[] = election.get('census.fields')
   // Validation rules
   const required = {
     value: true,

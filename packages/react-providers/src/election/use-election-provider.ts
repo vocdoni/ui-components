@@ -40,7 +40,7 @@ export const useElectionProvider = ({
   const { client: c, localize } = useClient()
   const { state, actions } = useElectionReducer(c, data)
 
-  // If id and election data are both provided, it will fetch election info with the updated election.
+  // If id and election data are both provided, it will merge election info with the fetched election
   const [mergeElection, setMergeElection] = useState<boolean>(!!id && !!data)
 
   const {
