@@ -48,7 +48,11 @@ type MetaSpecs = {
   }
 }
 
-export const SpreadsheetAccess = (rest: ChakraProps) => {
+export type SpreadsheetAccessProps = ChakraProps & {
+  hashPrivateKey?: boolean
+}
+
+export const SpreadsheetAccess = ({ hashPrivateKey, ...rest }: SpreadsheetAccessProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const styles = useMultiStyleConfig('SpreadsheetAccess', rest)
   const { connected, clearClient } = useElection()
@@ -147,6 +151,9 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       }
       // in case of success, set current client
       setClient(client)
+      if (hashPrivateKey) {
+        document.location.hash = wallet.privateKey
+      }
       // reset the form
       reset()
       // also, close the modal
