@@ -42,7 +42,6 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "npm": "please use yarn",
     "yarn": ">= 1.19.1 && < 2"
   }
 }
