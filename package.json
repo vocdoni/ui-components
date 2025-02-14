@@ -43,5 +43,8 @@
   "packageManager": "yarn@1.22.19",
   "engines": {
     "yarn": ">= 1.19.1 && < 2"
+  },
+  "resolutions": {
+    "@types/react": ">=17.0.0 <19.0.0"
   }
 }
