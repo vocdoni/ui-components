@@ -68,6 +68,7 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<any>()
 
   const shouldRender = election instanceof PublishedElection && election?.get('census.type') === 'spreadsheet'
@@ -146,6 +147,8 @@ export const SpreadsheetAccess = (rest: ChakraProps) => {
       }
       // in case of success, set current client
       setClient(client)
+      // reset the form
+      reset()
       // also, close the modal
       onClose()
     } catch (e) {
