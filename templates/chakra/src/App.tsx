@@ -10,13 +10,13 @@ import { RoutesProvider } from './router'
 export const App = () => {
   const { data } = useWalletClient()
 
-  let signer: Signer = {} as Signer
+  let signer = null
   if (data) {
     signer = walletClientToSigner(data)
   }
 
   return (
-    <ClientProvider env={VocdoniEnvironment as EnvOptions} signer={signer}>
+    <ClientProvider env={VocdoniEnvironment as EnvOptions} signer={signer as Signer}>
       <RoutesProvider />
       <ColorModeScript />
     </ClientProvider>
