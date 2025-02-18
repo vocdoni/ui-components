@@ -402,7 +402,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       return {
         ...state,
         client,
-        connected: client && client.wallet && Object.keys(client.wallet).length > 0,
+        connected: !!client && !!client.wallet && Object.keys(client.wallet).length > 0,
       }
     }
 
