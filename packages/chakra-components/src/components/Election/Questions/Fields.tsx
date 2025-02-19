@@ -13,6 +13,7 @@ import { useElection } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, ElectionStatus, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'
 import { Markdown } from '../../layout'
+import { QuestionChoice } from './Choice'
 import { QuestionTip } from './Tip'
 
 export type QuestionProps = {
@@ -140,7 +141,7 @@ export const MultiChoice = ({ index, question }: QuestionProps) => {
                       trigger(index) // Manually trigger validation
                     }}
                   >
-                    {choice.title.default}
+                    <QuestionChoice choice={choice} />
                   </Checkbox>
                 )
               })}
@@ -204,7 +205,7 @@ export const ApprovalChoice = ({ index, question }: QuestionProps) => {
                       }
                     }}
                   >
-                    {choice.title.default}
+                    <QuestionChoice choice={choice} />
                   </Checkbox>
                 )
               })}
@@ -246,7 +247,7 @@ export const SingleChoice = ({ index, question }: QuestionProps) => {
           <Stack direction='column' sx={styles.stack}>
             {question.choices.map((choice, ck) => (
               <Radio key={ck} sx={styles.radio} value={choice.value.toString()}>
-                {choice.title.default}
+                <QuestionChoice choice={choice} />
               </Radio>
             ))}
           </Stack>
