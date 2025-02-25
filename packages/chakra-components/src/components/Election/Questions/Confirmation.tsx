@@ -44,12 +44,13 @@ export const QuestionsConfirmation = ({ answers, election, ...rest }: QuestionsC
                 </chakra.div>
               )
             }
-            const choices = answers[0]
+
+            const choices = (answers[0] || ['-1'])
               .map((a: string) =>
                 q.choices[Number(a)] ? q.choices[Number(a)].title.default : localize('vote.abstain')
               )
               .map((a: string) => (
-                <span>
+                <span key={a}>
                   - {a}
                   <br />
                 </span>
