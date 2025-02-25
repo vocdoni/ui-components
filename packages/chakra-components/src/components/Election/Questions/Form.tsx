@@ -62,8 +62,13 @@ export const QuestionsFormProvider: React.FC<PropsWithChildren<QuestionsFormProv
           .pop()
           .map((v: string) => parseInt(v, 10))
         // map proper abstain ids
-        if (results.includes(-1)) {
-          results.splice(results.indexOf(-1), 1)
+        if (
+          results.includes(-1) ||
+          (election.resultsType.properties.canAbstain && (!values || results.length < election.voteType.maxCount!))
+        ) {
+          if (results.includes(-1)) {
+            results.splice(results.indexOf(-1), 1)
+          }
           let abs = 0
           while (results.length < (election.voteType.maxCount || 1)) {
             results.push(parseInt(election.resultsType.properties.abstainValues[abs++], 10))
