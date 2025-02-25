@@ -3,6 +3,7 @@ import { createMultiStyleConfigHelpers, SystemStyleObject } from '@chakra-ui/rea
 export const questionChoiceAnatomy = [
   // Choice Label
   'label',
+  'description',
   // Image for the choice
   'image',
   // Wrapper for image and label

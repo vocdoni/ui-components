@@ -14,29 +14,25 @@ import {
 } from '@chakra-ui/react'
 import { IChoice } from '@vocdoni/sdk'
 import { useState } from 'react'
-import { QuestionChoiceAnatomyRecord } from '../../../theme/question-choice'
 
 export type QuestionChoiceMeta = {
   image: {
     default: string
     thumbnail?: string
   }
-  description?: {
-    default: string
-    [lang: string]: string
-  }
+  description?: string
 }
 
 export const QuestionChoice = ({ choice, ...rest }: { choice: IChoice } & StackProps) => {
-  const styles = useMultiStyleConfig('QuestionChoice') as QuestionChoiceAnatomyRecord
+  const styles = useMultiStyleConfig('QuestionChoice')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [loaded, setLoaded] = useState(false)
   const [loadedModal, setLoadedModal] = useState(false)
 
   const label = choice.title.default
-  const { image, description } = ((choice as any)?.meta ?? {}) as QuestionChoiceMeta
-  const renderImage = !!image.default
-  const renderModal = image.default && image.thumbnail
+  const { image, description } = (choice.meta ?? {}) as QuestionChoiceMeta
+  const renderImage = !!image && !!image.default
+  const renderModal = !!image && image.default && image.thumbnail
 
   return (
     <Stack sx={styles.wrapper} {...rest}>
@@ -56,6 +52,7 @@ export const QuestionChoice = ({ choice, ...rest }: { choice: IChoice } & StackP
         </Skeleton>
       )}
       <Text sx={styles.label}>{label}</Text>
+      {description && <Text sx={styles.description}>{description}</Text>}
       {renderModal && (
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay sx={styles.modalOverlay} />
@@ -68,7 +65,7 @@ export const QuestionChoice = ({ choice, ...rest }: { choice: IChoice } & StackP
                 </Skeleton>
               )}
               <Text sx={styles.modalLabel}>{label}</Text>
-              {description && <Text sx={styles.modalDescription}>{description.default}</Text>}
+              {description && <Text sx={styles.modalDescription}>{description}</Text>}
             </ModalBody>
           </ModalContent>
         </Modal>
