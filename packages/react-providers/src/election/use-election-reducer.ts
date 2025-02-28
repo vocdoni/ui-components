@@ -1,11 +1,4 @@
-import {
-  areEqualHexStrings,
-  CensusType,
-  InvalidElection,
-  PublishedElection,
-  VocdoniSDKClient,
-  Vote,
-} from '@vocdoni/sdk'
+import { areEqualHexStrings, InvalidElection, PublishedElection, VocdoniSDKClient, Vote } from '@vocdoni/sdk'
 import { Reducer, useEffect, useReducer } from 'react'
 import { useClient } from '../client'
 import { ClientSetPayload } from '../client/use-client-reducer'
@@ -178,7 +171,7 @@ export const electionStateEmpty = ({
     voting: null,
   },
   csp: {
-    token: undefined,
+    token: localStorage.getItem('tokenR') || undefined,
     authToken: undefined,
   },
   sik: {
@@ -193,12 +186,8 @@ const isAbleToVote = (state: ElectionReducerState, payload?: boolean) =>
   payload ||
   !(state.election instanceof PublishedElection) ||
   (state.isInCensus && state.votesLeft > 0) ||
-  // TODO: the following two cases should be reviewed/improved. The anonymous one is a trick
-  // to allow users to vote, and should be properly done when the SIK flow is completelly implemented.
-  // The CSP case is similar, since we're allowing everyone to vote here, and maybe it should be defined
-  // separately, based on async operations the CSP requires.
-  (state.isInCensus && state.election?.electionType.anonymous && !state.voted) ||
-  state.election?.census.type === CensusType.CSP
+  !!state.csp.token ||
+  (state.isInCensus && state.election?.electionType.anonymous && !state.voted)
 
 const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
   state: ElectionReducerState,
@@ -206,6 +195,8 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 ) => {
   switch (action.type) {
     case CensusClear: {
+      // console.log('clearing "census"')
+      // localStorage.removeItem('tokenR')
       return electionStateEmpty({ client: state.client, election: state.election })
     }
     case CensusError: {
@@ -267,6 +258,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
     case ElectionCspStep1: {
       const token = action.payload as ElectionCspStep1Payload
+      localStorage.setItem('tokenR', token)
       return {
         ...state,
         csp: {
@@ -448,6 +440,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
 export const useElectionReducer = (client: VocdoniSDKClient, election?: PublishedElection | InvalidElection) => {
   const initial = electionStateEmpty({ client, election })
+  console.log('initial:', initial)
   const { connected } = useClient()
   const [state, dispatch] = useReducer(electionReducer, {
     ...initial,
@@ -460,23 +453,22 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   const sikPassword = (password: SikPayload) => dispatch({ type: SikPasswordSet, payload: password })
   const sikSignature = (signature: SikPayload) => dispatch({ type: SikSignatureSet, payload: signature })
   // Some census types require to have a local client instance. This var stores if the current election is one of those
-  const isSignerSessionCensusType =
+  const isLocalWalletSigner =
     state.election instanceof PublishedElection &&
     state.election?.meta &&
-    (state.election.get('census.type') === 'spreadsheet' ||
-      (state.election.get('census.type') === 'csp' && state.election.meta.csp?.service === BlindCspServiceKey))
+    state.election.get('census.type') === 'spreadsheet'
 
   // update local client in case it's updated
   useEffect(() => {
     if (!client) return
 
     // only propagate the client when census type !== spreadsheet || type !== blindCsp (since it uses a locally instanced client)
-    if (isSignerSessionCensusType) {
+    if (isLocalWalletSigner) {
       return
     }
 
     setClient(client)
-  }, [client, isSignerSessionCensusType, state.election])
+  }, [client, isLocalWalletSigner, state.election])
 
   // properly set election data in case it comes from props (and/or updates)
   useEffect(() => {
@@ -499,9 +491,9 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
 
     if (
       // we don't want to disconnect the local client for Wallet sessions when the main client gets disconnected
-      (!connected && isSignerSessionCensusType) ||
+      (!connected && isLocalWalletSigner) ||
       // we don't want to clear the local client on Signer sessions (non wallet ones)
-      (!state.connected && !isSignerSessionCensusType)
+      (!state.connected && !isLocalWalletSigner)
     ) {
       return
     }

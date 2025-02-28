@@ -5,8 +5,6 @@ import {
   CensusType,
   ChainAPI,
   CspVote,
-  ICspFinalStepResponse,
-  ICspIntermediateStepResponse,
   InvalidElection,
   PublishedElection,
   Vote,
@@ -16,7 +14,7 @@ import { useClient } from '../client'
 import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
 import { useWebWorker } from '../worker/useWebWorker'
 import { createWebWorker } from '../worker/webWorker'
-import { BlindCspServiceKey, useElectionReducer } from './use-election-reducer'
+import { useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
@@ -45,14 +43,12 @@ export const useElectionProvider = ({
 
   const {
     client,
-    csp,
     election,
     loading,
     loaded,
     sik: { password, signature },
   } = state
   const [anonCircuitsFetched, setAnonCircuitsFetched] = useState(false)
-  const [oAuthMessage, setOAuthMessage] = useState<{ code: string; handler: string } | undefined>()
 
   const isAnonCircuitsFetching = useRef(false)
 
@@ -156,15 +152,6 @@ export const useElectionProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [circuits])
 
-  // CSP OAuth flow
-  // As vote setting and voting token are async, we need to wait for both to be set
-  useEffect(() => {
-    if (csp.token && state.vote) {
-      cspVote(csp.token, state.vote)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [csp.token, state.vote])
-
   // fetch election
   useEffect(() => {
     if (!id || !client || loading.election) return
@@ -216,55 +203,6 @@ export const useElectionProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoUpdate, autoUpdateInterval, election])
 
-  // CSP OAuth flow
-  // Listening for the popup window message
-  useEffect(() => {
-    const handleMessage = (event: any) => {
-      if (event.data.code && event.data.handler) {
-        setOAuthMessage(event.data)
-      }
-    }
-
-    if (window.opener) {
-      return
-    }
-
-    window.addEventListener('message', handleMessage)
-
-    return () => {
-      window.removeEventListener('message', handleMessage)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // CSP OAuth flow
-  // Posting the message to the main window
-  useEffect(() => {
-    ;(async () => {
-      if (typeof window == 'undefined') return
-      if (window.location.href.split('?').length < 2) return
-
-      const params: URLSearchParams = new URLSearchParams(window.location.search)
-      const code: string | null = params.get('code')
-      const handler: string | null = params.get('handler')
-      if (!code || !handler) return
-
-      if (window.opener) {
-        // If it is, send the code to the parent window and close the popup
-        window.opener.postMessage({ code, handler }, '*')
-        window.close()
-      }
-    })()
-  }, [])
-
-  // CSP OAuth flow
-  // Handling message callback preventing multiple calls
-  useEffect(() => {
-    if (!oAuthMessage?.code || !oAuthMessage?.handler) return
-    getOAuthToken(oAuthMessage.code, oAuthMessage.handler)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [oAuthMessage])
-
   // context vote function (the one to be used with the given components)
   const vote = async (values: number[]) => {
     if (!client) {
@@ -296,7 +234,13 @@ export const useElectionProvider = ({
 
       switch (election.census.type) {
         case CensusType.CSP:
-          await cspVoteByService()
+          client.cspService.url = election.census.censusURI
+          // @ts-ignore
+          client.cspService.info = {
+            signatureType: ['blind'],
+            authType: '2fa',
+          }
+          await cspVote(localStorage.getItem('tokenR') as string, vote)
           break
         case CensusType.ANONYMOUS:
         case CensusType.WEIGHTED:
@@ -326,133 +270,7 @@ export const useElectionProvider = ({
     return await client.submitVote(vote)
   }
 
-  // CSP flow
-  const cspVoteByService = async () => {
-    const service = (election as PublishedElection)?.meta.csp?.service
-    if (!client) {
-      throw new Error('no client initialized')
-    }
-    if ((election as PublishedElection)?.census?.type !== CensusType.CSP) {
-      throw new Error('not a CSP election')
-    }
-    switch (service) {
-      case BlindCspServiceKey:
-        return blindCspVote()
-      default:
-        return cspAuthAndVote()
-    }
-  }
-
-  // CSP generic steps
-  const cspStep0 = async (handler: string, data: any[]) => {
-    let step0: ICspIntermediateStepResponse
-    try {
-      step0 = (await client.cspStep(0, data)) as ICspIntermediateStepResponse
-      actions.csp0({ handler, token: step0.authToken })
-      return step0
-    } catch (e) {
-      actions.votingError(e)
-      console.warn('CSP step 0 error', e)
-    }
-  }
-
-  // CSP generic steps
-  const cspStep1 = async (data: any[], authToken?: string | undefined) => {
-    try {
-      const step1 = (await client.cspStep(1, data, authToken)) as ICspFinalStepResponse
-      actions.csp1(step1.token)
-    } catch (e) {
-      actions.votingError(localize('errors.unauthorized'))
-      console.warn('CSP step 1 error', e)
-    }
-  }
-
-  // blind CSP flow
-  const blindCspVote = async () => {
-    if (!client) {
-      throw new Error('no client initialized')
-    }
-    if (!(election instanceof PublishedElection) || election?.census?.type !== CensusType.CSP) {
-      throw new Error('not a CSP election')
-    }
-    const handler = (election as PublishedElection).meta.csp?.service
-
-    const step0 = await cspStep0(handler, ['Name test'])
-    if (!step0) return
-    await cspStep1([step0.response.reduce((acc, v) => +acc + +v, 0).toString()], step0.authToken)
-  }
-
-  // CSP OAuth flow
-  const cspAuthAndVote = async () => {
-    const handler = (election as PublishedElection).meta.csp?.service
-    if (!election) {
-      throw new Error('no election initialized')
-    }
-    const params: URLSearchParams = new URLSearchParams(window.location.search)
-    if (!params.has('electionId')) {
-      params.append('electionId', election.id)
-    }
-
-    if (!params.has('handler')) {
-      params.append('handler', handler)
-    }
-    const redirectURL: string = `${window.location.origin}${window.location.pathname}?${params.toString()}${
-      window.location.hash
-    }`
-    const step0 = await cspStep0(handler, [handler, redirectURL])
-    if (step0) {
-      openLoginPopup(handler, step0['response'][0])
-    }
-  }
-
-  // CSP OAuth flow
-  // Opens a popup window to the service login page
-  const openLoginPopup = (handler: string, url: string) => {
-    const width = 600
-    const height = 600
-    const left = window.outerWidth / 2 - width / 2
-    const top = window.outerHeight / 2 - height / 2
-    const params = [
-      `width=${width}`,
-      `height=${height}`,
-      `top=${top}`,
-      `left=${left}`,
-      `status=no`,
-      `resizable=yes`,
-      `scrollbars=yes`,
-    ].join(',')
-
-    window.open(url, handler, params)
-  }
-
-  // CSP OAuth flow
-  const getOAuthToken = useCallback(
-    async (code: string, handler: string) => {
-      if (!client || csp.token) return
-      if (!code) {
-        throw new Error('no code provided')
-      }
-      if (!handler) {
-        throw new Error('no handler provided')
-      }
-
-      // Extract the electionId query param from the redirectURL
-      const existingParams = new URLSearchParams(window.location.search)
-      const electionId = existingParams.get('electionId')
-      const params: URLSearchParams = new URLSearchParams()
-      params.append('electionId', electionId as string)
-      params.append('handler', handler)
-
-      const redirectURL = `${window.location.origin}${window.location.pathname}?${params.toString()}${
-        window.location.hash
-      }`
-      await cspStep1([handler, code, redirectURL], csp.authToken)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [csp.token, csp.authToken, client]
-  )
-
-  // CSP OAuth flow
+  // CSP Vote
   const cspVote = async (token: string, vote: Vote) => {
     if (!client) {
       throw new Error('no client initialized')
@@ -475,6 +293,7 @@ export const useElectionProvider = ({
   return {
     ...rest,
     ...state,
+    actions,
     fetchElection,
     localize,
     vote,
