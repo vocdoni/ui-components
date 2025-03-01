@@ -4,14 +4,13 @@ import {
   areEqualHexStrings,
   CensusType,
   ChainAPI,
-  CspProofType,
-  CspVote,
   InvalidElection,
   PublishedElection,
   Vote,
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '../client'
+import { vote as cspVote } from '../csp'
 import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
 import { useWebWorker } from '../worker/useWebWorker'
 import { createWebWorker } from '../worker/webWorker'
@@ -234,20 +233,17 @@ export const useElectionProvider = ({
       }
 
       switch (election.census.type) {
-        case CensusType.CSP:
-          client.cspService.url = election.census.censusURI
-          // @ts-ignore
-          client.cspService.info = {
-            signatureType: ['blind'],
-            authType: '2fa',
-          }
-          await cspVote(localStorage.getItem('tokenR') as string, vote)
+        case CensusType.CSP: {
+          const vid = await cspVote(client, election, state.csp.token, vote)
+          actions.voted(vid)
           break
+        }
         case CensusType.ANONYMOUS:
-        case CensusType.WEIGHTED:
+        case CensusType.WEIGHTED: {
           const vid = await weightedVote(vote)
           actions.voted(vid)
           break
+        }
         default:
           throw new Error(`unsupported census type "${election.census.type}"`)
       }
@@ -269,26 +265,6 @@ export const useElectionProvider = ({
     }
 
     return await client.submitVote(vote)
-  }
-
-  // CSP Vote
-  const cspVote = async (token: string, vote: Vote) => {
-    if (!client) {
-      throw new Error('no client initialized')
-    }
-    if (!(election instanceof PublishedElection) || election?.census?.type !== CensusType.CSP) {
-      throw new Error('not a CSP election')
-    }
-
-    try {
-      const walletAddress: string = (await client.wallet?.getAddress()) as string
-      const signature: string = await client.cspSign(walletAddress, token)
-      const cspVote: CspVote = client.cspVote(vote, signature, CspProofType.ECDSA)
-      const vid: string = await client.submitVote(cspVote)
-      actions.voted(vid)
-    } catch (e) {
-      actions.votingError(e)
-    }
   }
 
   return {
