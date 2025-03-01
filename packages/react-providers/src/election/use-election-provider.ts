@@ -4,6 +4,7 @@ import {
   areEqualHexStrings,
   CensusType,
   ChainAPI,
+  CspProofType,
   CspVote,
   InvalidElection,
   PublishedElection,
@@ -282,7 +283,7 @@ export const useElectionProvider = ({
     try {
       const walletAddress: string = (await client.wallet?.getAddress()) as string
       const signature: string = await client.cspSign(walletAddress, token)
-      const cspVote: CspVote = client.cspVote(vote, signature)
+      const cspVote: CspVote = client.cspVote(vote, signature, CspProofType.ECDSA)
       const vid: string = await client.submitVote(cspVote)
       actions.voted(vid)
     } catch (e) {
