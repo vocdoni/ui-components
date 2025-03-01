@@ -12,14 +12,14 @@ export const vote = async (client: VocdoniSDKClient, election: PublishedElection
   }
 
   const walletAddress: string = (await client.wallet?.getAddress()) as string
-  const signature: string = await f(`${election.census.censusURI.replace(/\/bundle\/.+$/, '')}/${election.id}/sign`, {
+  const signature: { signature: string } = await f(`${election.census.censusURI}/sign`, {
     method: 'POST',
     body: {
       payload: walletAddress,
-      tokenR: token,
+      token: token,
     },
   })
-  const cspVote: CspVote = client.cspVote(vote, signature, CspProofType.ECDSA)
+  const cspVote: CspVote = client.cspVote(vote, signature.signature, CspProofType.ECDSA)
   const vid: string = await client.submitVote(cspVote)
 
   return vid
