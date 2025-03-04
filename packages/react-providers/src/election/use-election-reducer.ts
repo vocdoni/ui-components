@@ -126,20 +126,28 @@ const participation = (election?: PublishedElection | InvalidElection) => {
   if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
-
   const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
-
+  // Calculate percentage of people who voted
   return Math.round((election.voteCount / size) * 10000) / 100
 }
 
+// Turnout returns the % of total votes
 const turnout = (election?: PublishedElection | InvalidElection) => {
   if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
   }
-  const total = election.results ? election.results.reduce((acc, q) => acc + Number(q), 0) : 0
+
   const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
 
-  return Math.round((total / size) * 10000) / 100
+  // Calculate total votes (sum of all results if available, otherwise use voteCount)
+  const totalVotes = election.results
+    ? election.results.reduce((acc, questionResults) => {
+        return acc + questionResults.reduce((sum, value) => sum + Number(value), 0)
+      }, 0)
+    : election.voteCount || 0
+
+  // Calculate percentage of total votes
+  return Math.round((totalVotes / size) * 10000) / 100
 }
 
 export const electionStateEmpty = ({
