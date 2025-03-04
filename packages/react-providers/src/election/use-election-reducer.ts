@@ -118,6 +118,10 @@ export interface ElectionReducerState {
   turnout: number
 }
 
+export enum LSKey {
+  tokenR = 'tokenR',
+}
+
 const participation = (election?: PublishedElection | InvalidElection) => {
   if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
     return 0
@@ -171,7 +175,7 @@ export const electionStateEmpty = ({
     voting: null,
   },
   csp: {
-    token: localStorage.getItem('tokenR') || undefined,
+    token: localStorage.getItem(LSKey.tokenR) || undefined,
     authToken: undefined,
   },
   sik: {
@@ -195,8 +199,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 ) => {
   switch (action.type) {
     case CensusClear: {
-      // console.log('clearing "census"')
-      // localStorage.removeItem('tokenR')
+      localStorage.removeItem(LSKey.tokenR)
       return electionStateEmpty({ client: state.client, election: state.election })
     }
     case CensusError: {
@@ -258,7 +261,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
     case ElectionCspStep1: {
       const token = action.payload as ElectionCspStep1Payload
-      localStorage.setItem('tokenR', token)
+      localStorage.setItem(LSKey.tokenR, token)
       return {
         ...state,
         csp: {
