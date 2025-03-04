@@ -234,7 +234,7 @@ export const useElectionProvider = ({
 
       switch (election.census.type) {
         case CensusType.CSP: {
-          const vid = await cspVote(client, election, state.csp.token, vote)
+          const vid = await cspVote(client, election, state.csp.authToken, vote)
           actions.voted(vid)
           break
         }

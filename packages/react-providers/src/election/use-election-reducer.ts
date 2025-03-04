@@ -257,13 +257,13 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
     }
 
     case ElectionCspStep1: {
-      const token = action.payload as ElectionCspStep1Payload
-      localStorage.setItem('tokenR', token)
+      const authToken = action.payload as ElectionCspStep1Payload
+      localStorage.setItem('tokenR', authToken)
       return {
         ...state,
         csp: {
           ...state.csp,
-          token,
+          authToken,
         },
       }
     }

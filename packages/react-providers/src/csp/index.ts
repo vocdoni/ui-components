@@ -16,7 +16,8 @@ export const vote = async (client: VocdoniSDKClient, election: PublishedElection
     method: 'POST',
     body: {
       payload: walletAddress,
-      token: token,
+      authToken: token,
+      electionId: election.id,
     },
   })
   const cspVote: CspVote = client.cspVote(vote, signature.signature, CspProofType.ECDSA)
