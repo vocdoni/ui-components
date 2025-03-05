@@ -35,7 +35,7 @@ export const useElectionProvider = ({
   autoUpdate,
   ...rest
 }: ElectionProviderProps) => {
-  const { client: c, localize } = useClient()
+  const { client: c, localize, generateSigner } = useClient()
   const { state, actions } = useElectionReducer(c, data)
 
   // If id and election data are both provided, it will merge election info with the fetched election
@@ -141,6 +141,15 @@ export const useElectionProvider = ({
     fetchAnonCircuits()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchAnonCircuits, client.wallet, election, loading.census, fetchCensus])
+
+  // if tokenR is found, initialize a random signer
+  useEffect(() => {
+    if (state.connected || !state.csp.token) return
+
+    const signer = generateSigner()
+    client.wallet = signer
+    actions.setClient(client)
+  }, [state.connected, state.csp.token])
 
   // sets circuits in the anonymous service
   useEffect(() => {

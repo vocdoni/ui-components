@@ -50,7 +50,7 @@ export type CensusErrorPayload = ErrorPayload
 export type CensusIsAbleToVotePayload = undefined | boolean
 export type CensusLoadPayload = string
 export type ElectionClientSetPayload = VocdoniSDKClient
-export type ElectionCspStep0Payload = { handler: string; token: string }
+export type ElectionCspStep0Payload = { token: string }
 export type ElectionCspStep1Payload = string
 export type ElectionErrorPayload = ErrorPayload
 export type ElectionInCensusPayload = boolean
@@ -108,7 +108,6 @@ export interface ElectionReducerState {
   }
   csp: {
     token: string | undefined
-    authToken: string | undefined
   }
   sik: {
     password: string | undefined
@@ -184,7 +183,6 @@ export const electionStateEmpty = ({
   },
   csp: {
     token: localStorage.getItem(LSKey.tokenR) || undefined,
-    authToken: undefined,
   },
   sik: {
     password: undefined,
@@ -261,15 +259,14 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
         ...state,
         csp: {
           ...state.csp,
-          authToken: data.token,
-          handler: data.handler,
+          ...data,
         },
       }
     }
 
     case ElectionCspStep1: {
       const token = action.payload as ElectionCspStep1Payload
-      localStorage.setItem(LSKey.tokenR, token)
+      localStorage.setItem('tokenR', token)
       return {
         ...state,
         csp: {
@@ -359,7 +356,6 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
         },
         csp: {
           ...state.csp,
-          authToken: undefined,
           token: undefined,
         },
       }
