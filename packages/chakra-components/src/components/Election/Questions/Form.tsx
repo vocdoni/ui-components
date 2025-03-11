@@ -31,7 +31,7 @@ export const QuestionsFormProvider: React.FC<PropsWithChildren<QuestionsFormProv
 }) => {
   const fmethods = useForm()
   const { confirm } = useConfirm()
-  const { election, client, vote: bvote } = useElection()
+  const { election, client, vote: bvote, connected } = useElection()
 
   const vote = async (values: FieldValues) => {
     if (!election || !(election instanceof PublishedElection)) {
@@ -93,18 +93,12 @@ export const QuestionsFormProvider: React.FC<PropsWithChildren<QuestionsFormProv
 
   // reset form if account gets disconnected
   useEffect(() => {
-    if (
-      typeof client.wallet !== 'undefined' ||
-      !election ||
-      !(election instanceof PublishedElection) ||
-      !election?.questions
-    )
-      return
+    if (connected || !election || !(election instanceof PublishedElection) || !election?.questions) return
 
     fmethods.reset({
       ...election.questions.reduce((acc, question, index) => ({ ...acc, [index]: '' }), {}),
     })
-  }, [client, election, fmethods])
+  }, [election, fmethods, connected])
 
   return (
     <FormProvider {...fmethods}>
