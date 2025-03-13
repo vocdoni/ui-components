@@ -4,9 +4,11 @@ import {
   areEqualHexStrings,
   CensusType,
   ChainAPI,
+  HasAlreadyVotedOptions,
   InvalidElection,
   PublishedElection,
   Vote,
+  VotesLeftCountOptions,
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '../client'
@@ -70,25 +72,24 @@ export const useElectionProvider = ({
 
     try {
       actions.loadCensus(address as string)
-      const isIn = await client.isInCensus({ electionId: election.id })
+      const isIn =
+        election.census.type === CensusType.CSP ? false : await client.isInCensus({ electionId: election.id })
       actions.inCensus(isIn)
+
       const censusType = election.census.type as CensusType
 
-      if (isIn && censusType === CensusType.WEIGHTED && !election.electionType.anonymous) {
-        actions.voted(await client.hasAlreadyVoted({ electionId: election.id }))
-
-        // no need to check votes left if member ain't in census
-        actions.votesLeft(await client.votesLeftCount({ electionId: election.id }))
+      const requestData: HasAlreadyVotedOptions | VotesLeftCountOptions = {
+        electionId: election.id,
       }
 
-      // check differs a bit for anonymous votings
       if (isIn && election.electionType.anonymous && signature) {
-        const voteId = await AnonymousService.calcVoteId(signature, password ?? '0', election.id)
-        const hasAlreadyVoted = await client.hasAlreadyVoted({ voteId, electionId: election.id })
-        actions.voted(hasAlreadyVoted)
-        const votesLeft = await client.votesLeftCount({ voteId, electionId: election.id })
+        requestData.voteId = await AnonymousService.calcVoteId(signature, password ?? '0', election.id)
+      }
 
-        actions.votesLeft(votesLeft)
+      if (isIn && censusType === CensusType.WEIGHTED && !election.electionType.anonymous) {
+        actions.voted(await client.hasAlreadyVoted(requestData))
+        // no need to check votes left if member ain't in census
+        actions.votesLeft(await client.votesLeftCount(requestData))
       }
 
       actions.isAbleToVote()
@@ -179,15 +180,7 @@ export const useElectionProvider = ({
 
   // check census information
   useEffect(() => {
-    if (
-      !fetchCensus ||
-      !election ||
-      !loaded.election ||
-      loading.census ||
-      !client.wallet ||
-      (election instanceof PublishedElection && election.census.type === CensusType.CSP)
-    )
-      return
+    if (!fetchCensus || !election || !loaded.election || loading.census || !client.wallet) return
     ;(async () => {
       const address = await client.wallet?.getAddress()
       // The condition is just negated so we can return the code execution.
