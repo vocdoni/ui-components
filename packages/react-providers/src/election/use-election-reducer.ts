@@ -1,4 +1,11 @@
-import { areEqualHexStrings, InvalidElection, PublishedElection, VocdoniSDKClient, Vote } from '@vocdoni/sdk'
+import {
+  areEqualHexStrings,
+  CensusType,
+  InvalidElection,
+  PublishedElection,
+  VocdoniSDKClient,
+  Vote,
+} from '@vocdoni/sdk'
 import { Reducer, useEffect, useReducer } from 'react'
 import { useClient } from '../client'
 import { ClientSetPayload } from '../client/use-client-reducer'
@@ -118,7 +125,7 @@ export interface ElectionReducerState {
 }
 
 export enum LSKey {
-  tokenR = 'tokenR',
+  tokenR = 'csp_token',
 }
 
 const participation = (election?: PublishedElection | InvalidElection) => {
@@ -266,7 +273,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
     case ElectionCspStep1: {
       const token = action.payload as ElectionCspStep1Payload
-      localStorage.setItem('tokenR', token)
+      localStorage.setItem(LSKey.tokenR, token)
       return {
         ...state,
         csp: {
@@ -447,7 +454,6 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
 export const useElectionReducer = (client: VocdoniSDKClient, election?: PublishedElection | InvalidElection) => {
   const initial = electionStateEmpty({ client, election })
-  console.log('initial:', initial)
   const { connected } = useClient()
   const [state, dispatch] = useReducer(electionReducer, {
     ...initial,
@@ -462,8 +468,8 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   // Some census types require to have a local client instance. This var stores if the current election is one of those
   const isLocalWalletSigner =
     state.election instanceof PublishedElection &&
-    state.election?.meta &&
-    state.election.get('census.type') === 'spreadsheet'
+    (state.election.census.type === CensusType.CSP ||
+      (state.election?.meta && state.election.get('census.type') === 'spreadsheet'))
 
   // update local client in case it's updated
   useEffect(() => {

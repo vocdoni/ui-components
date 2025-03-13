@@ -179,7 +179,15 @@ export const useElectionProvider = ({
 
   // check census information
   useEffect(() => {
-    if (!fetchCensus || !election || !loaded.election || loading.census || !client.wallet) return
+    if (
+      !fetchCensus ||
+      !election ||
+      !loaded.election ||
+      loading.census ||
+      !client.wallet ||
+      (election instanceof PublishedElection && election.census.type === CensusType.CSP)
+    )
+      return
     ;(async () => {
       const address = await client.wallet?.getAddress()
       // The condition is just negated so we can return the code execution.

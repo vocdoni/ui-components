@@ -20,7 +20,7 @@ export const vote = async (client: VocdoniSDKClient, election: PublishedElection
       electionId: election.id,
     },
   })
-  const cspVote: CspVote = client.cspVote(vote, signature.signature, CspProofType.ECDSA)
+  const cspVote: CspVote = client.cspVote(vote, signature.signature, CspProofType.ECDSA_PIDSALTED)
   const vid: string = await client.submitVote(cspVote)
 
   return vid
