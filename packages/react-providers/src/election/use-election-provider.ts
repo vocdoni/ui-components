@@ -12,7 +12,7 @@ import {
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '../client'
-import { vote as cspVote, useSignInfoMutation } from '../csp'
+import { vote as cspVote, fetchSignInfo } from '../csp'
 import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
 import { useWebWorker } from '../worker/useWebWorker'
 import { createWebWorker } from '../worker/webWorker'
@@ -39,7 +39,6 @@ export const useElectionProvider = ({
 }: ElectionProviderProps) => {
   const { client: c, localize, generateSigner } = useClient()
   const { state, actions } = useElectionReducer(c, data)
-  const signInfo = useSignInfoMutation()
 
   // If id and election data are both provided, it will merge election info with the fetched election
   const [mergeElection, setMergeElection] = useState<boolean>(!!id && !!data)
@@ -220,7 +219,7 @@ export const useElectionProvider = ({
     ;(async () => {
       const uri = new URL(election.census.censusURI)
       const endpoint = `${uri.protocol}//${uri.host}`
-      const { nullifier } = await signInfo.mutateAsync({
+      const { nullifier } = await fetchSignInfo({
         endpoint,
         authToken: state.csp.token,
         processId: election.id,

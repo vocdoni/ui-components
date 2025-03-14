@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query'
 import { CensusType, CspProofType, CspVote, PublishedElection, VocdoniSDKClient, Vote } from '@vocdoni/sdk'
 import { up } from 'up-fetch'
 
@@ -39,11 +38,12 @@ type SignInfoMutationVariables = {
   authToken: string
 }
 
-export const useSignInfoMutation = () =>
-  useMutation<SignInfoResponse, Error, SignInfoMutationVariables>({
-    mutationFn: ({ endpoint, processId, authToken }) =>
-      f(`${endpoint}/process/${processId}/sign-info`, {
-        method: 'POST',
-        body: { authToken },
-      }),
+export const fetchSignInfo = ({
+  endpoint,
+  processId,
+  authToken,
+}: SignInfoMutationVariables): Promise<SignInfoResponse> =>
+  f(`${endpoint}/process/${processId}/sign-info`, {
+    method: 'POST',
+    body: { authToken },
   })
