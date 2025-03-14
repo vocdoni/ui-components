@@ -1,7 +1,7 @@
 import { Button, ButtonProps, chakra, Text, useMultiStyleConfig } from '@chakra-ui/react'
 import { Signer } from '@ethersproject/abstract-signer'
 import { useClient, useElection } from '@vocdoni/react-providers'
-import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
+import { CensusType, ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { results } from './Results'
 
@@ -77,6 +77,7 @@ export const VoteWeight = () => {
           !election ||
           !client.wallet ||
           !(election instanceof PublishedElection) ||
+          election.census.type === CensusType.CSP ||
           !election.census.censusId
         ) {
           return
