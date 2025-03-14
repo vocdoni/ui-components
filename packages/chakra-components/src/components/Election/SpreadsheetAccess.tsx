@@ -52,6 +52,18 @@ export type SpreadsheetAccessProps = ChakraProps & {
   hashPrivateKey?: boolean
 }
 
+function removeLastLetter(str) {
+  if (typeof str !== 'string' || str.length === 0) return str
+
+  const lastChar = str.charAt(str.length - 1)
+
+  if (/[a-zA-Z]/.test(lastChar)) {
+    return str.slice(0, -1)
+  }
+
+  return str
+}
+
 export const SpreadsheetAccess = ({ hashPrivateKey, ...rest }: SpreadsheetAccessProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const styles = useMultiStyleConfig('SpreadsheetAccess', rest)
@@ -114,6 +126,8 @@ export const SpreadsheetAccess = ({ hashPrivateKey, ...rest }: SpreadsheetAccess
         sikp = vals.sik_password
         delete vals.sik_password
       }
+
+      vals[0] = removeLastLetter(vals[0])
 
       // create wallet and client
       const hid = await cl.electionService.getNumericElectionId(election!.id)
