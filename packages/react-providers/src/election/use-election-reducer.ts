@@ -203,7 +203,7 @@ const isAbleToVote = (state: ElectionReducerState, payload?: boolean) =>
   payload ||
   !(state.election instanceof PublishedElection) ||
   (state.isInCensus && state.votesLeft > 0) ||
-  !!state.csp.token ||
+  (!!state.csp.token && !state.voted) ||
   (state.isInCensus && state.election?.electionType.anonymous && !state.voted)
 
 const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (

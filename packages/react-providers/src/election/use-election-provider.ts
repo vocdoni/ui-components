@@ -12,7 +12,7 @@ import {
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '../client'
-import { vote as cspVote } from '../csp'
+import { vote as cspVote, useSignInfoMutation } from '../csp'
 import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
 import { useWebWorker } from '../worker/useWebWorker'
 import { createWebWorker } from '../worker/webWorker'
@@ -39,6 +39,7 @@ export const useElectionProvider = ({
 }: ElectionProviderProps) => {
   const { client: c, localize, generateSigner } = useClient()
   const { state, actions } = useElectionReducer(c, data)
+  const signInfo = useSignInfoMutation()
 
   // If id and election data are both provided, it will merge election info with the fetched election
   const [mergeElection, setMergeElection] = useState<boolean>(!!id && !!data)
@@ -212,6 +213,23 @@ export const useElectionProvider = ({
     return () => clearInterval(interval)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoUpdate, autoUpdateInterval, election])
+
+  // csp check sign info (check if voter already voted)
+  useEffect(() => {
+    if (!state.csp.token || !election || !loaded.election || election instanceof InvalidElection) return
+    ;(async () => {
+      const uri = new URL(election.census.censusURI)
+      const endpoint = `${uri.protocol}//${uri.host}`
+      const { nullifier } = await signInfo.mutateAsync({
+        endpoint,
+        authToken: state.csp.token,
+        processId: election.id,
+      })
+
+      actions.voted(nullifier)
+      actions.votesLeft(0)
+    })()
+  }, [state.csp.token, election, loaded.election])
 
   // context vote function (the one to be used with the given components)
   const vote = async (values: number[]) => {

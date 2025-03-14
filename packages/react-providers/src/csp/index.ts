@@ -1,3 +1,4 @@
+import { useMutation } from '@tanstack/react-query'
 import { CensusType, CspProofType, CspVote, PublishedElection, VocdoniSDKClient, Vote } from '@vocdoni/sdk'
 import { up } from 'up-fetch'
 
@@ -25,3 +26,24 @@ export const vote = async (client: VocdoniSDKClient, election: PublishedElection
 
   return vid
 }
+
+type SignInfoResponse = {
+  address: string
+  nullifier: string
+  at: string // ISO date string
+}
+
+type SignInfoMutationVariables = {
+  endpoint: string
+  processId: string
+  authToken: string
+}
+
+export const useSignInfoMutation = () =>
+  useMutation<SignInfoResponse, Error, SignInfoMutationVariables>({
+    mutationFn: ({ endpoint, processId, authToken }) =>
+      f(`${endpoint}/process/${processId}/sign-info`, {
+        method: 'POST',
+        body: { authToken },
+      }),
+  })
