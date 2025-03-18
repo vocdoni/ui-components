@@ -2,24 +2,8 @@ import { createMultiStyleConfigHelpers, theme } from '@chakra-ui/react'
 
 export const questionsAnatomy = [
   // main content wrapper
-  'wrapper',
-  // alert messages (voted or no questions available)
-  'alert',
-  'alertTitle',
-  'alertDescription',
-  'alertLink',
-  // question wrapper
-  'question',
-  // question header
-  'header',
-  // question body
-  'body',
-  // question title
-  'title',
-  // Question type badge wrapper
-  'typeBadgeWrapper',
-  // question description
-  'description',
+  'container',
+  'form',
   // form radio group
   'radioGroup',
   // questions stack
@@ -30,6 +14,9 @@ export const questionsAnatomy = [
   // form error message
   'error',
 ] as const
+
+export const questionsEmptyAnatomy = ['container', 'icon', 'description'] as const
+export const questionsErrorAnatomy = questionsEmptyAnatomy
 
 export const questionsConfirmationAnatomy = [
   // confirmation wrapper box
@@ -44,27 +31,7 @@ export const questionsConfirmationAnatomy = [
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(questionsAnatomy)
 
-const baseStyle = definePartsStyle({
-  question: {
-    marginBottom: 8,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  typeBadgeWrapper: {
-    w: 'full',
-    display: 'flex',
-    justifyContent: 'end',
-    alignItems: 'end',
-  },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 'xl',
-    marginBottom: 1,
-  },
-  description: {
-    marginBottom: 4,
-  },
-})
+const baseStyle = definePartsStyle({})
 
 export const QuestionsTheme = defineMultiStyleConfig({
   baseStyle,

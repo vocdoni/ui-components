@@ -6,7 +6,7 @@ import { environment } from '../../../environment'
 export const Voted = () => {
   const { env } = useClient()
   const { localize, voted } = useElection()
-  const styles = useMultiStyleConfig('ElectionQuestions')
+  const styles = useMultiStyleConfig('Voted')
 
   if (!voted) {
     return null
@@ -21,13 +21,13 @@ export const Voted = () => {
       status='success'
       flexDir='column'
       isTruncated
-      sx={styles.alert}
+      sx={styles.container}
     >
-      <AlertIcon />
-      <AlertTitle sx={styles.alertTitle}>{localize('vote.voted_title')}</AlertTitle>
-      <AlertDescription isTruncated maxW='100%' whiteSpace='initial' sx={styles.alertDescription}>
+      <AlertIcon sx={styles.icon} />
+      <AlertTitle sx={styles.title}>{localize('vote.voted_title')}</AlertTitle>
+      <AlertDescription isTruncated maxW='100%' whiteSpace='initial' sx={styles.description}>
         {reactStringReplace(localize('vote.voted_description', { id: voted }), voted, (match, k) => (
-          <Link key={k} href={environment.verifyVote(env, voted)} target='_blank' isTruncated sx={styles.alertLink}>
+          <Link key={k} href={environment.verifyVote(env, voted)} target='_blank' isTruncated sx={styles.link}>
             {match}
           </Link>
         ))}
