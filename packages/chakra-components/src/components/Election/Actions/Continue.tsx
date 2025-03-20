@@ -26,6 +26,7 @@ export const ActionContinue = forwardRef<IconButtonProps, 'button'>((props, ref)
       onClick={resume}
       isDisabled={disabled || election.status !== ElectionStatus.PAUSED}
       children={localize('actions.continue')}
+      shouldWrapChildren
       {...props}
     />
   )

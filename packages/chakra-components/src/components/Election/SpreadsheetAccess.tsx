@@ -281,7 +281,7 @@ export const SpreadsheetAccess = ({ hashPrivateKey, ...rest }: SpreadsheetAccess
               <Button variant='ghost' mr={3} onClick={onClose} sx={styles.close} isDisabled={loading}>
                 {localize('spreadsheet.close')}
               </Button>
-              <Button type='submit' sx={styles.submit} isLoading={loading} loadingText={localize('loading')}>
+              <Button shouldWrapChildren type='submit' sx={styles.submit} isLoading={loading}>
                 {localize('spreadsheet.access_button')}
               </Button>
             </ModalFooter>

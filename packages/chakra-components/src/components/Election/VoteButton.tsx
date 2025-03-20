@@ -59,7 +59,7 @@ export const VoteButton = (props: ButtonProps) => {
     return <Text>{localize('errors.not_voted_in_ended_election')}</Text>
   }
 
-  return <Button {...button} />
+  return <Button shouldWrapChildren {...button} />
 }
 
 export const VoteWeight = () => {

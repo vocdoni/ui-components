@@ -25,6 +25,7 @@ export const ActionPause = forwardRef<IconButtonProps, 'button'>((props, ref) =>
       onClick={pause}
       isDisabled={disabled || election?.status !== ElectionStatus.ONGOING}
       children={localize('actions.pause')}
+      shouldWrapChildren
       {...props}
     />
   )

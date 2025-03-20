@@ -51,6 +51,7 @@ export const ActionEnd = forwardRef<IconButtonProps, 'button'>((props, ref) => {
         )
       }
       children={localize('actions.end')}
+      shouldWrapChildren
       {...props}
     />
   )

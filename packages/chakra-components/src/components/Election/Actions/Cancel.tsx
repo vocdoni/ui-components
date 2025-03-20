@@ -48,6 +48,7 @@ export const ActionCancel = forwardRef<IconButtonProps, 'button'>((props, ref) =
         disabled || [ElectionStatus.CANCELED, ElectionStatus.ENDED, ElectionStatus.RESULTS].includes(election.status)
       }
       children={localize('actions.cancel')}
+      shouldWrapChildren
       {...props}
     />
   )
