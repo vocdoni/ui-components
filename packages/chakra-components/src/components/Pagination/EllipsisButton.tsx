@@ -1,4 +1,5 @@
 import { Button, ButtonProps, Input, InputProps, useStyleConfig } from '@chakra-ui/react'
+import { useLocalize } from '@vocdoni/react-providers'
 import { useState } from 'react'
 
 type EllipsisButtonProps = ButtonProps & {
@@ -8,12 +9,13 @@ type EllipsisButtonProps = ButtonProps & {
 
 export const EllipsisButton = ({ gotoPage, inputProps, ...rest }: EllipsisButtonProps) => {
   const [ellipsisInput, setEllipsisInput] = useState(false)
+  const localize = useLocalize()
   const styles = useStyleConfig('EllipsisButton', rest)
 
   if (ellipsisInput) {
     return (
       <Input
-        placeholder='Page #'
+        placeholder={localize('pagination.page_placeholder')}
         width='50px'
         sx={styles}
         {...inputProps}
@@ -45,3 +47,4 @@ export const EllipsisButton = ({ gotoPage, inputProps, ...rest }: EllipsisButton
     </Button>
   )
 }
+EllipsisButton.displayName = 'EllipsisButton'

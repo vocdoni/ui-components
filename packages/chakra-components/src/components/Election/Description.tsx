@@ -18,3 +18,4 @@ export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children' |
     </Markdown>
   )
 }
+ElectionDescription.displayName = 'ElectionDescription'

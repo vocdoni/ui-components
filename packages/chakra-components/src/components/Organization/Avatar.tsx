@@ -15,6 +15,7 @@ export const OrganizationAvatar = (props: IPFSAvatarProps) => {
 
   return <Avatar src={avatar} name={organization?.account.name.default} sx={styles} {...props} />
 }
+OrganizationAvatar.displayName = 'OrganizationAvatar'
 
 export const OrganizationImage = (props: IPFSImageProps) => {
   const styles = useStyleConfig('OrganizationImage', props)
@@ -29,3 +30,4 @@ export const OrganizationImage = (props: IPFSImageProps) => {
 
   return <Image src={avatar} sx={styles} {...props} />
 }
+OrganizationImage.displayName = 'OrganizationImage'

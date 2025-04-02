@@ -12,3 +12,4 @@ export const OrganizationHeader = (props: IPFSImageProps) => {
 
   return <Image src={header} sx={styles} {...props} />
 }
+OrganizationHeader.displayName = 'OrganizationHeader'
