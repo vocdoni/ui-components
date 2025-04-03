@@ -11,8 +11,8 @@ import { useLocalize, usePagination, useRoutedPagination } from '@vocdoni/react-
 import { PaginationResponse } from '@vocdoni/sdk'
 import { ReactElement, useMemo } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
+import { PaginationButton as PaginatorButton } from './Button'
 import { EllipsisButton } from './EllipsisButton'
-import { PageButton as PaginatorButton } from './PaginatorButton'
 
 export type PaginationProps = ButtonGroupProps & {
   maxButtons?: number | false
@@ -30,12 +30,14 @@ const PageButton = ({ page, currentPage, ...rest }: PaginatorButtonProps) => (
     {page + 1}
   </PaginatorButton>
 )
+PageButton.displayName = 'PageButton'
 
 const RoutedPageButton = ({ page, currentPage, to, ...rest }: PaginatorButtonProps & { to: string }) => (
   <PaginatorButton as={RouterLink} to={to} isActive={currentPage === page} {...rest}>
     {page + 1}
   </PaginatorButton>
 )
+RoutedPageButton.displayName = 'RoutedPageButton'
 
 type CreatePageButtonType = (i: number) => ReactElement
 type GotoPageType = (page: number) => void
@@ -171,6 +173,7 @@ export const Pagination = ({ maxButtons = 10, buttonProps, inputProps, paginatio
     />
   )
 }
+Pagination.displayName = 'Pagination'
 
 export const RoutedPagination = ({ maxButtons = 10, buttonProps, pagination, ...rest }: PaginationProps) => {
   const { getPathForPage, setPage, page } = useRoutedPagination()
@@ -191,3 +194,4 @@ export const RoutedPagination = ({ maxButtons = 10, buttonProps, pagination, ...
     />
   )
 }
+RoutedPagination.displayName = 'RoutedPagination'

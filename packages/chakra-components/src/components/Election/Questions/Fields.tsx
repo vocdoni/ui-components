@@ -23,14 +23,14 @@ export type QuestionProps = {
 
 export type QuestionFieldProps = ChakraProps & QuestionProps
 
-export const QuestionField = ({ question, index }: QuestionFieldProps) => {
-  const styles = useMultiStyleConfig('ElectionQuestions')
+export const ElectionQuestion = ({ question, index }: QuestionFieldProps) => {
+  const styles = useMultiStyleConfig('ElectionQuestion')
   const {
     formState: { errors },
   } = useFormContext()
 
   return (
-    <chakra.div __css={styles.question}>
+    <chakra.div __css={styles.container}>
       <FormControl isInvalid={!!errors[index]}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>

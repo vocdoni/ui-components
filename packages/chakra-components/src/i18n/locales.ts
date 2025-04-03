@@ -40,6 +40,7 @@ export const locales = {
   },
   loading: 'Loading...',
   pagination: {
+    page_placeholder: 'Page #',
     total_results: 'Showing a total of {{ count }} results',
   },
   question_types: {

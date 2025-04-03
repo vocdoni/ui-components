@@ -32,11 +32,13 @@ export const theme = {
 }
 
 export * from './actions'
+export * from './alert'
 export * from './confirm'
 export * from './election'
 export * from './envelope'
 export * from './layout'
 export * from './pagination'
+export * from './question'
 export * from './question-choice'
 export * from './questions'
 export * from './results'

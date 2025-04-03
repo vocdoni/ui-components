@@ -16,3 +16,4 @@ export const OrganizationDescription = (props: Omit<ReactMarkdownProps, 'childre
     </Markdown>
   )
 }
+OrganizationDescription.displayName = 'OrganizationDescription'

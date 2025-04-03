@@ -1,3 +1,4 @@
+export * from './Choice'
 export * from './Confirmation'
 export * from './Fields'
 export * from './Form'

@@ -1,6 +1,6 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
 
-export const VoteWeightAnatomy = [
+export const voteWeightAnatomy = [
   // confirmation wrapper box
   'wrapper',
   // title text
@@ -8,7 +8,7 @@ export const VoteWeightAnatomy = [
 ] as const
 
 const { defineMultiStyleConfig: defineVoteWeightTipStyle, definePartsStyle: defineVoteWeightParts } =
-  createMultiStyleConfigHelpers(VoteWeightAnatomy)
+  createMultiStyleConfigHelpers(voteWeightAnatomy)
 
 export const VoteWeightTheme = defineVoteWeightTipStyle({
   baseStyle: defineVoteWeightParts({
