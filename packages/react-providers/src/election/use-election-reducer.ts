@@ -468,7 +468,7 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   // Some census types require to have a local client instance. This var stores if the current election is one of those
   const isLocalWalletSigner =
     state.election instanceof PublishedElection &&
-    (state.election.census.type === CensusType.CSP ||
+    (state.election.census?.type === CensusType.CSP ||
       (state.election?.meta && state.election.get('census.type') === 'spreadsheet'))
 
   // update local client in case it's updated
