@@ -54,5 +54,8 @@
     "tsconfig": "*",
     "typescript": "^4.9.5"
   },
-  "clean-package": "../../clean-package.config.json"
+  "clean-package": "../../clean-package.config.json",
+  "dependencies": {
+    "up-fetch": "^1.3.6"
+  }
 }
