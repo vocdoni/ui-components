@@ -1,6 +1,6 @@
 import { createMultiStyleConfigHelpers } from '@chakra-ui/react'
 
-export const PaginationAnatomy = [
+export const paginationAnatomy = [
   // Top level wrapper
   'wrapper',
   // wrapper for buttons
@@ -9,8 +9,10 @@ export const PaginationAnatomy = [
   'totalResults',
 ] as const
 
+export const ellipsisButtonAnatomy = ['input', 'button'] as const
+
 const { defineMultiStyleConfig: defineVoteWeightTipStyle, definePartsStyle: defineVoteWeightParts } =
-  createMultiStyleConfigHelpers(PaginationAnatomy)
+  createMultiStyleConfigHelpers(paginationAnatomy)
 
 export const PaginationTheme = defineVoteWeightTipStyle({
   baseStyle: defineVoteWeightParts({

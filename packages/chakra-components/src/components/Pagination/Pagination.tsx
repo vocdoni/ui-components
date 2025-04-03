@@ -11,8 +11,8 @@ import { useLocalize, usePagination, useRoutedPagination } from '@vocdoni/react-
 import { PaginationResponse } from '@vocdoni/sdk'
 import { ReactElement, useMemo } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
+import { PaginationButton as PaginatorButton } from './Button'
 import { EllipsisButton } from './EllipsisButton'
-import { PageButton as PaginatorButton } from './PaginatorButton'
 
 export type PaginationProps = ButtonGroupProps & {
   maxButtons?: number | false
