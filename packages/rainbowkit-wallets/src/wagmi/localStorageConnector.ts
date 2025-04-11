@@ -18,6 +18,7 @@ export class localStorageConnector extends Connector {
   protected provider: PublicClient | undefined
   protected wallet: WalletClient | undefined
   protected creating: boolean = false
+  protected newAccount: boolean | undefined
 
   constructor(config: { chains: Chain[]; options: any }) {
     super(config)
@@ -42,6 +43,7 @@ export class localStorageConnector extends Connector {
           id: chainId,
           unsupported: false,
         },
+        newAccount: this.newAccount,
       }
       return cdata
     } catch (error) {
