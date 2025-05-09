@@ -16,6 +16,20 @@ export interface VocdoniComponentDefinition {
     VoteButton: ComponentType<any>
     VoteWeight: ComponentType<any>
   }
+  Organization: {
+    Avatar: ComponentType<any>
+    Description: ComponentType<any>
+    Header: ComponentType<any>
+    Name: ComponentType<any>
+  }
+  Account: {
+    Balance: ComponentType<any>
+  }
+  Pagination: {
+    Button: ComponentType<any>
+    EllipsisButton: ComponentType<any>
+    Pagination: ComponentType<any>
+  }
 }
 
 export interface ComponentsContextValue {

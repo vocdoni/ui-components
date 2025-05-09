@@ -1,9 +1,9 @@
-import { ChakraProps, useStyleConfig } from '@chakra-ui/react'
-import { useOrganization } from '@vocdoni/react-providers'
-import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
+import { useStyleConfig } from '@chakra-ui/react'
+import { useOrganization, withRegistry } from '@vocdoni/react-providers'
+import { OrganizationDescriptionProps } from '../../types'
 import { Markdown } from '../layout'
 
-export const OrganizationDescription = (props: Omit<ReactMarkdownProps, 'children' | 'node'> & ChakraProps) => {
+const BaseOrganizationDescription = (props: OrganizationDescriptionProps) => {
   const styles = useStyleConfig('OrganizationDescription', props)
   const { organization } = useOrganization()
 
@@ -16,4 +16,7 @@ export const OrganizationDescription = (props: Omit<ReactMarkdownProps, 'childre
     </Markdown>
   )
 }
+BaseOrganizationDescription.displayName = 'BaseOrganizationDescription'
+
+export const OrganizationDescription = withRegistry(BaseOrganizationDescription, 'Organization', 'Description')
 OrganizationDescription.displayName = 'OrganizationDescription'

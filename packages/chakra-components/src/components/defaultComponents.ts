@@ -1,4 +1,5 @@
 import { ChakraVocdoniComponents } from '../types'
+import { Balance } from './Account/Balance'
 import { ElectionActions } from './Election/Actions/Actions'
 import { ElectionDescription } from './Election/Description'
 import { Election } from './Election/Election'
@@ -12,8 +13,14 @@ import { ElectionStatusBadge } from './Election/StatusBadge'
 import { ElectionTitle } from './Election/Title'
 import { VoteButton } from './Election/VoteButton'
 import { VoteWeight } from './Election/VoteWeight'
+import { OrganizationAvatar } from './Organization/Avatar'
+import { OrganizationDescription } from './Organization/Description'
+import { OrganizationHeader } from './Organization/Header'
+import { OrganizationName } from './Organization/Name'
+import { PaginationButton } from './Pagination/Button'
+import { EllipsisButton } from './Pagination/EllipsisButton'
+import { Pagination } from './Pagination/Pagination'
 
-// Initialize all components with their proper types
 export const defaultComponents: ChakraVocdoniComponents = {
   Election: {
     Actions: ElectionActions,
@@ -29,5 +36,19 @@ export const defaultComponents: ChakraVocdoniComponents = {
     Title: ElectionTitle,
     VoteButton,
     VoteWeight,
+  },
+  Organization: {
+    Avatar: OrganizationAvatar,
+    Description: OrganizationDescription,
+    Header: OrganizationHeader,
+    Name: OrganizationName,
+  },
+  Account: {
+    Balance,
+  },
+  Pagination: {
+    Button: PaginationButton,
+    EllipsisButton,
+    Pagination,
   },
 }

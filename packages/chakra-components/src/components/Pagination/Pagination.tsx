@@ -1,24 +1,10 @@
-import {
-  ButtonGroup,
-  ButtonGroupProps,
-  ButtonProps,
-  chakra,
-  InputProps,
-  Text,
-  useMultiStyleConfig,
-} from '@chakra-ui/react'
-import { useLocalize, usePagination, useRoutedPagination } from '@vocdoni/react-providers'
-import { PaginationResponse } from '@vocdoni/sdk'
+import { ButtonGroup, ButtonProps, chakra, InputProps, Text, useMultiStyleConfig } from '@chakra-ui/react'
+import { useLocalize, usePagination, useRoutedPagination, withRegistry } from '@vocdoni/react-providers'
 import { ReactElement, useMemo } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
+import { PaginationProps } from '../../types'
 import { PaginationButton as PaginatorButton } from './Button'
 import { EllipsisButton } from './EllipsisButton'
-
-export type PaginationProps = ButtonGroupProps & {
-  maxButtons?: number | false
-  buttonProps?: ButtonProps
-  inputProps?: InputProps
-} & PaginationResponse
 
 type PaginatorButtonProps = {
   page: number
@@ -105,8 +91,9 @@ const PaginationButtons = ({
   currentPage: number
   createPageButton: CreatePageButtonType
   goToPage: GotoPageType
-} & ButtonGroupProps &
-  Pick<PaginationProps, 'maxButtons' | 'buttonProps'>) => {
+  maxButtons?: number | false
+  buttonProps?: ButtonProps
+} & Omit<PaginationProps, 'pagination' | 'maxButtons' | 'buttonProps' | 'inputProps'>) => {
   const styles = useMultiStyleConfig('Pagination')
   const t = useLocalize()
 
@@ -124,7 +111,7 @@ const PaginationButtons = ({
 
   return (
     <chakra.div __css={styles.wrapper}>
-      <ButtonGroup sx={styles.buttonGroup} {...rest}>
+      <ButtonGroup __css={styles.buttonGroup} {...rest}>
         {totalPages === undefined ? (
           <>
             <PaginatorButton
@@ -154,7 +141,7 @@ const PaginationButtons = ({
   )
 }
 
-export const Pagination = ({ maxButtons = 10, buttonProps, inputProps, pagination, ...rest }: PaginationProps) => {
+const BasePagination = ({ maxButtons = 10, buttonProps, inputProps, pagination, ...rest }: PaginationProps) => {
   const { setPage } = usePagination()
   const totalPages = pagination.lastPage + 1
   const page = pagination.currentPage
@@ -169,10 +156,14 @@ export const Pagination = ({ maxButtons = 10, buttonProps, inputProps, paginatio
       totalPages={totalPages}
       totalItems={pagination.totalItems}
       maxButtons={maxButtons}
+      buttonProps={buttonProps}
       {...rest}
     />
   )
 }
+BasePagination.displayName = 'BasePagination'
+
+export const Pagination = withRegistry(BasePagination, 'Pagination', 'Pagination')
 Pagination.displayName = 'Pagination'
 
 export const RoutedPagination = ({ maxButtons = 10, buttonProps, pagination, ...rest }: PaginationProps) => {
@@ -190,6 +181,8 @@ export const RoutedPagination = ({ maxButtons = 10, buttonProps, pagination, ...
       currentPage={currentPage}
       totalPages={totalPages}
       totalItems={pagination.totalItems}
+      maxButtons={maxButtons}
+      buttonProps={buttonProps}
       {...rest}
     />
   )

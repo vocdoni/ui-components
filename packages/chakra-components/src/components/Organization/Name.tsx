@@ -1,7 +1,8 @@
-import { chakra, forwardRef, HeadingProps, omitThemingProps, useStyleConfig } from '@chakra-ui/react'
-import { useOrganization } from '@vocdoni/react-providers'
+import { chakra, forwardRef, omitThemingProps, useStyleConfig } from '@chakra-ui/react'
+import { useOrganization, withRegistry } from '@vocdoni/react-providers'
+import { OrganizationNameProps } from '../../types'
 
-export const OrganizationName = forwardRef<HeadingProps, 'h1'>((props, ref) => {
+const BaseOrganizationName = forwardRef<OrganizationNameProps, 'h1'>((props, ref) => {
   const { organization } = useOrganization()
   const styles = useStyleConfig('OrganizationName', props)
   const rest = omitThemingProps(props)
@@ -14,4 +15,7 @@ export const OrganizationName = forwardRef<HeadingProps, 'h1'>((props, ref) => {
     </chakra.h1>
   )
 })
+BaseOrganizationName.displayName = 'BaseOrganizationName'
+
+export const OrganizationName = withRegistry(BaseOrganizationName, 'Organization', 'Name')
 OrganizationName.displayName = 'OrganizationName'
