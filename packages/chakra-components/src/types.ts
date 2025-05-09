@@ -40,6 +40,11 @@ export interface ChakraVocdoniComponents {
   }
 }
 
+// Make each category's components optional
+export type PartialChakraVocdoniComponents = {
+  Election: Partial<ChakraVocdoniComponents['Election']>
+}
+
 export interface ChakraClientProviderProps extends ClientProviderComponentProps {
-  components?: Partial<ChakraVocdoniComponents>
+  components?: PartialChakraVocdoniComponents
 }

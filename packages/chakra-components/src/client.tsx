@@ -21,7 +21,7 @@ export const ClientProvider = ({ children, components: customComponents, ...prop
     <>
       <ToastProvider />
       <RPClientProvider {...props} {...loc}>
-        <ComponentsProvider components={mergedComponents as VocdoniComponentDefinition}>
+        <ComponentsProvider components={mergedComponents as unknown as VocdoniComponentDefinition}>
           <ConfirmProvider>{children}</ConfirmProvider>
         </ComponentsProvider>
       </RPClientProvider>
