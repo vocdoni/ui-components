@@ -1,9 +1,10 @@
 import { useStyleConfig } from '@chakra-ui/react'
-import { useElection } from '@vocdoni/react-providers'
+import { useElection, withRegistry } from '@vocdoni/react-providers'
 import { PublishedElection } from '@vocdoni/sdk'
-import { Image, IPFSImageProps } from '../layout'
+import { ElectionHeaderProps } from '../../types'
+import { Image } from '../layout'
 
-export const ElectionHeader = (props: IPFSImageProps) => {
+const BaseElectionHeader = (props: ElectionHeaderProps) => {
   const styles = useStyleConfig('ElectionHeader', props)
   const { election } = useElection()
 
@@ -13,3 +14,7 @@ export const ElectionHeader = (props: IPFSImageProps) => {
 
   return <Image src={election?.header} sx={styles} {...props} />
 }
+BaseElectionHeader.displayName = 'BaseElectionHeader'
+
+export const ElectionHeader = withRegistry(BaseElectionHeader, 'Election', 'Header')
+ElectionHeader.displayName = 'ElectionHeader'

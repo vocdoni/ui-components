@@ -33,6 +33,20 @@ const createDefaultComponents = (): VocdoniComponentDefinition => ({
     VoteButton: createEmptyComponent(),
     VoteWeight: createEmptyComponent(),
   },
+  Organization: {
+    Avatar: createEmptyComponent(),
+    Description: createEmptyComponent(),
+    Header: createEmptyComponent(),
+    Name: createEmptyComponent(),
+  },
+  Account: {
+    Balance: createEmptyComponent(),
+  },
+  Pagination: {
+    Button: createEmptyComponent(),
+    EllipsisButton: createEmptyComponent(),
+    Pagination: createEmptyComponent(),
+  },
 })
 
 const mergeComponents = (
@@ -44,6 +58,18 @@ const mergeComponents = (
     Election: {
       ...base.Election,
       ...override.Election,
+    },
+    Organization: {
+      ...base.Organization,
+      ...override.Organization,
+    },
+    Account: {
+      ...base.Account,
+      ...override.Account,
+    },
+    Pagination: {
+      ...base.Pagination,
+      ...override.Pagination,
     },
   }
 }

@@ -1,15 +1,10 @@
-import { chakra, forwardRef, HeadingProps, useMultiStyleConfig } from '@chakra-ui/react'
-import { useDatesLocale, useElection, useLocalize } from '@vocdoni/react-providers'
+import { chakra, forwardRef, useMultiStyleConfig } from '@chakra-ui/react'
+import { useDatesLocale, useElection, useLocalize, withRegistry } from '@vocdoni/react-providers'
 import { ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { format as dformat, formatDistance } from 'date-fns'
+import { ElectionScheduleProps } from '../../types'
 
-export type ElectionScheduleProps = HeadingProps & {
-  format?: string
-  showRemaining?: boolean // If true, it return the remaining time to start, end, if ended or paused, instead of the full schedule
-  showCreatedAt?: boolean
-}
-
-export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
+const BaseElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
   ({ format = 'PPp', showRemaining = false, showCreatedAt = false, ...rest }, ref) => {
     const styles = useMultiStyleConfig('ElectionSchedule', rest)
     const { election } = useElection()
@@ -78,11 +73,13 @@ export const ElectionSchedule = forwardRef<ElectionScheduleProps, 'h2'>(
     }
 
     return (
-      <chakra.h2 __css={styles} {...rest} {...ref}>
+      <chakra.h2 __css={styles} {...rest} ref={ref}>
         {text}
       </chakra.h2>
     )
   }
 )
+BaseElectionSchedule.displayName = 'BaseElectionSchedule'
 
+export const ElectionSchedule = withRegistry(BaseElectionSchedule, 'Election', 'Schedule')
 ElectionSchedule.displayName = 'ElectionSchedule'

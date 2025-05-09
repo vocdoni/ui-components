@@ -1,8 +1,9 @@
-import { Tag, TagProps } from '@chakra-ui/react'
-import { useElection } from '@vocdoni/react-providers'
+import { Tag } from '@chakra-ui/react'
+import { useElection, withRegistry } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection, PublishedElection } from '@vocdoni/sdk'
+import { ElectionStatusBadgeProps } from '../../types'
 
-export const ElectionStatusBadge = (props: TagProps) => {
+const BaseElectionStatusBadge = (props: ElectionStatusBadgeProps) => {
   const { election, localize } = useElection()
 
   if (!election) return null
@@ -33,3 +34,7 @@ export const ElectionStatusBadge = (props: TagProps) => {
     </Tag>
   )
 }
+BaseElectionStatusBadge.displayName = 'BaseElectionStatusBadge'
+
+export const ElectionStatusBadge = withRegistry(BaseElectionStatusBadge, 'Election', 'StatusBadge')
+ElectionStatusBadge.displayName = 'ElectionStatusBadge'

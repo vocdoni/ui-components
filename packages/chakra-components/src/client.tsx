@@ -1,9 +1,5 @@
 import { ToastProvider } from '@chakra-ui/react'
-import {
-  ComponentsProvider,
-  ClientProvider as RPClientProvider,
-  VocdoniComponentDefinition,
-} from '@vocdoni/react-providers'
+import { ComponentsProvider, ClientProvider as RPClientProvider } from '@vocdoni/react-providers'
 import merge from 'ts-deepmerge'
 import { ConfirmProvider } from './components'
 import { defaultComponents } from './components/defaultComponents'
@@ -15,13 +11,33 @@ export const ClientProvider = ({ children, components: customComponents, ...prop
     locale: merge(locales, props.locale || {}),
   }
 
-  const mergedComponents = customComponents ? merge(defaultComponents, customComponents) : defaultComponents
+  // Merge components safely
+  const mergedComponents = customComponents
+    ? {
+        Election: {
+          ...defaultComponents.Election,
+          ...customComponents.Election,
+        },
+        Organization: {
+          ...defaultComponents.Organization,
+          ...customComponents.Organization,
+        },
+        Account: {
+          ...defaultComponents.Account,
+          ...customComponents.Account,
+        },
+        Pagination: {
+          ...defaultComponents.Pagination,
+          ...customComponents.Pagination,
+        },
+      }
+    : defaultComponents
 
   return (
     <>
       <ToastProvider />
       <RPClientProvider {...props} {...loc}>
-        <ComponentsProvider components={mergedComponents as unknown as VocdoniComponentDefinition}>
+        <ComponentsProvider components={mergedComponents}>
           <ConfirmProvider>{children}</ConfirmProvider>
         </ComponentsProvider>
       </RPClientProvider>

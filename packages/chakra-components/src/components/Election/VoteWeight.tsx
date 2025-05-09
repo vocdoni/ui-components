@@ -1,10 +1,11 @@
 import { chakra, useMultiStyleConfig } from '@chakra-ui/react'
-import { useElection } from '@vocdoni/react-providers'
+import { useElection, withRegistry } from '@vocdoni/react-providers'
 import { PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
+import { ElectionVoteWeightProps } from '../../types'
 import { results } from './Results'
 
-export const VoteWeight = () => {
+const BaseVoteWeight = (props: ElectionVoteWeightProps) => {
   const { client, election, localize } = useElection()
   const [weight, setWeight] = useState<number | null>(null)
   const styles = useMultiStyleConfig('VoteWeight')
@@ -37,12 +38,16 @@ export const VoteWeight = () => {
     })()
   }, [client, election])
 
-  if (!weight || !election || !(election instanceof PublishedElection)) return
+  if (!weight || !election || !(election instanceof PublishedElection)) return null
 
   return (
-    <chakra.div __css={styles.wrapper}>
+    <chakra.div __css={styles.wrapper} {...props}>
       {localize('vote.weight')}
       <chakra.span __css={styles.weight}>{weight}</chakra.span>
     </chakra.div>
   )
 }
+BaseVoteWeight.displayName = 'BaseVoteWeight'
+
+export const VoteWeight = withRegistry(BaseVoteWeight, 'Election', 'VoteWeight')
+VoteWeight.displayName = 'VoteWeight'

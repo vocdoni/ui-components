@@ -1,10 +1,10 @@
-import { ChakraProps, useStyleConfig } from '@chakra-ui/react'
-import { useElection } from '@vocdoni/react-providers'
+import { useStyleConfig } from '@chakra-ui/react'
+import { useElection, withRegistry } from '@vocdoni/react-providers'
 import { PublishedElection } from '@vocdoni/sdk'
-import { ReactMarkdownProps } from 'react-markdown/lib/complex-types'
+import { ElectionDescriptionProps } from '../../types'
 import { Markdown } from '../layout'
 
-export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children' | 'node'> & ChakraProps) => {
+const BaseElectionDescription = (props: ElectionDescriptionProps) => {
   const styles = useStyleConfig('ElectionDescription', props)
   const { election } = useElection()
 
@@ -18,4 +18,7 @@ export const ElectionDescription = (props: Omit<ReactMarkdownProps, 'children' |
     </Markdown>
   )
 }
+BaseElectionDescription.displayName = 'BaseElectionDescription'
+
+export const ElectionDescription = withRegistry(BaseElectionDescription, 'Election', 'Description')
 ElectionDescription.displayName = 'ElectionDescription'

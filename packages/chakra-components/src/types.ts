@@ -10,7 +10,7 @@ import { IPFSImageProps } from './components/layout'
 
 // Define the prop types for each component
 export type ElectionActionProps = ChakraProps
-export type ElectionDescriptionProps = ReactMarkdownProps & ChakraProps
+export type ElectionDescriptionProps = Partial<ReactMarkdownProps> & ChakraProps
 export type ElectionEnvelopeProps = ChakraProps & { votePackage: any }
 export type ElectionHeaderProps = IPFSImageProps
 export type ElectionQuestionsProps = ChakraProps
@@ -20,7 +20,9 @@ export type ElectionScheduleProps = HeadingProps & {
   showRemaining?: boolean
   showCreatedAt?: boolean
 }
-export type ElectionSpreadsheetAccessProps = ChakraProps
+export type ElectionSpreadsheetAccessProps = ChakraProps & {
+  hashPrivateKey?: boolean
+}
 export type ElectionStatusBadgeProps = TagProps
 export type ElectionTitleProps = HeadingProps
 export type ElectionVoteButtonProps = ChakraProps

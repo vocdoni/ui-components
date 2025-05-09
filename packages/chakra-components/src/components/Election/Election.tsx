@@ -6,7 +6,7 @@ import {
   ElectionActions,
   ElectionDescription,
   ElectionHeader,
-  ElectionQuestions,
+  ElectionQuestion,
   ElectionResults,
   ElectionSchedule,
   ElectionStatusBadge,
@@ -25,35 +25,36 @@ Election.displayName = 'Election'
 // Not exported since we're not allowing it to be configured. If you want to customize it past
 // this level, create a custom Election component with the provided election components.
 const ElectionBody = () => {
-  const {
-    errors: { election: error },
-    election,
-    connected,
-  } = useElection()
+  const { election } = useElection()
 
-  if (error) {
+  if (!election) {
     return (
       <Alert status='error'>
         <AlertIcon />
-        <AlertDescription>{error}</AlertDescription>
+        <AlertDescription>Election not found</AlertDescription>
       </Alert>
     )
   }
 
+  if (!(election instanceof PublishedElection)) {
+    return null
+  }
+
   return (
     <>
-      <ElectionHeader />
-      <ElectionTitle />
-      <ElectionSchedule />
       <ElectionStatusBadge />
-      <ElectionActions />
+      <ElectionTitle />
       <ElectionDescription />
+      <ElectionHeader />
+      <ElectionSchedule />
       <HR />
-      <ElectionQuestions />
+      <ElectionActions />
+      <HR />
+      <SpreadsheetAccess />
       <VoteButton />
-      {election instanceof PublishedElection && election?.get('census.type') === 'spreadsheet' && connected && (
-        <SpreadsheetAccess />
-      )}
+      {election.questions.map((question, index) => (
+        <ElectionQuestion key={index} question={question} index={index.toString()} />
+      ))}
       <ElectionResults />
     </>
   )

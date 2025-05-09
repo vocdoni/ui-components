@@ -1,6 +1,5 @@
 import {
   Button,
-  ChakraProps,
   FormControl,
   FormErrorMessage,
   FormHelperText,
@@ -23,6 +22,7 @@ import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/r
 import { PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { RegisterOptions, useForm } from 'react-hook-form'
+import { ElectionSpreadsheetAccessProps } from '../../types'
 
 type MetaSpecs = {
   [name: string]: {
@@ -48,11 +48,7 @@ type MetaSpecs = {
   }
 }
 
-export type SpreadsheetAccessProps = ChakraProps & {
-  hashPrivateKey?: boolean
-}
-
-export const SpreadsheetAccess = ({ hashPrivateKey, ...rest }: SpreadsheetAccessProps) => {
+export const SpreadsheetAccess = ({ hashPrivateKey, ...rest }: ElectionSpreadsheetAccessProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const styles = useMultiStyleConfig('SpreadsheetAccess', rest)
   const { connected, clearClient } = useElection()
@@ -291,3 +287,4 @@ export const SpreadsheetAccess = ({ hashPrivateKey, ...rest }: SpreadsheetAccess
     </>
   )
 }
+SpreadsheetAccess.displayName = 'SpreadsheetAccess'

@@ -1,10 +1,11 @@
 import { Button, ButtonProps, Text } from '@chakra-ui/react'
 import { Signer } from '@ethersproject/abstract-signer'
-import { useClient, useElection } from '@vocdoni/react-providers'
+import { useClient, useElection, withRegistry } from '@vocdoni/react-providers'
 import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
 import { useState } from 'react'
+import { ElectionVoteButtonProps } from '../../types'
 
-export const VoteButton = (props: ButtonProps) => {
+const BaseVoteButton = (props: ElectionVoteButtonProps) => {
   const { connected } = useClient()
   const {
     client,
@@ -60,3 +61,7 @@ export const VoteButton = (props: ButtonProps) => {
 
   return <Button shouldWrapChildren {...button} />
 }
+BaseVoteButton.displayName = 'BaseVoteButton'
+
+export const VoteButton = withRegistry(BaseVoteButton, 'Election', 'VoteButton')
+VoteButton.displayName = 'VoteButton'
