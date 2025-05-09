@@ -49,12 +49,12 @@
 
 This package includes react context & providers for integration with the Vocdoni protocol via the [Vocdoni SDK](https://developer.vocdoni.io/sdk).
 
-
 The best place to learn about using this package is the [developer portal](https://developer.vocdoni.io/ui-components).
 
 ### Table of Contents
 - [Getting Started](#getting-started)
 - [Reference](#reference)
+- [Component System](#component-system)
 - [Examples](#examples)
 - [Preview](#preview)
 - [Disclaimer](#disclaimer)
@@ -63,7 +63,6 @@ The best place to learn about using this package is the [developer portal](https
 
 
 ## Getting Started
-
 
 Using your favorite package manager:
 
@@ -87,6 +86,57 @@ const App = () => {
 ~~~
 
 `ClientProvider` is a dependency of the other providers, so you'll have to ensure you initialize it first as the parent.
+
+## Component System
+
+The package includes a framework-agnostic component system that allows UI packages to provide their own component implementations. This system consists of:
+
+### ComponentsProvider
+
+The `ComponentsProvider` manages a registry of components that can be used throughout your application:
+
+```tsx
+import { ComponentsProvider } from '@vocdoni/react-providers'
+
+function App() {
+  return (
+    <ComponentsProvider>
+      {/* your app content */}
+    </ComponentsProvider>
+  )
+}
+```
+
+### Component Structure
+
+The component system defines a standard structure for election-related components:
+
+```typescript
+interface VocdoniComponentDefinition {
+  Election: {
+    Actions: ComponentType<any>
+    Description: ComponentType<any>
+    Election: ComponentType<any>
+    // ... other components
+  }
+}
+```
+
+### Component Registration
+
+UI packages can register their components with the system:
+
+```typescript
+const { override } = useComponents()
+
+override({
+  Election: {
+    Title: CustomTitleComponent
+  }
+})
+```
+
+This system allows UI packages to provide their own implementations while maintaining a consistent structure.
 
 ## Reference
 
