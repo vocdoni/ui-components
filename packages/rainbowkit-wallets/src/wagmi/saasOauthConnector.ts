@@ -67,9 +67,10 @@ export class saasOAuthConnector extends localStorageConnector {
       }
 
       const data = await response.json()
-      const { token, expiry, registered } = data
+      const { token, expirity, registered } = data
+
       localStorage.setItem(saasOAuthConnector.storageTokenName, token)
-      localStorage.setItem(saasOAuthConnector.storageExpiryName, expiry)
+      localStorage.setItem(saasOAuthConnector.storageExpiryName, expirity)
       this.newAccount = registered
 
       wallet = params.wallet
