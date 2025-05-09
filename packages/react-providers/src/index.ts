@@ -1,4 +1,5 @@
 export * from './client'
+export * from './components'
 export * from './election'
 export * from './i18n'
 export * from './organization'
