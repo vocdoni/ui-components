@@ -1,13 +1,16 @@
+import { PaginationResponse } from '@vocdoni/sdk'
 import { createContext, PropsWithChildren, useContext, useState } from 'react'
 import { generatePath, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 export type PaginationContextProps = {
   page: number
   setPage: (page: number) => void
+  pagination: PaginationResponse['pagination']
 }
 
 export type RoutedPaginationContextProps = Omit<PaginationContextProps, 'setPage'> & {
   path: string
+  pagination: PaginationResponse['pagination']
   // Util function that generates the path for a given page
   // (it return the actual path with queryParams and other route params but changing the page)
   getPathForPage: (page: number, queryParams?: string) => string
@@ -33,13 +36,19 @@ export const useRoutedPagination = (): RoutedPaginationContextProps => {
   return context
 }
 
-export type PaginationProviderProps = {}
+export type PaginationProviderProps = {
+  pagination: PaginationResponse['pagination']
+}
 
 export type RoutedPaginationProviderProps = PaginationProviderProps & {
   path: string
 }
 
-export const RoutedPaginationProvider = ({ path, ...rest }: PropsWithChildren<RoutedPaginationProviderProps>) => {
+export const RoutedPaginationProvider = ({
+  path,
+  pagination,
+  ...rest
+}: PropsWithChildren<RoutedPaginationProviderProps>) => {
   const { search } = useLocation()
   const { page, ...extraParams }: { page?: number } = useParams()
   const p = page && page > 0 ? page - 1 : 0
@@ -55,11 +64,11 @@ export const RoutedPaginationProvider = ({ path, ...rest }: PropsWithChildren<Ro
     navigate(getPathForPage(page, queryParams))
   }
 
-  return <RoutedPaginationContext.Provider value={{ page: p, path, getPathForPage, setPage }} {...rest} />
+  return <RoutedPaginationContext.Provider value={{ page: p, path, getPathForPage, setPage, pagination }} {...rest} />
 }
 
-export const PaginationProvider = ({ ...rest }: PropsWithChildren<PaginationProviderProps>) => {
+export const PaginationProvider = ({ pagination, ...rest }: PropsWithChildren<PaginationProviderProps>) => {
   const [page, setPage] = useState<number>(0)
 
-  return <PaginationContext.Provider value={{ page, setPage }} {...rest} />
+  return <PaginationContext.Provider value={{ page, setPage, pagination }} {...rest} />
 }
