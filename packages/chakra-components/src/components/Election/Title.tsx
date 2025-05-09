@@ -1,8 +1,8 @@
 import { chakra, forwardRef, HeadingProps, omitThemingProps, useStyleConfig } from '@chakra-ui/react'
-import { useElection } from '@vocdoni/react-providers'
+import { useElection, withRegistry } from '@vocdoni/react-providers'
 import { PublishedElection } from '@vocdoni/sdk'
 
-export const ElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
+const BaseElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
   const { election } = useElection()
   const styles = useStyleConfig('ElectionTitle', props)
   const rest = omitThemingProps(props)
@@ -17,4 +17,7 @@ export const ElectionTitle = forwardRef<HeadingProps, 'h1'>((props, ref) => {
     </chakra.h1>
   )
 })
+BaseElectionTitle.displayName = 'BaseElectionTitle'
+
+export const ElectionTitle = withRegistry(BaseElectionTitle, 'Election', 'Title')
 ElectionTitle.displayName = 'ElectionTitle'

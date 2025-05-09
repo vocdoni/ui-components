@@ -53,6 +53,8 @@ The best place to learn about using this package is the [developer portal](https
 
 ### Table of Contents
 - [Getting Started](#getting-started)
+- [Component System](#component-system)
+- [Customizing Components](#customizing-components)
 - [Reference](#reference)
 - [Examples](#examples)
 - [Preview](#preview)
@@ -71,6 +73,98 @@ After that, you can add the required vocdoni components dependencies:
 ~~~bash
 yarn add @vocdoni/sdk @vocdoni/chakra-components react-markdown remark-gfm
 ~~~
+
+## Component System
+
+This package provides Chakra UI implementations of the Vocdoni component system. The components are initialized automatically when you use the `ClientProvider`:
+
+```tsx
+import { ClientProvider } from '@vocdoni/chakra-components'
+
+function App() {
+  return (
+    <ClientProvider>
+      {/* your app content */}
+    </ClientProvider>
+  )
+}
+```
+
+## Customizing Components
+
+You can customize any component in two ways:
+
+### 1. Through the ClientProvider
+
+```tsx
+import { ClientProvider } from '@vocdoni/chakra-components'
+
+const CustomTitle = (props) => (
+  <h1 style={{ color: 'red' }} {...props}>
+    {props.children}
+  </h1>
+)
+
+function App() {
+  return (
+    <ClientProvider
+      components={{
+        Election: {
+          Title: CustomTitle
+        }
+      }}
+    >
+      {/* your app content */}
+    </ClientProvider>
+  )
+}
+```
+
+### 2. Using the useComponents Hook
+
+```tsx
+import { useComponents } from '@vocdoni/react-providers'
+
+function CustomizationExample() {
+  const { override } = useComponents()
+
+  useEffect(() => {
+    override({
+      Election: {
+        Title: CustomTitle
+      }
+    })
+  }, [])
+
+  return <div>{/* your content */}</div>
+}
+```
+
+### Available Components
+
+The following components can be customized:
+
+```typescript
+interface ChakraVocdoniComponents {
+  Election: {
+    Actions: React.ComponentType<ElectionActionProps>
+    Description: React.ComponentType<ElectionDescriptionProps>
+    Election: React.ComponentType<ElectionProviderComponentProps>
+    Envelope: React.ComponentType<ElectionEnvelopeProps>
+    Header: React.ComponentType<ElectionHeaderProps>
+    Questions: React.ComponentType<ElectionQuestionsProps>
+    Results: React.ComponentType<ElectionResultsProps>
+    Schedule: React.ComponentType<ElectionScheduleProps>
+    SpreadsheetAccess: React.ComponentType<ElectionSpreadsheetAccessProps>
+    StatusBadge: React.ComponentType<ElectionStatusBadgeProps>
+    Title: React.ComponentType<ElectionTitleProps>
+    VoteButton: React.ComponentType<ElectionVoteButtonProps>
+    VoteWeight: React.ComponentType<ElectionVoteWeightProps>
+  }
+}
+```
+
+Each component has its own prop types that extend Chakra UI's base props.
 
 ## Reference
 
@@ -116,11 +210,3 @@ This repository is licensed under the [GNU Affero General Public License v3.0.](
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-
-[`@vocdoni/chakra-components`]: ./packages/chakra-components/README.md
-[`@vocdoni/rainbowkit-wallets`]: ./packages/rainbowkit-wallets/README.md
-[`@vocdoni/react-providers`]: ./packages/react-providers/README.md
-
-[chakra-components badge]: https://img.shields.io/npm/v/%40vocdoni%2Fchakra-components?label=%40vocdoni%2Fchakra-components
-[rainbowkit-wallets badge]: https://img.shields.io/npm/v/%40vocdoni%2Frainbowkit-wallets?label=%40vocdoni%2Frainbowkit-wallets
-[react-providers badge]: https://img.shields.io/npm/v/%40vocdoni%2Freact-providers?label=%40vocdoni%2Freact-providers

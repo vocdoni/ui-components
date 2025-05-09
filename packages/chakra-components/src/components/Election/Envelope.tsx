@@ -1,4 +1,4 @@
-import { chakra, ChakraProps, List, ListItem, Text, useMultiStyleConfig } from '@chakra-ui/react'
+import { chakra, List, ListItem, Text, useMultiStyleConfig } from '@chakra-ui/react'
 import { useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
   ElectionResultsTypeNames,
@@ -11,15 +11,11 @@ import {
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 import { Component, ErrorInfo, PropsWithChildren } from 'react'
+import { ElectionEnvelopeProps } from '../../types'
 
 export type VotePackageType = IVotePackage | IVoteEncryptedPackage
 
-export const Envelope = ({
-  votePackage,
-  ...props
-}: {
-  votePackage: VotePackageType
-} & ChakraProps) => {
+export const Envelope = ({ votePackage, ...props }: ElectionEnvelopeProps) => {
   const styles = useMultiStyleConfig('Envelope')
   const { election, localize } = useElection()
   const locale = useDatesLocale()
@@ -46,7 +42,7 @@ export const Envelope = ({
     <chakra.div sx={styles.wrapper} {...props}>
       {election.questions.map((q, i) => {
         return (
-          <chakra.div sx={styles.question}>
+          <chakra.div key={i} sx={styles.question}>
             <EnvelopeErrorBoundary question={q}>
               <Text sx={styles.title}>{localize('envelopes.question_title', { title: q.title.default })}</Text>
               <SelectedOptions question={q} questionIndex={i} votes={votePackage.votes} />
@@ -57,6 +53,7 @@ export const Envelope = ({
     </chakra.div>
   )
 }
+Envelope.displayName = 'Envelope'
 
 const SelectedOptions = ({
   question,

@@ -1,65 +1,60 @@
-import { ButtonGroup, chakra, ChakraProps, IconButton, useMultiStyleConfig } from '@chakra-ui/react'
+import { ButtonGroup, chakra, IconButton, useMultiStyleConfig } from '@chakra-ui/react'
 import { useClient, useElection } from '@vocdoni/react-providers'
 import { areEqualHexStrings, ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { FaPause, FaPlay, FaStop } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
+import { ElectionActionProps } from '../../../types'
 import { ActionsProvider } from './ActionsProvider'
 import { ActionCancel } from './Cancel'
 import { ActionContinue } from './Continue'
 import { ActionEnd } from './End'
 import { ActionPause } from './Pause'
 
-const Cancel = chakra(ImCross)
+const Cross = chakra(ImCross)
 const Play = chakra(FaPlay)
 const Pause = chakra(FaPause)
 const Stop = chakra(FaStop)
 
-export const ElectionActions = (props: ChakraProps) => {
+export const ElectionActions = (props: ElectionActionProps) => {
   const { localize, account } = useClient()
   const { election } = useElection()
   const styles = useMultiStyleConfig('ElectionActions')
 
-  if (
-    !election ||
-    !(election instanceof PublishedElection) ||
-    (election && !areEqualHexStrings(election.organizationId, account?.address)) ||
-    [ElectionStatus.CANCELED, ElectionStatus.ENDED, ElectionStatus.RESULTS].includes(election.status)
-  ) {
-    return null
-  }
+  if (!election || !(election instanceof PublishedElection)) return null
+
+  const isOwner = areEqualHexStrings(election.organizationId, account?.address)
+
+  if (!isOwner) return null
 
   return (
-    <ButtonGroup size='sm' isAttached variant='outline' position='relative' sx={styles.group} {...props}>
+    <ButtonGroup sx={styles.wrapper} {...props}>
       <ActionsProvider>
-        <ActionContinue
-          as={IconButton}
-          aria-label={localize('actions.continue')}
-          title={localize('actions.continue')}
-          sx={styles.buttons}
-          icon={<Play sx={styles.icons} />}
+        {election.status === ElectionStatus.ONGOING && (
+          <IconButton
+            aria-label={localize('process_actions.pause', { defaultValue: 'Pause' })}
+            icon={<Pause />}
+            as={ActionPause}
+          />
+        )}
+        {election.status === ElectionStatus.PAUSED && (
+          <IconButton
+            aria-label={localize('process_actions.continue', { defaultValue: 'Continue' })}
+            icon={<Play />}
+            as={ActionContinue}
+          />
+        )}
+        <IconButton
+          aria-label={localize('process_actions.end', { defaultValue: 'End' })}
+          icon={<Stop />}
+          as={ActionEnd}
         />
-        <ActionPause
-          as={IconButton}
-          aria-label={localize('actions.pause')}
-          title={localize('actions.pause')}
-          sx={styles.buttons}
-          icon={<Pause sx={styles.icons} />}
-        />
-        <ActionEnd
-          as={IconButton}
-          aria-label={localize('actions.end')}
-          title={localize('actions.end')}
-          sx={styles.buttons}
-          icon={<Stop sx={styles.icons} />}
-        />
-        <ActionCancel
-          as={IconButton}
-          aria-label={localize('actions.cancel')}
-          title={localize('actions.cancel')}
-          sx={styles.buttons}
-          icon={<Cancel sx={styles.icons} />}
+        <IconButton
+          aria-label={localize('process_actions.cancel', { defaultValue: 'Cancel' })}
+          icon={<Cross />}
+          as={ActionCancel}
         />
       </ActionsProvider>
     </ButtonGroup>
   )
 }
+ElectionActions.displayName = 'ElectionActions'

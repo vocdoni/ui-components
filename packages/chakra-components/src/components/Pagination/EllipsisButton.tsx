@@ -1,13 +1,9 @@
-import { Button, ButtonProps, Input, InputProps, useMultiStyleConfig } from '@chakra-ui/react'
-import { useLocalize } from '@vocdoni/react-providers'
+import { Button, Input, useMultiStyleConfig } from '@chakra-ui/react'
+import { useLocalize, withRegistry } from '@vocdoni/react-providers'
 import { useState } from 'react'
+import { PaginationEllipsisButtonProps } from '../../types'
 
-type EllipsisButtonProps = ButtonProps & {
-  gotoPage: (page: number) => void
-  inputProps?: InputProps
-}
-
-export const EllipsisButton = ({ gotoPage, inputProps, ...rest }: EllipsisButtonProps) => {
+const BaseEllipsisButton = ({ gotoPage, inputProps, ...rest }: PaginationEllipsisButtonProps) => {
   const [ellipsisInput, setEllipsisInput] = useState(false)
   const localize = useLocalize()
   const styles = useMultiStyleConfig('EllipsisButton', rest)
@@ -47,4 +43,7 @@ export const EllipsisButton = ({ gotoPage, inputProps, ...rest }: EllipsisButton
     </Button>
   )
 }
+BaseEllipsisButton.displayName = 'BaseEllipsisButton'
+
+export const EllipsisButton = withRegistry(BaseEllipsisButton, 'Pagination', 'EllipsisButton')
 EllipsisButton.displayName = 'EllipsisButton'

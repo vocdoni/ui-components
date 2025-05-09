@@ -1,10 +1,10 @@
 import { useStyleConfig } from '@chakra-ui/react'
-import { useOrganization } from '@vocdoni/react-providers'
-import { Image, IPFSImageProps } from '../layout'
+import { useOrganization, withRegistry } from '@vocdoni/react-providers'
+import { OrganizationHeaderProps } from '../../types'
+import { Image } from '../layout'
 
-export const OrganizationHeader = (props: IPFSImageProps) => {
+const BaseOrganizationHeader = (props: OrganizationHeaderProps) => {
   const styles = useStyleConfig('OrganizationHeader', props)
-
   const { organization } = useOrganization()
 
   if (!organization) return null
@@ -12,4 +12,7 @@ export const OrganizationHeader = (props: IPFSImageProps) => {
 
   return <Image src={header} sx={styles} {...props} />
 }
+BaseOrganizationHeader.displayName = 'BaseOrganizationHeader'
+
+export const OrganizationHeader = withRegistry(BaseOrganizationHeader, 'Organization', 'Header')
 OrganizationHeader.displayName = 'OrganizationHeader'

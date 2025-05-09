@@ -1,7 +1,8 @@
-import { Tag, TagProps } from '@chakra-ui/react'
-import { useClient } from '@vocdoni/react-providers'
+import { Tag } from '@chakra-ui/react'
+import { useClient, withRegistry } from '@vocdoni/react-providers'
+import { AccountBalanceProps } from '../../types'
 
-export const Balance = (props: TagProps) => {
+const BaseBalance = (props: AccountBalanceProps) => {
   const { balance, localize } = useClient()
 
   if (balance < 0) {
@@ -21,3 +22,7 @@ export const Balance = (props: TagProps) => {
     </Tag>
   )
 }
+BaseBalance.displayName = 'BaseBalance'
+
+export const Balance = withRegistry(BaseBalance, 'Account', 'Balance')
+Balance.displayName = 'Balance'

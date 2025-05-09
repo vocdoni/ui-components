@@ -1,5 +1,5 @@
-import { Box, chakra, ChakraProps, Flex, Progress, Text, useMultiStyleConfig } from '@chakra-ui/react'
-import { useClient, useDatesLocale, useElection } from '@vocdoni/react-providers'
+import { Box, chakra, Flex, Progress, Text, useMultiStyleConfig } from '@chakra-ui/react'
+import { useClient, useDatesLocale, useElection, withRegistry } from '@vocdoni/react-providers'
 import {
   ElectionResultsTypeNames,
   ElectionStatus,
@@ -9,12 +9,13 @@ import {
   PublishedElection,
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
+import { ElectionResultsProps } from '../../types'
 
 const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(1) + '%'
 export const results = (result: number, decimals?: number) =>
   decimals ? parseInt(formatUnits(BigInt(result), decimals), 10) : result
 
-export const ElectionResults = (props: ChakraProps) => {
+const BaseElectionResults = (props: ElectionResultsProps) => {
   const styles = useMultiStyleConfig('ElectionResults')
   const { election } = useElection()
   const { localize } = useClient()
@@ -75,6 +76,10 @@ export const ElectionResults = (props: ChakraProps) => {
     </Flex>
   )
 }
+BaseElectionResults.displayName = 'BaseElectionResults'
+
+export const ElectionResults = withRegistry(BaseElectionResults, 'Election', 'Results')
+ElectionResults.displayName = 'ElectionResults'
 
 const electionChoices = (election: PublishedElection, q: IQuestion, abstainLabel: string) => {
   const nchoices = [...q.choices]

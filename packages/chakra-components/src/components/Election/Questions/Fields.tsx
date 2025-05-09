@@ -1,6 +1,5 @@
 import {
   chakra,
-  ChakraProps,
   Checkbox,
   FormControl,
   FormErrorMessage,
@@ -9,9 +8,10 @@ import {
   Stack,
   useMultiStyleConfig,
 } from '@chakra-ui/react'
-import { useElection } from '@vocdoni/react-providers'
+import { useElection, withRegistry } from '@vocdoni/react-providers'
 import { ElectionResultsTypeNames, ElectionStatus, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'
+import { ElectionQuestionsProps } from '../../../types'
 import { Markdown } from '../../layout'
 import { QuestionChoice } from './Choice'
 import { QuestionTip } from './Tip'
@@ -21,16 +21,16 @@ export type QuestionProps = {
   question: IQuestion
 }
 
-export type QuestionFieldProps = ChakraProps & QuestionProps
+export type QuestionFieldProps = ElectionQuestionsProps & QuestionProps
 
-export const ElectionQuestion = ({ question, index }: QuestionFieldProps) => {
+const BaseElectionQuestion = ({ question, index, ...props }: QuestionFieldProps) => {
   const styles = useMultiStyleConfig('ElectionQuestion')
   const {
     formState: { errors },
   } = useFormContext()
 
   return (
-    <chakra.div __css={styles.container}>
+    <chakra.div __css={styles.container} {...props}>
       <FormControl isInvalid={!!errors[index]}>
         <chakra.div __css={styles.header}>
           <chakra.label __css={styles.title}>{question.title.default}</chakra.label>
@@ -48,6 +48,10 @@ export const ElectionQuestion = ({ question, index }: QuestionFieldProps) => {
     </chakra.div>
   )
 }
+BaseElectionQuestion.displayName = 'BaseElectionQuestion'
+
+export const ElectionQuestion = withRegistry(BaseElectionQuestion, 'Election', 'Questions')
+ElectionQuestion.displayName = 'ElectionQuestion'
 
 export const FieldSwitcher = (props: QuestionProps) => {
   const { election } = useElection()
