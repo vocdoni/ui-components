@@ -11,6 +11,7 @@ export type PaginationContextProps = {
 export type RoutedPaginationContextProps = Omit<PaginationContextProps, 'setPage'> & {
   path: string
   pagination: PaginationResponse['pagination']
+  initialPage?: number
   // Util function that generates the path for a given page
   // (it return the actual path with queryParams and other route params but changing the page)
   getPathForPage: (page: number, queryParams?: string) => string
@@ -38,6 +39,7 @@ export const useRoutedPagination = (): RoutedPaginationContextProps => {
 
 export type PaginationProviderProps = {
   pagination: PaginationResponse['pagination']
+  initialPage?: number
 }
 
 export type RoutedPaginationProviderProps = PaginationProviderProps & {
@@ -47,11 +49,12 @@ export type RoutedPaginationProviderProps = PaginationProviderProps & {
 export const RoutedPaginationProvider = ({
   path,
   pagination,
+  initialPage = 0,
   ...rest
 }: PropsWithChildren<RoutedPaginationProviderProps>) => {
   const { search } = useLocation()
   const { page, ...extraParams }: { page?: number } = useParams()
-  const p = page && page > 0 ? page - 1 : 0
+  const p = page && page > 0 ? Number(page) : 0
 
   const navigate = useNavigate()
 
@@ -64,7 +67,12 @@ export const RoutedPaginationProvider = ({
     navigate(getPathForPage(page, queryParams))
   }
 
-  return <RoutedPaginationContext.Provider value={{ page: p, path, getPathForPage, setPage, pagination }} {...rest} />
+  return (
+    <RoutedPaginationContext.Provider
+      value={{ page: p, path, getPathForPage, setPage, pagination, initialPage }}
+      {...rest}
+    />
+  )
 }
 
 export const PaginationProvider = ({ pagination, ...rest }: PropsWithChildren<PaginationProviderProps>) => {
