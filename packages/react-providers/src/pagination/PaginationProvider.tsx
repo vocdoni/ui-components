@@ -5,13 +5,13 @@ import { generatePath, useLocation, useNavigate, useParams } from 'react-router-
 export type PaginationContextProps = {
   page: number
   setPage: (page: number) => void
+  initialPage?: number
   pagination: PaginationResponse['pagination']
 }
 
 export type RoutedPaginationContextProps = Omit<PaginationContextProps, 'setPage'> & {
   path: string
   pagination: PaginationResponse['pagination']
-  initialPage?: number
   // Util function that generates the path for a given page
   // (it return the actual path with queryParams and other route params but changing the page)
   getPathForPage: (page: number, queryParams?: string) => string
@@ -75,8 +75,12 @@ export const RoutedPaginationProvider = ({
   )
 }
 
-export const PaginationProvider = ({ pagination, ...rest }: PropsWithChildren<PaginationProviderProps>) => {
-  const [page, setPage] = useState<number>(0)
+export const PaginationProvider = ({
+  pagination,
+  initialPage = 0,
+  ...rest
+}: PropsWithChildren<PaginationProviderProps>) => {
+  const [page, setPage] = useState<number>(initialPage)
 
-  return <PaginationContext.Provider value={{ page, setPage, pagination }} {...rest} />
+  return <PaginationContext.Provider value={{ page, setPage, pagination, initialPage }} {...rest} />
 }
