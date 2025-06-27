@@ -5,6 +5,7 @@ import { generatePath, useLocation, useNavigate, useParams } from 'react-router-
 export type PaginationContextProps = {
   page: number
   setPage: (page: number) => void
+  initialPage?: number
   pagination: PaginationResponse['pagination']
 }
 
@@ -38,6 +39,7 @@ export const useRoutedPagination = (): RoutedPaginationContextProps => {
 
 export type PaginationProviderProps = {
   pagination: PaginationResponse['pagination']
+  initialPage?: number
 }
 
 export type RoutedPaginationProviderProps = PaginationProviderProps & {
@@ -47,11 +49,12 @@ export type RoutedPaginationProviderProps = PaginationProviderProps & {
 export const RoutedPaginationProvider = ({
   path,
   pagination,
+  initialPage = 0,
   ...rest
 }: PropsWithChildren<RoutedPaginationProviderProps>) => {
   const { search } = useLocation()
   const { page, ...extraParams }: { page?: number } = useParams()
-  const p = page && page > 0 ? page - 1 : 0
+  const p = page && page > 0 ? Number(page) : 0
 
   const navigate = useNavigate()
 
@@ -64,11 +67,20 @@ export const RoutedPaginationProvider = ({
     navigate(getPathForPage(page, queryParams))
   }
 
-  return <RoutedPaginationContext.Provider value={{ page: p, path, getPathForPage, setPage, pagination }} {...rest} />
+  return (
+    <RoutedPaginationContext.Provider
+      value={{ page: p, path, getPathForPage, setPage, pagination, initialPage }}
+      {...rest}
+    />
+  )
 }
 
-export const PaginationProvider = ({ pagination, ...rest }: PropsWithChildren<PaginationProviderProps>) => {
-  const [page, setPage] = useState<number>(0)
+export const PaginationProvider = ({
+  pagination,
+  initialPage = 0,
+  ...rest
+}: PropsWithChildren<PaginationProviderProps>) => {
+  const [page, setPage] = useState<number>(initialPage)
 
-  return <PaginationContext.Provider value={{ page, setPage, pagination }} {...rest} />
+  return <PaginationContext.Provider value={{ page, setPage, pagination, initialPage }} {...rest} />
 }
