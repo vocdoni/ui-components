@@ -62,16 +62,16 @@ export class saasOAuthConnector extends localStorageConnector {
           address: params.wallet.account.address,
         }),
       })
-      const data = await response.json()
-      const token = data['token']
-      const expiry = data['expirity']
-      localStorage.setItem(saasOAuthConnector.storageTokenName, token)
-      localStorage.setItem(saasOAuthConnector.storageExpiryName, expiry)
-
       if (!response.ok) {
         throw new Error('Failed to send data to SaaS backend')
       }
-      // user bearer to return
+
+      const data = await response.json()
+      const { token, expirity, registered } = data
+
+      localStorage.setItem(saasOAuthConnector.storageTokenName, token)
+      localStorage.setItem(saasOAuthConnector.storageExpiryName, expirity)
+      this.newAccount = registered
 
       wallet = params.wallet
     }
