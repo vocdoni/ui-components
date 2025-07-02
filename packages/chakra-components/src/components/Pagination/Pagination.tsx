@@ -144,7 +144,7 @@ const PaginationButtons = ({
           pages
         )}
       </ButtonGroup>
-      {totalItems && (
+      {Boolean(totalItems) && (
         <Text sx={styles.totalResults}>
           {t('pagination.total_results', {
             count: totalItems,
