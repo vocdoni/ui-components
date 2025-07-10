@@ -94,6 +94,7 @@ const SelectedOptions = ({
         } as IChoice)
       }
       break
+    case ElectionResultsTypeNames.BUDGET:
     case ElectionResultsTypeNames.APPROVAL:
       votes.forEach((v, i) => {
         if (v > 0) selectedOptions.push(question.choices[i])
