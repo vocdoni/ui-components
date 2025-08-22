@@ -1,4 +1,4 @@
-import { PublicClient, WalletClient } from 'wagmi'
+import { PublicClient, WalletClient } from 'viem'
 import localStorageWallet from './localStorageWallet'
 
 export type saasOauthParameters = {

@@ -1,8 +1,8 @@
 import { Buffer } from 'buffer'
 import CryptoJS from 'crypto-js'
-import { createWalletClient, custom, keccak256, publicActions } from 'viem'
+import { createWalletClient, custom, keccak256, PublicClient, WalletClient } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
-import { mainnet, PublicClient, WalletClient } from 'wagmi'
+import { mainnet } from 'viem/chains'
 
 export default class localStorageWallet {
   static storageItemName = 'localstorage-wallet-seed'
@@ -105,7 +105,7 @@ export default class localStorageWallet {
           }
         },
       }),
-    }).extend(publicActions)
+    })
 
     return client
   }

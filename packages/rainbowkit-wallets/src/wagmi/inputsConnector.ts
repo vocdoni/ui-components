@@ -1,22 +1,26 @@
+import { createPublicClient, http } from 'viem'
+import { mainnet } from 'viem/chains'
 import { inputsWallet } from '../lib/inputsWallet'
 import { localStorageConnector } from './localStorageConnector'
-import { PublicClient, WalletClient } from 'wagmi'
 
-const IS_SERVER = typeof window === 'undefined'
+/**
+ * Creates an inputs connector that prompts users for wallet creation data
+ */
+export function inputsConnector() {
+  return localStorageConnector({
+    async createWallet() {
+      const provider = createPublicClient({
+        chain: mainnet,
+        transport: http(),
+      })
 
-export class inputsConnector extends localStorageConnector {
-  ready = !IS_SERVER
-  readonly id = 'inputs'
-  readonly name = 'Inputs'
-
-  protected async createWallet() {
-    const provider = (await this.getProvider()) as PublicClient
-    let wallet = await inputsWallet.getWallet(provider)
-    if (!wallet) {
-      const w = new inputsWallet()
-      wallet = await w.create(provider)
-    }
-
-    this.wallet = wallet as WalletClient
-  }
+      // @ts-ignore - Viem v2 type issue with client extension
+      let wallet = await inputsWallet.getWallet(provider)
+      if (!wallet) {
+        const w = new inputsWallet()
+        // @ts-ignore - Viem v2 type issue with client extension
+        wallet = await w.create(provider)
+      }
+    },
+  })
 }

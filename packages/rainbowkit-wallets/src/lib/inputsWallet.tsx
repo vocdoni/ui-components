@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
+import { PublicClient, WalletClient } from 'viem'
 import { CreateWalletModal } from '../components/CreateWalletModal'
 import localStorageWallet from './localStorageWallet'
-import { PublicClient, WalletClient } from 'wagmi'
 
 /**
  * This class is used to create a wallet from a form

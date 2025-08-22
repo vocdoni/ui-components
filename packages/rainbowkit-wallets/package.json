@@ -18,22 +18,23 @@
     "postpack": "mv -fv package.json.backup package.json"
   },
   "peerDependencies": {
-    "@rainbow-me/rainbowkit": "^1.2.0",
-    "@wagmi/core": "^1.4.6",
-    "wagmi": "^1.4.6"
+    "@rainbow-me/rainbowkit": "^2.0.0",
+    "@tanstack/react-query": "^5.0.0",
+    "viem": "2.x",
+    "wagmi": "^2.16.4"
   },
   "devDependencies": {
-    "@rainbow-me/rainbowkit": "^1.2.0",
+    "@rainbow-me/rainbowkit": "^2.0.0",
+    "@tanstack/react-query": "^5.0.0",
     "@types/crypto-js": "^4.2.2",
     "@types/react-modal": "^3.16.0",
-    "@wagmi/core": "^1.4.6",
     "localforage": "^1.10.0",
     "react-modal": "^3.16.1",
     "tsconfig": "*",
     "typescript": "^5.9.2",
     "vite": "^4.4.2",
     "vite-plugin-dts": "^3.2.0",
-    "wagmi": "^1.4.6"
+    "wagmi": "^2.16.4"
   },
   "clean-package": "../../clean-package.config.json",
   "dependencies": {
