@@ -24,7 +24,7 @@ export type QuestionProps = {
 export type QuestionFieldProps = ChakraProps & QuestionProps
 
 export const ElectionQuestion = ({ question, index }: QuestionFieldProps) => {
-  const styles = useMultiStyleConfig('ElectionQuestion')
+  const styles = useMultiStyleConfig('ElectionQuestions')
   const {
     formState: { errors },
   } = useFormContext()
