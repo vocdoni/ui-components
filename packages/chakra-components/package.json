@@ -64,7 +64,7 @@
     "remark-gfm": "^3.0.1",
     "ts-deepmerge": "^6.0.3",
     "tsconfig": "*",
-    "typescript": "^4.9.5"
+    "typescript": "^5.9.2"
   },
   "clean-package": "../../clean-package.config.json"
 }

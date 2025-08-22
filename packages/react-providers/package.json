@@ -52,7 +52,7 @@
     "react-router-dom": "^6.26.1",
     "ts-deepmerge": "^6.2.0",
     "tsconfig": "*",
-    "typescript": "^4.9.5"
+    "typescript": "^5.9.2"
   },
   "clean-package": "../../clean-package.config.json",
   "dependencies": {
