@@ -5,6 +5,8 @@ import localStorageWallet from '../lib/localStorageWallet'
 
 export interface LocalStorageConnectorParameters {
   createWallet?: () => Promise<void>
+  id?: string
+  name?: string
 }
 
 /**
@@ -15,9 +17,9 @@ export function localStorageConnector(parameters: LocalStorageConnectorParameter
     let currentWallet: any = null
 
     return {
-      id: 'localStorageConnector',
-      name: 'localStorage',
-      type: 'localStorageConnector',
+      id: parameters.id || 'localStorageConnector',
+      name: parameters.name || 'localStorage',
+      type: parameters.id || 'localStorageConnector',
 
       async connect() {
         try {

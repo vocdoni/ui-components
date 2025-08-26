@@ -7,6 +7,8 @@ export type saasOauthConnectorOptions = {
   oAuthServiceUrl: string
   oAuthServiceProvider?: string
   saasBackendUrl: string
+  id?: string
+  name?: string
 }
 
 const STORAGE_TOKEN_NAME = 'authToken'
@@ -20,6 +22,8 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions) {
   if (!options.saasBackendUrl) throw new Error('saasBackendUrl is required')
 
   return localStorageConnector({
+    id: options.id,
+    name: options.name,
     async createWallet() {
       const provider = createPublicClient({
         chain: mainnet,

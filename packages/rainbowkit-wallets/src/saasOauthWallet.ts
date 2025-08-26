@@ -16,5 +16,10 @@ export const saasOAuthWallet = ({
   name: name || 'SaaS OAuth',
   iconUrl: iconUrl || 'https://i.ibb.co/Mh7LXsn/social-login-COLOR-2.png',
   iconBackground: '#fff',
-  createConnector: () => saasOAuthConnector(options),
+  createConnector: () =>
+    saasOAuthConnector({
+      ...options,
+      id: id || 'saasOAuth',
+      name: name || 'SaaS OAuth',
+    }),
 })
