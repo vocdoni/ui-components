@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer'
 import CryptoJS from 'crypto-js'
-import { createWalletClient, custom, keccak256, PublicClient, WalletClient } from 'viem'
+import { createWalletClient, custom, keccak256, WalletClient } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { mainnet } from 'viem/chains'
 
@@ -8,7 +8,7 @@ export default class localStorageWallet {
   static storageItemName = 'localstorage-wallet-seed'
   static storageItemEncryptionItemName = 'session-wallet-encryption-key'
 
-  public static async getWallet(provider: PublicClient): Promise<WalletClient | false> {
+  public static async getWallet(provider: any): Promise<WalletClient | false> {
     try {
       const value: string = localStorage.getItem(this.storageItemName) as string
       if (!value) return false
@@ -33,7 +33,7 @@ export default class localStorageWallet {
 
   public static async createWalletFromPrivateKey(
     pkAndPassword: { pk?: string; password: string },
-    provider: PublicClient
+    provider: any
   ): Promise<WalletClient> {
     let pk = pkAndPassword.pk
     // not receiving a pk means it should be stored in local storage (and encrypted already)
@@ -63,7 +63,7 @@ export default class localStorageWallet {
     return this.createWallet(pk as `0x${string}`, provider)
   }
 
-  public static async createWalletFromData(data: string | string[], provider: PublicClient): Promise<WalletClient> {
+  public static async createWalletFromData(data: string | string[], provider: any): Promise<WalletClient> {
     const inputs = Array.isArray(data) ? data : [data]
     const hash = inputs.reduce((acc, curr) => acc + curr, '')
     const pk = keccak256(Buffer.from(hash))
@@ -71,7 +71,7 @@ export default class localStorageWallet {
     return this.createWallet(pk, provider)
   }
 
-  public static async createWallet(pk: `0x${string}`, provider: PublicClient): Promise<WalletClient> {
+  public static async createWallet(pk: `0x${string}`, provider: any): Promise<WalletClient> {
     const account = privateKeyToAccount(pk)
     const client = createWalletClient({
       account,

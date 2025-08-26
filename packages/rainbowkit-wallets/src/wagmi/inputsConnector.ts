@@ -14,11 +14,9 @@ export function inputsConnector() {
         transport: http(),
       })
 
-      // @ts-ignore - Viem v2 type issue with client extension
       let wallet = await inputsWallet.getWallet(provider)
       if (!wallet) {
         const w = new inputsWallet()
-        // @ts-ignore - Viem v2 type issue with client extension
         wallet = await w.create(provider)
       }
     },

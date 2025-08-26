@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import { PublicClient, WalletClient } from 'viem'
+import { WalletClient } from 'viem'
 import { CreateWalletModal } from '../components/CreateWalletModal'
 import localStorageWallet from './localStorageWallet'
 
@@ -10,7 +10,7 @@ export class inputsWallet extends localStorageWallet {
   private data: any
   private cancel: boolean = false
 
-  async create(provider: PublicClient): Promise<WalletClient> {
+  async create(provider: any): Promise<WalletClient> {
     // Create a div to render the modal
     const myDiv = document.createElement('div')
     myDiv.setAttribute('id', 'myDiv' + Math.random())

@@ -26,12 +26,10 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions) {
         transport: http(),
       })
 
-      // @ts-ignore - Viem v2 type issue with client extension
       let wallet = await saasOAuthWallet.getWallet(provider)
 
       if (!wallet) {
         const w = new saasOAuthWallet(options.oAuthServiceUrl, options.oAuthServiceProvider || '')
-        // @ts-ignore - Viem v2 type issue with client extension
         const params = await w.create(provider)
         const userOauthSignature = await params.wallet.signMessage({
           account: params.wallet.account,

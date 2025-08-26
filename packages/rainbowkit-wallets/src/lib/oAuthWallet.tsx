@@ -1,4 +1,4 @@
-import { PublicClient, WalletClient } from 'viem'
+import { WalletClient } from 'viem'
 import localStorageWallet from './localStorageWallet'
 
 /**
@@ -17,7 +17,7 @@ export class oAuthWallet extends localStorageWallet {
     this.oAuthServiceProvider = oAuthServiceProvider
   }
 
-  async create(provider: PublicClient): Promise<WalletClient> {
+  async create(provider: any): Promise<WalletClient> {
     // Open the login popup
     const url = this.oAuthServiceUrl + (this.oAuthServiceProvider ? `?provider=${this.oAuthServiceProvider}` : '')
     this.openLoginPopup(url)

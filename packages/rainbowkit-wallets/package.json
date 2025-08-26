@@ -21,7 +21,7 @@
     "@rainbow-me/rainbowkit": "^2.0.0",
     "@tanstack/react-query": "^5.0.0",
     "viem": "2.x",
-    "wagmi": "^2.16.4"
+    "wagmi": "2"
   },
   "devDependencies": {
     "@rainbow-me/rainbowkit": "^2.0.0",
@@ -33,8 +33,8 @@
     "tsconfig": "*",
     "typescript": "^5.9.2",
     "vite": "^4.4.2",
-    "vite-plugin-dts": "^3.2.0",
-    "wagmi": "^2.16.4"
+    "vite-plugin-dts": "^4.5.4",
+    "wagmi": "2"
   },
   "clean-package": "../../clean-package.config.json",
   "dependencies": {

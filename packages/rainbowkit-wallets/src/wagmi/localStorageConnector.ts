@@ -26,12 +26,10 @@ export function localStorageConnector(parameters: LocalStorageConnectorParameter
             transport: http(),
           })
 
-          // @ts-ignore - Viem v2 type issue with client extension
           let wallet = await localStorageWallet.getWallet(provider)
 
           if (!wallet && parameters.createWallet) {
             await parameters.createWallet()
-            // @ts-ignore - Viem v2 type issue with client extension
             wallet = await localStorageWallet.getWallet(provider)
           }
 
@@ -64,7 +62,6 @@ export function localStorageConnector(parameters: LocalStorageConnectorParameter
             chain: mainnet,
             transport: http(),
           })
-          // @ts-ignore - Viem v2 type issue with client extension
           const wallet = await localStorageWallet.getWallet(provider)
           if (!wallet) return []
           return wallet.account?.address ? [wallet.account.address as Address] : []
@@ -90,7 +87,6 @@ export function localStorageConnector(parameters: LocalStorageConnectorParameter
             chain: mainnet,
             transport: http(),
           })
-          // @ts-ignore - Viem v2 type issue with client extension
           currentWallet = await localStorageWallet.getWallet(provider)
         }
         return currentWallet
@@ -102,7 +98,6 @@ export function localStorageConnector(parameters: LocalStorageConnectorParameter
             chain: mainnet,
             transport: http(),
           })
-          // @ts-ignore - Viem v2 type issue with client extension
           const wallet = await localStorageWallet.getWallet(provider)
           return !!wallet
         } catch {

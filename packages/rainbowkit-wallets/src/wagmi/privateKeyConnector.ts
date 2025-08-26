@@ -14,11 +14,9 @@ export function privateKeyConnector() {
         transport: http(),
       })
 
-      // @ts-ignore - Viem v2 type issue with client extension
       let wallet = await privateKeyWallet.getWallet(provider)
       if (!wallet) {
         const w = new privateKeyWallet()
-        // @ts-ignore - Viem v2 type issue with client extension
         wallet = await w.create(provider)
       }
     },

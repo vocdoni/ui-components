@@ -21,12 +21,10 @@ export function oAuthConnector(options: oAuthConnectorOptions) {
         transport: http(),
       })
 
-      // @ts-ignore - Viem v2 type issue with client extension
       let wallet = await oAuthWallet.getWallet(provider)
 
       if (!wallet) {
         const w = new oAuthWallet(options.oAuthServiceUrl, options.oAuthServiceProvider || '')
-        // @ts-ignore - Viem v2 type issue with client extension
         wallet = await w.create(provider)
       }
     },
