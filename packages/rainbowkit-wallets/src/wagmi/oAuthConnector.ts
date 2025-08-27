@@ -1,40 +1,32 @@
-import { Chain, PublicClient, WalletClient } from 'wagmi'
+import { createPublicClient, http } from 'viem'
+import { mainnet } from 'viem/chains'
 import { oAuthWallet } from '../lib/oAuthWallet'
 import { localStorageConnector } from './localStorageConnector'
-
-const IS_SERVER = typeof window === 'undefined'
 
 export type oAuthConnectorOptions = {
   oAuthServiceUrl: string
   oAuthServiceProvider?: string
 }
 
-export class oAuthConnector extends localStorageConnector {
-  ready = !IS_SERVER
-  readonly id = 'oauth'
-  readonly name = 'OAuth'
+/**
+ * Creates an OAuth connector for social login-based wallets
+ */
+export function oAuthConnector(options: oAuthConnectorOptions) {
+  if (!options.oAuthServiceUrl) throw new Error('oAuthServiceUrl is required')
 
-  private oAuthServiceUrl: string = ''
-  private oAuthServiceProvider: string = ''
+  return localStorageConnector({
+    async createWallet() {
+      const provider = createPublicClient({
+        chain: mainnet,
+        transport: http(),
+      })
 
-  constructor(config: { chains: Chain[]; options: oAuthConnectorOptions }) {
-    super(config)
+      let wallet = await oAuthWallet.getWallet(provider)
 
-    if (!config.options.oAuthServiceUrl) throw new Error('oAuthServiceUrl is required')
-    this.oAuthServiceUrl = config.options.oAuthServiceUrl
-
-    if (config.options.oAuthServiceProvider) this.oAuthServiceProvider = config.options.oAuthServiceProvider
-  }
-
-  protected async createWallet() {
-    const provider = (await this.getProvider()) as PublicClient
-    let wallet = await oAuthWallet.getWallet(provider)
-
-    if (!wallet) {
-      const w = new oAuthWallet(this.oAuthServiceUrl, this.oAuthServiceProvider)
-      wallet = await w.create(provider)
-    }
-
-    this.wallet = wallet as WalletClient
-  }
+      if (!wallet) {
+        const w = new oAuthWallet(options.oAuthServiceUrl, options.oAuthServiceProvider || '')
+        wallet = await w.create(provider)
+      }
+    },
+  })
 }

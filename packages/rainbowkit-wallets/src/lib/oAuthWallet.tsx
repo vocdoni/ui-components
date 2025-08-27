@@ -1,5 +1,5 @@
+import { WalletClient } from 'viem'
 import localStorageWallet from './localStorageWallet'
-import { PublicClient, WalletClient } from 'wagmi'
 
 /**
  * This class is used to create a wallet from an external service (OAuth)
@@ -17,7 +17,7 @@ export class oAuthWallet extends localStorageWallet {
     this.oAuthServiceProvider = oAuthServiceProvider
   }
 
-  async create(provider: PublicClient): Promise<WalletClient> {
+  async create(provider: any): Promise<WalletClient> {
     // Open the login popup
     const url = this.oAuthServiceUrl + (this.oAuthServiceProvider ? `?provider=${this.oAuthServiceProvider}` : '')
     this.openLoginPopup(url)

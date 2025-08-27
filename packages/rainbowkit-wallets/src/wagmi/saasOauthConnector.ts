@@ -1,81 +1,79 @@
-import { Chain, PublicClient, WalletClient } from 'wagmi'
+import { createPublicClient, http } from 'viem'
+import { mainnet } from 'viem/chains'
 import { saasOAuthWallet } from '../lib/saasOauthWallet'
 import { localStorageConnector } from './localStorageConnector'
-
-const IS_SERVER = typeof window === 'undefined'
 
 export type saasOauthConnectorOptions = {
   oAuthServiceUrl: string
   oAuthServiceProvider?: string
-  saasBackendUrl?: string
+  saasBackendUrl: string
+  id?: string
+  name?: string
 }
 
-export class saasOAuthConnector extends localStorageConnector {
-  ready = !IS_SERVER
-  readonly id = 'oauth'
-  readonly name = 'OAuth'
+const STORAGE_TOKEN_NAME = 'authToken'
+const STORAGE_EXPIRY_NAME = 'authExpiry'
 
-  private oAuthServiceUrl: string = ''
-  private oAuthServiceProvider: string = ''
-  static storageTokenName = 'authToken'
-  static storageExpiryName = 'authExpiry'
+/**
+ * Creates a SaaS OAuth connector that integrates with a backend service
+ */
+export function saasOAuthConnector(options: saasOauthConnectorOptions) {
+  if (!options.oAuthServiceUrl) throw new Error('oAuthServiceUrl is required')
+  if (!options.saasBackendUrl) throw new Error('saasBackendUrl is required')
 
-  constructor(config: { chains: Chain[]; options: saasOauthConnectorOptions }) {
-    super(config)
-
-    if (!config.options.oAuthServiceUrl) throw new Error('oAuthServiceUrl is required')
-    this.oAuthServiceUrl = config.options.oAuthServiceUrl
-
-    if (config.options.oAuthServiceProvider) this.oAuthServiceProvider = config.options.oAuthServiceProvider
-  }
-
-  protected async createWallet() {
-    const provider = (await this.getProvider()) as PublicClient
-    let wallet = await saasOAuthWallet.getWallet(provider)
-
-    if (!wallet) {
-      const w = new saasOAuthWallet(this.oAuthServiceUrl, this.oAuthServiceProvider)
-      const params = await w.create(provider)
-      const userOauthSignature = await params.wallet.signMessage({
-        account: params.wallet.account,
-        message: params.oauthSignedEmail,
+  return localStorageConnector({
+    id: options.id,
+    name: options.name,
+    async createWallet() {
+      const provider = createPublicClient({
+        chain: mainnet,
+        transport: http(),
       })
 
-      let lastname = ''
-      let nameData = params.userName.split(' ')
-      const firstname = nameData[0]
-      if (nameData.length > 1) {
-        lastname = nameData[1]
+      let wallet = await saasOAuthWallet.getWallet(provider)
+
+      if (!wallet) {
+        const w = new saasOAuthWallet(options.oAuthServiceUrl, options.oAuthServiceProvider || '')
+        const params = await w.create(provider)
+        const userOauthSignature = await params.wallet.signMessage({
+          account: params.wallet.account,
+          message: params.oauthSignedEmail,
+        })
+
+        let lastname = ''
+        let nameData = params.userName.split(' ')
+        const firstname = nameData[0]
+        if (nameData.length > 1) {
+          lastname = nameData[1]
+        }
+
+        const response = await fetch(options.saasBackendUrl + '/oauth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: params.userEmail,
+            firstName: firstname,
+            lastName: lastname,
+            userOauthSignature: userOauthSignature,
+            oauthSignature: params.oauthSignedEmail,
+            address: params.wallet.account.address,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to send data to SaaS backend')
+        }
+
+        const data = await response.json()
+        const token = data['token']
+        const expiry = data['expirity']
+        localStorage.setItem(STORAGE_TOKEN_NAME, token)
+        localStorage.setItem(STORAGE_EXPIRY_NAME, expiry)
+
+        wallet = params.wallet
       }
-
-      const response = await fetch(this.options.saasBackendUrl + '/oauth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: params.userEmail,
-          firstName: firstname,
-          lastName: lastname,
-          userOauthSignature: userOauthSignature,
-          oauthSignature: params.oauthSignedEmail,
-          address: params.wallet.account.address,
-        }),
-      })
-      const data = await response.json()
-      const token = data['token']
-      const expiry = data['expirity']
-      localStorage.setItem(saasOAuthConnector.storageTokenName, token)
-      localStorage.setItem(saasOAuthConnector.storageExpiryName, expiry)
-
-      if (!response.ok) {
-        throw new Error('Failed to send data to SaaS backend')
-      }
-      // user bearer to return
-
-      wallet = params.wallet
-    }
-
-    this.wallet = wallet as WalletClient
-  }
+    },
+  })
 }
