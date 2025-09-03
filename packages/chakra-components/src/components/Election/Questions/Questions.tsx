@@ -54,6 +54,7 @@ const QuestionsFormContents = ({ onInvalid }: ElectionQuestionsFormProps) => {
 
   return (
     <form onSubmit={fmethods.handleSubmit(vote, onInvalid)} id={`election-questions-${election.id}`}>
+      <Voted />
       <QuestionsTypeBadge />
       {questions.map((question, qk) => (
         <ElectionQuestion key={qk} index={qk.toString()} question={question} />
