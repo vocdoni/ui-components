@@ -14,7 +14,11 @@ const percent = (result: number, total: number) => ((Number(result) / total) * 1
 export const results = (result: number, decimals?: number) =>
   decimals ? parseInt(formatUnits(BigInt(result), decimals), 10) : result
 
-export const ElectionResults = (props: ChakraProps) => {
+export type ElectionResultsProps = ChakraProps & {
+  forceRender?: boolean
+}
+
+export const ElectionResults = (props: ElectionResultsProps) => {
   const styles = useMultiStyleConfig('ElectionResults')
   const { election } = useElection()
   const { localize } = useClient()
@@ -22,7 +26,7 @@ export const ElectionResults = (props: ChakraProps) => {
 
   if (!election || !(election instanceof PublishedElection) || election?.status === ElectionStatus.CANCELED) return null
 
-  if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS) {
+  if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS && !props.forceRender) {
     return (
       <Text sx={styles.secret} {...props}>
         {localize('results.secret_until_the_end', {
