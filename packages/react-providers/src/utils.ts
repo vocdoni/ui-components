@@ -19,6 +19,9 @@ export const enforceHexPrefix = (address?: string) => (!address ? '' : ensure0x(
  * @returns {string}
  */
 export const errorToString = (error: any | unknown): string => {
+  if (typeof error !== 'string' && 'data' in error && error.data && 'error' in error.data) {
+    return error.data.error
+  }
   if (typeof error !== 'string' && 'message' in error) {
     return error.message
   }
