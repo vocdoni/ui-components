@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { IChoice } from '@vocdoni/sdk'
 import { useState } from 'react'
+import { Markdown } from '../../layout'
 
 export type QuestionChoiceMeta = {
   image: {
@@ -52,7 +53,7 @@ export const QuestionChoice = ({ choice, ...rest }: { choice: IChoice } & StackP
         </Skeleton>
       )}
       <Text sx={styles.label}>{label}</Text>
-      {description && <Text sx={styles.description}>{description}</Text>}
+      {description && <Markdown sx={styles.description}>{description}</Markdown>}
       {renderModal && (
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay sx={styles.modalOverlay} />
@@ -65,7 +66,7 @@ export const QuestionChoice = ({ choice, ...rest }: { choice: IChoice } & StackP
                 </Skeleton>
               )}
               <Text sx={styles.modalLabel}>{label}</Text>
-              {description && <Text sx={styles.modalDescription}>{description}</Text>}
+              {description && <Markdown sx={styles.modalDescription}>{description}</Markdown>}
             </ModalBody>
           </ModalContent>
         </Modal>
