@@ -51,7 +51,7 @@ export const locales = {
     multichoice_tooltip:
       'Multichoice voting lets you vote for up to {{maxcount}} options (defined by the voting organizer). The one with the most votes wins.',
     multichoice_title: 'Multichoice Voting {{ weighted }}',
-    multichoice_desc: 'Select up to {{maxcount}} options',
+    multichoice_desc: 'You selected {{selected}} options (max {{maxcount}})',
     multichoice_desc_abstain: ' (or abstain)',
     multichoice_cannot_abstain: 'Too many options selected',
     weighted_voting: 'Weighted Voting',
