@@ -7,10 +7,6 @@
   "description": "Vocdoni UI components and related packages",
   "main": "index.js",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "templates/*"
-  ],
   "devDependencies": {
     "@swc-node/jest": "^1.6.7",
     "@swc/core": "^1.3.78",
@@ -40,13 +36,17 @@
     "clean": "turbo clean --filter=@vocdoni* && rm -fr node_modules",
     "test": "jest"
   },
-  "packageManager": "yarn@1.22.19",
   "engines": {
-    "yarn": ">= 1.19.1 && < 2",
     "node": ">= 20"
   },
-  "resolutions": {
-    "@types/react": "18.x",
-    "viem": "^2.37.1"
-  }
+  "pnpm": {
+    "overrides": {
+      "@types/react": "18.x",
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1",
+      "viem": "^2.37.1",
+      "@wagmi/core": "2.20.3"
+    }
+  },
+  "packageManager": "pnpm@10.16.1"
 }

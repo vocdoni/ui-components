@@ -2,9 +2,9 @@ node_modules
 *.lock
 .turbo
 vite.config.ts.timestamp-*.mjs
-.npmrc
 .vscode
-.yarn
-.yarnrc*
 
 package.json.backup
+yarn.lock
+pnpm-lock.yaml
+package-lock.json

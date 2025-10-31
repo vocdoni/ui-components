@@ -1,12 +1,13 @@
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
+import type { CreateConnectorFn } from 'wagmi'
 import { inputsWallet } from '../lib/inputsWallet'
 import { localStorageConnector } from './localStorageConnector'
 
 /**
  * Creates an inputs connector that prompts users for wallet creation data
  */
-export function inputsConnector() {
+export function inputsConnector(): CreateConnectorFn {
   return localStorageConnector({
     async createWallet() {
       const provider = createPublicClient({

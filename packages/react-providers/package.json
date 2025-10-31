@@ -32,6 +32,7 @@
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
     "@vocdoni/sdk": "~0.9.0",
+    "date-fns": "^4.1.0",
     "react": ">= 16.8.0 <19.0.0",
     "react-router": ">= 6.0.0",
     "react-router-dom": ">= 6.0.0"
@@ -42,6 +43,7 @@
     "@types/latinize": "^0.2.15",
     "@types/react": "^18.0.30",
     "@vocdoni/sdk": "~0.9.0",
+    "date-fns": "^4.1.0",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-react-app": "^7.0.1",
@@ -51,7 +53,7 @@
     "react-router": "^6.26.1",
     "react-router-dom": "^6.26.1",
     "ts-deepmerge": "^6.2.0",
-    "tsconfig": "*",
+    "tsconfig": "workspace:*",
     "typescript": "^5.9.2"
   },
   "clean-package": "../../clean-package.config.json",

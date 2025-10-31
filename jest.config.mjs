@@ -4,7 +4,8 @@ const config = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   modulePathIgnorePatterns: ['<rootDir>/templates'],
   moduleNameMapper: {
-    '^ffjavascript$': '<rootDir>/node_modules/ffjavascript/build/main.cjs',
+    // pnpm-compatible path resolution for ffjavascript
+    '^ffjavascript$': '<rootDir>/node_modules/.pnpm/ffjavascript@0.3.1/node_modules/ffjavascript/build/main.cjs',
   },
   transform: {
     '^.+\\.(ts|tsx|js|jsx)?$': '@swc-node/jest',

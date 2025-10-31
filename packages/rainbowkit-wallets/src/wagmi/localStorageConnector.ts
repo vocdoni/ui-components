@@ -1,6 +1,6 @@
 import { createPublicClient, http, UserRejectedRequestError, type Address } from 'viem'
 import { mainnet } from 'viem/chains'
-import { createConnector } from 'wagmi'
+import { createConnector, type CreateConnectorFn } from 'wagmi'
 import localStorageWallet from '../lib/localStorageWallet'
 
 export interface LocalStorageConnectorParameters {
@@ -12,7 +12,7 @@ export interface LocalStorageConnectorParameters {
 /**
  * A connector that uses the local storage to store seed for a deterministic wallet generation
  */
-export function localStorageConnector(parameters: LocalStorageConnectorParameters = {}) {
+export function localStorageConnector(parameters: LocalStorageConnectorParameters = {}): CreateConnectorFn {
   return createConnector((config) => {
     let currentWallet: any = null
 

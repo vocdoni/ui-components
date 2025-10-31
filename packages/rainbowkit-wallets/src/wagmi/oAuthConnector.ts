@@ -1,5 +1,6 @@
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
+import type { CreateConnectorFn } from 'wagmi'
 import { oAuthWallet } from '../lib/oAuthWallet'
 import { localStorageConnector } from './localStorageConnector'
 
@@ -11,7 +12,7 @@ export type oAuthConnectorOptions = {
 /**
  * Creates an OAuth connector for social login-based wallets
  */
-export function oAuthConnector(options: oAuthConnectorOptions) {
+export function oAuthConnector(options: oAuthConnectorOptions): CreateConnectorFn {
   if (!options.oAuthServiceUrl) throw new Error('oAuthServiceUrl is required')
 
   return localStorageConnector({

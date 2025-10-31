@@ -29,7 +29,7 @@
   },
   "main": "src/index.ts",
   "dependencies": {
-    "@vocdoni/react-providers": "^1.0.0-beta.3"
+    "@vocdoni/react-providers": "workspace:^"
   },
   "peerDependencies": {
     "@chakra-ui/react": "^2.10.4",
@@ -63,7 +63,7 @@
     "react-string-replace": "^1.1.0",
     "remark-gfm": "^3.0.1",
     "ts-deepmerge": "^6.0.3",
-    "tsconfig": "*",
+    "tsconfig": "workspace:*",
     "typescript": "^5.9.2"
   },
   "clean-package": "../../clean-package.config.json"

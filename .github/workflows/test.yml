@@ -18,9 +18,12 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Install dependencies
-        run: yarn
+        run: pnpm install
       - name: Run all lint tasks
-        run: yarn lint
+        run: pnpm lint
       - name: Test everything
-        run: yarn test --verbose
+        run: pnpm test --verbose

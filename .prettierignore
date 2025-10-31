@@ -1,2 +1,4 @@
 **/dist
 **/README.md
+pnpm-lock.yaml
+templates/**

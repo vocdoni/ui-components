@@ -1,5 +1,6 @@
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
+import type { CreateConnectorFn } from 'wagmi'
 import { saasOAuthWallet } from '../lib/saasOauthWallet'
 import { localStorageConnector } from './localStorageConnector'
 
@@ -17,7 +18,7 @@ const STORAGE_EXPIRY_NAME = 'authExpiry'
 /**
  * Creates a SaaS OAuth connector that integrates with a backend service
  */
-export function saasOAuthConnector(options: saasOauthConnectorOptions) {
+export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateConnectorFn {
   if (!options.oAuthServiceUrl) throw new Error('oAuthServiceUrl is required')
   if (!options.saasBackendUrl) throw new Error('saasBackendUrl is required')
 

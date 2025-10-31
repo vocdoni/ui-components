@@ -1,5 +1,6 @@
-import { useClient, useElection } from '@vocdoni/react-providers'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { useElection } from '.'
+import { useClient } from '../client'
 
 type LoadingState = {
   continue: boolean

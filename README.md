@@ -72,20 +72,20 @@ The best place to learn about using ui-components packages is the [developer por
 
 ## Getting Started
 
-Each of these packages can be used in a typescript/javascript project by importing them, eg. `yarn add @vocdoni/chakra-components`. Follow the developer documentation, or go to each individual package's readme file, for further details.
+Each of these packages can be used in a typescript/javascript project by importing them, eg. `pnpm add @vocdoni/chakra-components`. Follow the developer documentation, or go to each individual package's readme file, for further details.
 
-Each of the packages has a typescript file configured as an entrypoint, so you should be able to just run `yarn dev` on the included chakra template to start developing any of the included packages.
+Each of the packages has a typescript file configured as an entrypoint, so you should be able to just run `pnpm dev` on the included chakra template to start developing any of the included packages.
 
-If you link (via npm/yarn link) any of the included packages to your project, your project MUST be able to run typescript code. Otherwise it will fail.
+If you link (via pnpm link) any of the included packages to your project, your project MUST be able to run typescript code. Otherwise it will fail.
 
 Turbo was initially configured for the development process, but its usage is minimal; still, you can use it for some global commands:
 
-- `yarn build`: will build every package in the monorepo (including templates)
-- `yarn clean`: removes `dist`, `.turbo` and `node_modules` folders in the
+- `pnpm build`: will build every package in the monorepo (including templates)
+- `pnpm clean`: removes `dist`, `.turbo` and `node_modules` folders in the
   entire monorepo.
-- `yarn lint`: runs the linter of each package (may vary per package, but
+- `pnpm lint`: runs the linter of each package (may vary per package, but
   usually prettier & tsc).
-- `yarn test`: runs all the tests in the monorepo. Note these are configured globally in the monorepo (testing dependencies are in the base `package.json` file)
+- `pnpm test`: runs all the tests in the monorepo. Note these are configured globally in the monorepo (testing dependencies are in the base `package.json` file)
 
 ## Reference
 
