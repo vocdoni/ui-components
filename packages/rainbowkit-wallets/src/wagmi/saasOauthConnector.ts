@@ -12,6 +12,17 @@ export type saasOauthConnectorOptions = {
   name?: string
 }
 
+type ApiErrorResponse = {
+  code: number
+  message: string
+}
+
+type OAuthLoginResponse = {
+  token: string
+  expirity: string
+  registered: boolean
+}
+
 const STORAGE_TOKEN_NAME = 'authToken'
 const STORAGE_EXPIRY_NAME = 'authExpiry'
 
@@ -63,13 +74,27 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateCo
           }),
         })
 
-        if (!response.ok) {
-          throw new Error('Failed to send data to SaaS backend')
+        // Try to parse backend error body
+        let data: ApiErrorResponse | OAuthLoginResponse | null = null
+        try {
+          data = await response.json()
+        } catch (e) {
+          throw new Error('Failed to parse response from backend')
         }
 
-        const data = await response.json()
-        const token = data['token']
-        const expiry = data['expirity']
+        if (!response.ok) {
+          const { code, message } = data as ApiErrorResponse
+          switch (code) {
+            case 40101:
+              throw new Error('OAuthAccountConflictError')
+            default:
+              console.error('OAuth login failed', data)
+              throw new Error(message || 'OAuth login failed')
+          }
+        }
+
+        const { token, expirity: expiry } = data as OAuthLoginResponse
+
         localStorage.setItem(STORAGE_TOKEN_NAME, token)
         localStorage.setItem(STORAGE_EXPIRY_NAME, expiry)
 
