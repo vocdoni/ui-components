@@ -71,6 +71,7 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateCo
             userOauthSignature: userOauthSignature,
             oauthSignature: params.oauthSignedEmail,
             address: params.wallet.account.address,
+            provider: options.id,
           }),
         })
 
