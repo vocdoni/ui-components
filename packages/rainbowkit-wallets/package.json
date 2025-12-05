@@ -31,7 +31,7 @@
     "@tanstack/react-query": "^5.0.0",
     "@types/crypto-js": "^4.2.2",
     "@types/react-modal": "^3.16.0",
-    "@wagmi/core": "2.20.3",
+    "@wagmi/core": "^2.20.3",
     "localforage": "^1.10.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
