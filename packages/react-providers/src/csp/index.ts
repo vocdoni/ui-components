@@ -12,7 +12,7 @@ export const vote = async (client: VocdoniSDKClient, election: PublishedElection
   }
 
   const walletAddress: string = (await client.wallet?.getAddress()) as string
-  const signature: { signature: string } = await f(`${election.census.censusURI}/sign`, {
+  const { signature, weight }: { signature: string; weight?: string } = await f(`${election.census.censusURI}/sign`, {
     method: 'POST',
     body: {
       payload: walletAddress,
@@ -20,7 +20,10 @@ export const vote = async (client: VocdoniSDKClient, election: PublishedElection
       electionId: election.id,
     },
   })
-  const cspVote: CspVote = client.cspVote(vote, signature.signature, CspProofType.ECDSA_PIDSALTED)
+  const cspVote: CspVote = client.cspVote(vote, signature, CspProofType.ECDSA_PIDSALTED)
+  if (typeof weight !== 'undefined') {
+    cspVote.weight = isNaN(Number(weight)) ? BigInt(1) : BigInt(weight)
+  }
   const vid: string = await client.submitVote(cspVote)
 
   return vid
