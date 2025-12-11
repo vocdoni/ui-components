@@ -225,7 +225,12 @@ export const useElectionProvider = ({
         processId: election.id,
       })
 
-      actions.voted(nullifier)
+      const hasVoted = await client.hasAlreadyVoted({
+        electionId: election.id,
+        voteId: nullifier,
+      })
+
+      actions.voted(hasVoted)
       actions.votesLeft(0)
     })()
   }, [state.csp.token, election, loaded.election])
