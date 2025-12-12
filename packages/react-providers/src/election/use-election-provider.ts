@@ -48,6 +48,7 @@ export const useElectionProvider = ({
     election,
     loading,
     loaded,
+    connected,
     sik: { password, signature },
   } = state
   const [anonCircuitsFetched, setAnonCircuitsFetched] = useState(false)
@@ -67,6 +68,8 @@ export const useElectionProvider = ({
   )
 
   const censusFetch = useCallback(async () => {
+    if (!connected) return
+
     const address = await client.wallet?.getAddress()
     if (!election || !(election instanceof PublishedElection)) return
 
@@ -97,7 +100,7 @@ export const useElectionProvider = ({
       console.error('error in census fetch:', e)
       actions.censusError(e)
     }
-  }, [actions, client, election, password, signature])
+  }, [actions, client, connected, election, password, signature])
 
   const workerInstance = useMemo(() => createWebWorker(worker), [])
   const { result: circuits, startProcessing } = useWebWorker<ICircuit, ICircuitWorkerRequest>(workerInstance)
@@ -134,6 +137,7 @@ export const useElectionProvider = ({
       !election ||
       loading.census ||
       !client.wallet ||
+      !connected ||
       anonCircuitsFetched ||
       isAnonCircuitsFetching.current
     )
@@ -180,7 +184,7 @@ export const useElectionProvider = ({
 
   // check census information
   useEffect(() => {
-    if (!fetchCensus || !election || !loaded.election || loading.census || !client.wallet) return
+    if (!fetchCensus || !election || !loaded.election || loading.census || !client.wallet || !connected) return
     ;(async () => {
       const address = await client.wallet?.getAddress()
       // The condition is just negated so we can return the code execution.
@@ -201,7 +205,17 @@ export const useElectionProvider = ({
       await censusFetch()
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote, signature])
+  }, [
+    fetchCensus,
+    client,
+    state.voter,
+    loaded.election,
+    loading.census,
+    actions,
+    state.isAbleToVote,
+    signature,
+    connected,
+  ])
 
   // auto update metadata (if enabled)
   useEffect(() => {

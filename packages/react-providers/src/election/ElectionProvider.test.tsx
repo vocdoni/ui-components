@@ -1,6 +1,6 @@
 import { Wallet } from '@ethersproject/wallet'
 import { render, renderHook, waitFor } from '@testing-library/react'
-import { EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
+import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
 import { act } from 'react'
 import { ClientProvider, useClient } from '../client'
 import { onlyProps, properProps } from '../test-utils'
@@ -297,6 +297,92 @@ describe('<ElectionProvider />', () => {
     // in this case both should be disconnected, since is not a spreadsheet type election
     expect(result.current.client.connected).toBeFalsy()
     expect(result.current.election.connected).toBeFalsy()
+  })
+
+  it('clears voted state after a census fetch has set it', async () => {
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+    client.isInCensus = jest.fn().mockResolvedValue(true)
+    client.hasAlreadyVoted = jest.fn().mockResolvedValue('vote-id')
+    client.votesLeftCount = jest.fn().mockResolvedValue(1)
+
+    // @ts-ignore
+    const baseElection = PublishedElection.build({
+      id: 'test-voted-clear',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census: new WeightedCensus(),
+    })
+    const election = new Proxy(baseElection, {
+      get(target, prop) {
+        if (prop === 'electionType') {
+          return { anonymous: false }
+        }
+        if (prop === 'voteType') {
+          return { maxVoteOverwrites: 0 }
+        }
+        if (prop === 'census') {
+          return { ...target.census, type: CensusType.WEIGHTED }
+        }
+
+        // @ts-ignore
+        return target[prop]
+      },
+    }) as PublishedElection
+
+    expect(election).toBeInstanceOf(PublishedElection)
+
+    const wrapper = (props: any) => {
+      return (
+        <ClientProvider client={client}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      )
+    }
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election, fetchCensus: true },
+    })
+
+    expect(result.current.client).toBe(client)
+    expect(result.current.election).toBeInstanceOf(PublishedElection)
+
+    await waitFor(() => {
+      expect(result.current.connected).toBe(true)
+    })
+
+    await act(async () => {
+      await result.current.fetchCensus()
+    })
+
+    expect(client.isInCensus).toHaveBeenCalled()
+    client.isInCensus.mockClear()
+    client.hasAlreadyVoted.mockClear()
+
+    await act(async () => {
+      result.current.actions.voted('vote-id')
+    })
+
+    expect(result.current.voted).toBe('vote-id')
+
+    await act(async () => {
+      result.current.actions.clear()
+    })
+
+    expect(result.current.voted).toBeNull()
+
+    await act(async () => {
+      await result.current.fetchCensus()
+    })
+
+    expect(client.isInCensus).not.toHaveBeenCalled()
+    expect(client.hasAlreadyVoted).not.toHaveBeenCalled()
+    expect(result.current.voted).toBeNull()
   })
 
   describe('participation and turnout calculations', () => {
