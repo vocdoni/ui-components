@@ -1,11 +1,19 @@
 import { chakra, useMultiStyleConfig } from '@chakra-ui/react'
 import { useElection } from '@vocdoni/react-providers'
-import { PublishedElection } from '@vocdoni/sdk'
+import { CensusType, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
+import { up } from 'up-fetch'
 import { results } from './Results'
 
+const upfetch = up(fetch)
+
 export const VoteWeight = () => {
-  const { client, election, localize } = useElection()
+  const {
+    client,
+    election,
+    localize,
+    csp: { token },
+  } = useElection()
   const [weight, setWeight] = useState<number | null>(null)
   const styles = useMultiStyleConfig('VoteWeight')
 
@@ -19,23 +27,33 @@ export const VoteWeight = () => {
           !election ||
           !client.wallet ||
           !(election instanceof PublishedElection) ||
-          !election.census.censusId
+          !election.census.censusId ||
+          (election.census.type === CensusType.CSP && !token)
         ) {
           return
         }
 
-        const proof = await client.fetchProof(election.census.censusId, await client.wallet.getAddress())
+        if (election.census.type !== CensusType.CSP) {
+          const proof = await client.fetchProof(election.census.censusId, await client.wallet.getAddress())
+          // If is token voting reduce decimals
+          const decimals = (election.meta as any)?.token?.decimals || 0
 
-        // If is token voting reduce decimals
-        const decimals = (election.meta as any)?.token?.decimals || 0
-
-        setWeight(results(Number(proof.weight), decimals))
+          setWeight(results(Number(proof.weight), decimals))
+        } else {
+          const { weight } = await upfetch<{ weight: string }>(`${election.census.censusURI}/weight`, {
+            method: 'POST',
+            body: {
+              authToken: token,
+            },
+          })
+          setWeight(results(Number.parseInt(weight, 16)))
+        }
       } catch (e) {
         console.warn('Error fetching voter weight', e)
         setWeight(null)
       }
     })()
-  }, [client, election])
+  }, [client, election, token])
 
   if (!weight || !election || !(election instanceof PublishedElection)) return
 
