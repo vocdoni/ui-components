@@ -8,6 +8,7 @@ import {
   InvalidElection,
   PublishedElection,
   Vote,
+  VoteInfoResponse,
   VotesLeftCountOptions,
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -72,8 +73,8 @@ export const useElectionProvider = ({
 
     try {
       actions.loadCensus(address as string)
-      const isIn =
-        election.census.type === CensusType.CSP ? false : await client.isInCensus({ electionId: election.id })
+      const isCsp = election.census.type === CensusType.CSP
+      const isIn = isCsp ? !!state.csp.token : await client.isInCensus({ electionId: election.id })
       actions.inCensus(isIn)
 
       const censusType = election.census.type as CensusType
@@ -97,7 +98,7 @@ export const useElectionProvider = ({
       console.error('error in census fetch:', e)
       actions.censusError(e)
     }
-  }, [actions, client, election, password, signature])
+  }, [actions, client, election, password, signature, state.csp.token])
 
   const workerInstance = useMemo(() => createWebWorker(worker), [])
   const { result: circuits, startProcessing } = useWebWorker<ICircuit, ICircuitWorkerRequest>(workerInstance)
@@ -217,18 +218,45 @@ export const useElectionProvider = ({
   useEffect(() => {
     if (!state.csp.token || !election || !loaded.election || election instanceof InvalidElection) return
     ;(async () => {
-      const uri = new URL(election.census.censusURI)
-      const endpoint = `${uri.protocol}//${uri.host}`
-      const { nullifier } = await fetchSignInfo({
-        endpoint,
-        authToken: state.csp.token,
-        processId: election.id,
-      })
+      try {
+        actions.inCensus(true)
+        const uri = new URL(election.census.censusURI)
+        const endpoint = `${uri.protocol}//${uri.host}`
+        let nullifier: string | null = null
+        try {
+          const signInfo = await fetchSignInfo({
+            endpoint,
+            authToken: state.csp.token,
+            processId: election.id,
+          })
+          nullifier = signInfo.nullifier
+        } catch (error) {
+          const status = error?.status ?? error?.response?.status ?? error?.cause?.status
+          if (Number(status) === 401) {
+            const maxVoteOverwrites = election.voteType?.maxVoteOverwrites ?? 0
+            actions.votesLeft(maxVoteOverwrites + 1)
+            return
+          }
+          throw error
+        }
 
-      const hasVoted = await client.voteService.info(nullifier)
+        let voteInfo: VoteInfoResponse | null = null
+        try {
+          voteInfo = await client.voteService.info(nullifier)
+        } catch (e) {
+          voteInfo = null
+        }
 
-      actions.voted(hasVoted.voteID)
-      actions.votesLeft(0)
+        const voteId = voteInfo?.voteID ?? null
+        const overwriteCount = voteInfo?.overwriteCount ?? 0
+        const maxVoteOverwrites = election.voteType?.maxVoteOverwrites ?? 0
+        const votesLeft = voteId ? Math.max(0, maxVoteOverwrites - overwriteCount) : maxVoteOverwrites + 1
+
+        actions.votesLeft(votesLeft)
+        actions.voted(voteId)
+      } catch (e) {
+        console.error('error in csp sign info check:', e)
+      }
     })()
   }, [state.csp.token, election, loaded.election])
 

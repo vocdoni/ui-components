@@ -1,12 +1,29 @@
 import { Wallet } from '@ethersproject/wallet'
 import { render, renderHook, waitFor } from '@testing-library/react'
-import { EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
+import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
 import { act } from 'react'
 import { ClientProvider, useClient } from '../client'
+import { fetchSignInfo } from '../csp'
 import { onlyProps, properProps } from '../test-utils'
 import { ElectionProvider, useElection } from './ElectionProvider'
 
+jest.mock('../csp', () => ({
+  fetchSignInfo: jest.fn(() =>
+    Promise.resolve({
+      address: '0x0',
+      nullifier: '0xdeadbeef',
+      at: new Date().toISOString(),
+    })
+  ),
+  vote: jest.fn(),
+}))
+
 describe('<ElectionProvider />', () => {
+  beforeEach(() => {
+    localStorage.removeItem('csp_token')
+    jest.mocked(fetchSignInfo).mockClear()
+  })
+
   it('renders child elements', () => {
     const { getByText } = render(
       <ClientProvider>
@@ -451,5 +468,291 @@ describe('<ElectionProvider />', () => {
         expect(result.current.turnout).toBe(0)
       })
     })
+  })
+
+  it('marks CSP voters as in census when auth token is present', async () => {
+    localStorage.setItem('csp_token', 'token')
+
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+    client.voteService.info = jest.fn().mockResolvedValue({ voteID: null, overwriteCount: 0 })
+
+    const census = new WeightedCensus()
+    census.type = CensusType.CSP
+    census.censusURI = 'https://csp.example/api'
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'csp-election',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      )
+    }
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election, fetchCensus: true, client, signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.census).toBeTruthy()
+    })
+
+    expect(result.current.isInCensus).toBeTruthy()
+    expect(result.current.isAbleToVote).toBeTruthy()
+    expect(result.current.votesLeft).toBe(1)
+
+    localStorage.removeItem('csp_token')
+  })
+
+  it('treats 401 on CSP sign info as no prior vote', async () => {
+    localStorage.setItem('csp_token', 'token')
+    jest.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
+
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+
+    const census = new WeightedCensus()
+    census.type = CensusType.CSP
+    census.censusURI = 'https://csp.example/api'
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'csp-election-401',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      )
+    }
+
+    const useBothHooks = () => {
+      return {
+        election: useElection(),
+        client: useClient(),
+      }
+    }
+
+    const { result } = renderHook(() => useBothHooks(), {
+      wrapper,
+      initialProps: { election, client, signer, fetchCensus: true },
+    })
+
+    await waitFor(() => {
+      expect(result.current.client.loaded.fetch).toBeTruthy()
+    })
+
+    await waitFor(() => {
+      expect(result.current.election.votesLeft).toBe(1)
+    })
+
+    expect(result.current.election.voted).toBeNull()
+    expect(result.current.election.loaded.voted).toBeFalsy()
+    expect(result.current.election.votesLeft).toBe(1)
+    expect(result.current.election.isAbleToVote).toBeTruthy()
+
+    localStorage.removeItem('csp_token')
+  })
+
+  it('sets CSP votesLeft to 0 when vote exists and overwrites are disabled', async () => {
+    localStorage.setItem('csp_token', 'token')
+
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+    client.voteService.info = jest.fn().mockResolvedValue({ voteID: 'vote-id', overwriteCount: 0 })
+
+    const census = new WeightedCensus()
+    census.type = CensusType.CSP
+    census.censusURI = 'https://csp.example/api'
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'csp-election-voted',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      )
+    }
+
+    const useBothHooks = () => {
+      return {
+        election: useElection(),
+        client: useClient(),
+      }
+    }
+
+    const { result } = renderHook(() => useBothHooks(), {
+      wrapper,
+      initialProps: { election, client, signer, fetchCensus: true },
+    })
+
+    await waitFor(() => {
+      expect(result.current.client.loaded.fetch).toBeTruthy()
+    })
+
+    await waitFor(() => {
+      expect(result.current.election.loaded.voted).toBeTruthy()
+    })
+
+    expect(result.current.election.voted).toBe('vote-id')
+    expect(result.current.election.votesLeft).toBe(0)
+
+    localStorage.removeItem('csp_token')
+  })
+
+  it('does not allow CSP voting when not in census even with token', async () => {
+    localStorage.setItem('csp_token', 'token')
+
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+    client.voteService.info = jest.fn().mockResolvedValue({ voteID: null, overwriteCount: 0 })
+
+    const census = new WeightedCensus()
+    census.type = CensusType.CSP
+    census.censusURI = 'https://csp.example/api'
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'csp-election-2',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      )
+    }
+
+    const useBothHooks = () => {
+      return {
+        election: useElection(),
+        client: useClient(),
+      }
+    }
+
+    const { result } = renderHook(() => useBothHooks(), {
+      wrapper,
+      initialProps: { election, client, signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.client.loaded.fetch).toBeTruthy()
+    })
+
+    act(() => {
+      result.current.election.actions.inCensus(false)
+      result.current.election.actions.isAbleToVote()
+    })
+
+    await waitFor(() => {
+      expect(result.current.election.loaded.voted).toBeTruthy()
+    })
+
+    expect(result.current.election.isInCensus).toBeFalsy()
+    expect(result.current.election.isAbleToVote).toBeFalsy()
+
+    localStorage.removeItem('csp_token')
+  })
+
+  it('respects explicit isAbleToVote payload overrides', async () => {
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+
+    const census = new WeightedCensus()
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'weighted-election',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      )
+    }
+
+    const useBothHooks = () => {
+      return {
+        election: useElection(),
+        client: useClient(),
+      }
+    }
+
+    const { result } = renderHook(() => useBothHooks(), {
+      wrapper,
+      initialProps: { election, client, signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.client.loaded.fetch).toBeTruthy()
+    })
+
+    act(() => {
+      result.current.election.actions.inCensus(true)
+      result.current.election.actions.votesLeft(2)
+      result.current.election.actions.isAbleToVote(false)
+    })
+
+    expect(result.current.election.isAbleToVote).toBeFalsy()
   })
 })

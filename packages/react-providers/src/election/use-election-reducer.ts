@@ -199,12 +199,26 @@ export const electionStateEmpty = ({
   turnout: turnout(election),
 })
 
-const isAbleToVote = (state: ElectionReducerState, payload?: boolean) =>
-  payload ||
-  !(state.election instanceof PublishedElection) ||
-  (state.isInCensus && state.votesLeft > 0) ||
-  (!!state.csp.token && (!state.voted || (state.voted && state.election.voteType.maxVoteOverwrites > 0))) ||
-  (state.isInCensus && state.election?.electionType.anonymous && !state.voted)
+const isAbleToVote = (state: ElectionReducerState, payload?: boolean) => {
+  if (typeof payload === 'boolean') {
+    return payload
+  }
+
+  if (!(state.election instanceof PublishedElection)) {
+    // This returned always true for historical reasons. null makes more sense
+    // but the change might have side effects, so we'll see...
+    return null
+  }
+
+  const hasCspAccess = !!state.csp.token && state.isInCensus
+  const canOverwrite = (state.election.voteType?.maxVoteOverwrites ?? 0) > 0
+
+  return (
+    (state.isInCensus && state.votesLeft > 0) ||
+    (hasCspAccess && (!state.voted || (state.voted && canOverwrite))) ||
+    (state.isInCensus && state.election?.electionType.anonymous && !state.voted)
+  )
+}
 
 const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
   state: ElectionReducerState,
@@ -346,10 +360,12 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
     case ElectionVoted: {
       const voted = action.payload as ElectionVotedPayload
       // update state beforehand so `isAbleToVote` is properly calculated
+      const shouldDecrement = !!voted && state.loading.voting
+      const nextVotesLeft = shouldDecrement ? Math.max(0, state.votesLeft - 1) : state.votesLeft
       const rstate = {
         ...state,
         voted,
-        votesLeft: state.votesLeft - 1,
+        votesLeft: nextVotesLeft,
         vote: undefined,
         loaded: {
           ...state.loaded,
