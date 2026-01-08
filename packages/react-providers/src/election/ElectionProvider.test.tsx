@@ -755,4 +755,113 @@ describe('<ElectionProvider />', () => {
 
     expect(result.current.election.isAbleToVote).toBeFalsy()
   })
+
+  it('recalculates isAbleToVote on ElectionVoted with overwrites enabled', async () => {
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+
+    const census = new WeightedCensus()
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'weighted-election-overwrite',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 2, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      )
+    }
+
+    const useBothHooks = () => {
+      return {
+        election: useElection(),
+        client: useClient(),
+      }
+    }
+
+    const { result } = renderHook(() => useBothHooks(), {
+      wrapper,
+      initialProps: { election, client, signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.client.loaded.fetch).toBeTruthy()
+    })
+
+    act(() => {
+      result.current.election.actions.inCensus(true)
+      result.current.election.actions.votesLeft(2)
+      result.current.election.actions.voting()
+      result.current.election.actions.voted('vote-id')
+    })
+
+    expect(result.current.election.votesLeft).toBe(1)
+    expect(result.current.election.isAbleToVote).toBeTruthy()
+  })
+
+  it('does not decrement votesLeft when ElectionVoted is called outside a voting flow', async () => {
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+
+    const census = new WeightedCensus()
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'weighted-election-no-voting',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 2, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      )
+    }
+
+    const useBothHooks = () => {
+      return {
+        election: useElection(),
+        client: useClient(),
+      }
+    }
+
+    const { result } = renderHook(() => useBothHooks(), {
+      wrapper,
+      initialProps: { election, client, signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.client.loaded.fetch).toBeTruthy()
+    })
+
+    act(() => {
+      result.current.election.actions.inCensus(true)
+      result.current.election.actions.votesLeft(2)
+      result.current.election.actions.voted('vote-id')
+    })
+
+    expect(result.current.election.votesLeft).toBe(2)
+    expect(result.current.election.isAbleToVote).toBeTruthy()
+  })
 })

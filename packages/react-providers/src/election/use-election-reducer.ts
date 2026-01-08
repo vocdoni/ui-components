@@ -380,7 +380,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       }
       return {
         ...rstate,
-        isAbleToVote: isAbleToVote(rstate, false),
+        isAbleToVote: isAbleToVote(rstate),
       }
     }
 
