@@ -19,6 +19,14 @@ export const resultsAnatomy = [
   'choiceTitle',
   // choice number of votes
   'choiceVotes',
+  // choice body
+  'choiceBody',
+  // choice description
+  'choiceDescription',
+  // choice image wrapper
+  'choiceImageWrapper',
+  // choice image
+  'choiceImage',
 ] as const
 
 const { defineMultiStyleConfig, definePartsStyle } = createMultiStyleConfigHelpers(resultsAnatomy)
@@ -38,6 +46,30 @@ const baseStyle = definePartsStyle({
     color: 'red.200',
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  choiceBody: {
+    position: 'relative',
+    px: 3,
+    py: 2,
+    align: 'center',
+    justify: 'space-between',
+  },
+  choiceDescription: {
+    color: 'black',
+    pl: 2,
+  },
+  choiceImageWrapper: {
+    ml: 4,
+    flexShrink: 0,
+    w: ['90px', '130px'],
+    h: ['60px', '80px'],
+    borderRadius: 'md',
+    overflow: 'hidden',
+  },
+  choiceImage: {
+    w: '100%',
+    h: '100%',
+    objectFit: 'cover',
   },
 })
 

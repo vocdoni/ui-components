@@ -1,4 +1,4 @@
-import { Box, chakra, ChakraProps, Flex, Progress, Text, useMultiStyleConfig } from '@chakra-ui/react'
+import { Box, chakra, ChakraProps, Flex, Image, Progress, Text, useMultiStyleConfig } from '@chakra-ui/react'
 import { useClient, useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
   ElectionResultsTypeNames,
@@ -9,6 +9,7 @@ import {
   PublishedElection,
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
+import { Markdown } from '../layout'
 
 const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(1) + '%'
 export const results = (result: number, decimals?: number) =>
@@ -53,25 +54,46 @@ export const ElectionResults = (props: ElectionResultsProps) => {
               <Text sx={styles.title}>{localize('results.title', { title: q.title.default })}</Text>
             </chakra.div>
             <chakra.div sx={styles.body}>
-              {choices.map((c: any, i: number) => (
-                <Box key={i}>
-                  {totals && (
-                    <>
-                      <Text sx={styles.choiceTitle}>{c.title.default}</Text>
-                      <Text sx={styles.choiceVotes}>
-                        {localize('results.votes', {
-                          votes: results(c.results, decimals) || 0,
-                          percent: percent(results(c.results, decimals), totals[idx]),
-                        })}
-                      </Text>
-                      <Progress
-                        sx={styles.progress}
-                        value={((Number(c.results) / totals[idx]) * 100) / 10 ** decimals || 0}
-                      />
-                    </>
-                  )}
-                </Box>
-              ))}
+              {choices.map((c: any, i: number) => {
+                if (!totals) return null
+
+                const meta = c.meta ?? {}
+                const description = meta.description as string | undefined
+                const imageSrc = meta.image?.default as string | undefined
+                const hasDescription = !!description
+                const hasImage = !!imageSrc
+
+                return (
+                  <Box key={i}>
+                    <Progress
+                      value={((Number(c.results) / totals[idx]) * 100) / 10 ** decimals || 0}
+                      sx={styles.progress}
+                    />
+
+                    <Flex sx={styles.choiceBody}>
+                      <Box flex='1'>
+                        <Flex justify='space-between' mb={hasDescription ? 1 : 0}>
+                          <Text sx={styles.choiceTitle}>{c.title.default}</Text>
+                          <Text sx={styles.choiceVotes}>
+                            {localize('results.votes', {
+                              votes: results(c.results, decimals) || 0,
+                              percent: percent(results(c.results, decimals), totals[idx]),
+                            })}
+                          </Text>
+                        </Flex>
+
+                        {hasDescription && <Markdown sx={styles.choiceDescription}>{description}</Markdown>}
+                      </Box>
+
+                      {hasImage && (
+                        <Box sx={styles.choiceImageWrapper}>
+                          <Image src={imageSrc} alt={c.title.default} sx={styles.choiceImage} loading='lazy' />
+                        </Box>
+                      )}
+                    </Flex>
+                  </Box>
+                )
+              })}
             </chakra.div>
           </chakra.div>
         )
