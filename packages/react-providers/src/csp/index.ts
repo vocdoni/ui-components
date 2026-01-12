@@ -22,7 +22,8 @@ export const vote = async (client: VocdoniSDKClient, election: PublishedElection
   })
   const cspVote: CspVote = client.cspVote(vote, signature, CspProofType.ECDSA_PIDSALTED)
   if (typeof weight !== 'undefined') {
-    cspVote.weight = isNaN(Number(weight)) ? BigInt(1) : BigInt(weight)
+    const parsedWeight = Number.parseInt(weight, 16)
+    cspVote.weight = Number.isNaN(parsedWeight) ? BigInt(1) : BigInt(parsedWeight)
   }
   const vid: string = await client.submitVote(cspVote)
 
