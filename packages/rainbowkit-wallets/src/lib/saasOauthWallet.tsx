@@ -29,7 +29,7 @@ export class saasOAuthWallet extends localStorageWallet {
     this.oAuthServiceProvider = oAuthServiceProvider
   }
 
-  async create(provider: any): Promise<saasOauthParameters> {
+  async create(provider: any, options?: { persist?: boolean }): Promise<saasOauthParameters> {
     // Open the login popup
     const url = this.oAuthServiceUrl + (this.oAuthServiceProvider ? `?provider=${this.oAuthServiceProvider}` : '')
     this.openLoginPopup(url)
@@ -56,7 +56,7 @@ export class saasOAuthWallet extends localStorageWallet {
       throw new Error('User cancelled')
     }
 
-    const wallet = await localStorageWallet.createWalletFromData(JSON.stringify(this.seed), provider)
+    const wallet = await localStorageWallet.createWalletFromData(JSON.stringify(this.seed), provider, options)
 
     return {
       userSeed: this.seed,

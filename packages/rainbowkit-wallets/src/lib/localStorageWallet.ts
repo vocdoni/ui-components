@@ -63,11 +63,17 @@ export default class localStorageWallet {
     return this.createWallet(pk as `0x${string}`, provider)
   }
 
-  public static async createWalletFromData(data: string | string[], provider: any): Promise<WalletClient> {
+  public static async createWalletFromData(
+    data: string | string[],
+    provider: any,
+    options?: { persist?: boolean }
+  ): Promise<WalletClient> {
     const inputs = Array.isArray(data) ? data : [data]
     const hash = inputs.reduce((acc, curr) => acc + curr, '')
     const pk = keccak256(Buffer.from(hash))
-    localStorage.setItem(this.storageItemName, JSON.stringify({ type: 'plain', pk }))
+    if (options?.persist !== false) {
+      localStorage.setItem(this.storageItemName, JSON.stringify({ type: 'plain', pk }))
+    }
     return this.createWallet(pk, provider)
   }
 

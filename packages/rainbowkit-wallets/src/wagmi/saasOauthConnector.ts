@@ -10,6 +10,8 @@ export type saasOauthConnectorOptions = {
   saasBackendUrl: string
   id?: string
   name?: string
+  mode?: 'login' | 'link'
+  getAuthToken?: () => string | null
 }
 
 type ApiErrorResponse = {
@@ -59,11 +61,18 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateCo
           lastname = nameData[1]
         }
 
-        const response = await fetch(options.saasBackendUrl + '/oauth/login', {
+        const mode = options.mode || 'login'
+        const authToken = options.getAuthToken?.() || localStorage.getItem(STORAGE_TOKEN_NAME)
+        const endpoint = mode === 'link' ? '/auth/oauth/link' : '/oauth/login'
+        const headers = authToken
+          ? { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` }
+          : {
+              'Content-Type': 'application/json',
+            }
+
+        const response = await fetch(options.saasBackendUrl + endpoint, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify({
             email: params.userEmail,
             firstName: firstname,
@@ -78,7 +87,8 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateCo
         // Try to parse backend error body
         let data: ApiErrorResponse | OAuthLoginResponse | null = null
         try {
-          data = await response.json()
+          const raw = await response.text()
+          data = raw ? (JSON.parse(raw) as ApiErrorResponse | OAuthLoginResponse) : null
         } catch (e) {
           throw new Error('Failed to parse response from backend')
         }
@@ -94,10 +104,15 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateCo
           }
         }
 
-        const { token, expirity: expiry } = data as OAuthLoginResponse
+        if (mode === 'login') {
+          if (!data) {
+            throw new Error('Failed to parse response from backend')
+          }
+          const { token, expirity: expiry } = data as OAuthLoginResponse
 
-        localStorage.setItem(STORAGE_TOKEN_NAME, token)
-        localStorage.setItem(STORAGE_EXPIRY_NAME, expiry)
+          localStorage.setItem(STORAGE_TOKEN_NAME, token)
+          localStorage.setItem(STORAGE_EXPIRY_NAME, expiry)
+        }
 
         wallet = params.wallet
       }
