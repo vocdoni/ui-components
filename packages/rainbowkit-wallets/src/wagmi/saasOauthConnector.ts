@@ -2,6 +2,8 @@ import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
 import type { CreateConnectorFn } from 'wagmi'
 import { saasOAuthWallet } from '../lib/saasOauthWallet'
+import { clearAuthStorageKeys } from '../storageCleanup'
+import { AuthStorageKeys } from '../storageKeys'
 import { localStorageConnector } from './localStorageConnector'
 
 export type saasOauthConnectorOptions = {
@@ -25,8 +27,9 @@ type OAuthLoginResponse = {
   registered: boolean
 }
 
-const STORAGE_TOKEN_NAME = 'authToken'
-const STORAGE_EXPIRY_NAME = 'authExpiry'
+const STORAGE_TOKEN_NAME = AuthStorageKeys.Token
+const STORAGE_EXPIRY_NAME = AuthStorageKeys.Expiry
+const STORAGE_REGISTERED_NAME = AuthStorageKeys.Registered
 
 /**
  * Creates a SaaS OAuth connector that integrates with a backend service
@@ -62,6 +65,9 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateCo
         }
 
         const mode = options.mode || 'login'
+        if (mode === 'login') {
+          clearAuthStorageKeys()
+        }
         const authToken = options.getAuthToken?.() || localStorage.getItem(STORAGE_TOKEN_NAME)
         const endpoint = mode === 'link' ? '/auth/oauth/link' : '/oauth/login'
         const headers = authToken
@@ -108,10 +114,13 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateCo
           if (!data) {
             throw new Error('Failed to parse response from backend')
           }
-          const { token, expirity: expiry } = data as OAuthLoginResponse
+          const { token, expirity: expiry, registered } = data as OAuthLoginResponse
 
           localStorage.setItem(STORAGE_TOKEN_NAME, token)
           localStorage.setItem(STORAGE_EXPIRY_NAME, expiry)
+          if (typeof registered !== 'undefined') {
+            localStorage.setItem(STORAGE_REGISTERED_NAME, String(registered))
+          }
         }
 
         wallet = params.wallet

@@ -1,6 +1,6 @@
-import { saasOAuthConnector } from './saasOauthConnector'
-import { localStorageConnector } from './localStorageConnector'
 import { saasOAuthWallet } from '../lib/saasOauthWallet'
+import { localStorageConnector } from './localStorageConnector'
+import { saasOAuthConnector } from './saasOauthConnector'
 
 jest.mock('./localStorageConnector', () => ({
   localStorageConnector: jest.fn(),
@@ -84,6 +84,7 @@ describe('saasOAuthConnector', () => {
     })
     expect(localStorage.getItem('authToken')).toBe('token-123')
     expect(localStorage.getItem('authExpiry')).toBe('exp-123')
+    expect(localStorage.getItem('authRegistered')).toBe('true')
   })
 
   it('does not store auth token when linking an account', async () => {
@@ -110,5 +111,29 @@ describe('saasOAuthConnector', () => {
     expect(request.headers.Authorization).toBe('Bearer session-token')
     expect(localStorage.getItem('authToken')).toBeNull()
     expect(localStorage.getItem('authExpiry')).toBeNull()
+  })
+
+  it('clears auth storage keys before starting a login', async () => {
+    setupWalletMocks()
+    localStorage.setItem('authToken', 'old-token')
+    localStorage.setItem('authExpiry', 'old-expiry')
+    localStorage.setItem('authRegistered', 'true')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      text: async () => JSON.stringify({ code: 500, message: 'nope' }),
+    })
+
+    saasOAuthConnector({
+      oAuthServiceUrl: 'https://oauth.example.com',
+      saasBackendUrl: 'https://saas.example.com',
+      id: 'google',
+      name: 'Google',
+    })
+
+    await expect(capturedParams?.createWallet?.()).rejects.toThrow('nope')
+
+    expect(localStorage.getItem('authToken')).toBeNull()
+    expect(localStorage.getItem('authExpiry')).toBeNull()
+    expect(localStorage.getItem('authRegistered')).toBeNull()
   })
 })
