@@ -3,6 +3,9 @@ import { TextDecoder, TextEncoder } from 'node:util'
 import React from 'react'
 import { server } from './mocks/server'
 
+let consoleErrorSpy: jest.SpyInstance
+let consoleWarnSpy: jest.SpyInstance
+
 // polyfill text encoder/decoder
 Object.defineProperties(globalThis, {
   TextDecoder: { value: TextDecoder },
@@ -17,9 +20,18 @@ beforeAll(() =>
 )
 // Reset any request handlers that we may add during the tests,
 // so they don't affect other tests.
-afterEach(() => server.resetHandlers())
+afterEach(() => {
+  consoleErrorSpy?.mockRestore()
+  consoleWarnSpy?.mockRestore()
+  server.resetHandlers()
+})
 // Clean up after the tests are finished.
 afterAll(() => server.close())
+
+beforeEach(() => {
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+  consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+})
 
 class Worker {
   private url
