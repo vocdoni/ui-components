@@ -61,6 +61,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
                 const meta = c.meta ?? {}
                 const description = (dotobject(meta, 'description') as string | null) ?? undefined
                 const imageSrc = (dotobject(meta, 'image.default') as string | null) ?? undefined
+                const imageAlt = localize('results.image_alt', { title: c.title.default })
                 const hasDescription = !!description
                 const hasImage = !!imageSrc
 
@@ -88,7 +89,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
 
                       {hasImage && (
                         <Box sx={styles.choiceImageWrapper}>
-                          <Image src={imageSrc} alt={c.title.default} sx={styles.choiceImage} loading='lazy' />
+                          <Image src={imageSrc} alt={imageAlt} sx={styles.choiceImage} loading='lazy' />
                         </Box>
                       )}
                     </Flex>
