@@ -18,9 +18,11 @@ export const results = (result: number, decimals?: number) =>
 
 export type ElectionResultsProps = ChakraProps & {
   forceRender?: boolean
+  extended?: boolean
 }
 
 export const ElectionResults = (props: ElectionResultsProps) => {
+  const { extended = false, forceRender, ...rest } = props
   const styles = useMultiStyleConfig('ElectionResults')
   const { election } = useElection()
   const { localize } = useClient()
@@ -28,9 +30,9 @@ export const ElectionResults = (props: ElectionResultsProps) => {
 
   if (!election || !(election instanceof PublishedElection) || election?.status === ElectionStatus.CANCELED) return null
 
-  if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS && !props.forceRender) {
+  if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS && !forceRender) {
     return (
-      <Text sx={styles.secret} {...props}>
+      <Text sx={styles.secret} {...rest}>
         {localize('results.secret_until_the_end', {
           endDate: format(election.endDate, localize('results.date_format'), { locale }),
         })}
@@ -46,7 +48,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
     .map((votes: number) => results(votes, decimals))
 
   return (
-    <Flex sx={styles.wrapper} {...props}>
+    <Flex sx={styles.wrapper} {...rest}>
       {election?.questions.map((q: IQuestion, idx: number) => {
         const choices = electionChoices(election, q, localize('vote.abstain'))
         return (
@@ -61,9 +63,9 @@ export const ElectionResults = (props: ElectionResultsProps) => {
                 const meta = c.meta ?? {}
                 const description = (dotobject(meta, 'description') as string | null) ?? undefined
                 const imageSrc = (dotobject(meta, 'image.default') as string | null) ?? undefined
-                const imageAlt = localize('results.image_alt', { title: c.title.default })
-                const hasDescription = !!description
-                const hasImage = !!imageSrc
+                const hasDescription = extended && !!description
+                const hasImage = extended && !!imageSrc
+                const imageAlt = hasImage ? localize('results.image_alt', { title: c.title.default }) : ''
 
                 return (
                   <Box key={i}>
