@@ -1,6 +1,7 @@
 import { Box, chakra, ChakraProps, Flex, Image, Progress, Text, useMultiStyleConfig } from '@chakra-ui/react'
 import { useClient, useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
+  dotobject,
   ElectionResultsTypeNames,
   ElectionStatus,
   formatUnits,
@@ -58,8 +59,8 @@ export const ElectionResults = (props: ElectionResultsProps) => {
                 if (!totals) return null
 
                 const meta = c.meta ?? {}
-                const description = meta.description as string | undefined
-                const imageSrc = meta.image?.default as string | undefined
+                const description = (dotobject(meta, 'description') as string | null) ?? undefined
+                const imageSrc = (dotobject(meta, 'image.default') as string | null) ?? undefined
                 const hasDescription = !!description
                 const hasImage = !!imageSrc
 
