@@ -66,6 +66,7 @@ export const locales = {
   // results component
   results: {
     date_format: 'd-L-y HH:mm',
+    image_alt: 'Image for {{ title }}',
     secret_until_the_end: 'Secret until the end. The results will be available when the process ends at {{ endDate }}',
     title: 'Results for "{{ title }}"',
     votes: 'Votes: {{ votes }} ({{ percent }})',

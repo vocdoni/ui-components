@@ -1,6 +1,7 @@
-import { Box, chakra, ChakraProps, Flex, Progress, Text, useMultiStyleConfig } from '@chakra-ui/react'
+import { Box, chakra, ChakraProps, Flex, Image, Progress, Text, useMultiStyleConfig } from '@chakra-ui/react'
 import { useClient, useDatesLocale, useElection } from '@vocdoni/react-providers'
 import {
+  dotobject,
   ElectionResultsTypeNames,
   ElectionStatus,
   formatUnits,
@@ -9,6 +10,7 @@ import {
   PublishedElection,
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
+import { Markdown } from '../layout'
 
 const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(1) + '%'
 export const results = (result: number, decimals?: number) =>
@@ -16,9 +18,11 @@ export const results = (result: number, decimals?: number) =>
 
 export type ElectionResultsProps = ChakraProps & {
   forceRender?: boolean
+  extended?: boolean
 }
 
 export const ElectionResults = (props: ElectionResultsProps) => {
+  const { extended = false, forceRender, ...rest } = props
   const styles = useMultiStyleConfig('ElectionResults')
   const { election } = useElection()
   const { localize } = useClient()
@@ -26,9 +30,9 @@ export const ElectionResults = (props: ElectionResultsProps) => {
 
   if (!election || !(election instanceof PublishedElection) || election?.status === ElectionStatus.CANCELED) return null
 
-  if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS && !props.forceRender) {
+  if (election?.electionType.secretUntilTheEnd && election.status !== ElectionStatus.RESULTS && !forceRender) {
     return (
-      <Text sx={styles.secret} {...props}>
+      <Text sx={styles.secret} {...rest}>
         {localize('results.secret_until_the_end', {
           endDate: format(election.endDate, localize('results.date_format'), { locale }),
         })}
@@ -44,7 +48,7 @@ export const ElectionResults = (props: ElectionResultsProps) => {
     .map((votes: number) => results(votes, decimals))
 
   return (
-    <Flex sx={styles.wrapper} {...props}>
+    <Flex sx={styles.wrapper} {...rest}>
       {election?.questions.map((q: IQuestion, idx: number) => {
         const choices = electionChoices(election, q, localize('vote.abstain'))
         return (
@@ -53,25 +57,47 @@ export const ElectionResults = (props: ElectionResultsProps) => {
               <Text sx={styles.title}>{localize('results.title', { title: q.title.default })}</Text>
             </chakra.div>
             <chakra.div sx={styles.body}>
-              {choices.map((c: any, i: number) => (
-                <Box key={i}>
-                  {totals && (
-                    <>
-                      <Text sx={styles.choiceTitle}>{c.title.default}</Text>
-                      <Text sx={styles.choiceVotes}>
-                        {localize('results.votes', {
-                          votes: results(c.results, decimals) || 0,
-                          percent: percent(results(c.results, decimals), totals[idx]),
-                        })}
-                      </Text>
-                      <Progress
-                        sx={styles.progress}
-                        value={((Number(c.results) / totals[idx]) * 100) / 10 ** decimals || 0}
-                      />
-                    </>
-                  )}
-                </Box>
-              ))}
+              {choices.map((c: any, i: number) => {
+                if (!totals) return null
+
+                const meta = c.meta ?? {}
+                const description = dotobject(meta, 'description') as string | null
+                const imageSrc = dotobject(meta, 'image.default') as string | null
+                const hasDescription = extended && !!description
+                const hasImage = extended && !!imageSrc
+                const imageAlt = localize('results.image_alt', { title: c.title.default })
+
+                return (
+                  <Box key={i}>
+                    <Progress
+                      value={((Number(c.results) / totals[idx]) * 100) / 10 ** decimals || 0}
+                      sx={styles.progress}
+                    />
+
+                    <Flex sx={styles.choiceBody}>
+                      <Box flex='1'>
+                        <Flex justify='space-between' mb={hasDescription ? 1 : 0}>
+                          <Text sx={styles.choiceTitle}>{c.title.default}</Text>
+                          <Text sx={styles.choiceVotes}>
+                            {localize('results.votes', {
+                              votes: results(c.results, decimals) || 0,
+                              percent: percent(results(c.results, decimals), totals[idx]),
+                            })}
+                          </Text>
+                        </Flex>
+
+                        {hasDescription && <Markdown sx={styles.choiceDescription}>{description}</Markdown>}
+                      </Box>
+
+                      {hasImage && (
+                        <Box sx={styles.choiceImageWrapper}>
+                          <Image src={imageSrc} alt={imageAlt} sx={styles.choiceImage} loading='lazy' />
+                        </Box>
+                      )}
+                    </Flex>
+                  </Box>
+                )
+              })}
             </chakra.div>
           </chakra.div>
         )
