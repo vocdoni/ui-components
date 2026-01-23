@@ -61,11 +61,11 @@ export const ElectionResults = (props: ElectionResultsProps) => {
                 if (!totals) return null
 
                 const meta = c.meta ?? {}
-                const description = (dotobject(meta, 'description') as string | null) ?? undefined
-                const imageSrc = (dotobject(meta, 'image.default') as string | null) ?? undefined
+                const description = dotobject(meta, 'description') as string | null
+                const imageSrc = dotobject(meta, 'image.default') as string | null
                 const hasDescription = extended && !!description
                 const hasImage = extended && !!imageSrc
-                const imageAlt = hasImage ? localize('results.image_alt', { title: c.title.default }) : ''
+                const imageAlt = localize('results.image_alt', { title: c.title.default })
 
                 return (
                   <Box key={i}>
