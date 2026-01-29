@@ -46,7 +46,7 @@ export const linkSaasOAuth = async ({
     lastname = nameData[1]
   }
 
-  const response = await fetch(`${saasBackendUrl}/auth/oauth/link`, {
+  const response = await fetch(`${saasBackendUrl}/auth/oauth`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

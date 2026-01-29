@@ -69,7 +69,7 @@ export function saasOAuthConnector(options: saasOauthConnectorOptions): CreateCo
           clearAuthStorageKeys()
         }
         const authToken = options.getAuthToken?.() || localStorage.getItem(STORAGE_TOKEN_NAME)
-        const endpoint = mode === 'link' ? '/auth/oauth/link' : '/oauth/login'
+        const endpoint = mode === 'link' ? '/auth/oauth' : '/oauth/login'
         const headers = authToken
           ? { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` }
           : {

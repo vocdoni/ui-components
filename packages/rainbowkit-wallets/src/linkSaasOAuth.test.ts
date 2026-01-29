@@ -48,7 +48,7 @@ describe('linkSaasOAuth', () => {
     })
 
     expect(createMock).toHaveBeenCalledWith(expect.anything(), { persist: false })
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('https://saas.example.com/auth/oauth/link')
+    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('https://saas.example.com/auth/oauth')
     const [, request] = (global.fetch as jest.Mock).mock.calls[0]
     expect(request.headers.Authorization).toBe('Bearer session-token')
     expect(localStorage.getItem('authToken')).toBeNull()

@@ -106,7 +106,7 @@ describe('saasOAuthConnector', () => {
     await capturedParams?.createWallet?.()
 
     const [, request] = (global.fetch as jest.Mock).mock.calls[0]
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('https://saas.example.com/auth/oauth/link')
+    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('https://saas.example.com/auth/oauth')
     expect(request.method).toBe('POST')
     expect(request.headers.Authorization).toBe('Bearer session-token')
     expect(localStorage.getItem('authToken')).toBeNull()
