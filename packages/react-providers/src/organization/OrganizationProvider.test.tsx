@@ -2,7 +2,7 @@ import { Wallet } from '@ethersproject/wallet'
 import { act, render, renderHook, waitFor } from '@testing-library/react'
 import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { ClientProvider, useClient } from '../client'
-import { createQueryWrapper, properProps } from '../test-utils'
+import { properProps, TestProvider } from '../test-utils'
 import { OrganizationProvider, useOrganization } from './OrganizationProvider'
 
 describe('<OrganizationProvider />', () => {
@@ -20,29 +20,27 @@ describe('<OrganizationProvider />', () => {
   }
 
   it('renders child elements', () => {
-    const QueryWrapper = createQueryWrapper()
     const { getByText } = render(
-      <QueryWrapper>
+      <TestProvider>
         <ClientProvider>
           <OrganizationProvider>
             <p>is rendered</p>
           </OrganizationProvider>
         </ClientProvider>
-      </QueryWrapper>
+      </TestProvider>
     )
 
     expect(getByText('is rendered')).toBeInTheDocument()
   })
 
   it('properly sets and updates organization metadata', () => {
-    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider>
             <OrganizationProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -84,14 +82,13 @@ describe('<OrganizationProvider />', () => {
   })
 
   it('fetches an account given an ID to the provider', async () => {
-    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider>
             <OrganizationProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -109,13 +106,12 @@ describe('<OrganizationProvider />', () => {
   })
 
   it('fetches organization via react-query', async () => {
-    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => (
-      <QueryWrapper>
+      <TestProvider>
         <ClientProvider signer={props.signer}>
           <OrganizationProvider {...properProps(props)} />
         </ClientProvider>
-      </QueryWrapper>
+      </TestProvider>
     )
 
     const { result } = renderHook(() => useOrganization(), {
@@ -128,18 +124,17 @@ describe('<OrganizationProvider />', () => {
   })
 
   it('honors react-query refetch interval for organizations', async () => {
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({ env: EnvOptions.STG })
     client.fetchAccount = jest.fn().mockResolvedValue(baseOrganization) as any
 
     const wrapper = (props: any) => {
       const providerProps = properProps(props)
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider client={providerProps.client}>
             <OrganizationProvider {...providerProps} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -168,14 +163,22 @@ describe('<OrganizationProvider />', () => {
       ...baseOrganization,
       address: signer.address,
     }
-    const QueryWrapper = createQueryWrapper()
-    const wrapper = (props: any) => (
-      <QueryWrapper>
-        <ClientProvider signer={props.signer}>
-          <OrganizationProvider {...properProps(props)} />
-        </ClientProvider>
-      </QueryWrapper>
-    )
+    const client = new VocdoniSDKClient({ env: EnvOptions.STG })
+    client.fetchAccount = jest.fn().mockResolvedValue(orgWithSigner) as any
+    client.updateAccountInfo = jest.fn().mockResolvedValue({
+      ...orgWithSigner,
+      balance: 42,
+    }) as any
+    const wrapper = (props: any) => {
+      const providerProps = properProps(props)
+      return (
+        <TestProvider>
+          <ClientProvider signer={providerProps.signer} client={providerProps.client}>
+            <OrganizationProvider {...providerProps} />
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
 
     const useBothHooks = () => ({
       organization: useOrganization(),
@@ -184,17 +187,7 @@ describe('<OrganizationProvider />', () => {
 
     const { result } = renderHook(() => useBothHooks(), {
       wrapper,
-      initialProps: { organization: orgWithSigner, signer },
-    })
-
-    act(() => {
-      result.current.client.setSigner(signer)
-    })
-
-    result.current.client.client.fetchAccount = jest.fn().mockResolvedValue(orgWithSigner)
-    result.current.client.client.updateAccountInfo = jest.fn().mockResolvedValue({
-      ...orgWithSigner,
-      balance: 42,
+      initialProps: { organization: orgWithSigner, signer, client },
     })
 
     await act(async () => {
@@ -202,8 +195,10 @@ describe('<OrganizationProvider />', () => {
       await result.current.organization.update({ balance: 42 } as any)
     })
 
-    expect(result.current.organization.organization?.balance).toBe(42)
-    expect(result.current.organization.organization?.address).toBe(orgWithSigner.address)
+    await waitFor(() => {
+      expect(result.current.organization.organization?.balance).toBe(42)
+      expect(result.current.organization.organization?.address).toBe(orgWithSigner.address)
+    })
   })
 
   it('surfaces update errors', async () => {
@@ -212,13 +207,12 @@ describe('<OrganizationProvider />', () => {
       ...baseOrganization,
       address: signer.address,
     }
-    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => (
-      <QueryWrapper>
+      <TestProvider>
         <ClientProvider>
           <OrganizationProvider {...properProps(props)} />
         </ClientProvider>
-      </QueryWrapper>
+      </TestProvider>
     )
 
     const useBothHooks = () => ({

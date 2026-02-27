@@ -1,8 +1,5 @@
 import { VocdoniSDKClient } from '@vocdoni/sdk'
 import { PropsWithChildren, createContext, useContext } from 'react'
-import merge from 'ts-deepmerge'
-import { locales } from '../i18n/locales'
-import { LocaleProvider, LocaleProviderProps } from '../i18n/localize'
 import { ClientProviderProps, useClientProvider } from './use-client-provider'
 
 export type ClientState = ReturnType<typeof useClientProvider>
@@ -24,7 +21,7 @@ export const useClient = <T extends VocdoniSDKClient>() => {
 }
 
 type InternalClientProviderComponentProps = PropsWithChildren<ClientProviderProps>
-export type ClientProviderComponentProps = InternalClientProviderComponentProps & LocaleProviderProps
+export type ClientProviderComponentProps = InternalClientProviderComponentProps
 
 /**
  * Required internal client provider so we can use useLocalize in useClientProvider.
@@ -35,15 +32,6 @@ const InternalClientProvider = ({ env, client, signer, ...rest }: InternalClient
   return <ClientContext.Provider value={value} {...rest} />
 }
 
-export const ClientProvider = ({ locale, datesLocale, ...rest }: ClientProviderComponentProps) => {
-  const loc = {
-    locale: merge(locales, locale || {}),
-    datesLocale,
-  }
-
-  return (
-    <LocaleProvider {...loc}>
-      <InternalClientProvider {...rest} />
-    </LocaleProvider>
-  )
+export const ClientProvider = (props: ClientProviderComponentProps) => {
+  return <InternalClientProvider {...props} />
 }

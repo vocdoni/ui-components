@@ -4,7 +4,7 @@ import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCe
 import { act } from 'react'
 import { ClientProvider, useClient } from '../client'
 import { fetchSignInfo } from '../csp'
-import { createQueryWrapper, onlyProps, properProps } from '../test-utils'
+import { TestProvider, onlyProps, properProps } from '../test-utils'
 import { ElectionProvider, useElection } from './ElectionProvider'
 
 jest.mock('../csp', () => ({
@@ -25,29 +25,27 @@ describe('<ElectionProvider />', () => {
   })
 
   it('renders child elements', () => {
-    const QueryWrapper = createQueryWrapper()
     const { getByText } = render(
-      <QueryWrapper>
+      <TestProvider>
         <ClientProvider>
           <ElectionProvider>
             <p>is rendered</p>
           </ElectionProvider>
         </ClientProvider>
-      </QueryWrapper>
+      </TestProvider>
     )
 
     expect(getByText('is rendered')).toBeInTheDocument()
   })
 
   it('fetches an election given an ID to the provider', async () => {
-    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -64,13 +62,12 @@ describe('<ElectionProvider />', () => {
   })
 
   it('loads election via react-query and computes participation', async () => {
-    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => (
-      <QueryWrapper>
+      <TestProvider>
         <ClientProvider>
           <ElectionProvider {...properProps(props)} />
         </ClientProvider>
-      </QueryWrapper>
+      </TestProvider>
     )
 
     const { result } = renderHook(() => useElection(), {
@@ -84,7 +81,6 @@ describe('<ElectionProvider />', () => {
 
   it('honors react-query refetch interval for elections', async () => {
     jest.useFakeTimers()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({ env: EnvOptions.STG })
     const fetchElection = jest.fn()
     client.fetchElection = fetchElection as any
@@ -101,11 +97,11 @@ describe('<ElectionProvider />', () => {
     fetchElection.mockResolvedValue(election)
 
     const wrapper = (props: any) => (
-      <QueryWrapper>
+      <TestProvider>
         <ClientProvider {...onlyProps(props)}>
           <ElectionProvider {...properProps(props)} />
         </ClientProvider>
-      </QueryWrapper>
+      </TestProvider>
     )
 
     const { result } = renderHook(() => useElection(), {
@@ -131,7 +127,6 @@ describe('<ElectionProvider />', () => {
 
   it('ignores legacy autoUpdate settings when no queryOptions are provided', async () => {
     jest.useFakeTimers()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({ env: EnvOptions.STG })
     const fetchElection = jest.fn()
     client.fetchElection = fetchElection as any
@@ -148,11 +143,11 @@ describe('<ElectionProvider />', () => {
     fetchElection.mockResolvedValue(election)
 
     const wrapper = (props: any) => (
-      <QueryWrapper>
+      <TestProvider>
         <ClientProvider {...onlyProps(props)}>
           <ElectionProvider {...properProps(props)} />
         </ClientProvider>
-      </QueryWrapper>
+      </TestProvider>
     )
 
     const { result } = renderHook(() => useElection(), {
@@ -160,7 +155,7 @@ describe('<ElectionProvider />', () => {
       initialProps: {
         id: election.id,
         client,
-        ...( {
+        ...({
           autoUpdate: true,
           autoUpdateInterval: 1000,
         } as any),
@@ -185,14 +180,13 @@ describe('<ElectionProvider />', () => {
 
   it('sets proper client from ClientProvider by default', async () => {
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider>{props.children}</ElectionProvider>
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -207,14 +201,13 @@ describe('<ElectionProvider />', () => {
 
   it('can set and change signer at election level', () => {
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
     })
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider
               children={props.children}
@@ -229,7 +222,7 @@ describe('<ElectionProvider />', () => {
               })}
             />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -264,14 +257,13 @@ describe('<ElectionProvider />', () => {
 
   it('does not update client at election level for spreadsheet type census', async () => {
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
     })
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider
               children={props.children}
@@ -286,7 +278,7 @@ describe('<ElectionProvider />', () => {
               })}
             />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -324,14 +316,13 @@ describe('<ElectionProvider />', () => {
   })
 
   it('properly sets and updates election metadata', () => {
-    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -366,18 +357,17 @@ describe('<ElectionProvider />', () => {
 
   it('clears session data on logout', async () => {
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
     })
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider signer={signer}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
     // @ts-ignore
@@ -459,14 +449,13 @@ describe('<ElectionProvider />', () => {
 
   describe('participation and turnout calculations', () => {
     it('calculates participation correctly', () => {
-      const QueryWrapper = createQueryWrapper()
       const wrapper = (props: any) => {
         return (
-          <QueryWrapper>
+          <TestProvider>
             <ClientProvider>
               <ElectionProvider {...properProps(props)} />
             </ClientProvider>
-          </QueryWrapper>
+          </TestProvider>
         )
       }
 
@@ -525,14 +514,13 @@ describe('<ElectionProvider />', () => {
 
     describe('turnout calculations', () => {
       it('calculates turnout correctly for weighted voting', () => {
-        const QueryWrapper = createQueryWrapper()
         const wrapper = (props: any) => {
           return (
-            <QueryWrapper>
+            <TestProvider>
               <ClientProvider>
                 <ElectionProvider {...properProps(props)} />
               </ClientProvider>
-            </QueryWrapper>
+            </TestProvider>
           )
         }
 
@@ -561,14 +549,13 @@ describe('<ElectionProvider />', () => {
       })
 
       it('calculates turnout correctly for non-weighted voting', () => {
-        const QueryWrapper = createQueryWrapper()
         const wrapper = (props: any) => {
           return (
-            <QueryWrapper>
+            <TestProvider>
               <ClientProvider>
                 <ElectionProvider {...properProps(props)} />
               </ClientProvider>
-            </QueryWrapper>
+            </TestProvider>
           )
         }
 
@@ -594,14 +581,13 @@ describe('<ElectionProvider />', () => {
       })
 
       it('returns 0 for invalid election', () => {
-        const QueryWrapper = createQueryWrapper()
         const wrapper = (props: any) => {
           return (
-            <QueryWrapper>
+            <TestProvider>
               <ClientProvider>
                 <ElectionProvider {...properProps(props)} />
               </ClientProvider>
-            </QueryWrapper>
+            </TestProvider>
           )
         }
 
@@ -627,7 +613,6 @@ describe('<ElectionProvider />', () => {
     localStorage.setItem('csp_token', 'token')
 
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -651,11 +636,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -680,7 +665,6 @@ describe('<ElectionProvider />', () => {
     jest.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
 
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -703,11 +687,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -743,7 +727,6 @@ describe('<ElectionProvider />', () => {
     localStorage.setItem('csp_token', 'token')
 
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -767,11 +750,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -805,7 +788,6 @@ describe('<ElectionProvider />', () => {
     localStorage.setItem('csp_token', 'token')
 
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -829,11 +811,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -870,7 +852,6 @@ describe('<ElectionProvider />', () => {
 
   it('respects explicit isAbleToVote payload overrides', async () => {
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -891,11 +872,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -926,7 +907,6 @@ describe('<ElectionProvider />', () => {
 
   it('recalculates isAbleToVote on ElectionVoted with overwrites enabled', async () => {
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -947,11 +927,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -984,7 +964,6 @@ describe('<ElectionProvider />', () => {
 
   it('does not decrement votesLeft when ElectionVoted is called outside a voting flow', async () => {
     const signer = Wallet.createRandom()
-    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -1005,11 +984,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 
@@ -1058,13 +1037,12 @@ describe('<ElectionProvider />', () => {
     }
 
     const makeWrapper = () => {
-      const QueryWrapper = createQueryWrapper()
       return (props: any) => (
-        <QueryWrapper>
+        <TestProvider>
           <ClientProvider {...onlyProps(props)}>
             <ElectionProvider {...properProps(props)} />
           </ClientProvider>
-        </QueryWrapper>
+        </TestProvider>
       )
     }
 

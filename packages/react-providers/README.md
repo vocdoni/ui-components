@@ -88,6 +88,79 @@ const App = () => {
 
 `ClientProvider` is a dependency of the other providers, so you'll have to ensure you initialize it first as the parent.
 
+## i18n (i18next)
+
+This package relies on `i18next` + `react-i18next`. Your app must initialize i18next and provide the `I18nextProvider`.
+
+Example initialization:
+
+~~~ts
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import { reactProvidersResources, reactProvidersNamespace } from '@vocdoni/react-providers'
+
+i18n.use(initReactI18next).init({
+  lng: 'en',
+  resources: reactProvidersResources, // merge with your app resources
+  ns: [reactProvidersNamespace],
+  defaultNS: reactProvidersNamespace,
+})
+~~~
+
+### Extraction guidance
+
+We export base resources so you can merge them with your app translations:
+
+~~~ts
+import { reactProvidersResources } from '@vocdoni/react-providers'
+~~~
+
+If you want to scan for keys in workspace/local dev (monorepo), point your extractor to the source:
+
+~~~js
+// i18next-parser.config.cjs
+module.exports = {
+  locales: ['en'],
+  defaultNamespace: 'react-providers',
+  namespaceSeparator: ':',
+  keySeparator: '.',
+  input: ['../packages/react-providers/src/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
+  output: 'src/locales/$LOCALE/$NAMESPACE.json',
+}
+~~~
+
+For published installs, the package ships `dist` only. Do not scan `node_modules`. Scan your app
+code and merge with `reactProvidersResources` instead.
+
+### How to create your translation JSON files
+
+If you want to add a new language, use the exported base resources as the key template and fill in
+translations on the app side.
+
+Example: create `src/locales/es/react-providers.json`
+
+~~~ts
+import { reactProvidersResources, reactProvidersNamespace } from '@vocdoni/react-providers'
+
+const base = reactProvidersResources.en[reactProvidersNamespace]
+
+// Then translate values into your JSON file using the same keys:
+// src/locales/es/react-providers.json
+// {
+//   "errors": {
+//     "unauthorized": "No autorizado para votar"
+//   }
+// }
+~~~
+
+Load it with i18next:
+
+~~~ts
+import esReactProviders from './locales/es/react-providers.json'
+
+i18n.addResourceBundle('es', reactProvidersNamespace, esReactProviders, true, true)
+~~~
+
 ## Reference
 
 The developer portal includes a [reference](https://developer.vocdoni.io/ui-components) for using the `@vocdoni/react-providers` package.

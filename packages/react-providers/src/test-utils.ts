@@ -1,5 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createElement, ReactNode } from 'react'
+import i18n from 'i18next'
+import { createElement, ReactNode, useRef } from 'react'
+import { I18nextProvider, initReactI18next } from 'react-i18next'
+import { reactProvidersDefaultLanguage, reactProvidersNamespace, reactProvidersResources } from './i18n/locales'
 
 // workaround for https://github.com/testing-library/react-testing-library/issues/1233#issuecomment-1686160909
 export const onlyProps = (props: any) => {
@@ -30,11 +33,54 @@ export const ApiUrl = {
   prod: 'https://api.vocdoni.io/v2',
 }
 
-export const createQueryWrapper = () => {
-  const queryClient = new QueryClient({
+export const createI18nWrapper = () => {
+  const instance = i18n.createInstance()
+  instance.use(initReactI18next).init({
+    lng: reactProvidersDefaultLanguage,
+    resources: reactProvidersResources,
+    ns: [reactProvidersNamespace],
+    defaultNS: reactProvidersNamespace,
+    showSupportNotice: false,
+  })
+
+  return ({ children }: { children: ReactNode }) => createElement(I18nextProvider, { i18n: instance }, children)
+}
+
+export const createTestQueryClient = () =>
+  new QueryClient({
     defaultOptions: { queries: { retry: false } },
   })
 
+export const TestProvider = ({ children, queryClient }: { children: ReactNode; queryClient?: QueryClient }) => {
+  const clientRef = useRef<QueryClient | null>(null)
+  const i18nWrapperRef = useRef<ReturnType<typeof createI18nWrapper> | null>(null)
+  if (!clientRef.current) {
+    clientRef.current = createTestQueryClient()
+  }
+  if (!i18nWrapperRef.current) {
+    i18nWrapperRef.current = createI18nWrapper()
+  }
+
+  const client = queryClient ?? clientRef.current
+  const I18nWrapper = i18nWrapperRef.current
+
+  return createElement(QueryClientProvider, { client }, createElement(I18nWrapper, null, children))
+}
+
+export const createQueryWrapper = () => {
+  const queryClient = createTestQueryClient()
+  const I18nWrapper = createI18nWrapper()
+
   return ({ children }: { children: ReactNode }) =>
-    createElement(QueryClientProvider, { client: queryClient }, children)
+    createElement(QueryClientProvider, { client: queryClient }, createElement(I18nWrapper, null, children))
+}
+
+if (!i18n.isInitialized) {
+  i18n.use(initReactI18next).init({
+    lng: reactProvidersDefaultLanguage,
+    resources: reactProvidersResources,
+    ns: [reactProvidersNamespace],
+    defaultNS: reactProvidersNamespace,
+    showSupportNotice: false,
+  })
 }

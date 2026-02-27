@@ -1,6 +1,13 @@
-export const locales = {
-  errors: {
-    unauthorized: 'Not authorized to vote',
+export const reactProvidersNamespace = 'react-providers'
+export const reactProvidersDefaultLanguage = 'en'
+
+export const reactProvidersResources = {
+  [reactProvidersDefaultLanguage]: {
+    [reactProvidersNamespace]: {
+      errors: {
+        unauthorized: 'Not authorized to vote',
+      },
+    },
   },
 }
 

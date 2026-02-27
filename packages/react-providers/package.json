@@ -31,6 +31,8 @@
   "peerDependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
+    "i18next": "^25.8.13",
+    "react-i18next": "^16.5.4",
     "@tanstack/react-query": "^5.0.0",
     "@vocdoni/sdk": "~0.9.3",
     "date-fns": "^4.1.0",
@@ -41,6 +43,8 @@
   "devDependencies": {
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
+    "i18next": "^25.8.13",
+    "react-i18next": "^16.5.4",
     "@tanstack/react-query": "^5.0.0",
     "@types/latinize": "^0.2.15",
     "@types/react": "^18.0.30",
