@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import {
   AnonymousService,
   AnonymousVote,
@@ -14,6 +15,8 @@ import {
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '../client'
 import { vote as cspVote, fetchSignInfo } from '../csp'
+import { queryKeys } from '../query/keys'
+import { errorToString } from '../utils'
 import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
 import { useWebWorker } from '../worker/useWebWorker'
 import { createWebWorker } from '../worker/webWorker'
@@ -22,49 +25,103 @@ import { useElectionReducer } from './use-election-reducer'
 export type ElectionProviderProps = {
   id?: string
   election?: PublishedElection | InvalidElection
+  queryOptions?: Omit<UseQueryOptions<PublishedElection | InvalidElection, unknown>, 'queryKey' | 'queryFn' | 'enabled'>
   ConnectButton?: ComponentType
   fetchCensus?: boolean
   beforeSubmit?: (vote: Vote) => boolean
-  autoUpdateInterval?: number
-  autoUpdate?: boolean
 }
 
 export const useElectionProvider = ({
   id,
   election: data,
+  queryOptions,
   fetchCensus,
   beforeSubmit,
-  autoUpdateInterval,
-  autoUpdate,
   ...rest
 }: ElectionProviderProps) => {
   const { client: c, localize, generateSigner } = useClient()
+  const queryClient = useQueryClient()
   const { state, actions } = useElectionReducer(c, data)
-
-  // If id and election data are both provided, it will merge election info with the fetched election
-  const [mergeElection, setMergeElection] = useState<boolean>(!!id && !!data)
 
   const {
     client,
     election,
-    loading,
-    loaded,
     sik: { password, signature },
   } = state
   const [anonCircuitsFetched, setAnonCircuitsFetched] = useState(false)
+  const [loading, setLoading] = useState({
+    census: false,
+    election: false,
+    voting: false,
+  })
+  const [loaded, setLoaded] = useState({
+    census: false,
+    election: !!data,
+    voted: false,
+  })
+  const [errors, setErrors] = useState({
+    census: null as string | null,
+    election: null as string | null,
+    voting: null as string | null,
+  })
 
   const isAnonCircuitsFetching = useRef(false)
+
+  const setVoted = useCallback(
+    (voteId: string | null) => {
+      actions.voted(voteId)
+      setLoaded((prev) => ({ ...prev, census: true, voted: true }))
+      setLoading((prev) => ({ ...prev, census: false, voting: false }))
+    },
+    [actions]
+  )
+
+  const setIsAbleToVote = useCallback(
+    (payload?: boolean) => {
+      actions.isAbleToVote(payload)
+      setLoaded((prev) => ({ ...prev, census: true }))
+      setLoading((prev) => ({ ...prev, census: false }))
+    },
+    [actions]
+  )
+
+  const currentElectionId = id
+  const electionQueryKey = currentElectionId ? queryKeys.election.byId(currentElectionId) : ['election', 'disabled']
+  const electionQuery = useQuery({
+    queryKey: electionQueryKey,
+    queryFn: () => client.fetchElection(currentElectionId as string),
+    enabled: !!currentElectionId && !!client,
+    initialData: data,
+    ...queryOptions,
+  })
 
   const fetchElection = useCallback(
     async (id: string) => {
       actions.load(id)
+      setLoading((prev) => ({ ...prev, election: true }))
+      setErrors((prev) => ({ ...prev, election: null }))
       try {
-        actions.set(await client.fetchElection(id))
+        if (currentElectionId && id === currentElectionId && electionQuery.refetch) {
+          const { data: refreshed } = await electionQuery.refetch()
+          if (refreshed) {
+            actions.set(refreshed)
+          }
+        } else {
+          const fetched = await queryClient.fetchQuery({
+            queryKey: queryKeys.election.byId(id),
+            queryFn: () => client.fetchElection(id),
+          })
+          actions.set(fetched)
+        }
+        setLoaded((prev) => ({ ...prev, election: true }))
+        setLoading((prev) => ({ ...prev, election: false }))
       } catch (e) {
-        actions.error(e)
+        setLoaded((prev) => ({ ...prev, election: true }))
+        setLoading((prev) => ({ ...prev, election: false }))
+        setErrors((prev) => ({ ...prev, election: errorToString(e) }))
       }
     },
-    [actions, client]
+    [actions, client, currentElectionId, electionQuery, queryClient]
   )
 
   const censusFetch = useCallback(async () => {
@@ -72,6 +129,8 @@ export const useElectionProvider = ({
     if (!election || !(election instanceof PublishedElection)) return
 
     try {
+      setLoading((prev) => ({ ...prev, census: true }))
+      setErrors((prev) => ({ ...prev, census: null }))
       actions.loadCensus(address as string)
       const isCsp = election.census.type === CensusType.CSP
       const isIn = isCsp ? !!state.csp.token : await client.isInCensus({ electionId: election.id })
@@ -88,17 +147,19 @@ export const useElectionProvider = ({
       }
 
       if (isIn && censusType === CensusType.WEIGHTED && !election.electionType.anonymous) {
-        actions.voted(await client.hasAlreadyVoted(requestData))
+        setVoted(await client.hasAlreadyVoted(requestData))
         // no need to check votes left if member ain't in census
         actions.votesLeft(await client.votesLeftCount(requestData))
       }
 
-      actions.isAbleToVote()
+      setIsAbleToVote()
     } catch (e) {
       console.error('error in census fetch:', e)
-      actions.censusError(e)
+      setErrors((prev) => ({ ...prev, census: errorToString(e) }))
+      setLoading((prev) => ({ ...prev, census: false }))
+      setLoaded((prev) => ({ ...prev, census: true }))
     }
-  }, [actions, client, election, password, signature, state.csp.token])
+  }, [actions, client, election, password, signature, setIsAbleToVote, setVoted, state.csp.token])
 
   const workerInstance = useMemo(() => createWebWorker(worker), [])
   const { result: circuits, startProcessing } = useWebWorker<ICircuit, ICircuitWorkerRequest>(workerInstance)
@@ -125,28 +186,22 @@ export const useElectionProvider = ({
       }
       startProcessing({ circuits })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [election, state.isAbleToVote, state.isInCensus, state.voted, client.anonymousService])
+  }, [client.url, election, startProcessing, state.isAbleToVote, state.isInCensus, state.voted])
 
-  // pre-fetches circuits needed for voting in anonymous elections
+  // fetch anon circuits
   useEffect(() => {
-    if (
-      !fetchCensus ||
-      !election ||
-      loading.census ||
-      !client.wallet ||
-      anonCircuitsFetched ||
-      isAnonCircuitsFetching.current
-    )
-      return
+    if (!election) return
+    if (!(election instanceof PublishedElection)) return
+    if (!election.census || election.census.type !== CensusType.ANONYMOUS) return
+    if (isAnonCircuitsFetching.current || anonCircuitsFetched) return
+
     isAnonCircuitsFetching.current = true
     fetchAnonCircuits()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchAnonCircuits, client.wallet, election, loading.census, fetchCensus])
+  }, [anonCircuitsFetched, election, fetchAnonCircuits])
 
-  // if tokenR is found, initialize a random signer
+  // set local client if no signer and we have CSP
   useEffect(() => {
-    if (state.connected || !state.csp.token) return
+    if (!state.csp.token || state.connected || !state.election) return
 
     const signer = generateSigner()
     client.wallet = signer
@@ -163,21 +218,28 @@ export const useElectionProvider = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [circuits])
 
-  // fetch election
   useEffect(() => {
-    if (!id || !client || loading.election) return
-    if (loaded.election && areEqualHexStrings(state.id, id)) return
+    if (!id) return
+    if (state.id && areEqualHexStrings(state.id, id)) return
+    actions.load(id)
+  }, [actions, id, state.id])
 
-    fetchElection(id)
-  }, [state.id, id, client, loading.election, loaded.election, fetchElection])
-
-  // fetch election whenever the election id changes. This is useful if election data is provided,
-  // and you want to fetch the latest data anyway
   useEffect(() => {
-    if (!id || !mergeElection || !client || loading.election) return
-
-    fetchElection(id).finally(() => setMergeElection(false))
-  }, [client, data, election, fetchElection, id, loading.election, mergeElection])
+    if (!id || !client) return
+    if (electionQuery.isFetching) {
+      setLoading((prev) => ({ ...prev, election: true }))
+    }
+    if (electionQuery.data) {
+      actions.set(electionQuery.data)
+      setLoaded((prev) => ({ ...prev, election: true }))
+      setLoading((prev) => ({ ...prev, election: false }))
+    }
+    if (electionQuery.isError) {
+      setLoaded((prev) => ({ ...prev, election: true }))
+      setLoading((prev) => ({ ...prev, election: false }))
+      setErrors((prev) => ({ ...prev, election: errorToString(electionQuery.error) }))
+    }
+  }, [actions, client, electionQuery.data, electionQuery.error, electionQuery.isError, electionQuery.isFetching, id])
 
   // check census information
   useEffect(() => {
@@ -193,7 +255,7 @@ export const useElectionProvider = ({
           !areEqualHexStrings(state.voter, address) ||
           (data && !areEqualHexStrings(data.id, election.id)) ||
           // fetch census if there's sik signature and no vote id
-          (signature && !state.loaded.voted)
+          (signature && !loaded.voted)
         )
       ) {
         return
@@ -203,16 +265,6 @@ export const useElectionProvider = ({
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote, signature])
-
-  // auto update metadata (if enabled)
-  useEffect(() => {
-    if (!autoUpdate || !(election && election.id)) return
-
-    const interval = setInterval(() => fetchElection(election.id), autoUpdateInterval || 30000)
-
-    return () => clearInterval(interval)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoUpdate, autoUpdateInterval, election])
 
   // csp check sign info (check if voter already voted)
   useEffect(() => {
@@ -253,12 +305,12 @@ export const useElectionProvider = ({
         const votesLeft = voteId ? Math.max(0, maxVoteOverwrites - overwriteCount) : maxVoteOverwrites + 1
 
         actions.votesLeft(votesLeft)
-        actions.voted(voteId)
+        setVoted(voteId)
       } catch (e) {
         console.error('error in csp sign info check:', e)
       }
     })()
-  }, [state.csp.token, election, loaded.election])
+  }, [state.csp.token, election, loaded.election, setVoted, actions])
 
   // context vote function (the one to be used with the given components)
   const vote = async (values: number[]) => {
@@ -276,6 +328,8 @@ export const useElectionProvider = ({
     }
 
     actions.voting()
+    setLoading((prev) => ({ ...prev, voting: true }))
+    setErrors((prev) => ({ ...prev, voting: null }))
     client.setElectionId(election.id)
 
     try {
@@ -292,13 +346,13 @@ export const useElectionProvider = ({
       switch (election.census.type) {
         case CensusType.CSP: {
           const vid = await cspVote(client, election, state.csp.token, vote)
-          actions.voted(vid)
+          setVoted(vid)
           break
         }
         case CensusType.ANONYMOUS:
         case CensusType.WEIGHTED: {
           const vid = await weightedVote(vote)
-          actions.voted(vid)
+          setVoted(vid)
           break
         }
         default:
@@ -308,7 +362,8 @@ export const useElectionProvider = ({
       await fetchElection(election.id)
     } catch (e) {
       console.error('there was an error voting:', e)
-      actions.votingError(e)
+      setErrors((prev) => ({ ...prev, voting: errorToString(e) }))
+      setLoading((prev) => ({ ...prev, voting: false }))
     }
   }
 
@@ -324,10 +379,57 @@ export const useElectionProvider = ({
     return await client.submitVote(vote)
   }
 
+  const { vote: voteDraft, ...stateRest } = state
+
+  const wrappedActions = {
+    ...actions,
+    isAbleToVote: setIsAbleToVote,
+    voted: setVoted,
+    clear: () => {
+      actions.clear()
+      setLoading({ census: false, election: false, voting: false })
+      setLoaded({ census: false, election: !!data, voted: false })
+      setErrors({ census: null, election: null, voting: null })
+    },
+    error: (error: unknown) => {
+      setErrors((prev) => ({ ...prev, election: errorToString(error) }))
+      setLoading((prev) => ({ ...prev, election: false }))
+      setLoaded((prev) => ({ ...prev, election: true }))
+    },
+    censusError: (error: unknown) => {
+      setErrors((prev) => ({ ...prev, census: errorToString(error) }))
+      setLoading((prev) => ({ ...prev, census: false }))
+      setLoaded((prev) => ({ ...prev, census: true }))
+    },
+    votingError: (error: unknown) => {
+      setErrors((prev) => ({ ...prev, voting: errorToString(error) }))
+      setLoading((prev) => ({ ...prev, voting: false }))
+    },
+    load: (id?: string) => {
+      actions.load(id)
+      setLoading((prev) => ({ ...prev, election: true }))
+      setErrors((prev) => ({ ...prev, election: null }))
+    },
+    loadCensus: (voter: string) => {
+      actions.loadCensus(voter)
+      setLoading((prev) => ({ ...prev, census: true }))
+      setErrors((prev) => ({ ...prev, census: null }))
+    },
+    voting: () => {
+      actions.voting()
+      setLoading((prev) => ({ ...prev, voting: true }))
+      setErrors((prev) => ({ ...prev, voting: null }))
+    },
+  }
+
   return {
     ...rest,
-    ...state,
-    actions,
+    ...stateRest,
+    voteDraft,
+    loading,
+    loaded,
+    errors,
+    actions: wrappedActions,
     fetchElection,
     localize,
     vote,

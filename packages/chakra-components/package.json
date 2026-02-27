@@ -10,6 +10,7 @@
     "directory": "packages/chakra-components"
   },
   "description": "Vocdoni's Chakra UI Components",
+  "deprecated": "Deprecated. This package is no longer maintained and will be removed in a future major release.",
   "keywords": [
     "react",
     "chakra",

@@ -2,22 +2,42 @@ import { Wallet } from '@ethersproject/wallet'
 import { render, renderHook, waitFor } from '@testing-library/react'
 import { Account, VocdoniCensus3Client } from '@vocdoni/sdk'
 import { act } from 'react'
-import { ApiUrl, CensusUrls, properProps } from '../test-utils'
+import { ApiUrl, CensusUrls, createQueryWrapper, properProps } from '../test-utils'
 import { ClientProvider, useClient } from './ClientProvider'
+
+const mockAccount = (overrides?: Partial<Record<string, unknown>>) => ({
+  account: new Account({ name: 'alpha' }),
+  address: '0xabc',
+  balance: 10,
+  electionIndex: 0,
+  nonce: 0,
+  feesCount: 0,
+  sik: '',
+  transfersCount: 0,
+  ...(overrides || {}),
+})
 
 describe('<ClientProvider />', () => {
   it('renders child elements', () => {
+    const QueryWrapper = createQueryWrapper()
     const { getByText } = render(
-      <ClientProvider>
-        <p>is rendered</p>
-      </ClientProvider>
+      <QueryWrapper>
+        <ClientProvider>
+          <p>is rendered</p>
+        </ClientProvider>
+      </QueryWrapper>
     )
 
     expect(getByText('is rendered')).toBeInTheDocument()
   })
 
   it('has expected defaults defined if no props are passed', () => {
-    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
     const { result } = renderHook(() => useClient(), {
       wrapper,
     })
@@ -42,7 +62,12 @@ describe('<ClientProvider />', () => {
   })
 
   it('sets proper environment', () => {
-    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
     const { result, rerender } = renderHook(() => useClient(), {
       wrapper,
       initialProps: { env: 'stg' },
@@ -63,7 +88,12 @@ describe('<ClientProvider />', () => {
 
   it('sets proper signer', async () => {
     const signer = Wallet.createRandom()
-    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
     const { result, rerender } = renderHook(() => useClient(), {
       wrapper,
       initialProps: { signer, env: 'dev' },
@@ -93,7 +123,12 @@ describe('<ClientProvider />', () => {
   })
 
   it('fetches an account', async () => {
-    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
     const signer = Wallet.createRandom()
     const { result } = renderHook(() => useClient(), {
       wrapper,
@@ -116,8 +151,69 @@ describe('<ClientProvider />', () => {
     expect(result.current.errors.fetch).toBeNull()
   })
 
+  it('updates account data and balance', async () => {
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
+    const signer = Wallet.createRandom()
+    const { result } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { env: 'dev', signer },
+    })
+
+    result.current.client.fetchAccount = jest.fn().mockResolvedValue(mockAccount())
+
+    await act(async () => {
+      await result.current.fetchAccount()
+    })
+
+    await waitFor(() => expect(result.current.account?.balance).toBe(10))
+  })
+
+  it('surfaces fetch errors separately', async () => {
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
+    const signer = Wallet.createRandom()
+    const { result } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { env: 'dev', signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.connected).toBeTruthy()
+    })
+
+    const originalFetch = result.current.client.fetchAccount
+    result.current.client.fetchAccount = jest.fn().mockRejectedValueOnce(new Error('fetch failed'))
+
+    await act(async () => {
+      try {
+        await result.current.fetchAccount()
+      } catch {
+        // expected
+      }
+    })
+
+    await waitFor(() => expect(result.current.errors.fetch).toContain('fetch failed'))
+    expect(result.current.errors.create).toBeNull()
+    expect(result.current.errors.update).toBeNull()
+    result.current.client.fetchAccount = originalFetch
+  })
+
   it('creates an account', async () => {
-    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
     const signer = Wallet.createRandom()
     const { result } = renderHook(() => useClient(), {
       wrapper,
@@ -141,7 +237,12 @@ describe('<ClientProvider />', () => {
   })
 
   it('updates an account', async () => {
-    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
     const signer = Wallet.createRandom()
     const { result } = renderHook(() => useClient(), {
       wrapper,
@@ -174,7 +275,12 @@ describe('<ClientProvider />', () => {
   })
 
   it('properly clears session data', async () => {
-    const wrapper = (props: any) => <ClientProvider {...properProps(props)} />
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
     const signer = Wallet.createRandom()
     const { result } = renderHook(() => useClient(), {
       wrapper,
@@ -202,5 +308,45 @@ describe('<ClientProvider />', () => {
     expect(result.current.client.wallet).toBeUndefined()
     expect(result.current.signer).toStrictEqual(null)
     expect(result.current.balance).toEqual(-1)
+  })
+
+  it('marks connected when signer is set', async () => {
+    const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
+    const { result } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { env: 'dev', signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.connected).toBeTruthy()
+    })
+
+    expect(result.current.client.wallet).toEqual(signer)
+  })
+  it('fetchAccount populates account via react-query', async () => {
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...properProps(props)} />
+      </QueryWrapper>
+    )
+    const signer = Wallet.createRandom()
+    const { result } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { env: 'dev', signer },
+    })
+
+    await act(async () => {
+      await result.current.fetchAccount()
+    })
+
+    await waitFor(() => expect(result.current.account).toBeDefined())
+    expect(result.current.errors.fetch).toBeNull()
   })
 })

@@ -1,2 +1,2 @@
+export type { ClientEnv } from './client-utils'
 export * from './ClientProvider'
-export type { ClientEnv } from './use-client-reducer'

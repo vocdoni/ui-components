@@ -4,7 +4,7 @@ import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCe
 import { act } from 'react'
 import { ClientProvider, useClient } from '../client'
 import { fetchSignInfo } from '../csp'
-import { onlyProps, properProps } from '../test-utils'
+import { createQueryWrapper, onlyProps, properProps } from '../test-utils'
 import { ElectionProvider, useElection } from './ElectionProvider'
 
 jest.mock('../csp', () => ({
@@ -25,23 +25,29 @@ describe('<ElectionProvider />', () => {
   })
 
   it('renders child elements', () => {
+    const QueryWrapper = createQueryWrapper()
     const { getByText } = render(
-      <ClientProvider>
-        <ElectionProvider>
-          <p>is rendered</p>
-        </ElectionProvider>
-      </ClientProvider>
+      <QueryWrapper>
+        <ClientProvider>
+          <ElectionProvider>
+            <p>is rendered</p>
+          </ElectionProvider>
+        </ClientProvider>
+      </QueryWrapper>
     )
 
     expect(getByText('is rendered')).toBeInTheDocument()
   })
 
   it('fetches an election given an ID to the provider', async () => {
+    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => {
       return (
-        <ClientProvider>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -57,13 +63,136 @@ describe('<ElectionProvider />', () => {
     expect((result.current.election as PublishedElection)?.title.default).toEqual('mocked process')
   })
 
+  it('loads election via react-query and computes participation', async () => {
+    const QueryWrapper = createQueryWrapper()
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      </QueryWrapper>
+    )
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { id: '0xc5d2460186f73b259cfcf953772238dccf1d21605f00517933be020000000001' },
+    })
+
+    await waitFor(() => expect(result.current.loaded.election).toBeTruthy())
+    expect(result.current.participation).toBeGreaterThanOrEqual(0)
+  })
+
+  it('honors react-query refetch interval for elections', async () => {
+    jest.useFakeTimers()
+    const QueryWrapper = createQueryWrapper()
+    const client = new VocdoniSDKClient({ env: EnvOptions.STG })
+    const fetchElection = jest.fn()
+    client.fetchElection = fetchElection as any
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'refetch-election',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census: new WeightedCensus(),
+    })
+
+    fetchElection.mockResolvedValue(election)
+
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      </QueryWrapper>
+    )
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { id: election.id, client, queryOptions: { refetchInterval: 1000 } },
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.election).toBeTruthy()
+    })
+    expect(fetchElection).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000)
+    })
+
+    await waitFor(() => {
+      expect(fetchElection).toHaveBeenCalledTimes(2)
+    })
+
+    jest.useRealTimers()
+  })
+
+  it('ignores legacy autoUpdate settings when no queryOptions are provided', async () => {
+    jest.useFakeTimers()
+    const QueryWrapper = createQueryWrapper()
+    const client = new VocdoniSDKClient({ env: EnvOptions.STG })
+    const fetchElection = jest.fn()
+    client.fetchElection = fetchElection as any
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'refetch-election-auto',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census: new WeightedCensus(),
+    })
+
+    fetchElection.mockResolvedValue(election)
+
+    const wrapper = (props: any) => (
+      <QueryWrapper>
+        <ClientProvider {...onlyProps(props)}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientProvider>
+      </QueryWrapper>
+    )
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: {
+        id: election.id,
+        client,
+        ...( {
+          autoUpdate: true,
+          autoUpdateInterval: 1000,
+        } as any),
+      } as any,
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.election).toBeTruthy()
+    })
+    expect(fetchElection).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      jest.advanceTimersByTime(1000)
+    })
+
+    await waitFor(() => {
+      expect(fetchElection).toHaveBeenCalledTimes(1)
+    })
+
+    jest.useRealTimers()
+  })
+
   it('sets proper client from ClientProvider by default', async () => {
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider>{props.children}</ElectionProvider>
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider>{props.children}</ElectionProvider>
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -78,26 +207,29 @@ describe('<ElectionProvider />', () => {
 
   it('can set and change signer at election level', () => {
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
     })
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider
-            children={props.children}
-            // @ts-ignore
-            election={PublishedElection.build({
-              title: 'test',
-              description: 'test',
-              endDate: new Date(),
-              census: new WeightedCensus(),
-              // census type must be different than "spreadsheet", otherwise won't change it
-              meta: { census: { type: 'token' } },
-            })}
-          />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider
+              children={props.children}
+              // @ts-ignore
+              election={PublishedElection.build({
+                title: 'test',
+                description: 'test',
+                endDate: new Date(),
+                census: new WeightedCensus(),
+                // census type must be different than "spreadsheet", otherwise won't change it
+                meta: { census: { type: 'token' } },
+              })}
+            />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -132,26 +264,29 @@ describe('<ElectionProvider />', () => {
 
   it('does not update client at election level for spreadsheet type census', async () => {
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
     })
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider
-            children={props.children}
-            // @ts-ignore
-            election={PublishedElection.build({
-              title: 'test',
-              description: 'test',
-              endDate: new Date(),
-              census: new WeightedCensus(),
-              // here we want it to be spreadsheet, since it's what we're testing
-              meta: { census: { type: 'spreadsheet' } },
-            })}
-          />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider
+              children={props.children}
+              // @ts-ignore
+              election={PublishedElection.build({
+                title: 'test',
+                description: 'test',
+                endDate: new Date(),
+                census: new WeightedCensus(),
+                // here we want it to be spreadsheet, since it's what we're testing
+                meta: { census: { type: 'spreadsheet' } },
+              })}
+            />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -189,11 +324,14 @@ describe('<ElectionProvider />', () => {
   })
 
   it('properly sets and updates election metadata', () => {
+    const QueryWrapper = createQueryWrapper()
     const wrapper = (props: any) => {
       return (
-        <ClientProvider>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -228,15 +366,18 @@ describe('<ElectionProvider />', () => {
 
   it('clears session data on logout', async () => {
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
     })
     const wrapper = (props: any) => {
       return (
-        <ClientProvider signer={signer}>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider signer={signer}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
     // @ts-ignore
@@ -318,11 +459,14 @@ describe('<ElectionProvider />', () => {
 
   describe('participation and turnout calculations', () => {
     it('calculates participation correctly', () => {
+      const QueryWrapper = createQueryWrapper()
       const wrapper = (props: any) => {
         return (
-          <ClientProvider>
-            <ElectionProvider {...properProps(props)} />
-          </ClientProvider>
+          <QueryWrapper>
+            <ClientProvider>
+              <ElectionProvider {...properProps(props)} />
+            </ClientProvider>
+          </QueryWrapper>
         )
       }
 
@@ -381,11 +525,14 @@ describe('<ElectionProvider />', () => {
 
     describe('turnout calculations', () => {
       it('calculates turnout correctly for weighted voting', () => {
+        const QueryWrapper = createQueryWrapper()
         const wrapper = (props: any) => {
           return (
-            <ClientProvider>
-              <ElectionProvider {...properProps(props)} />
-            </ClientProvider>
+            <QueryWrapper>
+              <ClientProvider>
+                <ElectionProvider {...properProps(props)} />
+              </ClientProvider>
+            </QueryWrapper>
           )
         }
 
@@ -414,11 +561,14 @@ describe('<ElectionProvider />', () => {
       })
 
       it('calculates turnout correctly for non-weighted voting', () => {
+        const QueryWrapper = createQueryWrapper()
         const wrapper = (props: any) => {
           return (
-            <ClientProvider>
-              <ElectionProvider {...properProps(props)} />
-            </ClientProvider>
+            <QueryWrapper>
+              <ClientProvider>
+                <ElectionProvider {...properProps(props)} />
+              </ClientProvider>
+            </QueryWrapper>
           )
         }
 
@@ -444,11 +594,14 @@ describe('<ElectionProvider />', () => {
       })
 
       it('returns 0 for invalid election', () => {
+        const QueryWrapper = createQueryWrapper()
         const wrapper = (props: any) => {
           return (
-            <ClientProvider>
-              <ElectionProvider {...properProps(props)} />
-            </ClientProvider>
+            <QueryWrapper>
+              <ClientProvider>
+                <ElectionProvider {...properProps(props)} />
+              </ClientProvider>
+            </QueryWrapper>
           )
         }
 
@@ -474,6 +627,7 @@ describe('<ElectionProvider />', () => {
     localStorage.setItem('csp_token', 'token')
 
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -497,9 +651,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -524,6 +680,7 @@ describe('<ElectionProvider />', () => {
     jest.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
 
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -546,9 +703,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -584,6 +743,7 @@ describe('<ElectionProvider />', () => {
     localStorage.setItem('csp_token', 'token')
 
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -607,9 +767,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -643,6 +805,7 @@ describe('<ElectionProvider />', () => {
     localStorage.setItem('csp_token', 'token')
 
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -666,9 +829,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -705,6 +870,7 @@ describe('<ElectionProvider />', () => {
 
   it('respects explicit isAbleToVote payload overrides', async () => {
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -725,9 +891,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -758,6 +926,7 @@ describe('<ElectionProvider />', () => {
 
   it('recalculates isAbleToVote on ElectionVoted with overwrites enabled', async () => {
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -778,9 +947,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -813,6 +984,7 @@ describe('<ElectionProvider />', () => {
 
   it('does not decrement votesLeft when ElectionVoted is called outside a voting flow', async () => {
     const signer = Wallet.createRandom()
+    const QueryWrapper = createQueryWrapper()
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
       wallet: signer,
@@ -833,9 +1005,11 @@ describe('<ElectionProvider />', () => {
 
     const wrapper = (props: any) => {
       return (
-        <ClientProvider {...onlyProps(props)}>
-          <ElectionProvider {...properProps(props)} />
-        </ClientProvider>
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
       )
     }
 
@@ -863,5 +1037,223 @@ describe('<ElectionProvider />', () => {
 
     expect(result.current.election.votesLeft).toBe(2)
     expect(result.current.election.isAbleToVote).toBeTruthy()
+  })
+
+  describe('reducer behavior via provider', () => {
+    const buildElection = (overrides: Partial<Record<string, any>> = {}) => {
+      const census = new WeightedCensus()
+      census.size = 10
+      // @ts-ignore
+      return PublishedElection.build({
+        id: '0x0001',
+        title: 'test',
+        description: 'test',
+        endDate: new Date(),
+        census,
+        electionType: { anonymous: false },
+        voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+        voteCount: 2,
+        ...overrides,
+      })
+    }
+
+    const makeWrapper = () => {
+      const QueryWrapper = createQueryWrapper()
+      return (props: any) => (
+        <QueryWrapper>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </QueryWrapper>
+      )
+    }
+
+    it('computes isAbleToVote when payload is undefined', async () => {
+      const signer = Wallet.createRandom()
+      const client = new VocdoniSDKClient({
+        env: EnvOptions.STG,
+        wallet: signer,
+      })
+      const election = buildElection()
+      const wrapper = makeWrapper()
+
+      const { result } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, client, signer },
+      })
+
+      await waitFor(() => {
+        expect(result.current.loaded.election).toBeTruthy()
+      })
+
+      act(() => {
+        result.current.actions.votesLeft(1)
+        result.current.actions.inCensus(true)
+        result.current.actions.isAbleToVote()
+      })
+
+      expect(result.current.isAbleToVote).toBe(true)
+    })
+
+    it('clears CSP token on census clear', async () => {
+      const signer = Wallet.createRandom()
+      const client = new VocdoniSDKClient({
+        env: EnvOptions.STG,
+        wallet: signer,
+      })
+      const election = buildElection()
+      const wrapper = makeWrapper()
+
+      localStorage.setItem('csp_token', 'token')
+
+      const { result } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, client, signer },
+      })
+
+      await waitFor(() => {
+        expect(result.current.loaded.election).toBeTruthy()
+      })
+
+      act(() => {
+        result.current.actions.clear()
+      })
+
+      expect(localStorage.getItem('csp_token')).toBeNull()
+      expect(result.current.isInCensus).toBe(false)
+      expect(result.current.votesLeft).toBe(0)
+    })
+
+    it('persists CSP token on step 1', async () => {
+      const signer = Wallet.createRandom()
+      const client = new VocdoniSDKClient({
+        env: EnvOptions.STG,
+        wallet: signer,
+      })
+      const election = buildElection()
+      const wrapper = makeWrapper()
+
+      const { result } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, client, signer },
+      })
+
+      await waitFor(() => {
+        expect(result.current.loaded.election).toBeTruthy()
+      })
+
+      act(() => {
+        result.current.actions.csp1('t1')
+      })
+
+      expect(result.current.csp.token).toBe('t1')
+      expect(localStorage.getItem('csp_token')).toBe('t1')
+    })
+
+    it('marks voting in progress', async () => {
+      const signer = Wallet.createRandom()
+      const client = new VocdoniSDKClient({
+        env: EnvOptions.STG,
+        wallet: signer,
+      })
+      const election = buildElection()
+      const wrapper = makeWrapper()
+
+      const { result } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, client, signer },
+      })
+
+      await waitFor(() => {
+        expect(result.current.loaded.election).toBeTruthy()
+      })
+
+      act(() => {
+        result.current.actions.voting()
+      })
+
+      expect(result.current.loading.voting).toBe(true)
+      expect(result.current.voted).toBeNull()
+    })
+
+    it('stores vote draft', async () => {
+      const signer = Wallet.createRandom()
+      const client = new VocdoniSDKClient({
+        env: EnvOptions.STG,
+        wallet: signer,
+      })
+      const election = buildElection()
+      const wrapper = makeWrapper()
+
+      const { result } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, client, signer },
+      })
+
+      await waitFor(() => {
+        expect(result.current.loaded.election).toBeTruthy()
+      })
+
+      act(() => {
+        result.current.actions.setVote({ value: 1 } as any)
+      })
+
+      expect(result.current.voteDraft).toEqual({ value: 1 })
+    })
+
+    it('finalizes voting without dropping votesLeft below zero', async () => {
+      const signer = Wallet.createRandom()
+      const client = new VocdoniSDKClient({
+        env: EnvOptions.STG,
+        wallet: signer,
+      })
+      const election = buildElection()
+      const wrapper = makeWrapper()
+
+      const { result } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, client, signer },
+      })
+
+      await waitFor(() => {
+        expect(result.current.loaded.election).toBeTruthy()
+      })
+
+      act(() => {
+        result.current.actions.votesLeft(0)
+        result.current.actions.inCensus(true)
+        result.current.actions.voting()
+        result.current.actions.voted('vote-id')
+      })
+
+      expect(result.current.votesLeft).toBe(0)
+      expect(result.current.loaded.voted).toBe(true)
+    })
+
+    it('surfaces voting errors', async () => {
+      const signer = Wallet.createRandom()
+      const client = new VocdoniSDKClient({
+        env: EnvOptions.STG,
+        wallet: signer,
+      })
+      const election = buildElection()
+      const wrapper = makeWrapper()
+
+      const { result } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, client, signer },
+      })
+
+      await waitFor(() => {
+        expect(result.current.loaded.election).toBeTruthy()
+      })
+
+      act(() => {
+        result.current.actions.votingError(new Error('vote failed'))
+      })
+
+      expect(result.current.errors.voting).toContain('vote failed')
+      expect(result.current.voted).toBeNull()
+    })
   })
 })

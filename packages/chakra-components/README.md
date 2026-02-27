@@ -47,6 +47,8 @@
 
 # @vocdoni/chakra-components
 
+**Deprecated:** This package is no longer maintained and will be removed in a future major release.
+
 This package provides UI components that integrate the Vocdoni voting protocol. The components can be styled with Chakra UI-based custom theming.
 
 The best place to learn about using this package is the [developer portal](https://developer.vocdoni.io/ui-components).

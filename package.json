@@ -32,7 +32,7 @@
   "scripts": {
     "build": "turbo build --filter=@vocdoni*",
     "lint:fix": "prettier -c . --write",
-    "lint": "turbo lint && prettier -c .",
+    "lint": "turbo lint --filter=!@vocdoni/chakra-components && prettier -c .",
     "clean": "turbo clean --filter=@vocdoni* && rm -fr node_modules",
     "test": "jest"
   },
@@ -45,7 +45,8 @@
       "react": "^18.3.1",
       "react-dom": "^18.3.1",
       "viem": "^2.37.1",
-      "@wagmi/core": "2.20.3"
+      "@wagmi/core": "^2.22.1",
+      "@tanstack/react-query": "^5.90.21"
     },
     "onlyBuiltDependencies": [
       "esbuild",

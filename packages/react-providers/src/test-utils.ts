@@ -1,3 +1,6 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createElement, ReactNode } from 'react'
+
 // workaround for https://github.com/testing-library/react-testing-library/issues/1233#issuecomment-1686160909
 export const onlyProps = (props: any) => {
   const {
@@ -25,4 +28,13 @@ export const ApiUrl = {
   dev: 'https://api-dev.vocdoni.net/v2',
   stg: 'https://api-stg.vocdoni.net/v2',
   prod: 'https://api.vocdoni.io/v2',
+}
+
+export const createQueryWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+
+  return ({ children }: { children: ReactNode }) =>
+    createElement(QueryClientProvider, { client: queryClient }, children)
 }

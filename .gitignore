@@ -3,6 +3,7 @@ node_modules
 .turbo
 vite.config.ts.timestamp-*.mjs
 .vscode
+.worktrees
 
 package.json.backup
 yarn.lock

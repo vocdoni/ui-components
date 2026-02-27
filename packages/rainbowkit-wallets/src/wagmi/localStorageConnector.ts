@@ -13,7 +13,7 @@ export interface LocalStorageConnectorParameters {
  * A connector that uses the local storage to store seed for a deterministic wallet generation
  */
 export function localStorageConnector(parameters: LocalStorageConnectorParameters = {}): CreateConnectorFn {
-  return createConnector((config) => {
+  return createConnector(((config) => {
     let currentWallet: any = null
 
     return {
@@ -21,7 +21,7 @@ export function localStorageConnector(parameters: LocalStorageConnectorParameter
       name: parameters.name || 'localStorage',
       type: parameters.id || 'localStorageConnector',
 
-      async connect() {
+      connect: (async ({ withCapabilities = false }: { withCapabilities?: boolean } = {}) => {
         try {
           const provider = createPublicClient({
             chain: mainnet,
@@ -44,14 +44,23 @@ export function localStorageConnector(parameters: LocalStorageConnectorParameter
 
           currentWallet = wallet
 
+          const accounts = withCapabilities ? [{ address: account as Address, capabilities: {} }] : [account as Address]
+
           return {
-            accounts: [account as Address],
+            accounts,
             chainId: mainnet.id,
           }
         } catch (error) {
           throw new UserRejectedRequestError(error as Error)
         }
-      },
+      }) as <withCapabilities extends boolean = false>(args?: {
+        withCapabilities?: withCapabilities
+      }) => Promise<{
+        accounts: withCapabilities extends true
+          ? readonly { address: Address; capabilities: Record<string, unknown> }[]
+          : readonly Address[]
+        chainId: number
+      }>,
 
       async disconnect() {
         await localStorageWallet.deleteWallet()
@@ -117,5 +126,5 @@ export function localStorageConnector(parameters: LocalStorageConnectorParameter
       onDisconnect() {},
       onMessage() {},
     }
-  })
+  }) as unknown as CreateConnectorFn)
 }

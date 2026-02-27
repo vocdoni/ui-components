@@ -6,22 +6,17 @@ import {
   VocdoniSDKClient,
   Vote,
 } from '@vocdoni/sdk'
-import { Reducer, useEffect, useReducer } from 'react'
+import { Reducer, useEffect, useMemo, useReducer } from 'react'
 import { useClient } from '../client'
-import { ClientSetPayload } from '../client/use-client-reducer'
-import type { ErrorPayload } from '../types'
-import { errorToString } from '../utils'
-
+import { ClientSetPayload } from '../client/client-utils'
 export const BlindCspServiceKey = 'vocdoni-blind-csp'
 
 export const CensusClear = 'election:census:clear'
-export const CensusError = 'election:census:error'
 export const CensusIsAbleToVote = 'election:census:is_able_to_vote'
 export const CensusLoad = 'election:census:load'
 export const ElectionClientSet = 'election:client:set'
 export const ElectionCspStep0 = 'election:csp:step_0'
 export const ElectionCspStep1 = 'election:csp:step_1'
-export const ElectionError = 'election:error'
 export const ElectionInCensus = 'election:in_census'
 export const ElectionLoad = 'election:load'
 export const ElectionSet = 'election:set'
@@ -29,19 +24,16 @@ export const ElectionVoted = 'election:voted'
 export const ElectionVoteSet = 'election:vote:set'
 export const ElectionVotesLeft = 'election:votes_left'
 export const ElectionVoting = 'election:voting'
-export const ElectionVotingError = 'election:voting:error'
 export const SikPasswordSet = 'sik:password:set'
 export const SikSignatureSet = 'sik:signature:set'
 
 export type ElectionActionType =
   | typeof CensusClear
-  | typeof CensusError
   | typeof CensusIsAbleToVote
   | typeof CensusLoad
   | typeof ElectionClientSet
   | typeof ElectionCspStep0
   | typeof ElectionCspStep1
-  | typeof ElectionError
   | typeof ElectionInCensus
   | typeof ElectionLoad
   | typeof ElectionSet
@@ -49,37 +41,34 @@ export type ElectionActionType =
   | typeof ElectionVoteSet
   | typeof ElectionVotesLeft
   | typeof ElectionVoting
-  | typeof ElectionVotingError
   | typeof SikPasswordSet
   | typeof SikSignatureSet
 
-export type CensusErrorPayload = ErrorPayload
 export type CensusIsAbleToVotePayload = undefined | boolean
 export type CensusLoadPayload = string
 export type ElectionClientSetPayload = VocdoniSDKClient
 export type ElectionCspStep0Payload = { token: string }
 export type ElectionCspStep1Payload = string
-export type ElectionErrorPayload = ErrorPayload
 export type ElectionInCensusPayload = boolean
 export type ElectionLoadPayload = string | undefined
-export type ElectionSetPayload = PublishedElection
+export type ElectionSetPayload = PublishedElection | InvalidElection
 export type ElectionVotedPayload = string | null
 export type ElectionVoteSetPayload = Vote
 export type ElectionVotesLeftPayload = number
-export type ElectionVotingErrorPayload = ErrorPayload
 export type SikPayload = string | undefined
 
 export type ElectionActionPayload =
-  | CensusErrorPayload
+  | CensusIsAbleToVotePayload
   | CensusLoadPayload
-  | ElectionErrorPayload
+  | ElectionClientSetPayload
+  | ElectionCspStep0Payload
+  | ElectionCspStep1Payload
   | ElectionInCensusPayload
   | ElectionLoadPayload
   | ElectionSetPayload
   | ElectionVotedPayload
   | ElectionVoteSetPayload
   | ElectionVotesLeftPayload
-  | ElectionVotingErrorPayload
   | SikPayload
 
 export interface ElectionAction {
@@ -98,21 +87,7 @@ export interface ElectionReducerState {
   voter: string | undefined
   votesLeft: number
   voted: string | null
-  loading: {
-    census: boolean
-    election: boolean
-    voting: boolean
-  }
-  loaded: {
-    census: boolean
-    election: boolean
-    voted: boolean
-  }
-  errors: {
-    census: string | null
-    election: string | null
-    voting: string | null
-  }
+  voting: boolean
   csp: {
     token: string | undefined
   }
@@ -173,21 +148,7 @@ export const electionStateEmpty = ({
   voter: undefined,
   votesLeft: 0,
   voted: null,
-  loading: {
-    census: false,
-    election: false,
-    voting: false,
-  },
-  loaded: {
-    census: false,
-    election: !!election,
-    voted: false,
-  },
-  errors: {
-    census: null,
-    election: null,
-    voting: null,
-  },
+  voting: false,
   csp: {
     token: localStorage.getItem(LSKey.tokenR) || undefined,
   },
@@ -229,32 +190,11 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       localStorage.removeItem(LSKey.tokenR)
       return electionStateEmpty({ client: state.client, election: state.election })
     }
-    case CensusError: {
-      const payload = action.payload as CensusErrorPayload
-      return {
-        ...state,
-        voted: null,
-        loading: {
-          ...state.loading,
-          census: false,
-        },
-        errors: {
-          ...state.errors,
-          census: errorToString(payload),
-        },
-        votesLeft: 0,
-        isAbleToVote: false,
-      }
-    }
     case CensusLoad: {
       const payload = action.payload as CensusLoadPayload
       return {
         ...state,
         voter: payload,
-        loading: {
-          ...state.loading,
-          census: true,
-        },
       }
     }
 
@@ -262,14 +202,6 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       const payload = action.payload as CensusIsAbleToVotePayload
       return {
         ...state,
-        loading: {
-          ...state.loading,
-          census: false,
-        },
-        loaded: {
-          ...state.loaded,
-          census: true,
-        },
         isAbleToVote: isAbleToVote(state, payload),
       }
     }
@@ -302,50 +234,15 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       return {
         ...state,
         id,
-        loading: {
-          ...state.loading,
-          election: true,
-        },
       }
 
     case ElectionSet: {
       const election = action.payload as ElectionSetPayload
       return {
         ...state,
-        loaded: {
-          ...state.loaded,
-          election: true,
-        },
-        loading: {
-          ...state.loading,
-          election: false,
-        },
-        errors: {
-          ...state.errors,
-          election: null,
-        },
         election,
         participation: participation(election),
         turnout: turnout(election),
-      }
-    }
-
-    case ElectionError: {
-      const error = action.payload as ElectionErrorPayload
-      return {
-        ...state,
-        loaded: {
-          ...state.loaded,
-          election: true,
-        },
-        loading: {
-          ...state.loading,
-          election: false,
-        },
-        errors: {
-          ...state.errors,
-          election: errorToString(error),
-        },
       }
     }
 
@@ -360,23 +257,14 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
     case ElectionVoted: {
       const voted = action.payload as ElectionVotedPayload
       // update state beforehand so `isAbleToVote` is properly calculated
-      const shouldDecrement = !!voted && state.loading.voting
+      const shouldDecrement = !!voted && state.voting
       const nextVotesLeft = shouldDecrement ? Math.max(0, state.votesLeft - 1) : state.votesLeft
       const rstate = {
         ...state,
         voted,
         votesLeft: nextVotesLeft,
         vote: undefined,
-        loaded: {
-          ...state.loaded,
-          census: true,
-          voted: true,
-        },
-        loading: {
-          ...state.loading,
-          census: false,
-          voting: false,
-        },
+        voting: false,
       }
       return {
         ...rstate,
@@ -396,14 +284,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       return {
         ...state,
         voted: null,
-        loading: {
-          ...state.loading,
-          voting: true,
-        },
-        errors: {
-          ...state.errors,
-          voting: null,
-        },
+        voting: true,
       }
     }
 
@@ -424,21 +305,6 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       }
     }
 
-    case ElectionVotingError: {
-      const payload = action.payload as ElectionVotingErrorPayload
-      return {
-        ...state,
-        voted: null,
-        loading: {
-          ...state.loading,
-          voting: false,
-        },
-        errors: {
-          ...state.errors,
-          voting: errorToString(payload),
-        },
-      }
-    }
     case SikPasswordSet: {
       const password = action.payload as SikPayload
       return {
@@ -472,11 +338,6 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
     election,
   })
 
-  const clear = () => dispatch({ type: CensusClear })
-  const setClient = (client: VocdoniSDKClient) => dispatch({ type: ElectionClientSet, payload: client })
-  const set = (election: PublishedElection | InvalidElection) => dispatch({ type: ElectionSet, payload: election })
-  const sikPassword = (password: SikPayload) => dispatch({ type: SikPasswordSet, payload: password })
-  const sikSignature = (signature: SikPayload) => dispatch({ type: SikSignatureSet, payload: signature })
   // Some census types require to have a local client instance. This var stores if the current election is one of those
   const isLocalWalletSigner =
     state.election instanceof PublishedElection &&
@@ -492,17 +353,17 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
       return
     }
 
-    setClient(client)
+    dispatch({ type: ElectionClientSet, payload: client })
   }, [client, isLocalWalletSigner, state.election])
 
   // properly set election data in case it comes from props (and/or updates)
   useEffect(() => {
     if (!election) return
-    if (state.loaded.election && areEqualHexStrings(state.election?.id, election.id)) return
+    if (state.election && areEqualHexStrings(state.election?.id, election.id)) return
 
-    set(election)
+    dispatch({ type: ElectionSet, payload: election })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [election?.id, state.loaded.election])
+  }, [election?.id, state.election])
 
   // ensure user data is cleared on logout
   useEffect(() => {
@@ -523,37 +384,39 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
       return
     }
 
-    clear()
+    dispatch({ type: CensusClear })
   }, [state.connected, connected, state.election])
 
-  return {
-    state,
-    dispatch,
-    actions: {
-      clear,
-      set,
-      setClient,
-      sikPassword,
-      sikSignature,
+  const actions = useMemo(
+    () => ({
+      clear: () => dispatch({ type: CensusClear }),
+      set: (election: PublishedElection | InvalidElection) => dispatch({ type: ElectionSet, payload: election }),
+      setClient: (client: VocdoniSDKClient) => dispatch({ type: ElectionClientSet, payload: client }),
+      sikPassword: (password: SikPayload) => dispatch({ type: SikPasswordSet, payload: password }),
+      sikSignature: (signature: SikPayload) => dispatch({ type: SikSignatureSet, payload: signature }),
       clearClient: () => {
-        setClient(client)
-        sikPassword(undefined)
-        sikSignature(undefined)
-        clear()
+        dispatch({ type: ElectionClientSet, payload: client })
+        dispatch({ type: SikPasswordSet, payload: undefined })
+        dispatch({ type: SikSignatureSet, payload: undefined })
+        dispatch({ type: CensusClear })
       },
       load: (id?: string) => dispatch({ type: ElectionLoad, payload: id }),
       csp0: (data: ElectionCspStep0Payload) => dispatch({ type: ElectionCspStep0, payload: data }),
       csp1: (token: string) => dispatch({ type: ElectionCspStep1, payload: token }),
-      error: (error: ElectionErrorPayload) => dispatch({ type: ElectionError, payload: error }),
       loadCensus: (voter: string) => dispatch({ type: CensusLoad, payload: voter }),
-      censusError: (error: CensusErrorPayload) => dispatch({ type: CensusError, payload: error }),
       setVote: (vote: Vote) => dispatch({ type: ElectionVoteSet, payload: vote }),
       inCensus: (isIn: boolean) => dispatch({ type: ElectionInCensus, payload: isIn }),
       isAbleToVote: (isAble?: boolean) => dispatch({ type: CensusIsAbleToVote, payload: isAble }),
       voted: (voted: string) => dispatch({ type: ElectionVoted, payload: voted }),
       voting: () => dispatch({ type: ElectionVoting }),
       votesLeft: (votesLeft: number) => dispatch({ type: ElectionVotesLeft, payload: votesLeft }),
-      votingError: (error: ElectionVotingErrorPayload) => dispatch({ type: ElectionVotingError, payload: error }),
-    },
+    }),
+    [client, dispatch]
+  )
+
+  return {
+    state,
+    dispatch,
+    actions,
   }
 }
