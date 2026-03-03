@@ -660,6 +660,55 @@ describe('<ElectionProvider />', () => {
     localStorage.removeItem('csp_token')
   })
 
+  it('enables voting when CSP token is set after initial render and sign-info returns 401', async () => {
+    jest.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
+
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+    })
+
+    const census = new WeightedCensus()
+    census.type = CensusType.CSP
+    census.censusURI = 'https://csp.example/api'
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'csp-election-late-token',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <TestProvider>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election, fetchCensus: true, client },
+    })
+
+    await act(async () => {
+      result.current.actions.csp1('token')
+    })
+
+    await waitFor(() => {
+      expect(result.current.votesLeft).toBe(1)
+    })
+
+    expect(result.current.isInCensus).toBeTruthy()
+    expect(result.current.isAbleToVote).toBeTruthy()
+  })
+
   it('treats 401 on CSP sign info as no prior vote', async () => {
     localStorage.setItem('csp_token', 'token')
     jest.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })

@@ -264,7 +264,18 @@ export const useElectionProvider = ({
       await censusFetch()
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote, signature])
+  }, [
+    fetchCensus,
+    client,
+    client.wallet,
+    state.voter,
+    loaded.election,
+    loading.census,
+    actions,
+    state.isAbleToVote,
+    signature,
+    state.csp.token,
+  ])
 
   // csp check sign info (check if voter already voted)
   useEffect(() => {

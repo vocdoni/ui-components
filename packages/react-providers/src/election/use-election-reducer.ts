@@ -220,12 +220,16 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
     case ElectionCspStep1: {
       const token = action.payload as ElectionCspStep1Payload
       localStorage.setItem(LSKey.tokenR, token)
-      return {
+      const rstate = {
         ...state,
         csp: {
           ...state.csp,
           token,
         },
+      }
+      return {
+        ...rstate,
+        isAbleToVote: isAbleToVote(rstate),
       }
     }
 
@@ -248,9 +252,13 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
     case ElectionInCensus: {
       const isInCensus = action.payload as ElectionInCensusPayload
-      return {
+      const rstate = {
         ...state,
         isInCensus,
+      }
+      return {
+        ...rstate,
+        isAbleToVote: isAbleToVote(rstate),
       }
     }
 
@@ -290,9 +298,13 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
     case ElectionVotesLeft: {
       const votesLeft = action.payload as ElectionVotesLeftPayload
-      return {
+      const rstate = {
         ...state,
         votesLeft,
+      }
+      return {
+        ...rstate,
+        isAbleToVote: isAbleToVote(rstate),
       }
     }
 
