@@ -1,16 +1,19 @@
-import { saasOAuthWallet } from '../lib/saasOauthWallet'
 import { localStorageConnector } from './localStorageConnector'
 import { saasOAuthConnector } from './saasOauthConnector'
 
-jest.mock('./localStorageConnector', () => ({
-  localStorageConnector: jest.fn(),
+const { getWalletMock, createMock } = vi.hoisted(() => ({
+  getWalletMock: vi.fn(),
+  createMock: vi.fn(),
 }))
 
-jest.mock('../lib/saasOauthWallet', () => {
+vi.mock('./localStorageConnector', () => ({
+  localStorageConnector: vi.fn(),
+}))
+
+vi.mock('../lib/saasOauthWallet', () => {
   class MockSaasOAuthWallet {
-    static getWallet = jest.fn()
-    static __createMock = jest.fn()
-    create = MockSaasOAuthWallet.__createMock
+    static getWallet = getWalletMock
+    create = createMock
     constructor() {
       return this
     }
@@ -21,9 +24,7 @@ jest.mock('../lib/saasOauthWallet', () => {
   }
 })
 
-const localStorageConnectorMock = localStorageConnector as jest.Mock
-const getWalletMock = (saasOAuthWallet as unknown as { getWallet: jest.Mock }).getWallet
-const createMock = (saasOAuthWallet as unknown as { __createMock: jest.Mock }).__createMock
+const localStorageConnectorMock = localStorageConnector as ReturnType<typeof vi.fn>
 
 const setupWalletMocks = () => {
   getWalletMock.mockResolvedValue(false)
@@ -35,7 +36,7 @@ const setupWalletMocks = () => {
       account: {
         address: '0xabc',
       },
-      signMessage: jest.fn().mockResolvedValue('signature'),
+      signMessage: vi.fn().mockResolvedValue('signature') as any,
     },
   })
 }
@@ -46,17 +47,17 @@ describe('saasOAuthConnector', () => {
   beforeEach(() => {
     capturedParams = null
     localStorage.clear()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     localStorageConnectorMock.mockImplementation((params) => {
       capturedParams = params
-      return jest.fn()
+      return vi.fn() as any
     })
-    global.fetch = jest.fn()
+    global.fetch = vi.fn() as any
   })
 
   it('stores auth token when logging in', async () => {
     setupWalletMocks()
-    ;(global.fetch as jest.Mock).mockResolvedValue({
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       text: async () => JSON.stringify({ token: 'token-123', expirity: 'exp-123', registered: true }),
     })
@@ -70,8 +71,8 @@ describe('saasOAuthConnector', () => {
 
     await capturedParams?.createWallet?.()
 
-    const [, request] = (global.fetch as jest.Mock).mock.calls[0]
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('https://saas.example.com/oauth/login')
+    const [, request] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]
+    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0]).toBe('https://saas.example.com/oauth/login')
     expect(request.method).toBe('POST')
     expect(JSON.parse(request.body)).toMatchObject({
       email: 'ada@example.com',
@@ -89,7 +90,7 @@ describe('saasOAuthConnector', () => {
 
   it('does not store auth token when linking an account', async () => {
     setupWalletMocks()
-    ;(global.fetch as jest.Mock).mockResolvedValue({
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       text: async () => JSON.stringify({ token: 'token-456', expirity: 'exp-456' }),
     })
@@ -105,8 +106,8 @@ describe('saasOAuthConnector', () => {
 
     await capturedParams?.createWallet?.()
 
-    const [, request] = (global.fetch as jest.Mock).mock.calls[0]
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('https://saas.example.com/auth/oauth')
+    const [, request] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]
+    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0]).toBe('https://saas.example.com/auth/oauth')
     expect(request.method).toBe('POST')
     expect(request.headers.Authorization).toBe('Bearer session-token')
     expect(localStorage.getItem('authToken')).toBeNull()
@@ -118,7 +119,7 @@ describe('saasOAuthConnector', () => {
     localStorage.setItem('authToken', 'old-token')
     localStorage.setItem('authExpiry', 'old-expiry')
     localStorage.setItem('authRegistered', 'true')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: false,
       text: async () => JSON.stringify({ code: 500, message: 'nope' }),
     })

@@ -1,5 +1,5 @@
-jest.mock('viem', () => {
-  const actual = jest.requireActual('viem')
+vi.mock('viem', async () => {
+  const actual = await vi.importActual<typeof import('viem')>('viem')
   return {
     ...actual,
     keccak256: () => '0xmock',
@@ -14,7 +14,7 @@ describe('localStorageWallet.createWalletFromData', () => {
   })
 
   it('does not persist when persist is false', async () => {
-    const createWalletSpy = jest.spyOn(localStorageWallet, 'createWallet').mockResolvedValue({} as any)
+    const createWalletSpy = vi.spyOn(localStorageWallet, 'createWallet').mockResolvedValue({} as any)
 
     await localStorageWallet.createWalletFromData('seed', {} as any, { persist: false })
 

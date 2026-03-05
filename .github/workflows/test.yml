@@ -26,4 +26,4 @@ jobs:
       - name: Run all lint tasks
         run: pnpm lint
       - name: Test everything
-        run: pnpm test --verbose
+        run: pnpm test

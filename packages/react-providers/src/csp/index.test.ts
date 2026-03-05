@@ -1,12 +1,13 @@
 import { CensusType, CspProofType, PublishedElection, VocdoniSDKClient, Vote, WeightedCensus } from '@vocdoni/sdk'
 import { vote } from './index'
 
-var upFetchMock: jest.Mock
+const { upFetchMock } = vi.hoisted(() => ({
+  upFetchMock: vi.fn(),
+}))
 
-jest.mock('up-fetch', () => {
-  upFetchMock = jest.fn()
+vi.mock('up-fetch', () => {
   return {
-    up: jest.fn(() => upFetchMock),
+    up: vi.fn(() => upFetchMock),
   }
 })
 
@@ -19,9 +20,9 @@ describe('csp vote', () => {
     upFetchMock.mockResolvedValue({ signature: 'sig', weight: '0a' })
 
     const client = {
-      wallet: { getAddress: jest.fn().mockResolvedValue('0xabc') },
-      cspVote: jest.fn(() => ({ weight: BigInt(1) })),
-      submitVote: jest.fn().mockResolvedValue('vote-id'),
+      wallet: { getAddress: vi.fn().mockResolvedValue('0xabc') },
+      cspVote: vi.fn(() => ({ weight: BigInt(1) })),
+      submitVote: vi.fn().mockResolvedValue('vote-id'),
     } as unknown as VocdoniSDKClient
 
     const census = new WeightedCensus()

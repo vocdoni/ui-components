@@ -1,25 +1,23 @@
 import { linkSaasOAuth } from './linkSaasOAuth'
 
-jest.mock('./lib/saasOauthWallet', () => {
-  const createMock = jest.fn()
+const { createMock } = vi.hoisted(() => ({
+  createMock: vi.fn(),
+}))
+
+vi.mock('./lib/saasOauthWallet', () => {
   class MockSaasOAuthWallet {
     create = createMock
   }
   return {
     saasOAuthWallet: MockSaasOAuthWallet,
-    __createMock: createMock,
   }
 })
 
-const { __createMock: createMock } = jest.requireMock('./lib/saasOauthWallet') as {
-  __createMock: jest.Mock
-}
-
 describe('linkSaasOAuth', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     localStorage.clear()
-    global.fetch = jest.fn()
+    global.fetch = vi.fn() as any
     createMock.mockResolvedValue({
       userEmail: 'ada@example.com',
       userName: 'Ada Lovelace',
@@ -28,13 +26,13 @@ describe('linkSaasOAuth', () => {
         account: {
           address: '0xabc',
         },
-        signMessage: jest.fn().mockResolvedValue('signature'),
+        signMessage: vi.fn().mockResolvedValue('signature'),
       },
     })
   })
 
   it('links provider without persisting auth token or wallet', async () => {
-    ;(global.fetch as jest.Mock).mockResolvedValue({
+    ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       text: async () => '',
     })
@@ -48,8 +46,8 @@ describe('linkSaasOAuth', () => {
     })
 
     expect(createMock).toHaveBeenCalledWith(expect.anything(), { persist: false })
-    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('https://saas.example.com/auth/oauth')
-    const [, request] = (global.fetch as jest.Mock).mock.calls[0]
+    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0]).toBe('https://saas.example.com/auth/oauth')
+    const [, request] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]
     expect(request.headers.Authorization).toBe('Bearer session-token')
     expect(localStorage.getItem('authToken')).toBeNull()
   })

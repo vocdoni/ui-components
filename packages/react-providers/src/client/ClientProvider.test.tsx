@@ -158,7 +158,7 @@ describe('<ClientProvider />', () => {
       initialProps: { env: 'dev', signer },
     })
 
-    result.current.client.fetchAccount = jest.fn().mockResolvedValue(mockAccount())
+    result.current.client.fetchAccount = vi.fn().mockResolvedValue(mockAccount())
 
     await act(async () => {
       await result.current.fetchAccount()
@@ -184,7 +184,7 @@ describe('<ClientProvider />', () => {
     })
 
     const originalFetch = result.current.client.fetchAccount
-    result.current.client.fetchAccount = jest.fn().mockRejectedValueOnce(new Error('fetch failed'))
+    result.current.client.fetchAccount = vi.fn().mockRejectedValueOnce(new Error('fetch failed'))
 
     await act(async () => {
       try {

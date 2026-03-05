@@ -3,8 +3,8 @@ import { TextDecoder, TextEncoder } from 'node:util'
 import React from 'react'
 import { server } from './mocks/server'
 
-let consoleErrorSpy: jest.SpyInstance
-let consoleWarnSpy: jest.SpyInstance
+let consoleErrorSpy: ReturnType<typeof vi.spyOn> | undefined
+let consoleWarnSpy: ReturnType<typeof vi.spyOn> | undefined
 
 // polyfill text encoder/decoder
 Object.defineProperties(globalThis, {
@@ -29,8 +29,8 @@ afterEach(() => {
 afterAll(() => server.close())
 
 beforeEach(() => {
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-  consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+  consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
 class Worker {
@@ -60,9 +60,9 @@ Object.defineProperty(window, 'MockedWindowURL', {
 // required by any react component (almost all of them)
 global.React = React
 
-global.URL.createObjectURL = jest.fn()
-global.fetch = jest.fn(() =>
+global.URL.createObjectURL = vi.fn()
+global.fetch = vi.fn(() =>
   Promise.resolve({
     json: () => Promise.resolve({ test: 100 }),
   })
-) as jest.Mock
+) as ReturnType<typeof vi.fn>

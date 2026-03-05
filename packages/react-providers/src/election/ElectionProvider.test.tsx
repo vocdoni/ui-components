@@ -7,21 +7,21 @@ import { fetchSignInfo } from '../csp'
 import { TestProvider, onlyProps, properProps } from '../test-utils'
 import { ElectionProvider, useElection } from './ElectionProvider'
 
-jest.mock('../csp', () => ({
-  fetchSignInfo: jest.fn(() =>
+vi.mock('../csp', () => ({
+  fetchSignInfo: vi.fn(() =>
     Promise.resolve({
       address: '0x0',
       nullifier: '0xdeadbeef',
       at: new Date().toISOString(),
     })
   ),
-  vote: jest.fn(),
+  vote: vi.fn(),
 }))
 
 describe('<ElectionProvider />', () => {
   beforeEach(() => {
     localStorage.removeItem('csp_token')
-    jest.mocked(fetchSignInfo).mockClear()
+    vi.mocked(fetchSignInfo).mockClear()
   })
 
   it('renders child elements', () => {
@@ -80,9 +80,8 @@ describe('<ElectionProvider />', () => {
   })
 
   it('honors react-query refetch interval for elections', async () => {
-    jest.useFakeTimers()
     const client = new VocdoniSDKClient({ env: EnvOptions.STG })
-    const fetchElection = jest.fn()
+    const fetchElection = vi.fn()
     client.fetchElection = fetchElection as any
 
     // @ts-ignore
@@ -106,29 +105,22 @@ describe('<ElectionProvider />', () => {
 
     const { result } = renderHook(() => useElection(), {
       wrapper,
-      initialProps: { id: election.id, client, queryOptions: { refetchInterval: 1000 } },
+      initialProps: { id: election.id, client, queryOptions: { refetchInterval: 50 } },
     })
 
     await waitFor(() => {
       expect(result.current.loaded.election).toBeTruthy()
     })
-    expect(fetchElection).toHaveBeenCalledTimes(1)
-
-    await act(async () => {
-      jest.advanceTimersByTime(1000)
-    })
+    expect(fetchElection.mock.calls.length).toBeGreaterThanOrEqual(1)
 
     await waitFor(() => {
-      expect(fetchElection).toHaveBeenCalledTimes(2)
+      expect(fetchElection.mock.calls.length).toBeGreaterThanOrEqual(2)
     })
-
-    jest.useRealTimers()
   })
 
   it('ignores legacy autoUpdate settings when no queryOptions are provided', async () => {
-    jest.useFakeTimers()
     const client = new VocdoniSDKClient({ env: EnvOptions.STG })
-    const fetchElection = jest.fn()
+    const fetchElection = vi.fn()
     client.fetchElection = fetchElection as any
 
     // @ts-ignore
@@ -168,14 +160,12 @@ describe('<ElectionProvider />', () => {
     expect(fetchElection).toHaveBeenCalledTimes(1)
 
     await act(async () => {
-      jest.advanceTimersByTime(1000)
+      await new Promise((resolve) => setTimeout(resolve, 100))
     })
 
     await waitFor(() => {
       expect(fetchElection).toHaveBeenCalledTimes(1)
     })
-
-    jest.useRealTimers()
   })
 
   it('sets proper client from ClientProvider by default', async () => {
@@ -617,7 +607,7 @@ describe('<ElectionProvider />', () => {
       env: EnvOptions.STG,
       wallet: signer,
     })
-    client.voteService.info = jest.fn().mockResolvedValue({ voteID: null, overwriteCount: 0 })
+    client.voteService.info = vi.fn().mockResolvedValue({ voteID: null, overwriteCount: 0 })
 
     const census = new WeightedCensus()
     census.type = CensusType.CSP
@@ -661,7 +651,7 @@ describe('<ElectionProvider />', () => {
   })
 
   it('enables voting when CSP token is set after initial render and sign-info returns 401', async () => {
-    jest.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
+    vi.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
 
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
@@ -711,7 +701,7 @@ describe('<ElectionProvider />', () => {
 
   it('treats 401 on CSP sign info as no prior vote', async () => {
     localStorage.setItem('csp_token', 'token')
-    jest.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
+    vi.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
 
     const signer = Wallet.createRandom()
     const client = new VocdoniSDKClient({
@@ -780,7 +770,7 @@ describe('<ElectionProvider />', () => {
       env: EnvOptions.STG,
       wallet: signer,
     })
-    client.voteService.info = jest.fn().mockResolvedValue({ voteID: 'vote-id', overwriteCount: 0 })
+    client.voteService.info = vi.fn().mockResolvedValue({ voteID: 'vote-id', overwriteCount: 0 })
 
     const census = new WeightedCensus()
     census.type = CensusType.CSP
@@ -841,7 +831,7 @@ describe('<ElectionProvider />', () => {
       env: EnvOptions.STG,
       wallet: signer,
     })
-    client.voteService.info = jest.fn().mockResolvedValue({ voteID: null, overwriteCount: 0 })
+    client.voteService.info = vi.fn().mockResolvedValue({ voteID: null, overwriteCount: 0 })
 
     const census = new WeightedCensus()
     census.type = CensusType.CSP

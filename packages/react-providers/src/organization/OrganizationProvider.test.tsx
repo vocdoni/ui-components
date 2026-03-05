@@ -125,7 +125,7 @@ describe('<OrganizationProvider />', () => {
 
   it('honors react-query refetch interval for organizations', async () => {
     const client = new VocdoniSDKClient({ env: EnvOptions.STG })
-    client.fetchAccount = jest.fn().mockResolvedValue(baseOrganization) as any
+    client.fetchAccount = vi.fn().mockResolvedValue(baseOrganization) as any
 
     const wrapper = (props: any) => {
       const providerProps = properProps(props)
@@ -164,8 +164,8 @@ describe('<OrganizationProvider />', () => {
       address: signer.address,
     }
     const client = new VocdoniSDKClient({ env: EnvOptions.STG })
-    client.fetchAccount = jest.fn().mockResolvedValue(orgWithSigner) as any
-    client.updateAccountInfo = jest.fn().mockResolvedValue({
+    client.fetchAccount = vi.fn().mockResolvedValue(orgWithSigner) as any
+    client.updateAccountInfo = vi.fn().mockResolvedValue({
       ...orgWithSigner,
       balance: 42,
     }) as any
@@ -229,8 +229,8 @@ describe('<OrganizationProvider />', () => {
       result.current.client.setSigner(signer)
     })
 
-    result.current.client.client.fetchAccount = jest.fn().mockResolvedValue(orgWithSigner)
-    result.current.client.client.updateAccountInfo = jest.fn().mockRejectedValue(new Error('update failed'))
+    result.current.client.client.fetchAccount = vi.fn().mockResolvedValue(orgWithSigner)
+    result.current.client.client.updateAccountInfo = vi.fn().mockRejectedValue(new Error('update failed'))
 
     await act(async () => {
       await result.current.client.fetchAccount()

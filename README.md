@@ -85,7 +85,7 @@ Turbo was initially configured for the development process, but its usage is min
   entire monorepo.
 - `pnpm lint`: runs the linter of each package (may vary per package, but
   usually prettier & tsc).
-- `pnpm test`: runs all the tests in the monorepo. Note these are configured globally in the monorepo (testing dependencies are in the base `package.json` file)
+- `pnpm test`: runs all package tests in the monorepo through Turbo and Vitest.
 
 ## Reference
 
