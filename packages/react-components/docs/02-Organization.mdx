@@ -1,0 +1,42 @@
+---
+title: Organization components
+description: Vocdoni React components for Organizations
+---
+
+## Organization provider
+
+To use organization components, wrap your UI with `OrganizationProvider` from `@vocdoni/react-providers`.
+
+```jsx
+<OrganizationProvider id='your-organization-uid'>
+  <OrganizationAvatar />
+  <OrganizationName />
+  <OrganizationDescription />
+</OrganizationProvider>
+```
+
+## OrganizationAvatar
+
+Shows organization avatar/logo.
+
+`OrganizationAvatar` is headless and default rendering uses a native HTML `<img>` element.
+
+```jsx live
+<OrganizationAvatar />
+```
+
+## OrganizationName
+
+Shows organization name.
+
+```jsx live
+<OrganizationName />
+```
+
+## OrganizationDescription
+
+Shows organization description.
+
+```jsx live
+<OrganizationDescription />
+```
