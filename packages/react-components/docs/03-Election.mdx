@@ -1,0 +1,85 @@
+---
+title: Election components
+description: Vocdoni React components for Elections
+---
+
+## Election provider
+
+To use election components, wrap your UI with `ElectionProvider` from `@vocdoni/react-providers`.
+
+```jsx
+<ElectionProvider id='your-election-id'>
+  <ElectionHeader />
+  <ElectionTitle />
+  <ElectionSchedule />
+  <ElectionStatusBadge />
+  <ElectionDescription />
+  <ElectionQuestions />
+</ElectionProvider>
+```
+
+## ElectionHeader
+
+Shows the election header image.
+
+`ElectionHeader` is headless and default rendering uses a native HTML `<img>` element.
+
+```jsx live
+<ElectionHeader />
+```
+
+## ElectionTitle
+
+Shows election title.
+
+```jsx live
+<ElectionTitle />
+```
+
+## ElectionSchedule
+
+Shows election period. You can customize output formatting with `date-fns` format strings.
+
+```jsx live
+<ElectionSchedule format={'d-L-y HH:mm'} />
+```
+
+## ElectionStatusBadge
+
+Shows election status badge (`PROCESS_UNKNOWN`, `UPCOMING`, `ONGOING`, `ENDED`, `CANCELED`, `PAUSED`, `RESULTS`).
+
+```jsx live
+<ElectionStatusBadge />
+```
+
+## ElectionDescription
+
+Shows election description.
+
+```jsx live
+<ElectionDescription />
+```
+
+:::info
+
+By default, description-like content is rendered as trusted HTML.
+If you need markdown parsing or sanitization, override the corresponding slots (for example `ElectionDescription` and
+`QuestionChoice`) in `ComponentsProvider`.
+
+:::
+
+## ElectionQuestions
+
+Shows election questions and vote form flow.
+
+```jsx live
+<ElectionQuestions />
+```
+
+## ElectionResults
+
+Shows election results.
+
+```jsx live
+<ElectionResults />
+```
