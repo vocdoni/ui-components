@@ -21,6 +21,7 @@
     "prettier": "^2.8.7",
     "tsup": "^8.0.1",
     "turbo": "^1.8.6",
+    "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.0.16"
   },
   "peerDependencies": {
@@ -29,7 +30,7 @@
   "scripts": {
     "build": "turbo build --filter=@vocdoni*",
     "lint:fix": "prettier -c . --write",
-    "lint": "turbo lint --filter=!@vocdoni/chakra-components && prettier -c .",
+    "lint": "turbo lint && prettier -c .",
     "clean": "turbo clean --filter=@vocdoni* && rm -fr node_modules",
     "test": "turbo test --filter=@vocdoni/* --filter=!@vocdoni/ui-scaffold"
   },

@@ -6,7 +6,8 @@ on:
     branches:
       - main
     paths:
-      - packages/chakra-components/docs/**
+      - packages/react-components/docs/**
+      - packages/react-components/README.md
 
 jobs:
   job_docs_update:
@@ -19,7 +20,7 @@ jobs:
 
       - name: Generate 01-Intro.md # It appends the content of the README.md and fixes relative inks
         run: |
-          cd packages/chakra-components/docs
+          cd packages/react-components/docs
           cat ../README.md >> ./01-Intro.md
           sed -i 's#]: ./#]: https://github.com/vocdoni/vocdoni-sdk/blob/main/#g' ./01-Intro.md
 
@@ -38,7 +39,7 @@ jobs:
         run: |
           rm -rf ./developer-portal/docs/ui-components/
           mkdir -p ./developer-portal/docs/ui-components/
-          cp -R ./* ./developer-portal/docs/ui-components/
+          cp -R ./packages/react-components/docs/* ./developer-portal/docs/ui-components/
 
       - name: Create PR to developer-portal repo
         id: cpr

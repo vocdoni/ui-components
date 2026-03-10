@@ -1,0 +1,49 @@
+---
+title: Organization components
+description: Vocdoni React components for Organizations
+---
+
+## Organization provider
+
+Use `OrganizationProvider` from `@vocdoni/react-components`.
+
+`OrganizationProvider` depends on `ClientProvider` state, so `ClientProvider` must be a parent. `ComponentsProvider`
+must wrap `ClientProvider`.
+
+```jsx
+<ComponentsProvider>
+  <ClientProvider env='stg'>
+    <OrganizationProvider id='your-organization-uid'>
+      <OrganizationAvatar />
+      <OrganizationName />
+      <OrganizationDescription />
+    </OrganizationProvider>
+  </ClientProvider>
+</ComponentsProvider>
+```
+
+## OrganizationAvatar
+
+Shows organization avatar/logo.
+
+`OrganizationAvatar` is headless and default rendering uses a native HTML `<img>` element.
+
+```jsx live
+<OrganizationAvatar />
+```
+
+## OrganizationName
+
+Shows organization name.
+
+```jsx live
+<OrganizationName />
+```
+
+## OrganizationDescription
+
+Shows organization description.
+
+```jsx live
+<OrganizationDescription />
+```

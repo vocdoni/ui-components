@@ -1,0 +1,110 @@
+---
+title: Pagination components
+description: Vocdoni React components pagination
+---
+
+## Pagination APIs
+
+Pagination is split by import path:
+
+- `@vocdoni/react-components`: `PaginationProvider`, `Pagination`, `usePagination`
+- `@vocdoni/react-components/pagination`: all pagination exports, including routed helpers (`RoutedPaginationProvider`, `RoutedPagination`, `useRoutedPagination`)
+
+## Routed pagination (`react-router-dom`)
+
+Use this when the current page must be synced with the URL.
+
+```jsx
+import { RoutedPagination, RoutedPaginationProvider, useRoutedPagination } from '@vocdoni/react-components/pagination'
+
+const MyProvidedRoutedPaginatedComponent = ({ pagination }) => {
+  return (
+    <RoutedPaginationProvider path='/items/:page' pagination={pagination} initialPage={1}>
+      <MyRoutedPaginatedComponent pagination={pagination} />
+    </RoutedPaginationProvider>
+  )
+}
+
+const MyRoutedPaginatedComponent = ({ pagination }) => {
+  const { page } = useRoutedPagination()
+
+  // Retrieve your data using the current route page.
+  const { data } = useVocdoniSDKPaginatedCall({
+    page,
+  })
+
+  return (
+    <>
+      {data.items.map((item) => (
+        <MyItem key={item.id} item={item} />
+      ))}
+      <RoutedPagination pagination={pagination} />
+    </>
+  )
+}
+```
+
+If you need to set the page programmatically:
+
+```ts
+const {
+  getPathForPage, // Get path for a specific page
+  setPage, // Navigate to page
+  page, // Current page
+} = useRoutedPagination()
+```
+
+## Non-routed pagination
+
+Use this when pagination state should stay in local React state.
+
+```jsx
+import { Pagination, PaginationProvider, usePagination } from '@vocdoni/react-components'
+
+const MyProvidedPaginatedComponent = ({ pagination }) => {
+  return (
+    <PaginationProvider pagination={pagination} initialPage={1}>
+      <MyPaginatedComponent pagination={pagination} />
+    </PaginationProvider>
+  )
+}
+
+const MyPaginatedComponent = ({ pagination }) => {
+  const { page } = usePagination()
+
+  const { data } = useVocdoniSDKPaginatedCall({
+    page,
+  })
+
+  return (
+    <>
+      {data.items.map((item) => (
+        <MyItem key={item.id} item={item} />
+      ))}
+      <Pagination pagination={pagination} />
+    </>
+  )
+}
+```
+
+## PaginationResponse interface
+
+`Pagination` and `RoutedPagination` consume a `PaginationResponse['pagination']` object from `@vocdoni/sdk`:
+
+```ts
+interface PaginationResponse {
+  pagination: {
+    totalItems: number
+    previousPage: number | null
+    currentPage: number
+    nextPage: number | null
+    lastPage: number
+  }
+}
+```
+
+## Notes
+
+- `RoutedPaginationProvider.path` should include a `:page` route param.
+- Pass the same `pagination` object to the provider and pagination component for consistent behavior.
+- Pick `initialPage` to match your backend convention (`0`-based or `1`-based).

@@ -1,0 +1,68 @@
+---
+title: Customization
+description: Customize react-components rendering with ComponentsProvider
+---
+
+## ComponentsProvider
+
+`@vocdoni/react-components` keeps business logic in package components and delegates rendering through overridable
+slots.
+
+```jsx
+<ComponentsProvider components={customComponents}>{/* app */}</ComponentsProvider>
+```
+
+## Flat components map
+
+Customization uses a flat object (`ComponentsPartialDefinition`), not nested domain objects.
+
+```tsx
+import { ComponentsProvider, type ComponentsPartialDefinition } from '@vocdoni/react-components'
+
+const customComponents: ComponentsPartialDefinition = {
+  ElectionTitle: ({ title, ...props }) => <h1 {...props}>{title}</h1>,
+  OrganizationName: ({ name, ...props }) => <h2 {...props}>{name}</h2>,
+}
+```
+
+## Typed slot overrides with `defineComponent`
+
+Use `defineComponent` to keep slot props and UI-library props strongly typed.
+
+```tsx
+import { defineComponent, type ComponentsPartialDefinition } from '@vocdoni/react-components'
+import type { HeadingProps, BoxProps } from '@chakra-ui/react'
+import { Box, Heading } from '@chakra-ui/react'
+
+const customComponents: ComponentsPartialDefinition = {
+  ElectionTitle: defineComponent<'ElectionTitle', HeadingProps>(({ title, ...props }) => (
+    <Heading as='h1' {...props}>
+      {title}
+    </Heading>
+  )),
+  HR: defineComponent<'HR', BoxProps>((props) => <Box as='hr' {...props} />),
+}
+```
+
+## Compose domain partials
+
+If you split by domain, merge partial maps with `composeComponents`.
+
+```tsx
+import {
+  composeComponents,
+  type ComponentsPartialDefinition,
+  type ElectionComponentsDefinition,
+  type OrganizationComponentsDefinition,
+} from '@vocdoni/react-components'
+
+const electionComponents: Partial<ElectionComponentsDefinition> = {
+  ElectionTitle: ({ title }) => <h1>{title}</h1>,
+}
+
+const organizationComponents: Partial<OrganizationComponentsDefinition> = {
+  OrganizationName: ({ name }) => <h2>{name}</h2>,
+}
+
+const customComponents: ComponentsPartialDefinition = composeComponents(electionComponents, organizationComponents)
+```

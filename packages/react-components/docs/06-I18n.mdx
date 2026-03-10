@@ -1,0 +1,60 @@
+---
+title: i18n
+description: Internationalization in @vocdoni/react-components
+---
+
+## i18n exports
+
+`@vocdoni/react-components` ships i18n resources you can merge in your app i18next setup:
+
+- `reactComponentsNamespace`
+- `reactComponentsDefaultLanguage`
+- `reactComponentsResources`
+
+## Basic setup
+
+```ts
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import {
+  reactComponentsNamespace,
+  reactComponentsDefaultLanguage,
+  reactComponentsResources,
+} from '@vocdoni/react-components'
+
+i18n.use(initReactI18next).init({
+  lng: reactComponentsDefaultLanguage,
+  fallbackLng: reactComponentsDefaultLanguage,
+  resources: {
+    ...reactComponentsResources,
+  },
+  ns: [reactComponentsNamespace],
+  defaultNS: reactComponentsNamespace,
+  interpolation: { escapeValue: false },
+})
+```
+
+## With your own app namespaces
+
+```ts
+i18n.use(initReactI18next).init({
+  lng: 'en',
+  fallbackLng: 'en',
+  resources: {
+    ...reactComponentsResources,
+    en: {
+      ...reactComponentsResources.en,
+      common: {
+        hello: 'Hello',
+      },
+    },
+  },
+  ns: [reactComponentsNamespace, 'common'],
+  defaultNS: 'common',
+})
+```
+
+## Locale overrides
+
+If you want custom translations for package keys, override values under `reactComponentsNamespace` in your app
+resources.
