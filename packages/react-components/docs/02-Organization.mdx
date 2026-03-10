@@ -5,14 +5,21 @@ description: Vocdoni React components for Organizations
 
 ## Organization provider
 
-To use organization components, wrap your UI with `OrganizationProvider` from `@vocdoni/react-providers`.
+Use `OrganizationProvider` from `@vocdoni/react-components`.
+
+`OrganizationProvider` depends on `ClientProvider` state, so `ClientProvider` must be a parent. `ComponentsProvider`
+must wrap `ClientProvider`.
 
 ```jsx
-<OrganizationProvider id='your-organization-uid'>
-  <OrganizationAvatar />
-  <OrganizationName />
-  <OrganizationDescription />
-</OrganizationProvider>
+<ComponentsProvider>
+  <ClientProvider env='stg'>
+    <OrganizationProvider id='your-organization-uid'>
+      <OrganizationAvatar />
+      <OrganizationName />
+      <OrganizationDescription />
+    </OrganizationProvider>
+  </ClientProvider>
+</ComponentsProvider>
 ```
 
 ## OrganizationAvatar

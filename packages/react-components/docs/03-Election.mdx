@@ -5,17 +5,24 @@ description: Vocdoni React components for Elections
 
 ## Election provider
 
-To use election components, wrap your UI with `ElectionProvider` from `@vocdoni/react-providers`.
+Use `ElectionProvider` from `@vocdoni/react-components`.
+
+`ElectionProvider` depends on `ClientProvider` state, so `ClientProvider` must be a parent. `ComponentsProvider`
+must wrap `ClientProvider`.
 
 ```jsx
-<ElectionProvider id='your-election-id'>
-  <ElectionHeader />
-  <ElectionTitle />
-  <ElectionSchedule />
-  <ElectionStatusBadge />
-  <ElectionDescription />
-  <ElectionQuestions />
-</ElectionProvider>
+<ComponentsProvider>
+  <ClientProvider env='stg'>
+    <ElectionProvider id='your-election-id'>
+      <ElectionHeader />
+      <ElectionTitle />
+      <ElectionSchedule />
+      <ElectionStatusBadge />
+      <ElectionDescription />
+      <ElectionQuestions />
+    </ElectionProvider>
+  </ClientProvider>
+</ComponentsProvider>
 ```
 
 ## ElectionHeader
