@@ -137,7 +137,7 @@ describe('ElectionQuestion choice slot props', () => {
     expect(choiceProps[0].value).toBe('0')
     expect(choiceProps[0].compact).toBe(false)
     expect(choiceProps[0].hasImage).toBe(true)
-    expect(choiceProps[0].canOpenImageModal).toBe(true)
+    expect(choiceProps[0].canOpenImageModal).toBe(false)
     expect(choiceProps[0].dataAttrs?.['data-choice-card']).toBe('')
     expect(choiceProps[0].label).toBe('Choice A')
     expect(choiceProps[0].description).toBe('Meta description')

@@ -1,8 +1,8 @@
 import { IChoice } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
+import { QuestionChoicePresentation, QuestionSelectionMode } from '../../context/types'
 import { useComponents } from '../../context/useComponents'
 import { linkifyIpfs } from '../../shared/ipfs'
-import { QuestionChoicePresentation, QuestionSelectionMode } from '../../context/types'
 
 export type QuestionChoiceMeta = {
   image?: {
@@ -70,7 +70,7 @@ export const QuestionChoice = ({
   const { QuestionChoice: Slot } = useComponents()
   const metadata = getQuestionChoiceMeta(choice)
   const hasImage = Boolean(metadata.image?.default || metadata.image?.thumbnail)
-  const canOpenImageModal = Boolean(metadata.image?.default)
+  const canOpenImageModal = Boolean(metadata.image?.thumbnail && metadata.image?.default)
 
   return (
     <Slot
