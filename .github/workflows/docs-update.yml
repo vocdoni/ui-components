@@ -1,7 +1,7 @@
 name: Docs update
 
 on:
-  workflow_call:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -43,9 +43,9 @@ jobs:
 
       - name: Create PR to developer-portal repo
         id: cpr
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.VOCDONIBOT_PAT }}
+          token: ${{ secrets.VOCDONI_CI_PAT }}
           path: developer-portal
           commit-message: 'Update ui-components docs by commit ${{ steps.vars.outputs.sha_short }}'
           committer: 'Arabot-1 <arabot-1@users.noreply.github.com>'
