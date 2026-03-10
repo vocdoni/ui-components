@@ -1,4 +1,4 @@
-import { useElection } from '@vocdoni/react-providers'
+import { useElection } from '../../../providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
 import { useReactComponentsLocalize } from '../../../i18n/localize'
 import { useComponents } from '../../context/useComponents'

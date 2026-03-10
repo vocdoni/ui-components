@@ -1,4 +1,4 @@
-import { useClient, useElection } from '@vocdoni/react-providers'
+import { useClient, useElection } from '../../../providers'
 import { ReactNode } from 'react'
 import { environment } from '../../../environment'
 import { useReactComponentsLocalize } from '../../../i18n/localize'

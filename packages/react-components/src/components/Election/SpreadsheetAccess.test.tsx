@@ -55,7 +55,7 @@ vi.mock('@vocdoni/sdk', () => ({
   VocdoniSDKClient,
 }))
 
-vi.mock('@vocdoni/react-providers', () => ({
+vi.mock('../../providers', () => ({
   errorToString: (error: unknown) => String(error),
   walletFromRow: (salt: unknown, values: unknown[]) => (state.walletFromRow as any)(salt, values),
   useClient: () => ({ env: 'dev' }),

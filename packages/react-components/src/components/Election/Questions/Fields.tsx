@@ -1,4 +1,4 @@
-import { useElection } from '@vocdoni/react-providers'
+import { useElection } from '../../../providers'
 import { ElectionResultsTypeNames, ElectionStatus, IChoice, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'
 import { useReactComponentsLocalize } from '../../../i18n/localize'

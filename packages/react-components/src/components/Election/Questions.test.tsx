@@ -25,7 +25,7 @@ vi.mock('@vocdoni/sdk', () => {
   }
 })
 
-vi.mock('@vocdoni/react-providers', () => ({
+vi.mock('../../providers', () => ({
   useClient: vi.fn(() => ({ env: 'prod' })),
   useElection: vi.fn(() => ({
     election: new PublishedElection(),

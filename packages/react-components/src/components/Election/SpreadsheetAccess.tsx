@@ -1,5 +1,5 @@
 import { Wallet } from '@ethersproject/wallet'
-import { errorToString, useClient, useElection, walletFromRow } from '@vocdoni/react-providers'
+import { errorToString, useClient, useElection, walletFromRow } from '../../providers'
 import { PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'

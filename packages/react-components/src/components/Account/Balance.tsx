@@ -1,4 +1,4 @@
-import { useClient } from '@vocdoni/react-providers'
+import { useClient } from '../../providers'
 import { ComponentPropsWithoutRef } from 'react'
 import { useReactComponentsLocalize } from '../../i18n/localize'
 import { useComponents } from '../context/useComponents'

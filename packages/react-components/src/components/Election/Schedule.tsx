@@ -1,4 +1,4 @@
-import { useElection } from '@vocdoni/react-providers'
+import { useElection } from '../../providers'
 import { ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { format as dformat, formatDistance } from 'date-fns'
 import { ComponentPropsWithoutRef } from 'react'

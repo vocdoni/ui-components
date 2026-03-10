@@ -4,7 +4,7 @@ import { TestProvider } from '../test-utils'
 import { useLocalize } from './localize'
 
 describe('useLocalize', () => {
-  it('uses i18next namespace react-providers', () => {
+  it('uses i18next namespace react-components', () => {
     const wrapper = ({ children }: { children: ReactNode }) => <TestProvider>{children}</TestProvider>
     const { result } = renderHook(() => useLocalize(), { wrapper })
 

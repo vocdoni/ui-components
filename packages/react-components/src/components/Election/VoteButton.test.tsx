@@ -7,7 +7,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }))
 
-vi.mock('@vocdoni/react-providers', () => ({
+vi.mock('../../providers', () => ({
   useClient: vi.fn(() => ({ connected: true })),
   useElection: vi.fn(() => ({
     client: { wallet: {} },

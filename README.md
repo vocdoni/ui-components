@@ -55,7 +55,6 @@ This repository aims to ease the creation of voting interfaces for user-facing a
 | ---: | --- |
 | [![react-components badge]][`@vocdoni/react-components`] | Voting-related react components built with chakra for easy integration with Vocdoni. |
 | [![rainbowkit-wallets badge]][`@vocdoni/rainbowkit-wallets`] | A set of custom wallets for rainbowkit. |
-| [![react-providers badge]][`@vocdoni/react-providers`] | React providers and hooks, where most of the Vocdoni protocol integration happens (required by `@vocdoni/react-components`) |
 | [![extended-sdk badge]][`@vocdoni/extended-sdk`] | Package extending our SDK functionalities (for advanced usage). |
 
 The best place to learn about using ui-components packages is the [developer portal](https://developer.vocdoni.io/ui-components).
@@ -89,7 +88,7 @@ Turbo was initially configured for the development process, but its usage is min
 
 ## Reference
 
-The developer portal includes a [reference](https://developer.vocdoni.io/ui-components) for the `@vocdoni/react-components` package that also incorporates the full functionality of `@vocdoni/react-providers`.
+The developer portal includes a [reference](https://developer.vocdoni.io/ui-components) for the `@vocdoni/react-components` package.
 
 ## Examples
 
@@ -134,10 +133,8 @@ This repository is licensed under the [GNU Affero General Public License v3.0.](
 
 [`@vocdoni/react-components`]: ./packages/react-components/README.md
 [`@vocdoni/rainbowkit-wallets`]: ./packages/rainbowkit-wallets/README.md
-[`@vocdoni/react-providers`]: ./packages/react-providers/README.md
 [`@vocdoni/extended-sdk`]: ./packages/extended-sdk/README.md
 
 [react-components badge]: https://img.shields.io/npm/v/%40vocdoni%2Freact-components?label=%40vocdoni%2Freact-components
 [rainbowkit-wallets badge]: https://img.shields.io/npm/v/%40vocdoni%2Frainbowkit-wallets?label=%40vocdoni%2Frainbowkit-wallets
-[react-providers badge]: https://img.shields.io/npm/v/%40vocdoni%2Freact-providers?label=%40vocdoni%2Freact-providers
 [extended-sdk badge]: https://img.shields.io/npm/v/%40vocdoni%2Fextended-sdk?label=%40vocdoni%2Fextended-sdk

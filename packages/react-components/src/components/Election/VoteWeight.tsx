@@ -1,4 +1,4 @@
-import { useElection } from '@vocdoni/react-providers'
+import { useElection } from '../../providers'
 import { CensusType, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { up } from 'up-fetch'

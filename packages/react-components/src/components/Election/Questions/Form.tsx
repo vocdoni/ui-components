@@ -1,5 +1,5 @@
 import { Wallet } from '@ethersproject/wallet'
-import { useElection } from '@vocdoni/react-providers'
+import { useElection } from '../../../providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
 import { createContext, PropsWithChildren, ReactNode, useContext, useEffect } from 'react'
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form'

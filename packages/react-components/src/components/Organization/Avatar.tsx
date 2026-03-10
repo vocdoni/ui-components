@@ -1,4 +1,4 @@
-import { useOrganization } from '@vocdoni/react-providers'
+import { useOrganization } from '../../providers'
 import { ComponentPropsWithoutRef } from 'react'
 import { useComponents } from '../context/useComponents'
 import { linkifyIpfs } from '../shared/ipfs'

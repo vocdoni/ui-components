@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '../context/ComponentsProvider'
 import { Balance } from './Balance'
 
-vi.mock('@vocdoni/react-providers', () => ({
+vi.mock('../../providers', () => ({
   useClient: vi.fn(() => ({ balance: 42 })),
 }))
 

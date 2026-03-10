@@ -1,4 +1,4 @@
-import { ElectionProvider, ElectionProviderComponentProps, useElection } from '@vocdoni/react-providers'
+import { ElectionProvider, ElectionProviderComponentProps, useElection } from '../../providers'
 import { PublishedElection } from '@vocdoni/sdk'
 import { useComponents } from '../context/useComponents'
 import { ElectionActions } from './Actions'

@@ -1,4 +1,4 @@
-import { useElection } from '@vocdoni/react-providers'
+import { useElection } from '../../providers'
 import { PublishedElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
 import { useComponents } from '../context/useComponents'

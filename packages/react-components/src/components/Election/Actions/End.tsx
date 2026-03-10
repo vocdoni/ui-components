@@ -1,4 +1,4 @@
-import { useActions, useClient, useElection } from '@vocdoni/react-providers'
+import { useActions, useClient, useElection } from '../../../providers'
 import { areEqualHexStrings, ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
 import { useConfirm } from '../../../confirm/useConfirm'

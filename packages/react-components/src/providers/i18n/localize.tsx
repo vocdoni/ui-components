@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { reactProvidersNamespace } from './locales'
+import { reactComponentsNamespace } from '../../i18n/locales'
 
 const useLocalize = () => {
-  const { t } = useTranslation(reactProvidersNamespace)
+  const { t } = useTranslation(reactComponentsNamespace)
   return (key: string, substitutions?: Record<string, unknown>) => t(key, substitutions)
 }
 

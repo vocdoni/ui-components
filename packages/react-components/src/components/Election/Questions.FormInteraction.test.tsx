@@ -54,7 +54,7 @@ vi.mock('@ethersproject/wallet', () => ({
   Wallet: class Wallet {},
 }))
 
-vi.mock('@vocdoni/react-providers', () => ({
+vi.mock('../../providers', () => ({
   useElection: () => ({
     election: state.election,
     vote: state.vote,

@@ -1,4 +1,4 @@
-import { useClient, useElection } from '@vocdoni/react-providers'
+import { useClient, useElection } from '../../providers'
 import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef, useState } from 'react'
 import { useReactComponentsLocalize } from '../../i18n/localize'

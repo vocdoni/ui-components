@@ -1,22 +1,26 @@
-import { usePagination } from '../../providers/pagination/PaginationProvider'
+import { useRoutedPagination } from '../../providers/pagination/RoutedPaginationProvider'
 import { Button } from './Button'
 import { PaginationButtons, PaginationProps } from './shared'
 
-export type { PaginationProps } from './shared'
-
-export const Pagination = ({ maxButtons = 10, buttonProps, inputProps, pagination, ...rest }: PaginationProps) => {
-  const { page, setPage, initialPage } = usePagination()
+export const RoutedPagination = ({
+  maxButtons = 10,
+  buttonProps,
+  inputProps,
+  pagination,
+  ...rest
+}: PaginationProps) => {
+  const { getPathForPage, setPage, page, initialPage } = useRoutedPagination()
 
   const totalPages = initialPage === 0 ? pagination.lastPage + 1 : pagination.lastPage
   const currentPage = initialPage === 0 ? page - 1 : page
 
   return (
     <PaginationButtons
-      goToPage={(nextPage) => setPage(nextPage)}
+      goToPage={(nextPage) => setPage(nextPage + 1)}
       createPageButton={(i) => {
         const pageIndex = initialPage === 0 ? i : i + initialPage
         return (
-          <Button key={i} onClick={() => setPage(pageIndex)} isActive={currentPage === pageIndex} {...buttonProps}>
+          <Button key={i} href={getPathForPage(i + 1)} isActive={currentPage === pageIndex} {...buttonProps}>
             {i + 1}
           </Button>
         )

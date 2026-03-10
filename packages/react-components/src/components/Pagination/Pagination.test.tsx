@@ -5,14 +5,8 @@ import { Pagination } from './Pagination'
 
 const setPage = vi.fn()
 
-vi.mock('@vocdoni/react-providers', () => ({
+vi.mock('../../providers/pagination/PaginationProvider', () => ({
   usePagination: vi.fn(() => ({ page: 1, setPage, initialPage: 0 })),
-  useRoutedPagination: vi.fn(() => ({
-    page: 1,
-    setPage,
-    initialPage: 0,
-    getPathForPage: (page: number) => `/items/${page}`,
-  })),
 }))
 
 vi.mock('../../i18n/localize', () => ({

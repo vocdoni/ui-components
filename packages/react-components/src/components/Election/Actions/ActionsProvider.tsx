@@ -1,4 +1,4 @@
-import { ActionsProvider as RActionsProvider } from '@vocdoni/react-providers'
+import { ActionsProvider as RActionsProvider } from '../../../providers'
 import { PropsWithChildren } from 'react'
 
 export const ActionsProvider = ({ children }: PropsWithChildren) => <RActionsProvider>{children}</RActionsProvider>

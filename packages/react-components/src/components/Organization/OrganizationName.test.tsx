@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '../context/ComponentsProvider'
 import { OrganizationName } from './Name'
 
-vi.mock('@vocdoni/react-providers', () => ({
+vi.mock('../../providers', () => ({
   useOrganization: vi.fn(() => ({
     organization: {
       address: '0xorg',

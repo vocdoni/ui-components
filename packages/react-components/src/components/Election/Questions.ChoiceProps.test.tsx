@@ -40,7 +40,7 @@ vi.mock('@vocdoni/sdk', () => ({
   },
 }))
 
-vi.mock('@vocdoni/react-providers', () => ({
+vi.mock('../../providers', () => ({
   useElection: () => ({
     election: state.election,
     isAbleToVote: true,

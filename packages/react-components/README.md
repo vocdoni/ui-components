@@ -15,6 +15,7 @@ This package keeps business logic and component APIs while delegating visual ren
 ### Table of Contents
 - [Getting Started](#getting-started)
 - [How To Use Components](#how-to-use-components)
+  - [Pagination](#pagination)
 - [How Customization Works](#how-customization-works)
   - [TypeScript](#typescript)
 - [i18n (i18next)](#i18n-i18next)
@@ -27,10 +28,14 @@ This package keeps business logic and component APIs while delegating visual ren
 Install package and peer dependencies:
 
 ~~~bash
-yarn add @vocdoni/react-components @vocdoni/react-providers @vocdoni/sdk react react-i18next i18next date-fns
+pnpm add @vocdoni/react-components @vocdoni/sdk react react-i18next i18next date-fns
 ~~~
 
-If you use routed helpers (for example `RoutedPagination`), install router dependencies in your app where routing is configured.
+Pagination APIs are exported from explicit subpaths:
+
+- `@vocdoni/react-components/pagination`
+
+If you use routed helpers (for example `RoutedPagination`), install `react-router-dom` in your app where routing is configured.
 
 Set providers at app root:
 
@@ -49,7 +54,7 @@ export const App = () => (
 Users consume exported components normally by importing and rendering them:
 
 ~~~tsx
-import { Election, OrganizationName, Pagination, Balance } from '@vocdoni/react-components'
+import { Election, OrganizationName, Balance, Pagination } from '@vocdoni/react-components'
 
 export const Screen = () => (
   <>
@@ -62,6 +67,64 @@ export const Screen = () => (
 ~~~
 
 `ComponentsProvider` is optional. If you do not pass custom slots, built-in defaults are used.
+
+### Pagination
+
+Pagination is intentionally split into explicit subpaths:
+
+- `@vocdoni/react-components`: router-free pagination
+- `@vocdoni/react-components/pagination`: full pagination API (router-free + route-synced helpers)
+
+#### Router-Free Pagination
+
+Use this when pagination state lives in React state (no URL sync):
+
+~~~tsx
+import { PaginationProvider, Pagination } from '@vocdoni/react-components'
+
+export const Members = ({ pagination }) => (
+  <PaginationProvider initialPage={1} pagination={pagination}>
+    <Pagination pagination={pagination} />
+  </PaginationProvider>
+)
+~~~
+
+#### Routed Pagination
+
+Use this when page changes should update the URL.
+
+Required dependency in your app:
+
+~~~bash
+pnpm add react-router-dom
+~~~
+
+Example:
+
+~~~tsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { RoutedPaginationProvider, RoutedPagination } from '@vocdoni/react-components/pagination'
+
+const ProcessList = ({ pagination }) => (
+  <RoutedPaginationProvider path='/processes/:page' initialPage={1} pagination={pagination}>
+    <RoutedPagination pagination={pagination} />
+  </RoutedPaginationProvider>
+)
+
+export const App = ({ pagination }) => (
+  <BrowserRouter>
+    <Routes>
+      <Route path='/processes/:page' element={<ProcessList pagination={pagination} />} />
+    </Routes>
+  </BrowserRouter>
+)
+~~~
+
+Notes:
+
+- The route must include a `:page` param if you use `RoutedPaginationProvider`.
+- Use `initialPage` consistently with your backend pagination convention (`0`-based or `1`-based).
+- If you only use `@vocdoni/react-components/pagination`, you do not need `react-router-dom`.
 
 ## Default HTML Rendering
 
@@ -136,7 +199,7 @@ This keeps both slot props (for example `title`, `description`, `label`) and you
 
 ## i18n (i18next)
 
-This package exports i18n resources in the same style as `@vocdoni/react-providers`:
+This package exports i18n resources via the `react-components` namespace:
 
 - `reactComponentsNamespace`
 - `reactComponentsDefaultLanguage`

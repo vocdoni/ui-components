@@ -1,4 +1,4 @@
-import { useElection } from '@vocdoni/react-providers'
+import { useElection } from '../../providers'
 import {
   dotobject,
   ElectionResultsTypeNames,

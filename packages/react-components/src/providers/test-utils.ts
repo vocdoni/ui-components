@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import i18n from 'i18next'
 import { createElement, ReactNode, useRef } from 'react'
 import { I18nextProvider, initReactI18next } from 'react-i18next'
-import { reactProvidersDefaultLanguage, reactProvidersNamespace, reactProvidersResources } from './i18n/locales'
+import { reactComponentsDefaultLanguage, reactComponentsNamespace, reactComponentsResources } from '../i18n/locales'
 
 // workaround for https://github.com/testing-library/react-testing-library/issues/1233#issuecomment-1686160909
 export const onlyProps = (props: any) => {
@@ -36,10 +36,10 @@ export const ApiUrl = {
 export const createI18nWrapper = () => {
   const instance = i18n.createInstance()
   instance.use(initReactI18next).init({
-    lng: reactProvidersDefaultLanguage,
-    resources: reactProvidersResources,
-    ns: [reactProvidersNamespace],
-    defaultNS: reactProvidersNamespace,
+    lng: reactComponentsDefaultLanguage,
+    resources: reactComponentsResources,
+    ns: [reactComponentsNamespace],
+    defaultNS: reactComponentsNamespace,
     showSupportNotice: false,
   })
 
@@ -77,10 +77,10 @@ export const createQueryWrapper = () => {
 
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
-    lng: reactProvidersDefaultLanguage,
-    resources: reactProvidersResources,
-    ns: [reactProvidersNamespace],
-    defaultNS: reactProvidersNamespace,
+    lng: reactComponentsDefaultLanguage,
+    resources: reactComponentsResources,
+    ns: [reactComponentsNamespace],
+    defaultNS: reactComponentsNamespace,
     showSupportNotice: false,
   })
 }
