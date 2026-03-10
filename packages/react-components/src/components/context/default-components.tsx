@@ -242,6 +242,22 @@ export const defaultComponents: ComponentsDefinition = {
       <button onClick={onConfirm}>{confirm}</button>
     </div>
   ),
+  ConfirmShell: ({ isOpen, onClose, content, ...props }) => {
+    if (!isOpen) return null
+
+    return (
+      <div className='vocdoni-confirm-modal-overlay' role='presentation' onClick={onClose} {...props}>
+        <div
+          className='vocdoni-confirm-modal-content'
+          role='dialog'
+          aria-modal='true'
+          onClick={(event) => event.stopPropagation()}
+        >
+          {content}
+        </div>
+      </div>
+    )
+  },
   AccountBalance: ({ label, tone, ...props }) => (
     <span {...props} data-tone={tone}>
       {label}

@@ -43,9 +43,9 @@ Set providers at app root:
 import { ClientProvider, ComponentsProvider } from '@vocdoni/react-components'
 
 export const App = () => (
-  <ClientProvider env='stg'>
-    <ComponentsProvider>{/* app */}</ComponentsProvider>
-  </ClientProvider>
+  <ComponentsProvider>
+    <ClientProvider env='stg'>{/* app */}</ClientProvider>
+  </ComponentsProvider>
 )
 ~~~
 
@@ -66,7 +66,8 @@ export const Screen = () => (
 )
 ~~~
 
-`ComponentsProvider` is optional. If you do not pass custom slots, built-in defaults are used.
+`ComponentsProvider` must wrap `ClientProvider` so confirmation flows can resolve slot components.
+If you do not pass custom slots, built-in defaults are used.
 
 ### Pagination
 
@@ -150,6 +151,47 @@ Then provide it:
 
 ~~~tsx
 <ComponentsProvider components={components}>{/* app */}</ComponentsProvider>
+~~~
+
+### Confirm Customization
+
+Confirmation modals are fully slot-driven:
+
+- `ConfirmShell`: modal wrapper/shell (open state and close action)
+- `QuestionsConfirmation`: vote confirmation content
+
+Example:
+
+~~~tsx
+import { ComponentsProvider, composeComponents, defineComponent, type ComponentsPartialDefinition } from '@vocdoni/react-components'
+
+const components: ComponentsPartialDefinition = composeComponents({
+  ConfirmShell: defineComponent<'ConfirmShell'>(({ isOpen, onClose, content }) =>
+    isOpen ? (
+      <div role='dialog'>
+        <button onClick={onClose}>Close</button>
+        {content}
+      </div>
+    ) : null
+  ),
+  QuestionsConfirmation: defineComponent<'QuestionsConfirmation'>(({ answersView, onConfirm, onCancel }) => (
+    <div>
+      {answersView.map((item) => (
+        <div key={item.question}>
+          <strong>{item.question}</strong>: {item.answers.join(', ')}
+        </div>
+      ))}
+      <button onClick={onCancel}>Cancel</button>
+      <button onClick={onConfirm}>Confirm</button>
+    </div>
+  )),
+})
+
+export const App = () => (
+  <ComponentsProvider components={components}>
+    <ClientProvider env='prod'>{/* app */}</ClientProvider>
+  </ComponentsProvider>
+)
 ~~~
 
 The package also exports optional domain helper types and a merge helper for DX:

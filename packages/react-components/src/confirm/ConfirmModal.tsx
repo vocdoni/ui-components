@@ -1,20 +1,9 @@
 import { useConfirm } from './useConfirm'
+import { useComponents } from '../components/context/useComponents'
 
 export const ConfirmModal = () => {
   const { prompt, isOpen, cancel } = useConfirm()
+  const { ConfirmShell: Shell } = useComponents()
 
-  if (!isOpen) return null
-
-  return (
-    <div className='vocdoni-confirm-modal-overlay' role='presentation' onClick={() => cancel?.()}>
-      <div
-        className='vocdoni-confirm-modal-content'
-        role='dialog'
-        aria-modal='true'
-        onClick={(event) => event.stopPropagation()}
-      >
-        {prompt}
-      </div>
-    </div>
-  )
+  return <Shell isOpen={isOpen} onClose={() => cancel?.()} content={prompt} />
 }

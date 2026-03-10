@@ -13,8 +13,8 @@ export type ElectionQuestionsFormProps = ComponentPropsWithoutRef<'div'> & {
 
 export type ElectionQuestionsProps = ElectionQuestionsFormProps & QuestionsFormProviderProps
 
-export const ElectionQuestions = ({ confirmContents, ...props }: ElectionQuestionsProps) => (
-  <QuestionsFormProvider confirmContents={confirmContents}>
+export const ElectionQuestions = (props: ElectionQuestionsProps) => (
+  <QuestionsFormProvider>
     <ElectionQuestionsForm {...props} />
   </QuestionsFormProvider>
 )

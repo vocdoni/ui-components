@@ -3,10 +3,14 @@ import { describe, expect, it, vi } from 'vitest'
 import { ConfirmContext } from '../../confirm/ConfirmProvider'
 import { ComponentsProvider } from '../context/ComponentsProvider'
 import { ElectionQuestions } from './Questions/Questions'
+import { QuestionsConfirmation } from './Questions/Confirmation'
 
 const state = vi.hoisted(() => ({
   election: null as any,
   vote: vi.fn(async () => undefined),
+  wallet: {} as any,
+  confirm: vi.fn(async (_prompt: any) => true) as any,
+  capturedPrompt: null as any,
 }))
 
 const { PublishedElection } = vi.hoisted(() => {
@@ -50,8 +54,10 @@ vi.mock('@vocdoni/sdk', () => ({
   },
 }))
 
+const { Wallet } = vi.hoisted(() => ({ Wallet: class Wallet {} }))
+
 vi.mock('@ethersproject/wallet', () => ({
-  Wallet: class Wallet {},
+  Wallet,
 }))
 
 vi.mock('../../providers', () => ({
@@ -59,7 +65,7 @@ vi.mock('../../providers', () => ({
     election: state.election,
     vote: state.vote,
     connected: true,
-    client: { wallet: {} },
+    client: { wallet: state.wallet },
     voted: null,
     isAbleToVote: true,
     loading: { voting: false },
@@ -89,7 +95,7 @@ const renderElectionQuestions = () =>
         prompt: null,
         proceed: vi.fn(),
         cancel: vi.fn(),
-        confirm: vi.fn(async () => true),
+        confirm: state.confirm,
       }}
     >
       <ComponentsProvider>
@@ -99,6 +105,15 @@ const renderElectionQuestions = () =>
   )
 
 describe('ElectionQuestions form integration', () => {
+  beforeEach(() => {
+    state.wallet = {}
+    state.confirm = vi.fn(async (prompt) => {
+      state.capturedPrompt = prompt
+      return true
+    })
+    state.capturedPrompt = null
+  })
+
   it('submits single-choice selection as numeric payload', async () => {
     state.vote = vi.fn(async () => undefined)
     state.election = new PublishedElection('SINGLE_CHOICE_MULTIQUESTION', [
@@ -169,6 +184,30 @@ describe('ElectionQuestions form integration', () => {
 
     await waitFor(() => {
       expect(state.vote).toHaveBeenCalledWith([0, 99])
+    })
+  })
+
+  it('uses slot-based QuestionsConfirmation prompt when confirmation is required', async () => {
+    state.vote = vi.fn(async () => undefined)
+    state.wallet = new Wallet()
+    state.election = new PublishedElection('SINGLE_CHOICE_MULTIQUESTION', [
+      {
+        title: { default: 'Single question' },
+        choices: [
+          { value: 0, title: { default: 'A' } },
+          { value: 1, title: { default: 'B' } },
+        ],
+      },
+    ])
+
+    const { container } = renderElectionQuestions()
+
+    clickByValue(container, 'radio', '1')
+    fireEvent.submit(container.querySelector('form')!)
+
+    await waitFor(() => {
+      expect(state.confirm).toHaveBeenCalledTimes(1)
+      expect(state.capturedPrompt?.type).toBe(QuestionsConfirmation)
     })
   })
 })

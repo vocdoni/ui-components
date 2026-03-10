@@ -89,6 +89,11 @@ export type ConfirmActionModalSlotProps = BaseProps<HTMLDivElement> & {
   onConfirm: () => void
   onCancel: () => void
 }
+export type ConfirmShellSlotProps = Omit<BaseProps<HTMLDivElement>, 'content'> & {
+  isOpen: boolean
+  onClose: () => void
+  content: ReactNode
+}
 
 export type AccountBalanceSlotProps = BaseProps<HTMLSpanElement> & {
   balance: number
@@ -206,6 +211,7 @@ export type ComponentsDefinition<ExternalProps extends object = {}> = {
   ActionEnd: ComponentType<ActionButtonSlotProps & ExternalProps>
   ActionCancel: ComponentType<ActionButtonSlotProps & ExternalProps>
   ConfirmActionModal: ComponentType<ConfirmActionModalSlotProps & ExternalProps>
+  ConfirmShell: ComponentType<ConfirmShellSlotProps & ExternalProps>
   AccountBalance: ComponentType<AccountBalanceSlotProps & ExternalProps>
   PaginationContainer: ComponentType<PaginationContainerSlotProps & ExternalProps>
   PaginationButton: ComponentType<PaginationButtonSlotProps & ExternalProps>
@@ -246,6 +252,7 @@ export type ElectionComponentsDefinition = Pick<
   | 'ActionEnd'
   | 'ActionCancel'
   | 'ConfirmActionModal'
+  | 'ConfirmShell'
 >
 
 export type OrganizationComponentsDefinition = Pick<

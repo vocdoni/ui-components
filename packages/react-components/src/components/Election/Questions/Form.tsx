@@ -1,7 +1,7 @@
 import { Wallet } from '@ethersproject/wallet'
 import { useElection } from '../../../providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
-import { createContext, PropsWithChildren, ReactNode, useContext, useEffect } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect } from 'react'
 import { FieldValues, FormProvider, useForm, UseFormReturn } from 'react-hook-form'
 import { useConfirm } from '../../../confirm/useConfirm'
 import { QuestionsConfirmation } from './Confirmation'
@@ -21,15 +21,9 @@ export const useQuestionsForm = () => {
   return context
 }
 
-export type QuestionsFormProviderProps = {
-  confirmContents?: (election: PublishedElection, answers: FieldValues) => ReactNode
-}
+export type QuestionsFormProviderProps = {}
 
-const DefaultQuestionsConfirmation = ({ election, answers }: { election: PublishedElection; answers: FieldValues }) => {
-  return <QuestionsConfirmation election={election} answers={answers} />
-}
-
-export const QuestionsFormProvider = ({ confirmContents, children }: PropsWithChildren<QuestionsFormProviderProps>) => {
+export const QuestionsFormProvider = ({ children }: PropsWithChildren<QuestionsFormProviderProps>) => {
   const fmethods = useForm()
   const { confirm } = useConfirm()
   const { election, client, vote: baseVote, connected } = useElection()
@@ -42,13 +36,7 @@ export const QuestionsFormProvider = ({ confirmContents, children }: PropsWithCh
 
     if (
       client.wallet instanceof Wallet &&
-      !(await confirm(
-        typeof confirmContents === 'function' ? (
-          confirmContents(election, values)
-        ) : (
-          <DefaultQuestionsConfirmation election={election} answers={values} />
-        )
-      ))
+      !(await confirm(<QuestionsConfirmation election={election} answers={values} />))
     ) {
       return false
     }
