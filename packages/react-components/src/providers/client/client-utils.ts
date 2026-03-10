@@ -2,7 +2,8 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { Wallet } from '@ethersproject/wallet'
 import { EnvOptions, VocdoniCensus3Client, VocdoniSDKClient } from '@vocdoni/sdk'
 
-export type ClientEnv = `${EnvOptions}` | EnvOptions
+export const CLIENT_ENVS = [EnvOptions.DEV, EnvOptions.PROD] as const
+export type ClientEnv = (typeof CLIENT_ENVS)[number] | `${(typeof CLIENT_ENVS)[number]}`
 
 export type ClientReducerPropsOptions = {
   api_url?: string
@@ -22,6 +23,11 @@ export type ClientReducerProps = {
 }
 
 export type ClientSetPayload = VocdoniSDKClient
+
+export const normalizeClientEnv = (env?: ClientEnv | EnvOptions): (typeof CLIENT_ENVS)[number] => {
+  if (env === EnvOptions.PROD) return EnvOptions.PROD
+  return EnvOptions.DEV
+}
 
 export const newVocdoniSDKClient = (
   env: EnvOptions,

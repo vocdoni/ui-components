@@ -1,10 +1,10 @@
 export const environment = {
   explorer: (env: string) => {
-    let explorer = 'https://explorer.vote'
-    if (['stg', 'dev'].includes(env)) {
-      explorer = `https://${env}.explorer.vote`
+    if (env === 'dev') {
+      return 'https://dev.explorer.vote'
     }
-    return explorer
+
+    return 'https://explorer.vote'
   },
   verifyVote: (env: string, proof: string) => `${environment.explorer(env)}/verify/#/${proof}`,
 }

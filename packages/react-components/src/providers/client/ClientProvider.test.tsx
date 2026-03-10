@@ -40,7 +40,7 @@ describe('<ClientProvider />', () => {
       wrapper,
     })
 
-    expect(result.current.env).toBe('prod')
+    expect(result.current.env).toBe('dev')
 
     // no signer is passed, so none should be defined
     expect(result.current.signer).toBeUndefined()
@@ -50,8 +50,8 @@ describe('<ClientProvider />', () => {
     // and there should be no account connected either
     expect(result.current.account).toBeUndefined()
 
-    // ensures prod is taken by default in the client
-    expect(result.current.client.url).toEqual(ApiUrl.prod)
+    // ensures dev is taken by default in the client
+    expect(result.current.client.url).toEqual(ApiUrl.dev)
 
     // check census3 client is setup
     expect(result.current.census3).not.toBeUndefined()
@@ -67,18 +67,35 @@ describe('<ClientProvider />', () => {
     )
     const { result, rerender } = renderHook(() => useClient(), {
       wrapper,
-      initialProps: { env: 'stg' },
+      initialProps: { env: 'prod' },
     })
 
-    expect(result.current.env).toBe('stg')
-    expect(result.current.client.url).toEqual(ApiUrl.stg)
-    expect(result.current.census3.url).toEqual(CensusUrls.stg)
+    expect(result.current.env).toBe('prod')
+    expect(result.current.client.url).toEqual(ApiUrl.prod)
+    expect(result.current.census3.url).toEqual(CensusUrls.prod)
 
     // change it to dev
     rerender({ env: 'dev' })
 
     expect(result.current.env).toBe('dev')
     // ensure other related instances are updated too
+    expect(result.current.client.url).toEqual(ApiUrl.dev)
+    expect(result.current.census3.url).toEqual(CensusUrls.dev)
+  })
+
+  it('maps legacy stg env to dev', () => {
+    const wrapper = (props: any) => (
+      <TestProvider>
+        <ClientProvider {...properProps(props)} />
+      </TestProvider>
+    )
+    const { result } = renderHook(() => useClient(), {
+      wrapper,
+      // legacy runtime values can still bypass types
+      initialProps: { env: 'stg' as any },
+    })
+
+    expect(result.current.env).toBe('dev')
     expect(result.current.client.url).toEqual(ApiUrl.dev)
     expect(result.current.census3.url).toEqual(CensusUrls.dev)
   })

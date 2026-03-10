@@ -3,7 +3,7 @@ import { Wallet } from '@ethersproject/wallet'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useMemo, useState } from 'react'
-import { ClientReducerProps, newVocdoniCensus3, newVocdoniSDKClient } from './client-utils'
+import { ClientEnv, ClientReducerProps, newVocdoniCensus3, newVocdoniSDKClient, normalizeClientEnv } from './client-utils'
 import { useLocalize } from '~providers/i18n/localize'
 import { queryKeys } from '~providers/query/keys'
 import { errorToString } from '~providers/utils'
@@ -20,14 +20,13 @@ export const useClientProvider = ({
   const localize = useLocalize()
   const queryClient = useQueryClient()
 
-  const [env, setEnvState] = useState<EnvOptions>((e as EnvOptions) || EnvOptions.PROD)
+  const initialEnv = normalizeClientEnv(e as ClientEnv | EnvOptions | undefined)
+  const [env, setEnvState] = useState<EnvOptions>(initialEnv)
   const [signer, setSignerState] = useState<Wallet | Signer | undefined>(s)
   const [options, setOptionsState] = useState(o)
   const [census3Options, setCensus3OptionsState] = useState(c3o)
-  const [client, setClientState] = useState<VocdoniSDKClient>(
-    c || newVocdoniSDKClient((e as EnvOptions) || EnvOptions.PROD, s, o)
-  )
-  const [census3, setCensus3State] = useState(newVocdoniCensus3((e as EnvOptions) || EnvOptions.PROD, c3o?.api_url))
+  const [client, setClientState] = useState<VocdoniSDKClient>(c || newVocdoniSDKClient(initialEnv, s, o))
+  const [census3, setCensus3State] = useState(newVocdoniCensus3(initialEnv, c3o?.api_url))
   const [address, setAddress] = useState<string | undefined>(undefined)
 
   const connected = !!client?.wallet && Object.keys(client.wallet as unknown as Record<string, unknown>).length > 0
@@ -90,10 +89,11 @@ export const useClientProvider = ({
     },
   })
 
-  const setEnv = (nextEnv: EnvOptions) => {
-    setEnvState(nextEnv)
-    setClientState(newVocdoniSDKClient(nextEnv, signer, options))
-    setCensus3State(newVocdoniCensus3(nextEnv, census3Options?.api_url))
+  const setEnv = (nextEnv: ClientEnv | EnvOptions) => {
+    const normalizedEnv = normalizeClientEnv(nextEnv)
+    setEnvState(normalizedEnv)
+    setClientState(newVocdoniSDKClient(normalizedEnv, signer, options))
+    setCensus3State(newVocdoniCensus3(normalizedEnv, census3Options?.api_url))
     setAddress(undefined)
     queryClient.removeQueries({ queryKey: ['client'] })
   }
@@ -113,7 +113,7 @@ export const useClientProvider = ({
 
   useEffect(() => {
     if (!e || e === env) return
-    setEnv(e as EnvOptions)
+    setEnv(e as ClientEnv | EnvOptions)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [e])
 
