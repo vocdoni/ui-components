@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { ComponentsProvider } from '../context/ComponentsProvider'
 import { Balance } from './Balance'
+import { ComponentsProvider } from '~components/context/ComponentsProvider'
 
 vi.mock('../../providers', () => ({
   useClient: vi.fn(() => ({ balance: 42 })),

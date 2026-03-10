@@ -1,4 +1,4 @@
-import { useRoutedPagination } from '../../providers/pagination/RoutedPaginationProvider'
+import { useRoutedPagination } from '~providers/pagination/RoutedPaginationProvider'
 import { Button } from './Button'
 import { PaginationButtons, PaginationProps } from './shared'
 

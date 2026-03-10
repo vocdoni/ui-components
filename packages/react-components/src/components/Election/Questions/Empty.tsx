@@ -1,4 +1,4 @@
-import { useComponents } from '../../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
 
 export const QuestionsEmpty = () => {
   const { QuestionsEmpty: Slot } = useComponents()

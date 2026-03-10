@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import { useClient } from '~providers/client'
 import { useElection } from '.'
-import { useClient } from '../client'
 
 type LoadingState = {
   continue: boolean

@@ -1,9 +1,9 @@
-import { useElection } from '../../providers'
 import { CensusType, PublishedElection } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { up } from 'up-fetch'
-import { useReactComponentsLocalize } from '../../i18n/localize'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useElection } from '~providers'
 import { results } from './Results'
 
 const upfetch = up(fetch)

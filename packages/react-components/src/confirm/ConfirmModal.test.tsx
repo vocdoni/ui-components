@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { ConfirmContext } from './ConfirmProvider'
+import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { ConfirmModal } from './ConfirmModal'
-import { ComponentsProvider } from '../components/context/ComponentsProvider'
+import { ConfirmContext } from './ConfirmProvider'
 
 describe('ConfirmModal', () => {
   it('delegates modal rendering to ConfirmShell slot', () => {

@@ -1,7 +1,7 @@
-import { useElection } from '../../providers'
 import { PublishedElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useElection } from '~providers'
 
 export const ElectionDescription = (props: ComponentPropsWithoutRef<'div'> & Record<string, unknown>) => {
   const { election } = useElection()

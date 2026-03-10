@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
-import { TestProvider } from '../test-utils'
 import { useLocalize } from './localize'
+import { TestProvider } from '~providers/test-utils'
 
 describe('useLocalize', () => {
   it('uses i18next namespace react-components', () => {

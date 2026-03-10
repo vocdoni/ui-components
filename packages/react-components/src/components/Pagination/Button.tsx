@@ -1,5 +1,5 @@
 import { ComponentPropsWithoutRef } from 'react'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
 
 export type ButtonProps = ComponentPropsWithoutRef<'button'> & {
   isActive?: boolean

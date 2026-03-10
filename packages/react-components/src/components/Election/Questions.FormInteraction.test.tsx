@@ -1,9 +1,9 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { ConfirmContext } from '../../confirm/ConfirmProvider'
-import { ComponentsProvider } from '../context/ComponentsProvider'
-import { ElectionQuestions } from './Questions/Questions'
+import { ComponentsProvider } from '~components/context/ComponentsProvider'
+import { ConfirmContext } from '~confirm/ConfirmProvider'
 import { QuestionsConfirmation } from './Questions/Confirmation'
+import { ElectionQuestions } from './Questions/Questions'
 
 const state = vi.hoisted(() => ({
   election: null as any,

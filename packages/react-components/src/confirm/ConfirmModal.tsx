@@ -1,5 +1,5 @@
+import { useComponents } from '~components/context/useComponents'
 import { useConfirm } from './useConfirm'
-import { useComponents } from '../components/context/useComponents'
 
 export const ConfirmModal = () => {
   const { prompt, isOpen, cancel } = useConfirm()

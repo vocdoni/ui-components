@@ -1,8 +1,8 @@
-import { useElection } from '../../../providers'
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
-import { useReactComponentsLocalize } from '../../../i18n/localize'
-import { useComponents } from '../../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useElection } from '~providers'
 
 export const QuestionsTypeBadge = (props: ComponentPropsWithoutRef<'div'> & Record<string, unknown>) => {
   const { election } = useElection()

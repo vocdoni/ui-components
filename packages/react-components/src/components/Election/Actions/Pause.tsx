@@ -1,8 +1,8 @@
-import { useActions, useClient, useElection } from '../../../providers'
 import { areEqualHexStrings, ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
-import { useReactComponentsLocalize } from '../../../i18n/localize'
-import { useComponents } from '../../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useActions, useClient, useElection } from '~providers'
 
 export const ActionPause = (props: ComponentPropsWithoutRef<'button'>) => {
   const { account } = useClient()

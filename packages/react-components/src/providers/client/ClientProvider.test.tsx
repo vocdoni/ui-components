@@ -2,8 +2,8 @@ import { Wallet } from '@ethersproject/wallet'
 import { render, renderHook, waitFor } from '@testing-library/react'
 import { Account, VocdoniCensus3Client } from '@vocdoni/sdk'
 import { act } from 'react'
-import { ApiUrl, CensusUrls, properProps, TestProvider } from '../test-utils'
 import { ClientProvider, useClient } from './ClientProvider'
+import { ApiUrl, CensusUrls, properProps, TestProvider } from '~providers/test-utils'
 
 const mockAccount = (overrides?: Partial<Record<string, unknown>>) => ({
   account: new Account({ name: 'alpha' }),

@@ -1,10 +1,10 @@
 import { Wallet } from '@ethersproject/wallet'
-import { errorToString, useClient, useElection, walletFromRow } from '../../providers'
 import { PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useReactComponentsLocalize } from '../../i18n/localize'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { errorToString, useClient, useElection, walletFromRow } from '~providers'
 
 type MetaSpecs = {
   [name: string]: {

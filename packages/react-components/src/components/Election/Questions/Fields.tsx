@@ -1,9 +1,9 @@
-import { useElection } from '../../../providers'
 import { ElectionResultsTypeNames, ElectionStatus, IChoice, IQuestion, PublishedElection } from '@vocdoni/sdk'
 import { Controller, useFormContext } from 'react-hook-form'
-import { useReactComponentsLocalize } from '../../../i18n/localize'
-import { QuestionChoicePresentation, QuestionLayout, QuestionSelectionMode } from '../../context/types'
-import { useComponents } from '../../context/useComponents'
+import { QuestionChoicePresentation, QuestionLayout, QuestionSelectionMode } from '~components/context/types'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useElection } from '~providers'
 import { hasExtendedChoiceMeta, QuestionChoice } from './Choice'
 import { QuestionTip } from './Tip'
 

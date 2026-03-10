@@ -1,6 +1,6 @@
-import { ElectionProvider, ElectionProviderComponentProps, useElection } from '../../providers'
 import { PublishedElection } from '@vocdoni/sdk'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { ElectionProvider, ElectionProviderComponentProps, useElection } from '~providers'
 import { ElectionActions } from './Actions'
 import { ElectionDescription } from './Description'
 import { ElectionHeader } from './Header'

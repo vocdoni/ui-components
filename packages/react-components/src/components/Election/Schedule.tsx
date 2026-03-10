@@ -1,9 +1,9 @@
-import { useElection } from '../../providers'
 import { ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { format as dformat, formatDistance } from 'date-fns'
 import { ComponentPropsWithoutRef } from 'react'
-import { useReactComponentsLocalize } from '../../i18n/localize'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useElection } from '~providers'
 
 export type ElectionScheduleProps = ComponentPropsWithoutRef<'p'> &
   Record<string, unknown> & {

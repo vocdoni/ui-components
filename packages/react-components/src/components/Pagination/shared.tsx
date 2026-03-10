@@ -1,7 +1,7 @@
 import { PaginationResponse } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef, ReactElement, useMemo } from 'react'
-import { useReactComponentsLocalize } from '../../i18n/localize'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
 import { Button, ButtonProps } from './Button'
 import { EllipsisButton } from './EllipsisButton'
 

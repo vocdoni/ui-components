@@ -7,8 +7,8 @@ import {
   Vote,
 } from '@vocdoni/sdk'
 import { Reducer, useEffect, useMemo, useReducer } from 'react'
-import { useClient } from '../client'
-import { ClientSetPayload } from '../client/client-utils'
+import { useClient } from '~providers/client'
+import { ClientSetPayload } from '~providers/client/client-utils'
 export const BlindCspServiceKey = 'vocdoni-blind-csp'
 
 export const CensusClear = 'election:census:clear'

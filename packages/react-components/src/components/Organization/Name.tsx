@@ -1,6 +1,6 @@
-import { useOrganization } from '../../providers'
 import { ComponentPropsWithoutRef } from 'react'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useOrganization } from '~providers'
 
 export const OrganizationName = (props: ComponentPropsWithoutRef<'h1'> & Record<string, unknown>) => {
   const { organization } = useOrganization()

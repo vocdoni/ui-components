@@ -13,14 +13,14 @@ import {
   VotesLeftCountOptions,
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useClient } from '../client'
-import { vote as cspVote, fetchSignInfo } from '../csp'
-import { queryKeys } from '../query/keys'
-import { errorToString } from '../utils'
-import worker, { ICircuit, ICircuitWorkerRequest } from '../worker/circuitWorkerScript'
-import { useWebWorker } from '../worker/useWebWorker'
-import { createWebWorker } from '../worker/webWorker'
+import { useClient } from '~providers/client'
+import { vote as cspVote, fetchSignInfo } from '~providers/csp'
 import { useElectionReducer } from './use-election-reducer'
+import { queryKeys } from '~providers/query/keys'
+import { errorToString } from '~providers/utils'
+import worker, { ICircuit, ICircuitWorkerRequest } from '~providers/worker/circuitWorkerScript'
+import { useWebWorker } from '~providers/worker/useWebWorker'
+import { createWebWorker } from '~providers/worker/webWorker'
 
 export type ElectionProviderProps = {
   id?: string

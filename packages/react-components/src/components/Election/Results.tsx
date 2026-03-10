@@ -1,4 +1,3 @@
-import { useElection } from '../../providers'
 import {
   dotobject,
   ElectionResultsTypeNames,
@@ -10,9 +9,10 @@ import {
 } from '@vocdoni/sdk'
 import { format } from 'date-fns'
 import { ComponentPropsWithoutRef } from 'react'
-import { useReactComponentsLocalize } from '../../i18n/localize'
-import { useComponents } from '../context/useComponents'
-import { linkifyIpfs } from '../shared/ipfs'
+import { useComponents } from '~components/context/useComponents'
+import { linkifyIpfs } from '~components/shared/ipfs'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useElection } from '~providers'
 
 const percent = (result: number, total: number) => ((Number(result) / total) * 100 || 0).toFixed(1) + '%'
 export const results = (result: number, decimals?: number) =>

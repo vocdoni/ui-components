@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef, useState } from 'react'
-import { useReactComponentsLocalize } from '../../i18n/localize'
-import { useComponents } from '../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
 
 export type EllipsisButtonProps = ComponentPropsWithoutRef<'button'> & {
   gotoPage: (page: number) => void

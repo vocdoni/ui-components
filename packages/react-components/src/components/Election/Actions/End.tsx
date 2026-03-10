@@ -1,9 +1,9 @@
-import { useActions, useClient, useElection } from '../../../providers'
 import { areEqualHexStrings, ElectionStatus, PublishedElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
-import { useConfirm } from '../../../confirm/useConfirm'
-import { useReactComponentsLocalize } from '../../../i18n/localize'
-import { useComponents } from '../../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useConfirm } from '~confirm/useConfirm'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useActions, useClient, useElection } from '~providers'
 import { ConfirmActionModal } from './ConfirmActionModal'
 
 export const ActionEnd = (props: ComponentPropsWithoutRef<'button'>) => {

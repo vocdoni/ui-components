@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { ComponentsProvider } from '../context/ComponentsProvider'
-import { SpreadsheetAccessSlotProps } from '../context/types'
+import { ComponentsProvider } from '~components/context/ComponentsProvider'
+import { SpreadsheetAccessSlotProps } from '~components/context/types'
 import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 const state = vi.hoisted(() => ({

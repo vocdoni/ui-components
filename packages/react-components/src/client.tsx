@@ -1,5 +1,5 @@
-import { ClientProvider as RPClientProvider, type ClientProviderComponentProps } from './providers/client'
 import { ConfirmProvider } from './confirm/ConfirmProvider'
+import { ClientProvider as RPClientProvider, type ClientProviderComponentProps } from './providers/client'
 
 export { useClient } from './providers/client'
 export type { ClientEnv, ClientProviderComponentProps, ClientState } from './providers/client'

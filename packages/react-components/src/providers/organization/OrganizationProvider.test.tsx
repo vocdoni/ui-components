@@ -1,9 +1,9 @@
 import { Wallet } from '@ethersproject/wallet'
 import { act, render, renderHook, waitFor } from '@testing-library/react'
 import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
-import { ClientProvider, useClient } from '../client'
-import { properProps, TestProvider } from '../test-utils'
+import { ClientProvider, useClient } from '~providers/client'
 import { OrganizationProvider, useOrganization } from './OrganizationProvider'
+import { properProps, TestProvider } from '~providers/test-utils'
 
 describe('<OrganizationProvider />', () => {
   const baseOrganization: AccountData = {

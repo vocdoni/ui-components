@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { ConfirmContext } from '../../confirm/ConfirmProvider'
-import { ComponentsProvider } from '../context/ComponentsProvider'
+import { ComponentsProvider } from '~components/context/ComponentsProvider'
+import { ConfirmContext } from '~confirm/ConfirmProvider'
 import { QuestionsConfirmation } from './Questions/Confirmation'
 
 vi.mock('../../../i18n/localize', () => ({

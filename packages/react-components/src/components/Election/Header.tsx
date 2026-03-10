@@ -1,8 +1,8 @@
-import { useElection } from '../../providers'
 import { PublishedElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
-import { useComponents } from '../context/useComponents'
-import { linkifyIpfs } from '../shared/ipfs'
+import { useComponents } from '~components/context/useComponents'
+import { linkifyIpfs } from '~components/shared/ipfs'
+import { useElection } from '~providers'
 
 export const ElectionHeader = (props: ComponentPropsWithoutRef<'img'>) => {
   const { election } = useElection()

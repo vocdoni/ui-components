@@ -1,4 +1,4 @@
-import { usePagination } from '../../providers/pagination/PaginationProvider'
+import { usePagination } from '~providers/pagination/PaginationProvider'
 import { Button } from './Button'
 import { PaginationButtons, PaginationProps } from './shared'
 

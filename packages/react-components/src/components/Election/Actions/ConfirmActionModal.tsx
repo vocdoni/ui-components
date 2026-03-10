@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef } from 'react'
-import { useConfirm } from '../../../confirm/useConfirm'
-import { useComponents } from '../../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useConfirm } from '~confirm/useConfirm'
 
 export type ConfirmActionModalProps = ComponentPropsWithoutRef<'div'> & {
   title: string

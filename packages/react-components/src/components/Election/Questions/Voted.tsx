@@ -1,8 +1,8 @@
-import { useClient, useElection } from '../../../providers'
 import { ReactNode } from 'react'
-import { environment } from '../../../environment'
-import { useReactComponentsLocalize } from '../../../i18n/localize'
-import { useComponents } from '../../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useClient, useElection } from '~providers'
+import { environment } from '~src/environment'
 
 export const Voted = () => {
   const { env } = useClient()

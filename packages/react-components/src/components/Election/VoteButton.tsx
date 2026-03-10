@@ -1,9 +1,9 @@
-import { useClient, useElection } from '../../providers'
 import { ElectionStatus, InvalidElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef, useState } from 'react'
-import { useReactComponentsLocalize } from '../../i18n/localize'
-import { VoteButtonSlotProps } from '../context/types'
-import { useComponents } from '../context/useComponents'
+import { VoteButtonSlotProps } from '~components/context/types'
+import { useComponents } from '~components/context/useComponents'
+import { useReactComponentsLocalize } from '~i18n/localize'
+import { useClient, useElection } from '~providers'
 
 export const VoteButton = (props: ComponentPropsWithoutRef<'button'> & Record<string, unknown>) => {
   const { connected } = useClient()

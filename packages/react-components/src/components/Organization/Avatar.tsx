@@ -1,7 +1,7 @@
-import { useOrganization } from '../../providers'
 import { ComponentPropsWithoutRef } from 'react'
-import { useComponents } from '../context/useComponents'
-import { linkifyIpfs } from '../shared/ipfs'
+import { useComponents } from '~components/context/useComponents'
+import { linkifyIpfs } from '~components/shared/ipfs'
+import { useOrganization } from '~providers'
 
 export const OrganizationAvatar = (props: ComponentPropsWithoutRef<'img'> & Record<string, unknown>) => {
   const { organization } = useOrganization()

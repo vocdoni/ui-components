@@ -1,9 +1,9 @@
 import { UseQueryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Account, AccountData, areEqualHexStrings } from '@vocdoni/sdk'
 import { useEffect, useMemo, useState } from 'react'
-import { useClient } from '../client'
-import { queryKeys } from '../query/keys'
-import { errorToString } from '../utils'
+import { useClient } from '~providers/client'
+import { queryKeys } from '~providers/query/keys'
+import { errorToString } from '~providers/utils'
 
 export type OrganizationProviderProps = {
   id?: string

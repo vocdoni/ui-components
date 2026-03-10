@@ -1,8 +1,8 @@
 import { IChoice } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
-import { QuestionChoicePresentation, QuestionSelectionMode } from '../../context/types'
-import { useComponents } from '../../context/useComponents'
-import { linkifyIpfs } from '../../shared/ipfs'
+import { QuestionChoicePresentation, QuestionSelectionMode } from '~components/context/types'
+import { useComponents } from '~components/context/useComponents'
+import { linkifyIpfs } from '~components/shared/ipfs'
 
 export type QuestionChoiceMeta = {
   image?: {

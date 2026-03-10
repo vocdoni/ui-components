@@ -3,10 +3,10 @@ import { Wallet } from '@ethersproject/wallet'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useMemo, useState } from 'react'
-import { useLocalize } from '../i18n/localize'
-import { queryKeys } from '../query/keys'
-import { errorToString } from '../utils'
 import { ClientReducerProps, newVocdoniCensus3, newVocdoniSDKClient } from './client-utils'
+import { useLocalize } from '~providers/i18n/localize'
+import { queryKeys } from '~providers/query/keys'
+import { errorToString } from '~providers/utils'
 
 export type ClientProviderProps = ClientReducerProps
 

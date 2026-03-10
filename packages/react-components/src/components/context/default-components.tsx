@@ -1,6 +1,6 @@
 import { FormEvent, HTMLAttributes } from 'react'
-import { HR } from '../shared/HR'
-import { linkifyIpfs } from '../shared/ipfs'
+import { HR } from '~components/shared/HR'
+import { linkifyIpfs } from '~components/shared/ipfs'
 import { ComponentsDefinition } from './types'
 
 const ActionButton = ({ label, loading, ...props }: any) => (

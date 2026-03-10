@@ -1,8 +1,8 @@
 import { ElectionResultsTypeNames, PublishedElection } from '@vocdoni/sdk'
 import { FieldValues } from 'react-hook-form'
-import { useConfirm } from '../../../confirm/useConfirm'
-import { useReactComponentsLocalize } from '../../../i18n/localize'
-import { useComponents } from '../../context/useComponents'
+import { useComponents } from '~components/context/useComponents'
+import { useConfirm } from '~confirm/useConfirm'
+import { useReactComponentsLocalize } from '~i18n/localize'
 
 export type QuestionsConfirmationProps = {
   answers: FieldValues

@@ -2,10 +2,10 @@ import { Wallet } from '@ethersproject/wallet'
 import { render, renderHook, waitFor } from '@testing-library/react'
 import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
 import { act } from 'react'
-import { ClientProvider, useClient } from '../client'
-import { fetchSignInfo } from '../csp'
-import { TestProvider, onlyProps, properProps } from '../test-utils'
+import { ClientProvider, useClient } from '~providers/client'
+import { fetchSignInfo } from '~providers/csp'
 import { ElectionProvider, useElection } from './ElectionProvider'
+import { TestProvider, onlyProps, properProps } from '~providers/test-utils'
 
 vi.mock('../csp', () => ({
   fetchSignInfo: vi.fn(() =>
