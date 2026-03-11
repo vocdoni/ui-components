@@ -630,6 +630,70 @@ describe('<ElectionProvider />', () => {
         expect(result.current.turnout).toBe(0)
       })
     })
+
+    describe('isWeighted', () => {
+      it('returns false when census weight is missing', () => {
+        const wrapper = (props: any) => {
+          return (
+            <TestProvider>
+              <ClientProvider>
+                <ElectionProvider {...properProps(props)} />
+              </ClientProvider>
+            </TestProvider>
+          )
+        }
+
+        const census = new WeightedCensus()
+        census.size = 1
+        ;(census as any).weight = undefined
+        // @ts-ignore
+        const election = PublishedElection.build({
+          id: 'weighted-missing-weight',
+          title: 'test',
+          description: 'test',
+          endDate: new Date(),
+          census,
+        })
+
+        const { result } = renderHook(() => useElection(), {
+          wrapper,
+          initialProps: { election },
+        })
+
+        expect(result.current.isWeighted).toBe(false)
+      })
+
+      it('returns true when census weight differs from census size', () => {
+        const wrapper = (props: any) => {
+          return (
+            <TestProvider>
+              <ClientProvider>
+                <ElectionProvider {...properProps(props)} />
+              </ClientProvider>
+            </TestProvider>
+          )
+        }
+
+        const census = new WeightedCensus()
+        census.size = 1
+        ;(census as any).weight = 2
+        // @ts-ignore
+        const election = PublishedElection.build({
+          id: 'weighted-different-weight',
+          title: 'test',
+          description: 'test',
+          endDate: new Date(),
+          census,
+        })
+
+        const { result } = renderHook(() => useElection(), {
+          wrapper,
+          initialProps: { election },
+        })
+
+        expect(result.current.isWeighted).toBe(true)
+      })
+    })
   })
 
   it('marks CSP voters as in census when auth token is present', async () => {

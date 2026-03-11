@@ -5,7 +5,7 @@ import { useReactComponentsLocalize } from '~i18n/localize'
 import { useElection } from '~providers'
 
 export const QuestionsTypeBadge = (props: ComponentPropsWithoutRef<'div'> & Record<string, unknown>) => {
-  const { election } = useElection()
+  const { election, isWeighted } = useElection()
   const { QuestionsTypeBadge: Slot } = useComponents()
   const t = useReactComponentsLocalize()
 
@@ -13,7 +13,7 @@ export const QuestionsTypeBadge = (props: ComponentPropsWithoutRef<'div'> & Reco
     return null
   }
 
-  const weighted = Number(election.census.weight) !== election.census.size ? t('question_types.weighted_voting') : ''
+  const weighted = isWeighted ? t('question_types.weighted_voting') : ''
 
   let title = ''
   let tooltip = ''

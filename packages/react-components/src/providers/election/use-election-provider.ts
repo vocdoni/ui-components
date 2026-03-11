@@ -31,6 +31,26 @@ export type ElectionProviderProps = {
   beforeSubmit?: (vote: Vote) => boolean
 }
 
+const getIsWeighted = (election?: PublishedElection | InvalidElection): boolean => {
+  if (!(election instanceof PublishedElection) || !election.census) {
+    return false
+  }
+
+  const rawWeight = election.census.weight
+  const rawSize = election.census.size
+  if (typeof rawWeight === 'undefined' || rawWeight === null || typeof rawSize === 'undefined' || rawSize === null) {
+    return false
+  }
+
+  const weight = Number(rawWeight)
+  const size = Number(rawSize)
+  if (!Number.isFinite(weight) || !Number.isFinite(size)) {
+    return false
+  }
+
+  return weight !== size
+}
+
 export const useElectionProvider = ({
   id,
   election: data,
@@ -388,6 +408,7 @@ export const useElectionProvider = ({
   }
 
   const { vote: voteDraft, ...stateRest } = state
+  const isWeighted = useMemo(() => getIsWeighted(election), [election])
 
   const wrappedActions = {
     ...actions,
@@ -437,6 +458,7 @@ export const useElectionProvider = ({
   return {
     ...rest,
     ...stateRest,
+    isWeighted,
     voteDraft,
     loading,
     loaded,
