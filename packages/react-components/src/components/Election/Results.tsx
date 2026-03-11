@@ -74,7 +74,7 @@ export const ElectionResults = ({ extended = false, forceRender, ...rest }: Elec
         const meta = choice.meta ?? {}
         const description = dotobject(meta, 'description') as string | undefined
         const image = dotobject(meta, 'image.default') as string | undefined
-        const votes = results(choice.results, decimals)
+        const votes = results(choice.results ?? 0, decimals)
         return {
           title: choice.title.default,
           votes: String(votes),
