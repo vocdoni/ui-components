@@ -53,7 +53,7 @@ This repository aims to ease the creation of voting interfaces for user-facing a
 
 | Component | Description |
 | ---: | --- |
-| [![react-components badge]][`@vocdoni/react-components`] | Voting-related react components built with chakra for easy integration with Vocdoni. |
+| [![react-components badge]][`@vocdoni/react-components`] | Voting-related React components and providers for easy Vocdoni integration. |
 | [![rainbowkit-wallets badge]][`@vocdoni/rainbowkit-wallets`] | A set of custom wallets for rainbowkit. |
 | [![extended-sdk badge]][`@vocdoni/extended-sdk`] | Package extending our SDK functionalities (for advanced usage). |
 
@@ -73,7 +73,7 @@ The best place to learn about using ui-components packages is the [developer por
 
 Each of these packages can be used in a typescript/javascript project by importing them, eg. `pnpm add @vocdoni/react-components`. Follow the developer documentation, or go to each individual package's readme file, for further details.
 
-Each of the packages has a typescript file configured as an entrypoint, so you should be able to just run `pnpm dev` on the included chakra template to start developing any of the included packages.
+Each package has a TypeScript entrypoint configured, so you can run `pnpm dev` from the included `ui-scaffold` template to develop and validate changes across the monorepo.
 
 If you link (via pnpm link) any of the included packages to your project, your project MUST be able to run typescript code. Otherwise it will fail.
 
@@ -86,13 +86,19 @@ Turbo was initially configured for the development process, but its usage is min
   usually prettier & tsc).
 - `pnpm test`: runs all package tests in the monorepo through Turbo and Vitest.
 
+To run commands for a single package, use `pnpm --filter`:
+
+- `pnpm --filter @vocdoni/react-components build`
+- `pnpm --filter @vocdoni/rainbowkit-wallets lint`
+- `pnpm --filter @vocdoni/extended-sdk test`
+
 ## Reference
 
 The developer portal includes a [reference](https://developer.vocdoni.io/ui-components) for the `@vocdoni/react-components` package.
 
 ## Examples
 
-You can find mock-functional examples of each of the chakra components in the ui-components [documentation](https://developer.vocdoni.io/ui-components/Election). There is also real-world usage of many of the components and providers from this library in the [code](https://github.com/vocdoni/ui-scaffold) for the Vocdoni application front-end.
+You can find mock-functional examples of election-related components in the ui-components [documentation](https://developer.vocdoni.io/ui-components/Election). There is also real-world usage of many components and providers from this library in the [ui-scaffold codebase](https://github.com/vocdoni/ui-scaffold), including a full theme customization example in [`src/theme/react-components`](https://github.com/vocdoni/ui-scaffold/tree/develop/src/theme/react-components).
 
 ## Preview
 
