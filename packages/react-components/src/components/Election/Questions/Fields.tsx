@@ -141,6 +141,8 @@ const MultiChoice = ({
                     'data-choice-body': '',
                     'data-choice-media': '',
                     'data-layout': layout,
+                    'data-choice-id-base': `question-${index}-choice-${value}`,
+                    'data-choice-field-name': field.name,
                   }}
                   selected={currentValues.includes(value)}
                   disabled={disabled || maxSelected}
@@ -214,6 +216,8 @@ const ApprovalChoice = ({
                     'data-choice-body': '',
                     'data-choice-media': '',
                     'data-layout': layout,
+                    'data-choice-id-base': `question-${index}-choice-${value}`,
+                    'data-choice-field-name': field.name,
                   }}
                   selected={currentValues.includes(value)}
                   disabled={disabled}

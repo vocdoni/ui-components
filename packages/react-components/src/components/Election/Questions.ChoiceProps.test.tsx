@@ -40,7 +40,7 @@ vi.mock('@vocdoni/sdk', () => ({
   },
 }))
 
-vi.mock('../../providers', () => ({
+vi.mock('~providers', () => ({
   useElection: () => ({
     election: state.election,
     isAbleToVote: true,
@@ -65,7 +65,7 @@ vi.mock('react-hook-form', () => ({
     }),
 }))
 
-vi.mock('../../../i18n/localize', () => ({
+vi.mock('~i18n/localize', () => ({
   useReactComponentsLocalize: () => (key: string) => key,
 }))
 
@@ -174,6 +174,8 @@ describe('ElectionQuestion choice slot props', () => {
     expect(choiceProps[0].canOpenImageModal).toBe(false)
     expect(choiceProps[0].description).toBeUndefined()
     expect(choiceProps[0].image).toBeUndefined()
+    expect(choiceProps[0].dataAttrs?.['data-choice-id-base']).toBe('question-0-choice-0')
+    expect(choiceProps[0].dataAttrs?.['data-choice-field-name']).toBe('0')
   })
 
   it('emits basic + single selection props for single-choice without metadata', () => {
@@ -237,6 +239,8 @@ describe('ElectionQuestion choice slot props', () => {
     expect(questionProps[0].layout).toBe('list')
     expect(choiceProps[0].controlType).toBe('checkbox')
     expect(choiceProps[0].presentation).toBe('basic')
+    expect(choiceProps[0].dataAttrs?.['data-choice-id-base']).toBe('question-0-choice-0')
+    expect(choiceProps[0].dataAttrs?.['data-choice-field-name']).toBe('0')
   })
 
   it('emits extended + multiple selection props for approval metadata questions', () => {
