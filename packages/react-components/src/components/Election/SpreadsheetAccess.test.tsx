@@ -10,7 +10,14 @@ const state = vi.hoisted(() => ({
   setClient: vi.fn(),
   sikPassword: vi.fn(),
   sikSignature: vi.fn(),
-  walletFromRow: vi.fn(() => ({ privateKey: '0xprivate', address: '0xaddress' })),
+  isInCensus: true,
+  chainServiceUrl: 'https://api-chain.localhost',
+  sdkClientCtorCalls: [] as Array<Record<string, unknown>>,
+  walletFromRow: vi.fn(() => ({
+    privateKey: '0xprivate',
+    address: '0xaddress',
+    getAddress: vi.fn(async () => '0xaddress'),
+  })),
   electionService: {
     getNumericElectionId: vi.fn(async () => 42),
     getElectionSalt: vi.fn(async () => 'salt-from-service'),
@@ -34,14 +41,18 @@ const { PublishedElection, VocdoniSDKClient } = vi.hoisted(() => {
     }
   }
 
-  const VocdoniSDKClient = vi.fn().mockImplementation(() => ({
-    isInCensus: vi.fn(async () => true),
-    anonymousService: {
+  class VocdoniSDKClient {
+    constructor(params: Record<string, unknown>) {
+      state.sdkClientCtorCalls.push(params)
+    }
+
+    isInCensus = vi.fn(async () => state.isInCensus)
+    anonymousService = {
       signSIKPayload: vi.fn(async () => 'signature'),
       fetchAccountSIK: vi.fn(async () => false),
       hasRegisteredSIK: vi.fn(async () => true),
-    },
-  }))
+    }
+  }
 
   return { PublishedElection, VocdoniSDKClient }
 })
@@ -63,7 +74,10 @@ vi.mock('../../providers', () => ({
     connected: false,
     clearClient: state.clearClient,
     election: state.election,
-    client: { electionService: state.electionService },
+    client: {
+      electionService: state.electionService,
+      chainService: { url: state.chainServiceUrl },
+    },
     setClient: state.setClient,
     sikPassword: state.sikPassword,
     sikSignature: state.sikSignature,
@@ -83,6 +97,7 @@ const SpreadsheetSlot = ({
   onLogout,
   fields,
   anonymousField,
+  formError,
 }: SpreadsheetAccessSlotProps) => {
   if (connected) {
     return <button onClick={onLogout}>logout</button>
@@ -113,6 +128,7 @@ const SpreadsheetSlot = ({
           {anonymousField.error ? <span>{anonymousField.error}</span> : null}
         </label>
       ) : null}
+      {formError ? <span>{formError}</span> : null}
       <button type='submit'>submit</button>
     </form>
   )
@@ -129,6 +145,7 @@ describe('SpreadsheetAccess', () => {
   it('submits with valid values using visible registered fields', async () => {
     state.setClient.mockClear()
     state.walletFromRow.mockClear()
+    state.sdkClientCtorCalls = []
     state.election = new PublishedElection({
       data: {
         'census.type': 'spreadsheet',
@@ -149,6 +166,11 @@ describe('SpreadsheetAccess', () => {
 
     await waitFor(() => {
       expect(state.walletFromRow).toHaveBeenCalledWith('salt-fixed', ['hello@example.com', '1234'])
+    })
+    expect(state.sdkClientCtorCalls.at(-1)).toMatchObject({
+      env: 'dev',
+      electionId: '0xelection',
+      api_url: state.chainServiceUrl,
     })
 
     expect(screen.queryByText('validation.required')).not.toBeInTheDocument()
@@ -218,5 +240,29 @@ describe('SpreadsheetAccess', () => {
     await waitFor(() => {
       expect(screen.getByText('validation.min_length:8')).toBeInTheDocument()
     })
+  })
+
+  it('shows form-level wrong data error when generated wallet is not in census', async () => {
+    state.setClient.mockClear()
+    state.isInCensus = false
+    state.election = new PublishedElection({
+      data: {
+        'census.type': 'spreadsheet',
+        'census.fields': ['Email', 'Code'],
+        'census.specs': {},
+      },
+    })
+
+    renderSpreadsheetAccess()
+
+    fireEvent.click(screen.getByRole('button', { name: 'open' }))
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'hello@example.com' } })
+    fireEvent.change(screen.getByLabelText('Code'), { target: { value: '1234' } })
+    fireEvent.click(screen.getByRole('button', { name: 'submit' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('errors.wrong_data_description')).toBeInTheDocument()
+    })
+    expect(state.setClient).not.toHaveBeenCalled()
   })
 })

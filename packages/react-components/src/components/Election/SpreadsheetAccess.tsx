@@ -23,6 +23,7 @@ export type SpreadsheetAccessProps = {
 export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAccessProps) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [formError, setFormError] = useState<string>()
   const { SpreadsheetAccess: Slot } = useComponents()
   const localize = useReactComponentsLocalize()
   const { env } = useClient()
@@ -99,6 +100,7 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
   const onSubmit = async (vals: any) => {
     try {
       setLoading(true)
+      setFormError(undefined)
 
       let sikp: null | string = null
       if (election.electionType.anonymous) {
@@ -106,14 +108,24 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
         delete vals.sik_password
       }
 
+      const row = fields.map((_, index) => `${vals[index.toString()] ?? ''}`)
+
       const hid = await cl.electionService.getNumericElectionId(election.id)
       const salt =
         election.get('census.salt') || (await cl.electionService.getElectionSalt(election.organizationId, hid))
-      const wallet = walletFromRow(salt, Object.values(vals))
-      const client = new VocdoniSDKClient({ env, wallet, electionId: election.id })
+      const wallet = walletFromRow(salt, row)
+      const derivedAddress = await wallet.getAddress()
 
-      if (!(await client.isInCensus())) {
-        console.warn(localize('errors.wrong_data_description'))
+      const client = new VocdoniSDKClient({
+        env,
+        wallet,
+        electionId: election.id,
+        api_url: cl.chainService.url,
+      })
+
+      const inCensus = await client.isInCensus()
+      if (!inCensus) {
+        setFormError(localize('errors.wrong_data_description'))
         return
       }
 
@@ -122,7 +134,7 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
         const sik = await client.anonymousService.fetchAccountSIK(wallet.address).catch(() => false)
         const valid = await client.anonymousService.hasRegisteredSIK(wallet.address, signature, sikp)
         if (sik && !valid) {
-          console.warn(localize('errors.wrong_data_description'))
+          setFormError(localize('errors.wrong_data_description'))
           return
         }
         sikPassword(sikp)
@@ -136,7 +148,7 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
       reset()
       setOpen(false)
     } catch (error) {
-      console.warn(errorToString(error))
+      setFormError(errorToString(error))
     } finally {
       setLoading(false)
     }
@@ -152,12 +164,20 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
       className={className}
       connected={connected}
       loading={loading}
+      formError={formError}
       title={localize('spreadsheet.modal_title')}
       open={open}
-      onOpen={() => setOpen(true)}
-      onClose={() => !loading && setOpen(false)}
+      onOpen={() => {
+        setFormError(undefined)
+        setOpen(true)
+      }}
+      onClose={() => {
+        if (loading) return
+        setFormError(undefined)
+        setOpen(false)
+      }}
       onLogout={logout}
-      onSubmit={handleSubmit(onSubmit) as unknown as () => void}
+      onSubmit={handleSubmit(onSubmit)}
       fields={fields.map((field, key) => ({
         id: key.toString(),
         label: field,

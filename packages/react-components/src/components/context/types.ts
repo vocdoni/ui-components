@@ -1,5 +1,5 @@
 import { IChoice, IQuestion, PublishedElection } from '@vocdoni/sdk'
-import { ComponentPropsWithoutRef, ComponentType, HTMLAttributes, ReactNode } from 'react'
+import { ComponentPropsWithoutRef, ComponentType, FormEvent, HTMLAttributes, ReactNode } from 'react'
 import { FieldValues, UseFormRegisterReturn } from 'react-hook-form'
 
 type BaseProps<T extends HTMLElement = HTMLElement> = Omit<HTMLAttributes<T>, 'children'>
@@ -61,12 +61,13 @@ export type SpreadsheetInputField = {
 export type SpreadsheetAccessSlotProps = BaseProps<HTMLDivElement> & {
   connected: boolean
   loading: boolean
+  formError?: string
   title: string
   open: boolean
   onOpen: () => void
   onClose: () => void
   onLogout: () => void
-  onSubmit: () => void
+  onSubmit: (event?: FormEvent<HTMLFormElement>) => void
   fields: SpreadsheetInputField[]
   anonymousField?: SpreadsheetInputField
   extraFields?: ReactNode

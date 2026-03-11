@@ -166,6 +166,7 @@ export const defaultComponents: ComponentsDefinition = {
   SpreadsheetAccess: ({
     connected,
     loading,
+    formError,
     title,
     open,
     onOpen,
@@ -198,8 +199,7 @@ export const defaultComponents: ComponentsDefinition = {
         <h3>{title}</h3>
         <form
           onSubmit={(event: FormEvent<HTMLFormElement>) => {
-            event.preventDefault()
-            onSubmit()
+            onSubmit(event)
           }}
         >
           {fields.map((field) => (
@@ -218,6 +218,7 @@ export const defaultComponents: ComponentsDefinition = {
               {anonymousField.description ? <small>{anonymousField.description}</small> : null}
             </label>
           ) : null}
+          {formError ? <small>{formError}</small> : null}
           {extraFields}
           <button type='button' onClick={onClose}>
             Close
