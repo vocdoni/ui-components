@@ -45,4 +45,14 @@ describe('VoteButton', () => {
 
     expect(screen.getByRole('button')).toBeInTheDocument()
   })
+
+  it('honors externally forced disabled prop', () => {
+    render(
+      <ComponentsProvider>
+        <VoteButton disabled />
+      </ComponentsProvider>
+    )
+
+    expect(screen.getByRole('button')).toBeDisabled()
+  })
 })

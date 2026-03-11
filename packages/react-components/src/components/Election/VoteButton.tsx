@@ -6,6 +6,7 @@ import { useReactComponentsLocalize } from '~i18n/localize'
 import { useClient, useElection } from '~providers'
 
 export const VoteButton = (props: ComponentPropsWithoutRef<'button'> & Record<string, unknown>) => {
+  const externalDisabled = Boolean(props.disabled)
   const { connected } = useClient()
   const {
     client,
@@ -26,7 +27,7 @@ export const VoteButton = (props: ComponentPropsWithoutRef<'button'> & Record<st
     return null
   }
 
-  const isDisabled = !client.wallet || !isAbleToVote || election.status !== ElectionStatus.ONGOING
+  const isDisabled = !client.wallet || !isAbleToVote || election.status !== ElectionStatus.ONGOING || externalDisabled
 
   if (!connected && !electionConnected && ConnectButton) {
     return <ConnectButton />
