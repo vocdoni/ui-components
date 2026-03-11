@@ -4,8 +4,8 @@ import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCe
 import { act } from 'react'
 import { ClientProvider, useClient } from '~providers/client'
 import { fetchSignInfo } from '~providers/csp'
-import { ElectionProvider, useElection } from './ElectionProvider'
 import { TestProvider, onlyProps, properProps } from '~providers/test-utils'
+import { ElectionProvider, useElection } from './ElectionProvider'
 
 vi.mock('../csp', () => ({
   fetchSignInfo: vi.fn(() =>
@@ -1080,7 +1080,7 @@ describe('<ElectionProvider />', () => {
 
     const { result, rerender } = renderHook(() => useElection(), {
       wrapper,
-      initialProps: { election, client: disconnectedClient, fetchCensus: true },
+      initialProps: { election, client: disconnectedClient, signer: undefined, fetchCensus: true },
     })
 
     await waitFor(() => {

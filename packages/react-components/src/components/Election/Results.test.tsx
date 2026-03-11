@@ -81,4 +81,3 @@ describe('ElectionResults', () => {
     expect(captured[0].questions[0].choices[0].votes).toBe('0')
   })
 })
-
