@@ -6,9 +6,9 @@ import {
   VocdoniSDKClient,
   Vote,
 } from '@vocdoni/sdk'
-import { Reducer, useEffect, useMemo, useReducer } from 'react'
+import { Reducer, useEffect, useMemo, useReducer, useRef } from 'react'
 import { useClient } from '~providers/client'
-import { ClientSetPayload } from '~providers/client/client-utils'
+import { ClientSetPayload, hasSigner } from '~providers/client/client-utils'
 export const BlindCspServiceKey = 'vocdoni-blind-csp'
 
 export const CensusClear = 'election:census:clear'
@@ -313,7 +313,7 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
       return {
         ...state,
         client,
-        connected: !!client && !!client.wallet && Object.keys(client.wallet).length > 0,
+        connected: hasSigner(client?.wallet),
       }
     }
 
@@ -349,6 +349,7 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
     ...initial,
     election,
   })
+  const previousGlobalClient = useRef(client)
 
   // Some census types require to have a local client instance. This var stores if the current election is one of those
   const isLocalWalletSigner =
@@ -360,13 +361,23 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   useEffect(() => {
     if (!client) return
 
+    const electionHasWallet = hasSigner(state.client?.wallet)
+    const globalHasWallet = hasSigner(client?.wallet)
+
     // only propagate the client when census type !== spreadsheet || type !== blindCsp (since it uses a locally instanced client)
-    if (isLocalWalletSigner) {
+    // Keep legacy local-signer isolation, but allow a one-time sync when election session has no signer
+    // and the global client has just connected (login/connect after mount scenario).
+    if (isLocalWalletSigner && (electionHasWallet || !globalHasWallet)) {
       return
     }
 
-    dispatch({ type: ElectionClientSet, payload: client })
-  }, [client, isLocalWalletSigner, state.election])
+    const globalClientChanged = previousGlobalClient.current !== client
+    previousGlobalClient.current = client
+
+    if (globalClientChanged || state.connected !== connected) {
+      dispatch({ type: ElectionClientSet, payload: client })
+    }
+  }, [client, connected, isLocalWalletSigner, state.connected, state.election])
 
   // properly set election data in case it comes from props (and/or updates)
   useEffect(() => {

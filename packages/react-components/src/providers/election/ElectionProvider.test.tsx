@@ -189,6 +189,39 @@ describe('<ElectionProvider />', () => {
     expect(result.current.client.wallet).toStrictEqual(signer)
   })
 
+  it('marks election session as connected with non-enumerable signer methods', async () => {
+    const signer = Object.create(
+      {},
+      {
+        getAddress: {
+          value: vi.fn().mockResolvedValue('0xabc0000000000000000000000000000000000000'),
+          enumerable: false,
+        },
+      }
+    )
+
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+    })
+    client.wallet = signer as any
+
+    const wrapper = (props: any) => {
+      return (
+        <TestProvider>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider>{props.children}</ElectionProvider>
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
+
+    const { result } = renderHook(() => useElection(), { wrapper, initialProps: { client } })
+
+    await waitFor(() => {
+      expect(result.current.connected).toBeTruthy()
+    })
+  })
+
   it('can set and change signer at election level', () => {
     const signer = Wallet.createRandom()
     const client = new VocdoniSDKClient({
@@ -944,6 +977,113 @@ describe('<ElectionProvider />', () => {
     expect(result.current.election.isAbleToVote).toBeFalsy()
   })
 
+  it('fetches census after connecting when election was opened disconnected', async () => {
+    const disconnectedClient = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+    })
+    const connectedSigner = Wallet.createRandom()
+    const connectedClient = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: connectedSigner,
+    })
+
+    connectedClient.isInCensus = vi.fn().mockResolvedValue(true) as any
+    connectedClient.hasAlreadyVoted = vi.fn().mockResolvedValue(null) as any
+    connectedClient.votesLeftCount = vi.fn().mockResolvedValue(1) as any
+
+    const census = new WeightedCensus()
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'weighted-election-connect-late',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <TestProvider>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
+
+    const { result, rerender } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election, client: disconnectedClient, fetchCensus: true },
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.election).toBeTruthy()
+    })
+
+    expect(result.current.loaded.census).toBeFalsy()
+
+    rerender({ election, client: connectedClient, signer: connectedSigner, fetchCensus: true })
+
+    await waitFor(() => {
+      expect(result.current.loaded.census).toBeTruthy()
+    })
+
+    expect(connectedClient.isInCensus).toHaveBeenCalled()
+    expect(result.current.isInCensus).toBeTruthy()
+    expect(result.current.isAbleToVote).toBeTruthy()
+  })
+
+  it('fetches census after signer prop is set in ClientProvider post-mount', async () => {
+    const signer = Wallet.createRandom()
+    const census = new WeightedCensus()
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'weighted-election-signer-late',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <TestProvider>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
+
+    const { result, rerender } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election, fetchCensus: true, signer: null },
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.election).toBeTruthy()
+    })
+
+    expect(result.current.client.wallet).toBeFalsy()
+    expect(result.current.loaded.census).toBeFalsy()
+
+    rerender({ election, fetchCensus: true, signer })
+
+    await waitFor(() => {
+      expect(result.current.client.wallet).toStrictEqual(signer)
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.census).toBeTruthy()
+    })
+  })
+
   it('recalculates isAbleToVote on ElectionVoted with overwrites enabled', async () => {
     const signer = Wallet.createRandom()
     const client = new VocdoniSDKClient({
@@ -1271,6 +1411,39 @@ describe('<ElectionProvider />', () => {
 
       expect(result.current.errors.voting).toContain('vote failed')
       expect(result.current.voted).toBeNull()
+    })
+
+    it('censusError keeps old reducer side effects', async () => {
+      const signer = Wallet.createRandom()
+      const client = new VocdoniSDKClient({
+        env: EnvOptions.STG,
+        wallet: signer,
+      })
+      const election = buildElection()
+      const wrapper = makeWrapper()
+
+      const { result } = renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, client, signer },
+      })
+
+      await waitFor(() => {
+        expect(result.current.loaded.election).toBeTruthy()
+      })
+
+      act(() => {
+        result.current.actions.inCensus(true)
+        result.current.actions.votesLeft(2)
+        result.current.actions.isAbleToVote()
+        result.current.actions.censusError(new Error('census failed'))
+      })
+
+      expect(result.current.voted).toBeNull()
+      expect(result.current.votesLeft).toBe(0)
+      expect(result.current.isAbleToVote).toBeFalsy()
+      expect(result.current.loading.census).toBe(false)
+      expect(result.current.loaded.census).toBe(true)
+      expect(result.current.errors.census).toContain('census failed')
     })
   })
 })

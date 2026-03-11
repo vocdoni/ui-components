@@ -15,12 +15,12 @@ import {
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useClient } from '~providers/client'
 import { vote as cspVote, fetchSignInfo } from '~providers/csp'
-import { useElectionReducer } from './use-election-reducer'
 import { queryKeys } from '~providers/query/keys'
 import { errorToString } from '~providers/utils'
 import worker, { ICircuit, ICircuitWorkerRequest } from '~providers/worker/circuitWorkerScript'
 import { useWebWorker } from '~providers/worker/useWebWorker'
 import { createWebWorker } from '~providers/worker/webWorker'
+import { useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
@@ -190,14 +190,23 @@ export const useElectionProvider = ({
 
   // fetch anon circuits
   useEffect(() => {
-    if (!election) return
+    if (
+      !fetchCensus ||
+      !election ||
+      loading.census ||
+      !client.wallet ||
+      anonCircuitsFetched ||
+      isAnonCircuitsFetching.current
+    ) {
+      return
+    }
+
     if (!(election instanceof PublishedElection)) return
     if (!election.census || election.census.type !== CensusType.ANONYMOUS) return
-    if (isAnonCircuitsFetching.current || anonCircuitsFetched) return
 
     isAnonCircuitsFetching.current = true
     fetchAnonCircuits()
-  }, [anonCircuitsFetched, election, fetchAnonCircuits])
+  }, [anonCircuitsFetched, client.wallet, election, fetchAnonCircuits, fetchCensus, loading.census])
 
   // set local client if no signer and we have CSP
   useEffect(() => {
@@ -206,7 +215,7 @@ export const useElectionProvider = ({
     const signer = generateSigner()
     client.wallet = signer
     actions.setClient(client)
-  }, [state.connected, state.csp.token])
+  }, [actions, client, generateSigner, state.connected, state.csp.token, state.election])
 
   // sets circuits in the anonymous service
   useEffect(() => {
@@ -263,19 +272,7 @@ export const useElectionProvider = ({
 
       await censusFetch()
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    fetchCensus,
-    client,
-    client.wallet,
-    state.voter,
-    loaded.election,
-    loading.census,
-    actions,
-    state.isAbleToVote,
-    signature,
-    state.csp.token,
-  ])
+  }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote, signature])
 
   // csp check sign info (check if voter already voted)
   useEffect(() => {
@@ -408,11 +405,15 @@ export const useElectionProvider = ({
       setLoaded((prev) => ({ ...prev, election: true }))
     },
     censusError: (error: unknown) => {
+      actions.voted(null)
+      actions.votesLeft(0)
+      actions.isAbleToVote(false)
       setErrors((prev) => ({ ...prev, census: errorToString(error) }))
       setLoading((prev) => ({ ...prev, census: false }))
       setLoaded((prev) => ({ ...prev, census: true }))
     },
     votingError: (error: unknown) => {
+      actions.voted(null)
       setErrors((prev) => ({ ...prev, voting: errorToString(error) }))
       setLoading((prev) => ({ ...prev, voting: false }))
     },

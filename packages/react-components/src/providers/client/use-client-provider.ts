@@ -9,6 +9,7 @@ import { errorToString } from '~providers/utils'
 import {
   ClientEnv,
   ClientReducerProps,
+  hasSigner,
   newVocdoniCensus3,
   newVocdoniSDKClient,
   normalizeClientEnv,
@@ -35,7 +36,7 @@ export const useClientProvider = ({
   const [census3, setCensus3State] = useState(newVocdoniCensus3(initialEnv, c3o?.api_url))
   const [address, setAddress] = useState<string | undefined>(undefined)
 
-  const connected = !!client?.wallet && Object.keys(client.wallet as unknown as Record<string, unknown>).length > 0
+  const connected = hasSigner(client?.wallet)
 
   useEffect(() => {
     let active = true
@@ -106,7 +107,13 @@ export const useClientProvider = ({
 
   const setSigner = (nextSigner: Wallet | Signer) => {
     setSignerState(nextSigner)
-    setClientState(newVocdoniSDKClient(env, nextSigner, options))
+    const nextClient = newVocdoniSDKClient(env, nextSigner, options)
+    // Some signer implementations (e.g. bridged JsonRpcSigner instances) can be dropped by SDK client init.
+    // Keep the signer explicitly so downstream provider state can react to post-connect updates.
+    if (!hasSigner(nextClient.wallet) && hasSigner(nextSigner)) {
+      nextClient.wallet = nextSigner as any
+    }
+    setClientState(nextClient)
     setAddress(undefined)
     queryClient.removeQueries({ queryKey: ['client'] })
   }
@@ -131,8 +138,14 @@ export const useClientProvider = ({
 
   useEffect(() => {
     if (o === options) return
+    const signerFromProps = hasSigner(s) ? (s as Wallet | Signer) : undefined
+    const signerToUse = signerFromProps || signer
     setOptionsState(o)
-    setClientState(newVocdoniSDKClient(env, signer, o))
+    const nextClient = newVocdoniSDKClient(env, signerToUse, o)
+    if (!hasSigner(nextClient.wallet) && hasSigner(signerToUse)) {
+      nextClient.wallet = signerToUse as any
+    }
+    setClientState(nextClient)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [o])
 

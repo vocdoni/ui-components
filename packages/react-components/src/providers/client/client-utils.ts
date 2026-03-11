@@ -24,6 +24,10 @@ export type ClientReducerProps = {
 
 export type ClientSetPayload = VocdoniSDKClient
 
+export const hasSigner = (wallet: unknown): boolean => {
+  return !!wallet && typeof (wallet as { getAddress?: unknown }).getAddress === 'function'
+}
+
 export const normalizeClientEnv = (env?: ClientEnv | EnvOptions): (typeof CLIENT_ENVS)[number] => {
   if (env === EnvOptions.PROD) return EnvOptions.PROD
   return EnvOptions.DEV

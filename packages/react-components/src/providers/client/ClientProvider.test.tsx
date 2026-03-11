@@ -135,6 +135,32 @@ describe('<ClientProvider />', () => {
     expect(result.current.client.url).toEqual(ApiUrl.dev)
   })
 
+  it('marks client as connected when signer methods are non-enumerable', async () => {
+    const signer = Object.create(
+      {},
+      {
+        getAddress: {
+          value: vi.fn().mockResolvedValue('0xabc0000000000000000000000000000000000000'),
+          enumerable: false,
+        },
+      }
+    )
+    const wrapper = (props: any) => (
+      <TestProvider>
+        <ClientProvider {...properProps(props)} />
+      </TestProvider>
+    )
+
+    const { result } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { signer: signer as any, env: 'dev' },
+    })
+
+    await waitFor(() => {
+      expect(result.current.connected).toBeTruthy()
+    })
+  })
+
   it('fetches an account', async () => {
     const wrapper = (props: any) => (
       <TestProvider>
@@ -335,6 +361,57 @@ describe('<ClientProvider />', () => {
 
     expect(result.current.client.wallet).toEqual(signer)
   })
+
+  it('keeps signer connected when options object changes after connect', async () => {
+    const signer = Wallet.createRandom()
+    const wrapper = (props: any) => (
+      <TestProvider>
+        <ClientProvider {...properProps(props)} />
+      </TestProvider>
+    )
+
+    const { result, rerender } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { env: 'dev', signer, options: { api_url: ApiUrl.dev } },
+    })
+
+    await waitFor(() => {
+      expect(result.current.connected).toBeTruthy()
+    })
+
+    rerender({ env: 'dev', signer, options: { api_url: ApiUrl.dev } })
+
+    await waitFor(() => {
+      expect(result.current.connected).toBeTruthy()
+    })
+
+    expect(result.current.client.wallet).toEqual(signer)
+  })
+
+  it('stays connected when signer and options change in the same rerender', async () => {
+    const signer = Wallet.createRandom()
+    const wrapper = (props: any) => (
+      <TestProvider>
+        <ClientProvider {...properProps(props)} />
+      </TestProvider>
+    )
+
+    const { result, rerender } = renderHook(() => useClient(), {
+      wrapper,
+      initialProps: { env: 'dev' },
+    })
+
+    expect(result.current.connected).toBeFalsy()
+
+    rerender({ env: 'dev', signer, options: { api_url: ApiUrl.dev } })
+
+    await waitFor(() => {
+      expect(result.current.connected).toBeTruthy()
+    })
+
+    expect(result.current.client.wallet).toEqual(signer)
+  })
+
   it('fetchAccount populates account via react-query', async () => {
     const wrapper = (props: any) => (
       <TestProvider>
