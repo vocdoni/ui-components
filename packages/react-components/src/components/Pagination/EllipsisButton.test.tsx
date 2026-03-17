@@ -1,9 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { EllipsisButton } from './EllipsisButton'
 
-vi.mock('../../i18n/localize', () => ({
+vi.mock('~i18n/localize', () => ({
   useReactComponentsLocalize: () => (key: string) => key === 'pagination.page_placeholder' ? 'Page #' : key,
 }))
 

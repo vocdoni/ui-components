@@ -2,8 +2,8 @@ import { Wallet } from '@ethersproject/wallet'
 import { act, render, renderHook, waitFor } from '@testing-library/react'
 import { Account, AccountData, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { ClientProvider, useClient } from '~providers/client'
-import { OrganizationProvider, useOrganization } from './OrganizationProvider'
 import { properProps, TestProvider } from '~providers/test-utils'
+import { OrganizationProvider, useOrganization } from './OrganizationProvider'
 
 describe('<OrganizationProvider />', () => {
   const baseOrganization: AccountData = {
@@ -79,6 +79,25 @@ describe('<OrganizationProvider />', () => {
 
     expect(result.current.organization?.account.name.default).toBe('testing2')
     expect(result.current.organization?.address).toEqual('0xde0F66E999db9927cc31acABED5cEd80a926d4b7')
+  })
+
+  it('accepts serialized organization data', () => {
+    const wrapper = (props: any) => {
+      return (
+        <TestProvider>
+          <ClientProvider>
+            <OrganizationProvider {...properProps(props)} />
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
+
+    const organization = JSON.parse(JSON.stringify(baseOrganization))
+
+    const { result } = renderHook(() => useOrganization(), { wrapper, initialProps: { organization } })
+
+    expect(result.current.organization?.account.name.default).toBe('testing')
+    expect(result.current.organization?.address).toEqual(baseOrganization.address)
   })
 
   it('fetches an account given an ID to the provider', async () => {

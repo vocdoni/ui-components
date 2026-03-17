@@ -3,6 +3,7 @@ import { Wallet } from '@ethersproject/wallet'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Account, EnvOptions, VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useMemo, useState } from 'react'
+import { hasEthereumProvider } from '~providers/browser'
 import { useLocalize } from '~providers/i18n/localize'
 import { queryKeys } from '~providers/query/keys'
 import { errorToString } from '~providers/utils'
@@ -166,7 +167,7 @@ export const useClientProvider = ({
 
   // switch account behavior handler
   useEffect(() => {
-    if (!('ethereum' in window)) return
+    if (!hasEthereumProvider()) return
 
     const accChanged = async () => {
       setClientState(newVocdoniSDKClient(env, signer, options))

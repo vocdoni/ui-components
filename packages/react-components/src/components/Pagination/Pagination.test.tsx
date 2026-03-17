@@ -1,15 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { Pagination } from './Pagination'
 
 const setPage = vi.fn()
 
-vi.mock('../../providers/pagination/PaginationProvider', () => ({
+vi.mock('~providers/pagination/PaginationProvider', () => ({
   usePagination: vi.fn(() => ({ page: 1, setPage, initialPage: 0 })),
 }))
 
-vi.mock('../../i18n/localize', () => ({
+vi.mock('~i18n/localize', () => ({
   useReactComponentsLocalize: () => (key: string, vars?: Record<string, unknown>) => {
     if (key === 'pagination.total_results') return `Showing a total of ${vars?.count} results`
     if (key === 'pagination.previous') return 'Previous'

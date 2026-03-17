@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { ElectionQuestionsForm } from './Questions/Questions'
 
@@ -25,7 +24,7 @@ vi.mock('@vocdoni/sdk', () => {
   }
 })
 
-vi.mock('../../providers', () => ({
+vi.mock('~providers', () => ({
   useClient: vi.fn(() => ({ env: 'prod' })),
   useElection: vi.fn(() => ({
     election: new PublishedElection(),

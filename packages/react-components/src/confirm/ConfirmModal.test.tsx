@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { ConfirmModal } from './ConfirmModal'
 import { ConfirmContext } from './ConfirmProvider'

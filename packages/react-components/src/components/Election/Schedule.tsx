@@ -1,9 +1,10 @@
-import { ElectionStatus, PublishedElection } from '@vocdoni/sdk'
+import { ElectionStatus } from '@vocdoni/sdk'
 import { format as dformat, formatDistance } from 'date-fns'
 import { ComponentPropsWithoutRef } from 'react'
 import { useComponents } from '~components/context/useComponents'
 import { useReactComponentsLocalize } from '~i18n/localize'
 import { useElection } from '~providers'
+import { getElectionDate, getElectionStatus } from '~providers/election/normalized'
 
 export type ElectionScheduleProps = ComponentPropsWithoutRef<'p'> &
   Record<string, unknown> & {
@@ -21,13 +22,15 @@ export const ElectionSchedule = ({
   const { election } = useElection()
   const t = useReactComponentsLocalize()
   const { ElectionSchedule: Slot } = useComponents()
+  const startDate = getElectionDate(election, 'startDate')
+  const endDate = getElectionDate(election, 'endDate')
+  const creationTime = getElectionDate(election, 'creationTime')
+  const status = getElectionStatus(election)
 
-  if (!election || !(election instanceof PublishedElection)) return null
+  if (!election || !startDate || !endDate || !status) return null
 
   const getRemaining = (): string => {
-    const endDate = election.endDate
-    const startDate = election.startDate
-    switch (election.status) {
+    switch (status) {
       case ElectionStatus.ONGOING:
       case ElectionStatus.RESULTS:
         if (endDate < new Date()) {
@@ -56,15 +59,15 @@ export const ElectionSchedule = ({
   }
 
   let text = t('schedule.from_begin_to_end', {
-    begin: dformat(new Date(election.startDate), format),
-    end: dformat(new Date(election.endDate), format),
+    begin: dformat(new Date(startDate), format),
+    end: dformat(new Date(endDate), format),
   })
 
   if (showRemaining) {
     text = getRemaining()
-  } else if (showCreatedAt) {
+  } else if (showCreatedAt && creationTime) {
     text = t('schedule.created', {
-      distance: formatDistance(election.creationTime, new Date(), { addSuffix: true }),
+      distance: formatDistance(creationTime, new Date(), { addSuffix: true }),
     })
   }
 

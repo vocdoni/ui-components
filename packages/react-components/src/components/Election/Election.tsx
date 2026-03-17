@@ -1,6 +1,6 @@
-import { PublishedElection } from '@vocdoni/sdk'
 import { useComponents } from '~components/context/useComponents'
 import { ElectionProvider, ElectionProviderComponentProps, useElection } from '~providers'
+import { getElectionField, isPublishedElectionLike } from '~providers/election/normalized'
 import { ElectionActions } from './Actions'
 import { ElectionDescription } from './Description'
 import { ElectionHeader } from './Header'
@@ -41,7 +41,7 @@ const ElectionBody = () => {
       <HR />
       <ElectionQuestions />
       <VoteButton />
-      {election instanceof PublishedElection && election.get('census.type') === 'spreadsheet' && connected ? (
+      {isPublishedElectionLike(election) && getElectionField(election, 'census.type') === 'spreadsheet' && connected ? (
         <SpreadsheetAccess />
       ) : null}
       <ElectionResults />

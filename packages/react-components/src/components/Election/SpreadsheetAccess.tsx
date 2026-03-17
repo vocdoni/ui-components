@@ -1,10 +1,12 @@
 import { Wallet } from '@ethersproject/wallet'
-import { PublishedElection, VocdoniSDKClient } from '@vocdoni/sdk'
+import { VocdoniSDKClient } from '@vocdoni/sdk'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useComponents } from '~components/context/useComponents'
 import { useReactComponentsLocalize } from '~i18n/localize'
 import { errorToString, useClient, useElection, walletFromRow } from '~providers'
+import { clearLocationHash, getLocationHash, replaceLocationHash } from '~providers/browser'
+import { getElectionField, isPublishedElectionLike } from '~providers/election/normalized'
 
 type MetaSpecs = {
   [name: string]: {
@@ -24,6 +26,7 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formError, setFormError] = useState<string>()
+  const [privkey, setPrivkey] = useState('')
   const { SpreadsheetAccess: Slot } = useComponents()
   const localize = useReactComponentsLocalize()
   const { env } = useClient()
@@ -36,8 +39,11 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
     reset,
   } = useForm<any>()
 
-  const shouldRender = election instanceof PublishedElection && election.get('census.type') === 'spreadsheet'
-  const privkey = window.location.hash ? window.location.hash.split('#')[1] : ''
+  const shouldRender = isPublishedElectionLike(election) && getElectionField(election, 'census.type') === 'spreadsheet'
+
+  useEffect(() => {
+    setPrivkey(getLocationHash())
+  }, [])
 
   useEffect(() => {
     ;(async () => {
@@ -143,7 +149,7 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
 
       setClient(client)
       if (hashPrivateKey) {
-        document.location.hash = wallet.privateKey
+        replaceLocationHash(wallet.privateKey)
       }
       reset()
       setOpen(false)
@@ -155,7 +161,8 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
   }
 
   const logout = () => {
-    window.history.pushState({}, '', document.location.pathname)
+    setPrivkey('')
+    clearLocationHash()
     clearClient()
   }
 

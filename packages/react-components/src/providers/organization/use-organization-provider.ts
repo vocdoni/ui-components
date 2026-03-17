@@ -1,13 +1,14 @@
-import { UseQueryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { Account, AccountData, areEqualHexStrings } from '@vocdoni/sdk'
 import { useEffect, useMemo, useState } from 'react'
 import { useClient } from '~providers/client'
 import { queryKeys } from '~providers/query/keys'
 import { errorToString } from '~providers/utils'
+import { normalizeOrganization, OrganizationLike } from './normalized'
 
 export type OrganizationProviderProps = {
   id?: string
-  organization?: AccountData
+  organization?: OrganizationLike
   queryOptions?: Omit<UseQueryOptions<AccountData, unknown>, 'queryKey' | 'queryFn' | 'enabled'>
   organizationQueryOptions?: Omit<UseQueryOptions<AccountData, unknown>, 'queryKey' | 'queryFn' | 'enabled'>
 }
@@ -20,7 +21,8 @@ export const useOrganizationProvider = ({
 }: OrganizationProviderProps) => {
   const { client, signer, account: vAccount } = useClient()
   const queryClient = useQueryClient()
-  const [orgId, setOrgId] = useState<string | undefined>(id || organization?.address)
+  const normalizedOrganization = useMemo(() => normalizeOrganization(organization), [organization])
+  const [orgId, setOrgId] = useState<string | undefined>(id || normalizedOrganization?.address)
 
   useEffect(() => {
     if (!id || id === orgId) return
@@ -28,11 +30,11 @@ export const useOrganizationProvider = ({
   }, [id, orgId])
 
   useEffect(() => {
-    if (!organization) return
-    if (organization.address === orgId) return
-    setOrgId(organization.address)
-    queryClient.setQueryData(queryKeys.organization.byId(organization.address), organization)
-  }, [organization, orgId, queryClient])
+    if (!normalizedOrganization) return
+    if (normalizedOrganization.address === orgId) return
+    setOrgId(normalizedOrganization.address)
+    queryClient.setQueryData(queryKeys.organization.byId(normalizedOrganization.address), normalizedOrganization)
+  }, [normalizedOrganization, orgId, queryClient])
 
   const queryKey = useMemo(() => {
     if (!orgId) return null
@@ -41,9 +43,9 @@ export const useOrganizationProvider = ({
 
   const organizationQuery = useQuery({
     queryKey: queryKey || ['organization', 'disabled'],
-    queryFn: () => client.fetchAccount(orgId as string),
+    queryFn: async () => normalizeOrganization(await client.fetchAccount(orgId as string)) as AccountData,
     enabled: !!orgId,
-    initialData: organization,
+    initialData: normalizedOrganization,
     ...(queryOptions ?? organizationQueryOptions),
   })
 
@@ -58,7 +60,9 @@ export const useOrganizationProvider = ({
         throw new Error("You're not the owner of this account")
       }
 
-      return client.updateAccountInfo(account instanceof Account ? account : new Account(account))
+      return normalizeOrganization(
+        await client.updateAccountInfo(account instanceof Account ? account : new Account(account))
+      )
     },
     onSuccess: (data) => {
       if (data?.address) {
@@ -75,7 +79,7 @@ export const useOrganizationProvider = ({
 
     return queryClient.fetchQuery({
       queryKey: queryKeys.organization.byId(identifier),
-      queryFn: () => client.fetchAccount(identifier),
+      queryFn: async () => normalizeOrganization(await client.fetchAccount(identifier)) as AccountData,
     })
   }
 

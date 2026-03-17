@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { VoteButton } from './VoteButton'
 
@@ -7,7 +6,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }))
 
-vi.mock('../../providers', () => ({
+vi.mock('~providers', () => ({
   useClient: vi.fn(() => ({ connected: true })),
   useElection: vi.fn(() => ({
     client: { wallet: {} },

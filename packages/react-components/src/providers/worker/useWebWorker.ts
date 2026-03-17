@@ -5,13 +5,14 @@ export interface IBaseWorkerResponse<T> {
   error?: any
 }
 
-export const useWebWorker = <TResult, TWorkerPayload>(worker: Worker) => {
+export const useWebWorker = <TResult, TWorkerPayload>(worker: Worker | null) => {
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<any>()
   const [result, setResult] = useState<TResult>()
 
   const startProcessing = useCallback(
     (data: TWorkerPayload) => {
+      if (!worker) return
       setRunning(true)
       worker.postMessage(data)
     },
@@ -19,6 +20,8 @@ export const useWebWorker = <TResult, TWorkerPayload>(worker: Worker) => {
   )
 
   useEffect(() => {
+    if (!worker) return
+
     const onMessage = (event: MessageEvent<IBaseWorkerResponse<TResult>>) => {
       setRunning(false)
       setError(event.data.error)

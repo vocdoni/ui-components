@@ -1,13 +1,12 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
-import { Balance } from './Balance'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
+import { Balance } from './Balance'
 
-vi.mock('../../providers', () => ({
+vi.mock('~providers', () => ({
   useClient: vi.fn(() => ({ balance: 42 })),
 }))
 
-vi.mock('../../i18n/localize', () => ({
+vi.mock('~i18n/localize', () => ({
   useReactComponentsLocalize: () => (key: string, vars?: Record<string, unknown>) =>
     key === 'balance' ? `${vars?.balance} VOC tokens` : key,
 }))
