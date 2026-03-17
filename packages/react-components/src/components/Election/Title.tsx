@@ -1,7 +1,7 @@
-import { PublishedElection } from '@vocdoni/sdk'
 import { ComponentPropsWithoutRef } from 'react'
 import { useComponents } from '~components/context/useComponents'
 import { useElection } from '~providers'
+import { getElectionTitle } from '~providers/election/normalized'
 
 export const ElectionTitle = (props: ComponentPropsWithoutRef<'h1'> & Record<string, unknown>) => {
   const { election } = useElection()
@@ -9,6 +9,6 @@ export const ElectionTitle = (props: ComponentPropsWithoutRef<'h1'> & Record<str
 
   if (!election) return null
 
-  const title = election instanceof PublishedElection ? election.title?.default : election.id
+  const title = getElectionTitle(election)
   return <Slot {...props} title={title} />
 }

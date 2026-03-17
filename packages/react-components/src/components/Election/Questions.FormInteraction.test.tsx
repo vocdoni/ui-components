@@ -1,5 +1,4 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { ConfirmContext } from '~confirm/ConfirmProvider'
 import { QuestionsConfirmation } from './Questions/Confirmation'
@@ -60,7 +59,7 @@ vi.mock('@ethersproject/wallet', () => ({
   Wallet,
 }))
 
-vi.mock('../../providers', () => ({
+vi.mock('~providers', () => ({
   useElection: () => ({
     election: state.election,
     vote: state.vote,
@@ -76,7 +75,7 @@ vi.mock('../../providers', () => ({
   }),
 }))
 
-vi.mock('../../../i18n/localize', () => ({
+vi.mock('~i18n/localize', () => ({
   useReactComponentsLocalize: () => (key: string, options?: Record<string, unknown>) =>
     key === 'validation.choices_count' ? `choices_count:${String(options?.count)}` : key,
 }))

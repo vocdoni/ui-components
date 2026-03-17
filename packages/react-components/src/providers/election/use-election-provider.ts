@@ -6,13 +6,13 @@ import {
   CensusType,
   ChainAPI,
   HasAlreadyVotedOptions,
-  InvalidElection,
   PublishedElection,
   Vote,
   VoteInfoResponse,
   VotesLeftCountOptions,
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { canUseWorkers } from '~providers/browser'
 import { useClient } from '~providers/client'
 import { vote as cspVote, fetchSignInfo } from '~providers/csp'
 import { queryKeys } from '~providers/query/keys'
@@ -20,24 +20,29 @@ import { errorToString } from '~providers/utils'
 import worker, { ICircuit, ICircuitWorkerRequest } from '~providers/worker/circuitWorkerScript'
 import { useWebWorker } from '~providers/worker/useWebWorker'
 import { createWebWorker } from '~providers/worker/webWorker'
+import { ElectionLike, isInvalidElectionLike, isPublishedElectionLike, normalizeElection } from './normalized'
 import { useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
   id?: string
-  election?: PublishedElection | InvalidElection
-  queryOptions?: Omit<UseQueryOptions<PublishedElection | InvalidElection, unknown>, 'queryKey' | 'queryFn' | 'enabled'>
+  election?: ElectionLike
+  queryOptions?: Omit<UseQueryOptions<ElectionLike, unknown>, 'queryKey' | 'queryFn' | 'enabled'>
   ConnectButton?: ComponentType
   fetchCensus?: boolean
   beforeSubmit?: (vote: Vote) => boolean
 }
 
-const getIsWeighted = (election?: PublishedElection | InvalidElection): boolean => {
-  if (!(election instanceof PublishedElection) || !election.census) {
-    return false
-  }
-
-  const rawWeight = election.census.weight
-  const rawSize = election.census.size
+const getIsWeighted = (election?: ElectionLike): boolean => {
+  const current = election as
+    | {
+        census?: {
+          weight?: unknown
+          size?: unknown
+        }
+      }
+    | undefined
+  const rawWeight = current?.census?.weight
+  const rawSize = current?.census?.size
   if (typeof rawWeight === 'undefined' || rawWeight === null || typeof rawSize === 'undefined' || rawSize === null) {
     return false
   }
@@ -61,7 +66,8 @@ export const useElectionProvider = ({
 }: ElectionProviderProps) => {
   const { client: c, localize, generateSigner } = useClient()
   const queryClient = useQueryClient()
-  const { state, actions } = useElectionReducer(c, data)
+  const normalizedData = useMemo(() => normalizeElection(data), [data])
+  const { state, actions } = useElectionReducer(c, normalizedData)
 
   const {
     client,
@@ -86,6 +92,7 @@ export const useElectionProvider = ({
   })
 
   const isAnonCircuitsFetching = useRef(false)
+  const [workerInstance, setWorkerInstance] = useState<Worker | null>(null)
 
   const setVoted = useCallback(
     (voteId: string | null) => {
@@ -111,7 +118,7 @@ export const useElectionProvider = ({
     queryKey: electionQueryKey,
     queryFn: () => client.fetchElection(currentElectionId as string),
     enabled: !!currentElectionId && !!client,
-    initialData: data,
+    initialData: normalizedData,
     ...queryOptions,
   })
 
@@ -124,14 +131,14 @@ export const useElectionProvider = ({
         if (currentElectionId && id === currentElectionId && electionQuery.refetch) {
           const { data: refreshed } = await electionQuery.refetch()
           if (refreshed) {
-            actions.set(refreshed)
+            actions.set(normalizeElection(refreshed))
           }
         } else {
           const fetched = await queryClient.fetchQuery({
             queryKey: queryKeys.election.byId(id),
             queryFn: () => client.fetchElection(id),
           })
-          actions.set(fetched)
+          actions.set(normalizeElection(fetched))
         }
         setLoaded((prev) => ({ ...prev, election: true }))
         setLoading((prev) => ({ ...prev, election: false }))
@@ -146,27 +153,31 @@ export const useElectionProvider = ({
 
   const censusFetch = useCallback(async () => {
     const address = await client.wallet?.getAddress()
-    if (!election || !(election instanceof PublishedElection)) return
+    if (!isPublishedElectionLike(election)) return
+    const current = election as {
+      census?: { type?: CensusType }
+      electionType?: { anonymous?: boolean }
+    }
 
     try {
       setLoading((prev) => ({ ...prev, census: true }))
       setErrors((prev) => ({ ...prev, census: null }))
       actions.loadCensus(address as string)
-      const isCsp = election.census.type === CensusType.CSP
+      const censusType = current.census?.type
+      const isAnonymousElection = !!current.electionType?.anonymous
+      const isCsp = censusType === CensusType.CSP
       const isIn = isCsp ? !!state.csp.token : await client.isInCensus({ electionId: election.id })
       actions.inCensus(isIn)
-
-      const censusType = election.census.type as CensusType
 
       const requestData: HasAlreadyVotedOptions | VotesLeftCountOptions = {
         electionId: election.id,
       }
 
-      if (isIn && election.electionType.anonymous && signature) {
+      if (isIn && isAnonymousElection && signature) {
         requestData.voteId = await AnonymousService.calcVoteId(signature, password ?? '0', election.id)
       }
 
-      if (isIn && censusType === CensusType.WEIGHTED && !election.electionType.anonymous) {
+      if (isIn && censusType === CensusType.WEIGHTED && !isAnonymousElection) {
         setVoted(await client.hasAlreadyVoted(requestData))
         // no need to check votes left if member ain't in census
         actions.votesLeft(await client.votesLeftCount(requestData))
@@ -181,20 +192,33 @@ export const useElectionProvider = ({
     }
   }, [actions, client, election, password, signature, setIsAbleToVote, setVoted, state.csp.token])
 
-  const workerInstance = useMemo(() => createWebWorker(worker), [])
   const { result: circuits, startProcessing } = useWebWorker<ICircuit, ICircuitWorkerRequest>(workerInstance)
 
-  const fetchAnonCircuits = useCallback(async () => {
-    if (!(election instanceof PublishedElection)) return
+  useEffect(() => {
+    if (workerInstance || !fetchCensus || !isPublishedElectionLike(election)) return
+    if (election.census?.type !== CensusType.ANONYMOUS || !canUseWorkers()) return
 
-    const hasOverwriteEnabled =
-      typeof election !== 'undefined' &&
-      typeof election.voteType.maxVoteOverwrites !== 'undefined' &&
-      election.voteType.maxVoteOverwrites > 0
+    const instance = createWebWorker(worker)
+    setWorkerInstance(instance)
+
+    return () => {
+      instance?.terminate?.()
+    }
+  }, [election, fetchCensus, workerInstance])
+
+  const fetchAnonCircuits = useCallback(async () => {
+    if (!isPublishedElectionLike(election)) return
+    const current = election as {
+      census?: { type?: CensusType }
+      voteType?: { maxVoteOverwrites?: unknown }
+    }
+
+    const maxVoteOverwrites = Number(current.voteType?.maxVoteOverwrites ?? 0)
+    const hasOverwriteEnabled = Number.isFinite(maxVoteOverwrites) && maxVoteOverwrites > 0
 
     const votable = state.isAbleToVote || (hasOverwriteEnabled && state.isInCensus && state.voted)
 
-    if (votable && election?.census.type === CensusType.ANONYMOUS) {
+    if (votable && current.census?.type === CensusType.ANONYMOUS) {
       const chainCircuits = await ChainAPI.circuits(client.url)
       const circuits = {
         zKeyURI: chainCircuits.uri + '/' + chainCircuits.circuitPath + '/' + chainCircuits.zKeyFilename,
@@ -206,7 +230,7 @@ export const useElectionProvider = ({
       }
       startProcessing({ circuits })
     }
-  }, [client.url, election, startProcessing, state.isAbleToVote, state.isInCensus, state.voted])
+  }, [client.url, election, startProcessing, state.isAbleToVote, state.isInCensus, state.voted, workerInstance])
 
   // fetch anon circuits
   useEffect(() => {
@@ -221,8 +245,8 @@ export const useElectionProvider = ({
       return
     }
 
-    if (!(election instanceof PublishedElection)) return
-    if (!election.census || election.census.type !== CensusType.ANONYMOUS) return
+    if (!isPublishedElectionLike(election)) return
+    if (election.census?.type !== CensusType.ANONYMOUS) return
 
     isAnonCircuitsFetching.current = true
     fetchAnonCircuits()
@@ -259,7 +283,7 @@ export const useElectionProvider = ({
       setLoading((prev) => ({ ...prev, election: true }))
     }
     if (electionQuery.data) {
-      actions.set(electionQuery.data)
+      actions.set(normalizeElection(electionQuery.data))
       setLoaded((prev) => ({ ...prev, election: true }))
       setLoading((prev) => ({ ...prev, election: false }))
     }
@@ -296,7 +320,7 @@ export const useElectionProvider = ({
 
   // csp check sign info (check if voter already voted)
   useEffect(() => {
-    if (!state.csp.token || !election || !loaded.election || election instanceof InvalidElection) return
+    if (!state.csp.token || !election || !loaded.election || isInvalidElectionLike(election)) return
     ;(async () => {
       try {
         actions.inCensus(true)
@@ -437,6 +461,9 @@ export const useElectionProvider = ({
       actions.voted(null)
       setErrors((prev) => ({ ...prev, voting: errorToString(error) }))
       setLoading((prev) => ({ ...prev, voting: false }))
+    },
+    set: (nextElection: ElectionLike) => {
+      actions.set(normalizeElection(nextElection))
     },
     load: (id?: string) => {
       actions.load(id)

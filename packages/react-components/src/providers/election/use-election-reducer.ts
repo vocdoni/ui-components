@@ -1,14 +1,9 @@
-import {
-  areEqualHexStrings,
-  CensusType,
-  InvalidElection,
-  PublishedElection,
-  VocdoniSDKClient,
-  Vote,
-} from '@vocdoni/sdk'
-import { Reducer, useEffect, useMemo, useReducer, useRef } from 'react'
+import { areEqualHexStrings, CensusType, PublishedElection, VocdoniSDKClient, Vote } from '@vocdoni/sdk'
+import { Reducer, useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { getStorageItem, removeStorageItem, setStorageItem } from '~providers/browser'
 import { useClient } from '~providers/client'
 import { ClientSetPayload, hasSigner } from '~providers/client/client-utils'
+import { ElectionLike, getElectionField, isInvalidElectionLike } from './normalized'
 export const BlindCspServiceKey = 'vocdoni-blind-csp'
 
 export const CensusClear = 'election:census:clear'
@@ -51,7 +46,7 @@ export type ElectionCspStep0Payload = { token: string }
 export type ElectionCspStep1Payload = string
 export type ElectionInCensusPayload = boolean
 export type ElectionLoadPayload = string | undefined
-export type ElectionSetPayload = PublishedElection | InvalidElection
+export type ElectionSetPayload = ElectionLike
 export type ElectionVotedPayload = string | null
 export type ElectionVoteSetPayload = Vote
 export type ElectionVotesLeftPayload = number
@@ -82,7 +77,7 @@ export interface ElectionReducerState {
   id: string | undefined
   isAbleToVote: boolean | undefined
   isInCensus: boolean
-  election: PublishedElection | InvalidElection | undefined
+  election: ElectionLike | undefined
   vote: Vote | undefined
   voter: string | undefined
   votesLeft: number
@@ -103,29 +98,31 @@ export enum LSKey {
   tokenR = 'csp_token',
 }
 
-const participation = (election?: PublishedElection | InvalidElection) => {
-  if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
+const participation = (election?: ElectionLike) => {
+  const current = election as any
+  if (!current || isInvalidElectionLike(election) || (!current.census && !current.maxCensusSize)) {
     return 0
   }
-  const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
+  const size = current.census && current.census.size ? current.census.size : current.maxCensusSize
   // Calculate percentage of people who voted
-  return Math.round((election.voteCount / size) * 10000) / 100
+  return Math.round(((current.voteCount || 0) / size) * 10000) / 100
 }
 
 // Turnout returns the % of total votes
-const turnout = (election?: PublishedElection | InvalidElection) => {
-  if (!election || election instanceof InvalidElection || (!election.census && !election.maxCensusSize)) {
+const turnout = (election?: ElectionLike) => {
+  const current = election as any
+  if (!current || isInvalidElectionLike(election) || (!current.census && !current.maxCensusSize)) {
     return 0
   }
 
-  const size = election.census && election.census.size ? election.census.size : election.maxCensusSize
+  const size = current.census && current.census.size ? current.census.size : current.maxCensusSize
 
   // Calculate total votes (sum of all results if available, otherwise use voteCount)
-  const totalVotes = election.results
-    ? election.results.reduce((acc, questionResults) => {
+  const totalVotes = current.results
+    ? current.results.reduce((acc, questionResults) => {
         return acc + questionResults.reduce((sum, value) => sum + Number(value), 0)
       }, 0)
-    : election.voteCount || 0
+    : current.voteCount || 0
 
   // Calculate percentage of total votes
   return Math.round((totalVotes / size) * 10000) / 100
@@ -136,7 +133,7 @@ export const electionStateEmpty = ({
   election,
 }: {
   client: VocdoniSDKClient
-  election?: PublishedElection | InvalidElection
+  election?: ElectionLike
 }): ElectionReducerState => ({
   client,
   connected: false,
@@ -150,7 +147,7 @@ export const electionStateEmpty = ({
   voted: null,
   voting: false,
   csp: {
-    token: localStorage.getItem(LSKey.tokenR) || undefined,
+    token: undefined,
   },
   sik: {
     password: undefined,
@@ -187,7 +184,6 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 ) => {
   switch (action.type) {
     case CensusClear: {
-      localStorage.removeItem(LSKey.tokenR)
       return electionStateEmpty({ client: state.client, election: state.election })
     }
     case CensusLoad: {
@@ -219,7 +215,6 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
 
     case ElectionCspStep1: {
       const token = action.payload as ElectionCspStep1Payload
-      localStorage.setItem(LSKey.tokenR, token)
       const rstate = {
         ...state,
         csp: {
@@ -342,9 +337,10 @@ const electionReducer: Reducer<ElectionReducerState, ElectionAction> = (
   }
 }
 
-export const useElectionReducer = (client: VocdoniSDKClient, election?: PublishedElection | InvalidElection) => {
+export const useElectionReducer = (client: VocdoniSDKClient, election?: ElectionLike) => {
   const initial = electionStateEmpty({ client, election })
   const { connected } = useClient()
+  const [storageHydrated, setStorageHydrated] = useState(false)
   const [state, dispatch] = useReducer(electionReducer, {
     ...initial,
     election,
@@ -355,7 +351,26 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   const isLocalWalletSigner =
     state.election instanceof PublishedElection &&
     (state.election.census?.type === CensusType.CSP ||
-      (state.election?.meta && state.election.get('census.type') === 'spreadsheet'))
+      getElectionField(state.election, 'census.type') === 'spreadsheet')
+
+  useEffect(() => {
+    const token = getStorageItem(LSKey.tokenR) || undefined
+    if (token) {
+      dispatch({ type: ElectionCspStep0, payload: { token } })
+    }
+    setStorageHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!storageHydrated) return
+
+    if (state.csp.token) {
+      setStorageItem(LSKey.tokenR, state.csp.token)
+      return
+    }
+
+    removeStorageItem(LSKey.tokenR)
+  }, [state.csp.token, storageHydrated])
 
   // update local client in case it's updated
   useEffect(() => {
@@ -413,7 +428,7 @@ export const useElectionReducer = (client: VocdoniSDKClient, election?: Publishe
   const actions = useMemo(
     () => ({
       clear: () => dispatch({ type: CensusClear }),
-      set: (election: PublishedElection | InvalidElection) => dispatch({ type: ElectionSet, payload: election }),
+      set: (election: ElectionLike) => dispatch({ type: ElectionSet, payload: election }),
       setClient: (client: VocdoniSDKClient) => dispatch({ type: ElectionClientSet, payload: client }),
       sikPassword: (password: SikPayload) => dispatch({ type: SikPasswordSet, payload: password }),
       sikSignature: (signature: SikPayload) => dispatch({ type: SikSignatureSet, payload: signature }),

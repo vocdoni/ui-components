@@ -1,10 +1,9 @@
 import { render } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { ConfirmContext } from '~confirm/ConfirmProvider'
 import { QuestionsConfirmation } from './Questions/Confirmation'
 
-vi.mock('../../../i18n/localize', () => ({
+vi.mock('~i18n/localize', () => ({
   useReactComponentsLocalize: () => (key: string) => key === 'vote.abstain' ? 'Abstain' : key,
 }))
 
@@ -73,6 +72,6 @@ describe('QuestionsConfirmation', () => {
       </ConfirmContext.Provider>
     )
 
-    expect(captured[0].answersView).toEqual([{ question: 'Q1', answers: ['vote.abstain'] }])
+    expect(captured[0].answersView).toEqual([{ question: 'Q1', answers: ['Abstain'] }])
   })
 })

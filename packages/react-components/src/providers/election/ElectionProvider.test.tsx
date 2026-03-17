@@ -2,12 +2,14 @@ import { Wallet } from '@ethersproject/wallet'
 import { render, renderHook, waitFor } from '@testing-library/react'
 import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
 import { act } from 'react'
+import * as browserModule from '~providers/browser'
 import { ClientProvider, useClient } from '~providers/client'
 import { fetchSignInfo } from '~providers/csp'
 import { TestProvider, onlyProps, properProps } from '~providers/test-utils'
+import * as webWorkerModule from '~providers/worker/webWorker'
 import { ElectionProvider, useElection } from './ElectionProvider'
 
-vi.mock('../csp', () => ({
+vi.mock('~providers/csp', () => ({
   fetchSignInfo: vi.fn(() =>
     Promise.resolve({
       address: '0x0',
@@ -59,6 +61,101 @@ describe('<ElectionProvider />', () => {
     })
 
     expect((result.current.election as PublishedElection)?.title.default).toEqual('mocked process')
+  })
+
+  it('accepts serialized election data', async () => {
+    const wrapper = (props: any) => {
+      return (
+        <TestProvider>
+          <ClientProvider>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
+
+    const election = JSON.parse(
+      JSON.stringify(
+        // @ts-ignore
+        PublishedElection.build({
+          id: '0xserialized',
+          title: 'serialized election',
+          description: 'serialized description',
+          startDate: '2026-01-01T00:00:00.000Z',
+          endDate: '2026-12-31T00:00:00.000Z',
+          creationTime: '2025-12-01T00:00:00.000Z',
+          census: new WeightedCensus(),
+        })
+      )
+    )
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election },
+    })
+
+    await waitFor(() => {
+      expect(result.current.election?.id).toEqual('0xserialized')
+    })
+
+    expect(
+      (result.current.election as PublishedElection)?.title?.default ?? result.current.election?.title?.default
+    ).toBe('serialized election')
+  })
+
+  it('creates the anonymous worker for serialized elections when normalization cannot revive a PublishedElection', async () => {
+    const createWebWorker = vi.spyOn(webWorkerModule, 'createWebWorker').mockReturnValue({
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      postMessage: vi.fn(),
+      terminate: vi.fn(),
+    } as any)
+    const canUseWorkers = vi.spyOn(browserModule, 'canUseWorkers').mockReturnValue(true)
+    const build = vi.spyOn(PublishedElection as any, 'build').mockImplementationOnce(() => {
+      throw new Error('builder unavailable')
+    })
+
+    try {
+      const wrapper = (props: any) => {
+        return (
+          <TestProvider>
+            <ClientProvider>
+              <ElectionProvider {...properProps(props)} />
+            </ClientProvider>
+          </TestProvider>
+        )
+      }
+
+      const election = {
+        _id: '0xserialized-anonymous',
+        _title: { default: 'serialized anonymous election' },
+        _description: { default: 'serialized anonymous description' },
+        _status: 'ONGOING',
+        _endDate: new Date().toISOString(),
+        _census: {
+          _type: CensusType.ANONYMOUS,
+        },
+        _electionType: {
+          _anonymous: true,
+        },
+        _voteType: {
+          _maxVoteOverwrites: 0,
+        },
+      }
+
+      renderHook(() => useElection(), {
+        wrapper,
+        initialProps: { election, fetchCensus: true },
+      })
+
+      await waitFor(() => {
+        expect(createWebWorker).toHaveBeenCalledTimes(1)
+      })
+    } finally {
+      build.mockRestore()
+      canUseWorkers.mockRestore()
+      createWebWorker.mockRestore()
+    }
   })
 
   it('loads election via react-query and computes participation', async () => {
@@ -689,6 +786,38 @@ describe('<ElectionProvider />', () => {
         const { result } = renderHook(() => useElection(), {
           wrapper,
           initialProps: { election },
+        })
+
+        expect(result.current.isWeighted).toBe(true)
+      })
+
+      it('returns true when serialized election census weight differs from size', () => {
+        const wrapper = (props: any) => {
+          return (
+            <TestProvider>
+              <ClientProvider>
+                <ElectionProvider {...properProps(props)} />
+              </ClientProvider>
+            </TestProvider>
+          )
+        }
+
+        const serializedElection = {
+          _id: 'weighted-serialized',
+          _title: { default: 'test' },
+          _description: { default: 'test' },
+          _endDate: new Date().toISOString(),
+          _status: 'ONGOING',
+          _census: {
+            _type: CensusType.WEIGHTED,
+            _size: 1,
+            _weight: 2,
+          },
+        }
+
+        const { result } = renderHook(() => useElection(), {
+          wrapper,
+          initialProps: { election: serializedElection },
         })
 
         expect(result.current.isWeighted).toBe(true)

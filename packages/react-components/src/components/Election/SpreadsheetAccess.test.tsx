@@ -1,11 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { SpreadsheetAccessSlotProps } from '~components/context/types'
 import { SpreadsheetAccess } from './SpreadsheetAccess'
 
 const state = vi.hoisted(() => ({
   election: null as any,
+  connected: false,
   clearClient: vi.fn(),
   setClient: vi.fn(),
   sikPassword: vi.fn(),
@@ -66,12 +66,12 @@ vi.mock('@vocdoni/sdk', () => ({
   VocdoniSDKClient,
 }))
 
-vi.mock('../../providers', () => ({
+vi.mock('~providers', () => ({
   errorToString: (error: unknown) => String(error),
   walletFromRow: (salt: unknown, values: unknown[]) => (state.walletFromRow as any)(salt, values),
   useClient: () => ({ env: 'dev' }),
   useElection: () => ({
-    connected: false,
+    connected: state.connected,
     clearClient: state.clearClient,
     election: state.election,
     client: {
@@ -84,7 +84,7 @@ vi.mock('../../providers', () => ({
   }),
 }))
 
-vi.mock('../../i18n/localize', () => ({
+vi.mock('~i18n/localize', () => ({
   useReactComponentsLocalize: () => (key: string, options?: Record<string, unknown>) =>
     key === 'validation.min_length' ? `validation.min_length:${String(options?.min)}` : key,
 }))
@@ -264,5 +264,50 @@ describe('SpreadsheetAccess', () => {
       expect(screen.getByText('errors.wrong_data_description')).toBeInTheDocument()
     })
     expect(state.setClient).not.toHaveBeenCalled()
+  })
+
+  it('does not reuse a hash-derived private key after logout', async () => {
+    state.connected = true
+    state.setClient.mockClear()
+    state.clearClient.mockClear()
+    state.sdkClientCtorCalls = []
+    state.election = new PublishedElection({
+      data: {
+        'census.type': 'spreadsheet',
+        'census.fields': ['Email'],
+        'census.specs': {},
+      },
+    })
+    window.location.hash = '#0xprivate'
+
+    const view = renderSpreadsheetAccess()
+
+    await waitFor(() => {
+      expect(state.setClient).toHaveBeenCalledTimes(1)
+    })
+
+    state.setClient.mockClear()
+    fireEvent.click(screen.getByRole('button', { name: 'logout' }))
+
+    expect(state.clearClient).toHaveBeenCalledTimes(1)
+    expect(window.location.hash).toBe('')
+
+    state.election = new PublishedElection({
+      data: {
+        'census.type': 'spreadsheet',
+        'census.fields': ['Email'],
+        'census.specs': {},
+      },
+    })
+
+    view.rerender(
+      <ComponentsProvider components={{ SpreadsheetAccess: SpreadsheetSlot }}>
+        <SpreadsheetAccess />
+      </ComponentsProvider>
+    )
+
+    await waitFor(() => {
+      expect(state.setClient).not.toHaveBeenCalled()
+    })
   })
 })

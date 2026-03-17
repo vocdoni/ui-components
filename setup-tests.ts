@@ -49,18 +49,22 @@ class Worker {
 }
 
 // required due to SDK dependency
-Object.defineProperty(window, 'Worker', { value: Worker })
-Object.defineProperty(window, 'MockedWindowURL', {
-  value: {
-    createObjectURL: () => 'blob:mocked',
-    revokeObjectURL: () => {},
-  },
-})
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'Worker', { value: Worker })
+  Object.defineProperty(window, 'MockedWindowURL', {
+    value: {
+      createObjectURL: () => 'blob:mocked',
+      revokeObjectURL: () => {},
+    },
+  })
+}
 
 // required by any react component (almost all of them)
 global.React = React
 
-global.URL.createObjectURL = vi.fn()
+if (typeof globalThis.URL !== 'undefined') {
+  globalThis.URL.createObjectURL = vi.fn()
+}
 global.fetch = vi.fn(() =>
   Promise.resolve({
     json: () => Promise.resolve({ test: 100 }),

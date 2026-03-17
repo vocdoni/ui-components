@@ -1,6 +1,6 @@
 {
   "name": "@vocdoni/react-components",
-  "version": "1.0.1",
+  "version": "1.1.0-beta.0",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/vocdoni/ui-components/tree/main/packages/react-components#readme",
   "bugs": "https://github.com/vocdoni/ui-components/issues",
@@ -71,6 +71,7 @@
     "i18next": "^25.8.13",
     "latinize": "^0.5.0",
     "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-i18next": "^16.5.4",
     "react-router-dom": "^6.26.1",
     "tsconfig": "workspace:*",

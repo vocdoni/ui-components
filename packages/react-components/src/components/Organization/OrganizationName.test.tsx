@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
 import { ComponentsProvider } from '~components/context/ComponentsProvider'
 import { OrganizationName } from './Name'
 
-vi.mock('../../providers', () => ({
+vi.mock('~providers', () => ({
   useOrganization: vi.fn(() => ({
     organization: {
       address: '0xorg',
