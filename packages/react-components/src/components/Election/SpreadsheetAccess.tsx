@@ -44,7 +44,13 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
       try {
         if (!shouldRender || !privkey) return
         const privKeyWallet = new Wallet(privkey)
-        const client = new VocdoniSDKClient({ env, wallet: privKeyWallet, electionId: election?.id })
+        const client = new VocdoniSDKClient({
+          env,
+          wallet: privKeyWallet,
+          electionId: election?.id,
+          api_url: cl.chainService.url,
+        })
+        console.log('ENTRA AQUIIIIII')
         setClient(client)
       } catch (error) {
         console.warn('Error trying to login with private key ', error)
