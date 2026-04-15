@@ -50,7 +50,12 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
       try {
         if (!shouldRender || !privkey) return
         const privKeyWallet = new Wallet(privkey)
-        const client = new VocdoniSDKClient({ env, wallet: privKeyWallet, electionId: election?.id })
+        const client = new VocdoniSDKClient({
+          env,
+          wallet: privKeyWallet,
+          electionId: election?.id,
+          api_url: cl.chainService.url,
+        })
         setClient(client)
       } catch (error) {
         console.warn('Error trying to login with private key ', error)
@@ -120,7 +125,6 @@ export const SpreadsheetAccess = ({ hashPrivateKey, className }: SpreadsheetAcce
       const salt =
         election.get('census.salt') || (await cl.electionService.getElectionSalt(election.organizationId, hid))
       const wallet = walletFromRow(salt, row)
-      const derivedAddress = await wallet.getAddress()
 
       const client = new VocdoniSDKClient({
         env,
