@@ -1,6 +1,6 @@
 import { ElectionStatus } from '@vocdoni/sdk'
 import { format as dformat, formatDistance } from 'date-fns'
-import { ComponentPropsWithoutRef } from 'react'
+import { ComponentPropsWithoutRef, useSyncExternalStore } from 'react'
 import { useComponents } from '~components/context/useComponents'
 import { useReactComponentsLocalize } from '~i18n/localize'
 import { useElection } from '~providers'
@@ -13,6 +13,15 @@ export type ElectionScheduleProps = ComponentPropsWithoutRef<'p'> &
     showCreatedAt?: boolean
   }
 
+const subscribe = () => () => {}
+const useIsHydrationRender = () =>
+  useSyncExternalStore(
+    subscribe,
+    () => false,
+    () => true
+  )
+const formatDeterministicDate = (date: Date) => date.toISOString()
+
 export const ElectionSchedule = ({
   format = 'PPp',
   showRemaining = false,
@@ -22,6 +31,7 @@ export const ElectionSchedule = ({
   const { election } = useElection()
   const t = useReactComponentsLocalize()
   const { ElectionSchedule: Slot } = useComponents()
+  const isHydrationRender = useIsHydrationRender()
   const startDate = getElectionDate(election, 'startDate')
   const endDate = getElectionDate(election, 'endDate')
   const creationTime = getElectionDate(election, 'creationTime')
@@ -29,46 +39,65 @@ export const ElectionSchedule = ({
 
   if (!election || !startDate || !endDate || !status) return null
 
-  const getRemaining = (): string => {
+  const getRemaining = (now: Date): string => {
     switch (status) {
       case ElectionStatus.ONGOING:
       case ElectionStatus.RESULTS:
-        if (endDate < new Date()) {
+        if (endDate < now) {
           return t('schedule.ended', {
-            distance: formatDistance(endDate, new Date(), { addSuffix: true }),
+            distance: formatDistance(endDate, now, { addSuffix: true }),
           })
         }
-        return formatDistance(endDate, new Date(), { addSuffix: true })
+        return formatDistance(endDate, now, { addSuffix: true })
       case ElectionStatus.ENDED:
         return t('schedule.ended', {
-          distance: formatDistance(endDate, new Date(), { addSuffix: true }),
+          distance: formatDistance(endDate, now, { addSuffix: true }),
         })
       case ElectionStatus.PAUSED:
-        if (new Date() < startDate) {
+        if (now < startDate) {
           return t('schedule.paused_start', {
-            distance: formatDistance(startDate, new Date(), { addSuffix: true }),
+            distance: formatDistance(startDate, now, { addSuffix: true }),
           })
         }
         return t('schedule.paused_end', {
-          distance: formatDistance(endDate, new Date(), { addSuffix: true }),
+          distance: formatDistance(endDate, now, { addSuffix: true }),
         })
       case ElectionStatus.UPCOMING:
       default:
-        return formatDistance(startDate, new Date(), { addSuffix: true })
+        return formatDistance(startDate, now, { addSuffix: true })
     }
   }
 
-  let text = t('schedule.from_begin_to_end', {
-    begin: dformat(new Date(startDate), format),
-    end: dformat(new Date(endDate), format),
-  })
+  const getDeterministicText = () => {
+    if (showCreatedAt && creationTime) {
+      return t('schedule.created', {
+        distance: formatDeterministicDate(creationTime),
+      })
+    }
 
-  if (showRemaining) {
-    text = getRemaining()
-  } else if (showCreatedAt && creationTime) {
-    text = t('schedule.created', {
-      distance: formatDistance(creationTime, new Date(), { addSuffix: true }),
+    return t('schedule.from_begin_to_end', {
+      begin: formatDeterministicDate(startDate),
+      end: formatDeterministicDate(endDate),
     })
+  }
+
+  let text = getDeterministicText()
+
+  if (!isHydrationRender) {
+    const now = new Date()
+
+    text = t('schedule.from_begin_to_end', {
+      begin: dformat(startDate, format),
+      end: dformat(endDate, format),
+    })
+
+    if (showRemaining) {
+      text = getRemaining(now)
+    } else if (showCreatedAt && creationTime) {
+      text = t('schedule.created', {
+        distance: formatDistance(creationTime, now, { addSuffix: true }),
+      })
+    }
   }
 
   return <Slot {...rest} text={text} />
