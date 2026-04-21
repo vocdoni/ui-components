@@ -67,6 +67,7 @@ export const useElectionProvider = ({
   const { client: c, localize, generateSigner } = useClient()
   const queryClient = useQueryClient()
   const normalizedData = useMemo(() => normalizeElection(data), [data])
+  const initialElectionId = normalizedData?.id
   const { state, actions } = useElectionReducer(c, normalizedData)
 
   const {
@@ -306,7 +307,7 @@ export const useElectionProvider = ({
         !(
           !loaded.census ||
           !areEqualHexStrings(state.voter, address) ||
-          (data && !areEqualHexStrings(data.id, election.id)) ||
+          (initialElectionId && !areEqualHexStrings(initialElectionId, election.id)) ||
           // fetch census if there's sik signature and no vote id
           (signature && !loaded.voted)
         )
@@ -316,7 +317,17 @@ export const useElectionProvider = ({
 
       await censusFetch()
     })()
-  }, [fetchCensus, client, state.voter, loaded.election, loading.census, actions, state.isAbleToVote, signature])
+  }, [
+    fetchCensus,
+    client,
+    state.voter,
+    loaded.election,
+    loading.census,
+    actions,
+    state.isAbleToVote,
+    signature,
+    initialElectionId,
+  ])
 
   // csp check sign info (check if voter already voted)
   useEffect(() => {

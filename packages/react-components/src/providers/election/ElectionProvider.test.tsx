@@ -3,7 +3,7 @@ import { render, renderHook, waitFor } from '@testing-library/react'
 import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCensus } from '@vocdoni/sdk'
 import { act } from 'react'
 import * as browserModule from '~providers/browser'
-import { ClientProvider, useClient } from '~providers/client'
+import { ClientContext, ClientProvider, useClient } from '~providers/client'
 import { fetchSignInfo } from '~providers/csp'
 import { TestProvider, onlyProps, properProps } from '~providers/test-utils'
 import * as webWorkerModule from '~providers/worker/webWorker'
@@ -1275,6 +1275,78 @@ describe('<ElectionProvider />', () => {
     await waitFor(() => {
       expect(result.current.loaded.census).toBeTruthy()
     })
+  })
+
+  it('does not refetch census forever for serialized non-CSP elections with an existing session', async () => {
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+
+    client.isInCensus = vi.fn().mockResolvedValue(true) as any
+    client.hasAlreadyVoted = vi.fn().mockResolvedValue(null) as any
+    client.votesLeftCount = vi.fn().mockResolvedValue(1) as any
+
+    const serializedElection = {
+      _id: '6be21a5a9dc034ede83966b661e6a648854bd92b7d209d2c97c2020000000042',
+      _title: { default: 'serialized spreadsheet election' },
+      _description: { default: '' },
+      _status: 'ONGOING',
+      _endDate: new Date().toISOString(),
+      _census: {
+        _type: CensusType.WEIGHTED,
+        _size: 100,
+        _weight: 100n,
+      },
+      _electionType: {
+        _anonymous: false,
+      },
+      _voteType: {
+        _maxVoteOverwrites: 0,
+        _maxCount: 1,
+        _maxValue: 1,
+      },
+      _meta: {
+        census: {
+          type: 'spreadsheet',
+        },
+      },
+    }
+
+    const clientContextValue = {
+      client,
+      connected: true,
+      localize: (key: string) => key,
+      generateSigner: () => signer,
+    } as any
+
+    const wrapper = (props: any) => (
+      <TestProvider>
+        <ClientContext.Provider value={clientContextValue}>
+          <ElectionProvider {...properProps(props)} />
+        </ClientContext.Provider>
+      </TestProvider>
+    )
+
+    const { result, rerender } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election: serializedElection, fetchCensus: true },
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.census).toBeTruthy()
+    })
+
+    rerender({ election: serializedElection, fetchCensus: true })
+
+    await waitFor(() => {
+      expect(result.current.loaded.census).toBeTruthy()
+    })
+
+    expect(client.isInCensus).toHaveBeenCalledTimes(1)
+    expect(client.hasAlreadyVoted).toHaveBeenCalledTimes(1)
+    expect(client.votesLeftCount).toHaveBeenCalledTimes(1)
   })
 
   it('recalculates isAbleToVote on ElectionVoted with overwrites enabled', async () => {
