@@ -362,7 +362,9 @@ export const useElectionProvider = ({
     if (!fetchCensus || !election || !loaded.election || loading.census || !client.wallet) return
     ;(async () => {
       const address = await client.wallet?.getAddress()
-      const isCsp = isPublishedElectionLike(election) && (election as { census?: { type?: CensusType } }).census?.type === CensusType.CSP
+      const isCsp =
+        isPublishedElectionLike(election) &&
+        (election as { census?: { type?: CensusType } }).census?.type === CensusType.CSP
       // re-resolve CSP membership whenever the auth token changes (hydration,
       // login, bundle switch, logout) since gating depends on /check
       const cspTokenChanged = isCsp && state.csp.token !== lastCspCensusToken.current
