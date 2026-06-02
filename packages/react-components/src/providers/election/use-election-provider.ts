@@ -8,19 +8,18 @@ import {
   HasAlreadyVotedOptions,
   PublishedElection,
   Vote,
-  VoteInfoResponse,
   VotesLeftCountOptions,
 } from '@vocdoni/sdk'
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { canUseWorkers } from '~providers/browser'
 import { useClient } from '~providers/client'
-import { vote as cspVote, fetchSignInfo } from '~providers/csp'
+import { vote as cspVote, fetchCheckMembership, fetchSignInfo } from '~providers/csp'
 import { queryKeys } from '~providers/query/keys'
 import { errorToString } from '~providers/utils'
 import worker, { ICircuit, ICircuitWorkerRequest } from '~providers/worker/circuitWorkerScript'
 import { useWebWorker } from '~providers/worker/useWebWorker'
 import { createWebWorker } from '~providers/worker/webWorker'
-import { ElectionLike, isInvalidElectionLike, isPublishedElectionLike, normalizeElection } from './normalized'
+import { ElectionLike, isPublishedElectionLike, normalizeElection } from './normalized'
 import { useElectionReducer } from './use-election-reducer'
 
 export type ElectionProviderProps = {
@@ -93,6 +92,10 @@ export const useElectionProvider = ({
   })
 
   const isAnonCircuitsFetching = useRef(false)
+  // Tracks the CSP token the census membership (/check) was last resolved for,
+  // so censusFetch re-runs when the token is hydrated/changed (login, bundle
+  // switch, logout) instead of relying on a stale early run.
+  const lastCspCensusToken = useRef<string | undefined>(undefined)
   const [workerInstance, setWorkerInstance] = useState<Worker | null>(null)
 
   const setVoted = useCallback(
@@ -152,6 +155,45 @@ export const useElectionProvider = ({
     [actions, client, currentElectionId, electionQuery, queryClient]
   )
 
+  // Resolves voted/votesLeft for a CSP voter known to belong to the census.
+  // The bundle /check endpoint only reports a boolean hasVoted, so the exact
+  // remaining-overwrites count is resolved via the nullifier only when needed.
+  const resolveCspVoteStatus = useCallback(
+    async (
+      election: { id: string; census: { censusURI: string }; voteType?: { maxVoteOverwrites?: number } },
+      token: string,
+      hasVoted: boolean
+    ) => {
+      const maxVoteOverwrites = election.voteType?.maxVoteOverwrites ?? 0
+
+      // Not voted yet: full allowance, no nullifier lookup required.
+      if (!hasVoted) {
+        actions.votesLeft(maxVoteOverwrites + 1)
+        setVoted(null)
+        return
+      }
+
+      // Voted: resolve the exact remaining overwrites through the nullifier.
+      try {
+        const uri = new URL(election.census.censusURI)
+        const endpoint = `${uri.protocol}//${uri.host}`
+        const signInfo = await fetchSignInfo({ endpoint, authToken: token, processId: election.id })
+        const voteInfo = await client.voteService.info(signInfo.nullifier)
+        const voteId = voteInfo?.voteID ?? null
+        const overwriteCount = voteInfo?.overwriteCount ?? 0
+        const votesLeft = voteId ? Math.max(0, maxVoteOverwrites - overwriteCount) : maxVoteOverwrites + 1
+        actions.votesLeft(votesLeft)
+        setVoted(voteId)
+      } catch (e) {
+        console.error('error resolving csp vote status:', e)
+        // /check already told us the voter has voted; without overwrite details
+        // assume no overwrites remain (votesLeft already defaults to 0).
+        setVoted(null)
+      }
+    },
+    [actions, client, setVoted]
+  )
+
   const censusFetch = useCallback(async () => {
     const address = await client.wallet?.getAddress()
     if (!isPublishedElectionLike(election)) return
@@ -167,7 +209,27 @@ export const useElectionProvider = ({
       const censusType = current.census?.type
       const isAnonymousElection = !!current.electionType?.anonymous
       const isCsp = censusType === CensusType.CSP
-      const isIn = isCsp ? !!state.csp.token : await client.isInCensus({ electionId: election.id })
+      let isIn: boolean
+      if (isCsp) {
+        // CSP membership is gated on the bundle/check endpoint: a token alone
+        // does not imply the voter belongs to *this* election's census.
+        lastCspCensusToken.current = state.csp.token
+        if (state.csp.token) {
+          const check = await fetchCheckMembership({
+            endpoint: election.census.censusURI,
+            authToken: state.csp.token,
+            electionId: election.id,
+          })
+          isIn = check.belongs
+          if (check.belongs) {
+            await resolveCspVoteStatus(election as PublishedElection, state.csp.token, check.hasVoted)
+          }
+        } else {
+          isIn = false
+        }
+      } else {
+        isIn = await client.isInCensus({ electionId: election.id })
+      }
       actions.inCensus(isIn)
 
       const requestData: HasAlreadyVotedOptions | VotesLeftCountOptions = {
@@ -191,7 +253,7 @@ export const useElectionProvider = ({
       setLoading((prev) => ({ ...prev, census: false }))
       setLoaded((prev) => ({ ...prev, census: true }))
     }
-  }, [actions, client, election, password, signature, setIsAbleToVote, setVoted, state.csp.token])
+  }, [actions, client, election, password, signature, setIsAbleToVote, setVoted, resolveCspVoteStatus, state.csp.token])
 
   const { result: circuits, startProcessing } = useWebWorker<ICircuit, ICircuitWorkerRequest>(workerInstance)
 
@@ -300,6 +362,12 @@ export const useElectionProvider = ({
     if (!fetchCensus || !election || !loaded.election || loading.census || !client.wallet) return
     ;(async () => {
       const address = await client.wallet?.getAddress()
+      const isCsp =
+        isPublishedElectionLike(election) &&
+        (election as { census?: { type?: CensusType } }).census?.type === CensusType.CSP
+      // re-resolve CSP membership whenever the auth token changes (hydration,
+      // login, bundle switch, logout) since gating depends on /check
+      const cspTokenChanged = isCsp && state.csp.token !== lastCspCensusToken.current
       // The condition is just negated so we can return the code execution.
       // A less mental option is to not negate the entire condition and add
       // the `await censusFetch()` execution in there
@@ -309,7 +377,8 @@ export const useElectionProvider = ({
           !areEqualHexStrings(state.voter, address) ||
           (initialElectionId && !areEqualHexStrings(initialElectionId, election.id)) ||
           // fetch census if there's sik signature and no vote id
-          (signature && !loaded.voted)
+          (signature && !loaded.voted) ||
+          cspTokenChanged
         )
       ) {
         return
@@ -321,6 +390,7 @@ export const useElectionProvider = ({
     fetchCensus,
     client,
     state.voter,
+    state.csp.token,
     loaded.election,
     loading.census,
     actions,
@@ -328,52 +398,6 @@ export const useElectionProvider = ({
     signature,
     initialElectionId,
   ])
-
-  // csp check sign info (check if voter already voted)
-  useEffect(() => {
-    if (!state.csp.token || !election || !loaded.election || isInvalidElectionLike(election)) return
-    ;(async () => {
-      try {
-        actions.inCensus(true)
-        const uri = new URL(election.census.censusURI)
-        const endpoint = `${uri.protocol}//${uri.host}`
-        let nullifier: string | null = null
-        try {
-          const signInfo = await fetchSignInfo({
-            endpoint,
-            authToken: state.csp.token,
-            processId: election.id,
-          })
-          nullifier = signInfo.nullifier
-        } catch (error) {
-          const status = error?.status ?? error?.response?.status ?? error?.cause?.status
-          if (Number(status) === 401) {
-            const maxVoteOverwrites = election.voteType?.maxVoteOverwrites ?? 0
-            actions.votesLeft(maxVoteOverwrites + 1)
-            return
-          }
-          throw error
-        }
-
-        let voteInfo: VoteInfoResponse | null = null
-        try {
-          voteInfo = await client.voteService.info(nullifier)
-        } catch (e) {
-          voteInfo = null
-        }
-
-        const voteId = voteInfo?.voteID ?? null
-        const overwriteCount = voteInfo?.overwriteCount ?? 0
-        const maxVoteOverwrites = election.voteType?.maxVoteOverwrites ?? 0
-        const votesLeft = voteId ? Math.max(0, maxVoteOverwrites - overwriteCount) : maxVoteOverwrites + 1
-
-        actions.votesLeft(votesLeft)
-        setVoted(voteId)
-      } catch (e) {
-        console.error('error in csp sign info check:', e)
-      }
-    })()
-  }, [state.csp.token, election, loaded.election, setVoted, actions])
 
   // context vote function (the one to be used with the given components)
   const vote = async (values: number[]) => {

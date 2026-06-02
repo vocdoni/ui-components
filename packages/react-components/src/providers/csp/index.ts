@@ -51,3 +51,28 @@ export const fetchSignInfo = ({
     method: 'POST',
     body: { authToken },
   })
+
+type CheckMembershipResponse = {
+  belongs: boolean
+  weight?: string // hex
+  hasVoted: boolean
+}
+
+type CheckMembershipMutationVariables = {
+  endpoint: string
+  authToken: string
+  electionId?: string
+}
+
+// Posts to ${endpoint}/check, where endpoint is the bundle base
+// (the same base used by /sign and /weight, i.e. census.censusURI), which
+// resolves to POST /process/bundle/{bundleId}/check on the backend.
+export const fetchCheckMembership = ({
+  endpoint,
+  authToken,
+  electionId,
+}: CheckMembershipMutationVariables): Promise<CheckMembershipResponse> =>
+  f(`${endpoint}/check`, {
+    method: 'POST',
+    body: { authToken, ...(electionId ? { electionId } : {}) },
+  })

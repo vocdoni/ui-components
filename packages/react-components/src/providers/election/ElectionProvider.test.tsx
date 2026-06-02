@@ -4,7 +4,7 @@ import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCe
 import { act } from 'react'
 import * as browserModule from '~providers/browser'
 import { ClientContext, ClientProvider, useClient } from '~providers/client'
-import { fetchSignInfo } from '~providers/csp'
+import { fetchCheckMembership, fetchSignInfo } from '~providers/csp'
 import { TestProvider, onlyProps, properProps } from '~providers/test-utils'
 import * as webWorkerModule from '~providers/worker/webWorker'
 import { ElectionProvider, useElection } from './ElectionProvider'
@@ -17,13 +17,23 @@ vi.mock('~providers/csp', () => ({
       at: new Date().toISOString(),
     })
   ),
+  fetchCheckMembership: vi.fn(() => Promise.resolve({ belongs: true, hasVoted: false })),
   vote: vi.fn(),
 }))
 
 describe('<ElectionProvider />', () => {
   beforeEach(() => {
     localStorage.removeItem('csp_token')
-    vi.mocked(fetchSignInfo).mockClear()
+    // mockReset (not mockClear) drains any *Once queued implementations so they
+    // can't leak into later tests, then we re-establish the default behaviour.
+    vi.mocked(fetchSignInfo).mockReset()
+    vi.mocked(fetchSignInfo).mockResolvedValue({
+      address: '0x0',
+      nullifier: '0xdeadbeef',
+      at: new Date().toISOString(),
+    })
+    vi.mocked(fetchCheckMembership).mockReset()
+    vi.mocked(fetchCheckMembership).mockResolvedValue({ belongs: true, hasVoted: false })
   })
 
   it('renders child elements', () => {
@@ -876,9 +886,65 @@ describe('<ElectionProvider />', () => {
     localStorage.removeItem('csp_token')
   })
 
-  it('enables voting when CSP token is set after initial render and sign-info returns 401', async () => {
-    vi.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
+  it('gates CSP voters out of census when bundle check reports they do not belong', async () => {
+    localStorage.setItem('csp_token', 'token')
+    vi.mocked(fetchCheckMembership).mockResolvedValue({ belongs: false, hasVoted: false })
 
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+    client.voteService.info = vi.fn().mockResolvedValue({ voteID: null, overwriteCount: 0 })
+
+    const census = new WeightedCensus()
+    census.type = CensusType.CSP
+    census.censusURI = 'https://csp.example/api'
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'csp-election-not-belonging',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <TestProvider>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election, fetchCensus: true, client, signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.census).toBeTruthy()
+    })
+
+    expect(fetchCheckMembership).toHaveBeenCalledWith(
+      expect.objectContaining({
+        endpoint: 'https://csp.example/api',
+        authToken: 'token',
+        electionId: 'csp-election-not-belonging',
+      })
+    )
+    expect(result.current.isInCensus).toBeFalsy()
+    expect(result.current.isAbleToVote).toBeFalsy()
+
+    localStorage.removeItem('csp_token')
+  })
+
+  it('enables voting when the CSP token is set after the initial render', async () => {
     const client = new VocdoniSDKClient({
       env: EnvOptions.STG,
     })
@@ -925,9 +991,9 @@ describe('<ElectionProvider />', () => {
     expect(result.current.isAbleToVote).toBeTruthy()
   })
 
-  it('treats 401 on CSP sign info as no prior vote', async () => {
+  it('grants full allowance to a CSP member who has not voted (check hasVoted=false)', async () => {
     localStorage.setItem('csp_token', 'token')
-    vi.mocked(fetchSignInfo).mockRejectedValueOnce({ status: 401 })
+    vi.mocked(fetchCheckMembership).mockResolvedValue({ belongs: true, hasVoted: false })
 
     const signer = Wallet.createRandom()
     const client = new VocdoniSDKClient({
@@ -941,7 +1007,7 @@ describe('<ElectionProvider />', () => {
 
     // @ts-ignore
     const election = PublishedElection.build({
-      id: 'csp-election-401',
+      id: 'csp-election-not-voted',
       title: 'test',
       description: 'test',
       endDate: new Date(),
@@ -981,15 +1047,18 @@ describe('<ElectionProvider />', () => {
     })
 
     expect(result.current.election.voted).toBeNull()
-    expect(result.current.election.loaded.voted).toBeFalsy()
     expect(result.current.election.votesLeft).toBe(1)
     expect(result.current.election.isAbleToVote).toBeTruthy()
+    // membership check resolved hasVoted directly, so no nullifier lookup is needed
+    expect(fetchSignInfo).not.toHaveBeenCalled()
 
     localStorage.removeItem('csp_token')
   })
 
   it('sets CSP votesLeft to 0 when vote exists and overwrites are disabled', async () => {
     localStorage.setItem('csp_token', 'token')
+    // hasVoted=true forces the exact-overwrite resolution via the nullifier
+    vi.mocked(fetchCheckMembership).mockResolvedValue({ belongs: true, hasVoted: true })
 
     const signer = Wallet.createRandom()
     const client = new VocdoniSDKClient({
@@ -1106,7 +1175,7 @@ describe('<ElectionProvider />', () => {
     })
 
     await waitFor(() => {
-      expect(result.current.election.loaded.voted).toBeTruthy()
+      expect(result.current.election.isAbleToVote).toBe(false)
     })
 
     expect(result.current.election.isInCensus).toBeFalsy()
