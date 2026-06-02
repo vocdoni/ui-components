@@ -4,6 +4,7 @@ import { up } from 'up-fetch'
 import { useComponents } from '~components/context/useComponents'
 import { useReactComponentsLocalize } from '~i18n/localize'
 import { useElection } from '~providers'
+import { fetchCheckMembership } from '~providers/csp'
 import { results } from './Results'
 
 const upfetch = up(fetch)
@@ -37,10 +38,21 @@ export const VoteWeight = () => {
           const decimals = (election.meta as any)?.token?.decimals || 0
           setWeight(results(Number(proof.weight), decimals))
         } else {
-          const { weight } = await upfetch<{ weight: string }>(`${election.census.censusURI}/weight`, {
-            method: 'POST',
-            body: { authToken: token },
+          // The bundle /check endpoint returns the voter weight alongside the
+          // membership result, so prefer it and only fall back to the dedicated
+          // /weight endpoint when it doesn't carry a weight.
+          const check = await fetchCheckMembership({
+            endpoint: election.census.censusURI,
+            authToken: token as string,
+            electionId: election.id,
           })
+          let weight = check.belongs ? check.weight : undefined
+          if (typeof weight === 'undefined') {
+            ;({ weight } = await upfetch<{ weight: string }>(`${election.census.censusURI}/weight`, {
+              method: 'POST',
+              body: { authToken: token },
+            }))
+          }
           setWeight(results(Number.parseInt(weight, 16)))
         }
       } catch (error) {
