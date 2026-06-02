@@ -14,7 +14,7 @@ import {
 import { ComponentType, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { canUseWorkers } from '~providers/browser'
 import { useClient } from '~providers/client'
-import { vote as cspVote, fetchSignInfo } from '~providers/csp'
+import { vote as cspVote, fetchCheckMembership, fetchSignInfo } from '~providers/csp'
 import { queryKeys } from '~providers/query/keys'
 import { errorToString } from '~providers/utils'
 import worker, { ICircuit, ICircuitWorkerRequest } from '~providers/worker/circuitWorkerScript'
@@ -93,6 +93,10 @@ export const useElectionProvider = ({
   })
 
   const isAnonCircuitsFetching = useRef(false)
+  // Tracks the CSP token the census membership (/check) was last resolved for,
+  // so censusFetch re-runs when the token is hydrated/changed (login, bundle
+  // switch, logout) instead of relying on a stale early run.
+  const lastCspCensusToken = useRef<string | undefined>(undefined)
   const [workerInstance, setWorkerInstance] = useState<Worker | null>(null)
 
   const setVoted = useCallback(
@@ -167,7 +171,23 @@ export const useElectionProvider = ({
       const censusType = current.census?.type
       const isAnonymousElection = !!current.electionType?.anonymous
       const isCsp = censusType === CensusType.CSP
-      const isIn = isCsp ? !!state.csp.token : await client.isInCensus({ electionId: election.id })
+      let isIn: boolean
+      if (isCsp) {
+        // CSP membership is gated on the bundle/check endpoint: a token alone
+        // does not imply the voter belongs to *this* election's census.
+        lastCspCensusToken.current = state.csp.token
+        isIn = state.csp.token
+          ? (
+              await fetchCheckMembership({
+                endpoint: election.census.censusURI,
+                authToken: state.csp.token,
+                electionId: election.id,
+              })
+            ).belongs
+          : false
+      } else {
+        isIn = await client.isInCensus({ electionId: election.id })
+      }
       actions.inCensus(isIn)
 
       const requestData: HasAlreadyVotedOptions | VotesLeftCountOptions = {
@@ -300,6 +320,10 @@ export const useElectionProvider = ({
     if (!fetchCensus || !election || !loaded.election || loading.census || !client.wallet) return
     ;(async () => {
       const address = await client.wallet?.getAddress()
+      const isCsp = isPublishedElectionLike(election) && (election as { census?: { type?: CensusType } }).census?.type === CensusType.CSP
+      // re-resolve CSP membership whenever the auth token changes (hydration,
+      // login, bundle switch, logout) since gating depends on /check
+      const cspTokenChanged = isCsp && state.csp.token !== lastCspCensusToken.current
       // The condition is just negated so we can return the code execution.
       // A less mental option is to not negate the entire condition and add
       // the `await censusFetch()` execution in there
@@ -309,7 +333,8 @@ export const useElectionProvider = ({
           !areEqualHexStrings(state.voter, address) ||
           (initialElectionId && !areEqualHexStrings(initialElectionId, election.id)) ||
           // fetch census if there's sik signature and no vote id
-          (signature && !loaded.voted)
+          (signature && !loaded.voted) ||
+          cspTokenChanged
         )
       ) {
         return
@@ -321,6 +346,7 @@ export const useElectionProvider = ({
     fetchCensus,
     client,
     state.voter,
+    state.csp.token,
     loaded.election,
     loading.census,
     actions,
@@ -334,7 +360,9 @@ export const useElectionProvider = ({
     if (!state.csp.token || !election || !loaded.election || isInvalidElectionLike(election)) return
     ;(async () => {
       try {
-        actions.inCensus(true)
+        // NOTE: membership (isInCensus) is decided by censusFetch via the
+        // bundle /check endpoint; this effect only resolves voted/votesLeft and
+        // must not assume the voter belongs to the census.
         const uri = new URL(election.census.censusURI)
         const endpoint = `${uri.protocol}//${uri.host}`
         let nullifier: string | null = null

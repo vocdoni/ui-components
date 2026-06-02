@@ -1,5 +1,5 @@
 import { CensusType, CspProofType, PublishedElection, VocdoniSDKClient, Vote, WeightedCensus } from '@vocdoni/sdk'
-import { vote } from './index'
+import { fetchCheckMembership, vote } from './index'
 
 const { upFetchMock } = vi.hoisted(() => ({
   upFetchMock: vi.fn(),
@@ -45,5 +45,38 @@ describe('csp vote', () => {
     expect(vid).toBe('vote-id')
     expect(client.cspVote).toHaveBeenCalledWith(expect.any(Vote), 'sig', CspProofType.ECDSA_PIDSALTED)
     expect(client.submitVote).toHaveBeenCalledWith(expect.objectContaining({ weight: BigInt(10) }))
+  })
+})
+
+describe('fetchCheckMembership', () => {
+  beforeEach(() => {
+    upFetchMock.mockReset()
+  })
+
+  it('posts to the bundle ${censusURI}/check endpoint with token and electionId', async () => {
+    upFetchMock.mockResolvedValue({ belongs: true, weight: '0a', hasVoted: false })
+
+    const result = await fetchCheckMembership({
+      endpoint: 'https://csp.example/process/bundle/abc',
+      authToken: 'token',
+      electionId: 'election-1',
+    })
+
+    expect(upFetchMock).toHaveBeenCalledWith('https://csp.example/process/bundle/abc/check', {
+      method: 'POST',
+      body: { authToken: 'token', electionId: 'election-1' },
+    })
+    expect(result).toEqual({ belongs: true, weight: '0a', hasVoted: false })
+  })
+
+  it('omits electionId from the body when not provided', async () => {
+    upFetchMock.mockResolvedValue({ belongs: false, hasVoted: false })
+
+    await fetchCheckMembership({ endpoint: 'https://csp.example/process/bundle/abc', authToken: 'token' })
+
+    expect(upFetchMock).toHaveBeenCalledWith('https://csp.example/process/bundle/abc/check', {
+      method: 'POST',
+      body: { authToken: 'token' },
+    })
   })
 })

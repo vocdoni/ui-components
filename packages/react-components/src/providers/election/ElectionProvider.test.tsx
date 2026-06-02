@@ -4,7 +4,7 @@ import { CensusType, EnvOptions, PublishedElection, VocdoniSDKClient, WeightedCe
 import { act } from 'react'
 import * as browserModule from '~providers/browser'
 import { ClientContext, ClientProvider, useClient } from '~providers/client'
-import { fetchSignInfo } from '~providers/csp'
+import { fetchCheckMembership, fetchSignInfo } from '~providers/csp'
 import { TestProvider, onlyProps, properProps } from '~providers/test-utils'
 import * as webWorkerModule from '~providers/worker/webWorker'
 import { ElectionProvider, useElection } from './ElectionProvider'
@@ -17,6 +17,7 @@ vi.mock('~providers/csp', () => ({
       at: new Date().toISOString(),
     })
   ),
+  fetchCheckMembership: vi.fn(() => Promise.resolve({ belongs: true, hasVoted: false })),
   vote: vi.fn(),
 }))
 
@@ -24,6 +25,8 @@ describe('<ElectionProvider />', () => {
   beforeEach(() => {
     localStorage.removeItem('csp_token')
     vi.mocked(fetchSignInfo).mockClear()
+    vi.mocked(fetchCheckMembership).mockClear()
+    vi.mocked(fetchCheckMembership).mockResolvedValue({ belongs: true, hasVoted: false })
   })
 
   it('renders child elements', () => {
@@ -872,6 +875,64 @@ describe('<ElectionProvider />', () => {
     expect(result.current.isInCensus).toBeTruthy()
     expect(result.current.isAbleToVote).toBeTruthy()
     expect(result.current.votesLeft).toBe(1)
+
+    localStorage.removeItem('csp_token')
+  })
+
+  it('gates CSP voters out of census when bundle check reports they do not belong', async () => {
+    localStorage.setItem('csp_token', 'token')
+    vi.mocked(fetchCheckMembership).mockResolvedValue({ belongs: false, hasVoted: false })
+
+    const signer = Wallet.createRandom()
+    const client = new VocdoniSDKClient({
+      env: EnvOptions.STG,
+      wallet: signer,
+    })
+    client.voteService.info = vi.fn().mockResolvedValue({ voteID: null, overwriteCount: 0 })
+
+    const census = new WeightedCensus()
+    census.type = CensusType.CSP
+    census.censusURI = 'https://csp.example/api'
+
+    // @ts-ignore
+    const election = PublishedElection.build({
+      id: 'csp-election-not-belonging',
+      title: 'test',
+      description: 'test',
+      endDate: new Date(),
+      census,
+      electionType: { anonymous: false },
+      voteType: { maxVoteOverwrites: 0, maxCount: 1, maxValue: 1 },
+    })
+
+    const wrapper = (props: any) => {
+      return (
+        <TestProvider>
+          <ClientProvider {...onlyProps(props)}>
+            <ElectionProvider {...properProps(props)} />
+          </ClientProvider>
+        </TestProvider>
+      )
+    }
+
+    const { result } = renderHook(() => useElection(), {
+      wrapper,
+      initialProps: { election, fetchCensus: true, client, signer },
+    })
+
+    await waitFor(() => {
+      expect(result.current.loaded.census).toBeTruthy()
+    })
+
+    expect(fetchCheckMembership).toHaveBeenCalledWith(
+      expect.objectContaining({
+        endpoint: 'https://csp.example/api',
+        authToken: 'token',
+        electionId: 'csp-election-not-belonging',
+      })
+    )
+    expect(result.current.isInCensus).toBeFalsy()
+    expect(result.current.isAbleToVote).toBeFalsy()
 
     localStorage.removeItem('csp_token')
   })
